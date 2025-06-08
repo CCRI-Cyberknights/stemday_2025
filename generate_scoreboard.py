@@ -8,7 +8,7 @@ CHALLENGES = {
     "#01 Stego": "CCRI-STE-101",
     "#02 Base64": "CCRI-B64-102",
     "#03 ROT13": "CCRI-ROT-303",
-    "#04 Vigenère": "CCRI-VIG-004",
+    "#04 Vigenère": "CCRI-UGE-925",
     # ... add more as needed
 }
 
