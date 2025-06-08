@@ -9,7 +9,7 @@ CHALLENGES = {
     "#02 Base64": "CCRI-B64-102",
     "#03 ROT13": "CCRI-ROT-303",
     "#04 Vigenère": "CCRI-UGE-925",
-    "#05 Hidden Zip": "CCRI-BIN-401",
+    "#05 Archive Password": "CCRI-BIN-401",
     # ... add more as needed
 }
 
