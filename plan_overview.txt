@@ -1,0 +1,20 @@
+1	Stego Decode	Forensics	Extract a flag from an image using steghide (already created)
+2	Base64 Decode	Crypto	Decode a flag from a .txt file using Base64
+3	ROT13 Puzzle	Crypto	Flag is encoded using ROT13; includes helper script
+4	Vigenère Decrypt	Crypto	Given ciphertext and keyword, decrypt using helper script
+5	Hidden ZIP Flag	Forensics	A ZIP file contains the flag, but the password is given elsewhere
+6	Hashcat Crack	Crypto	Use preconfigured hashcat to crack an MD5 password with rockyou.txt
+7	Extract from Binary	Forensics	Use strings on a binary file to find a readable flag
+8	Fake Auth Log	Forensics	Spot the login anomaly in a fake auth.log file
+9	Script Analysis	Reverse Eng.	Examine a Python/bash script to figure out what it outputs
+10	Metadata Flag	Forensics	Flag hidden in image metadata (via exiftool)
+11	Find the File	Recon	Use a helper script to search for a hidden file (e.g. .flag)
+12	Environment Variable	Recon	Script reveals a secret stored in a custom env variable
+13	Web Page Source Flag	Recon	Open index.html, find flag in source comments
+14	Custom Whois File	Recon	Search through whois.txt dump for the domain that has the flag
+15	Simulated DNS Dump	Recon	DNS zone file with flag in TXT record
+16	ICMP Payload Read	Forensics	Hex dump of ICMP payload contains flag (open with hex viewer)
+17	Caesar Cipher	Crypto	Brute-force Caesar-encrypted flag with script
+18	PDF with Hidden Text	Forensics	PDF has hidden text (copied from invisible font)
+19	Wrong Password Log	Forensics	Log file of failed logins contains the correct password once
+20	QR Code Decode	Recon	Flag is in a QR code image (viewed in browser, decoded externally or via script)

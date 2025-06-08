@@ -9,6 +9,7 @@ CHALLENGES = {
     "#02 Base64": "CCRI-B64-102",
     "#03 ROT13": "CCRI-ROT-303",
     "#04 Vigenère": "CCRI-UGE-925",
+    "#05 Hidden Zip": "CCRI-BIN-401",
     # ... add more as needed
 }
 
@@ -125,11 +126,16 @@ def make_html(challenges, obfuscated_flags, key_b64):
 # ==== MAIN EXECUTION ====
 
 def main():
+    import os
+    script_dir = Path(__file__).resolve().parent
+    output_path = script_dir / "index_grid_obfuscated.html"
+
     obfuscated_flags = make_obfuscated_flags(CHALLENGES, XOR_KEY)
     key_b64 = base64.b64encode(XOR_KEY.encode()).decode()
     html = make_html(CHALLENGES, obfuscated_flags, key_b64)
-    Path("index_grid_obfuscated.html").write_text(html)
-    print("[+] HTML scoreboard generated: index_grid_obfuscated.html")
+
+    output_path.write_text(html)
+    print(f"[+] HTML scoreboard generated at: {output_path}")
 
 if __name__ == "__main__":
     main()
