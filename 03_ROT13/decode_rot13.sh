@@ -70,7 +70,7 @@ EOF
 
 echo
 echo "⚠️  Multiple code-like values detected."
-echo "🔎 Only one matches the official flag format: CCRI-XXX-###"
+echo "🔎 Only one matches the official flag format: CCRI-AAAA-1111"
 echo "🧠 Review the decoded message and copy the correct flag to submit on the scoreboard."
 
 echo

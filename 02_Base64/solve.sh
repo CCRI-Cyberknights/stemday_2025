@@ -43,7 +43,7 @@ echo "$decoded" > decoded_output.txt
 echo
 echo "📁 A copy of the decoded message has been saved to: decoded_output.txt"
 echo "🔎 Multiple code-like strings may be present."
-echo "🧠 Only one of them fits the official CCRI flag format: CCRI-XXX-###"
+echo "🧠 Only one of them fits the official CCRI flag format: CCRI-AAAA-1111"
 echo "📋 Manually copy the correct flag into the scoreboard when ready."
 echo
 

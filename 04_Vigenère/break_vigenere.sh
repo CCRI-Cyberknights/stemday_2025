@@ -24,6 +24,7 @@ while true; do
     # Run Python decoder using key and cipher.txt
     decoded=$(python3 - "$key" <<'EOF'
 import sys
+from itertools import cycle
 
 key = sys.argv[1]
 filename = "cipher.txt"
@@ -40,14 +41,16 @@ def vigenere_decrypt(ciphertext, key):
     key = key.lower()
     key_len = len(key)
     key_indices = [ord(k) - ord('a') for k in key]
+    key_pos = 0
 
-    for i, char in enumerate(ciphertext):
+    for char in ciphertext:
         if char.isalpha():
             offset = ord('A') if char.isupper() else ord('a')
             pi = ord(char) - offset
-            ki = key_indices[i % key_len]
+            ki = key_indices[key_pos % key_len]
             decrypted = chr((pi - ki) % 26 + offset)
             result.append(decrypted)
+            key_pos += 1
         else:
             result.append(char)
     return ''.join(result)
@@ -61,16 +64,15 @@ EOF
     echo "-----------------------------"
     echo "$decoded"
     echo "-----------------------------"
-
     echo
 
-    if echo "$decoded" | grep -qE 'CCRI-[A-Z]{3}-[0-9]{3}'; then
-        echo "✅ Flag format detected!"
+    if echo "$decoded" | grep -qE 'CCRI-[A-Z]{4}-[0-9]{4}'; then
+        echo "✅ Valid flag format detected!"
         echo "$decoded" > decoded_output.txt
         echo "📁 Decoded output saved to: decoded_output.txt"
         break
     else
-        echo "❌ No valid flag format found. Try another key."
+        echo "❌ No valid CCRI flag format found. Try another key."
     fi
 
     echo

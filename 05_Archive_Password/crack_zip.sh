@@ -87,5 +87,5 @@ echo "$decoded" > decoded_output.txt
 echo "💾 Decoded message saved to: decoded_output.txt"
 
 echo
-echo "🧠 Pick the valid flag from the list (format: CCRI-XXX-###) and enter it into the scoreboard."
+echo "🧠 Pick the valid flag from the list (format: CCRI-AAAA-1111) and enter it into the scoreboard."
 read -p "Press ENTER to close this terminal..." done

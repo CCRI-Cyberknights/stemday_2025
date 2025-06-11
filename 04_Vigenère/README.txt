@@ -13,6 +13,6 @@ What’s the opposite of logout?
 🖥️ Script to run: break_vigenere.sh
 
 🚫 Not every decoded result will be valid.
-Only one flag matches the official format: CCRI-XXX-###
+Only one flag matches the official format: CCRI-AAAA-1111
 
 Good luck, Agent. 🕵️

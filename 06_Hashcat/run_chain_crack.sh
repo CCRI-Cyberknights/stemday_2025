@@ -20,9 +20,9 @@ DECODED_SEGMENTS="$SCRIPT_DIR/decoded_segments"
 
 # Map hash to segment zip
 declare -A hash_to_file
-hash_to_file["e99a18c428cb38d5f260853678922e03"]="part1.zip"  # abc123
-hash_to_file["0d107d09f5bbe40cade3de5c71e9e9b7"]="part2.zip"  # letmein
-hash_to_file["2ab96390c7dbe3439de74d0c9b0b1767"]="part3.zip"  # hunter2
+hash_to_file["4e14b4bed16c945384faad2365913886"]="part1.zip"  # brightmail
+hash_to_file["ceabb18ea6bbce06ce83664cf46d1fa8"]="part2.zip"  # letacla
+hash_to_file["08f5b04545cbf7eaa238621b9ab84734"]="part3.zip"  # Password12
 
 echo -e "\n[🧹] Clearing previous Hashcat cache and outputs..."
 rm -f "$POTFILE" "$ASSEMBLED"
@@ -40,7 +40,7 @@ grep -Ff "$HASHES" "$POTFILE" | while IFS=: read -r hash pass; do
 done
 echo
 
-# Extract and decode all segments
+# Extract and decode all segment files
 grep -Ff "$HASHES" "$POTFILE" | while IFS=: read -r hash pass; do
     zipfile="${hash_to_file[$hash]}"
     if [[ -z "$zipfile" ]]; then
@@ -51,60 +51,52 @@ grep -Ff "$HASHES" "$POTFILE" | while IFS=: read -r hash pass; do
     echo "🔑 Using password for hash $hash → $pass"
     echo "📦 Extracting $SEGMENTS/$zipfile..."
 
-    rm -rf "$EXTRACTED"/*
     unzip -P "$pass" "$SEGMENTS/$zipfile" -d "$EXTRACTED" >/dev/null 2>&1
 
-    segment_file=$(unzip -P "$pass" -l "$SEGMENTS/$zipfile" | awk '{print $4}' | grep -i 'segment' | head -n 1)
+    segment_file=$(unzip -P "$pass" -l "$SEGMENTS/$zipfile" | awk '{print $4}' | grep -i 'encoded_segment' | head -n 1 | xargs basename)
     segfile="$EXTRACTED/$segment_file"
 
     if [[ -f "$segfile" ]]; then
         echo "✅ $(basename "$segfile") recovered."
 
-        echo -e "\n📦 Raw Base64 from $(basename "$segfile"):"
-        echo "--------------------"
-        cat "$segfile"
-        echo -e "\n--------------------"
+        decoded_file="$DECODED_SEGMENTS/decoded_${segment_file%.txt}.txt"
+        base64 --decode "$segfile" > "$decoded_file" 2>/dev/null
 
-        echo -n "🔽 Decoding: "
-        for i in {1..20}; do echo -n "█"; sleep 0.03; done
-        echo
-
-        decoded=$(base64 --decode "$segfile" 2>/dev/null)
-        if [[ -n "$decoded" ]]; then
-            segnum=$(echo "$segfile" | grep -oE 'segment([0-9]+)\.txt' | grep -oE '[0-9]+')
-            echo "$decoded" > "$DECODED_SEGMENTS/decoded_segment$segnum.txt"
+        if [[ -s "$decoded_file" ]]; then
+            echo "📄 Decoded → $decoded_file"
+        else
+            echo "⚠️  Failed to decode: $segfile"
         fi
     else
-        echo "❌ Failed to recover segment from $zipfile"
+        echo "❌ Segment file not found in $zipfile"
     fi
 
     echo
 done
 
-# Assemble final flag in segment order
-echo "🧩 Final Assembled Flag:"
+echo "🧩 Assembled Flag Candidates:"
 echo "---------------------------"
 
-rm -f "$ASSEMBLED"
-touch "$ASSEMBLED"
+seg1_file="$DECODED_SEGMENTS/decoded_encoded_segments1.txt"
+seg2_file="$DECODED_SEGMENTS/decoded_encoded_segments2.txt"
+seg3_file="$DECODED_SEGMENTS/decoded_encoded_segments3.txt"
 
-first=1
-for seg in $(ls "$DECODED_SEGMENTS"/decoded_segment*.txt 2>/dev/null | sort -V); do
-    part=$(cat "$seg")
-    if [[ $first -eq 1 ]]; then
-        echo -n "$part" >> "$ASSEMBLED"
-        first=0
-    else
-        echo -n "-$part" >> "$ASSEMBLED"
-    fi
-done
+if [[ -f "$seg1_file" && -f "$seg2_file" && -f "$seg3_file" ]]; then
+    mapfile -t seg1 < "$seg1_file"
+    mapfile -t seg2 < "$seg2_file"
+    mapfile -t seg3 < "$seg3_file"
 
-if [[ -s "$ASSEMBLED" ]]; then
-    cat "$ASSEMBLED"
-    echo -e "\n---------------------------"
-    echo "✅ Flag saved to: $ASSEMBLED"
+    rm -f "$ASSEMBLED"
+
+    for i in {0..4}; do
+        flag="${seg1[$i]}-${seg2[$i]}-${seg3[$i]}"
+        echo "- $flag" | tee -a "$ASSEMBLED"
+    done
+
+    echo "---------------------------"
+    echo "✅ All 5 flags saved to: $ASSEMBLED"
 else
-    echo "❌ No decoded segments were saved."
+    echo "❌ Missing one or more decoded segment files."
 fi
 
 echo

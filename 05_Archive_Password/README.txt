@@ -11,6 +11,6 @@ Your mission:
   1. Run `crack_zip.sh` in the terminal.
   2. The script will try common passwords automatically.
   3. Once cracked, it will extract and decode the hidden message.
-  4. Pick out the real flag: Format `CCRI-XXX-###`
+  4. Pick out the real flag: Format `CCRI-AAAA-1111`
 
 🧠 Tip: Watch the wordlist scroll to see how brute-force tools operate!

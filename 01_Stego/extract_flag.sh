@@ -44,7 +44,7 @@ while true; do
         cat decoded_message.txt
         echo "----------------------------"
         echo "📁 A copy has been saved as decoded_message.txt"
-        echo "🔎 Review the contents carefully. Only one string matches the CCRI-XXX-### format."
+        echo "🔎 Review the contents carefully. Only one string matches the CCRI-AAAA-1111 format."
         echo
         read -p "Press ENTER to close this terminal..." done
         exec $SHELL

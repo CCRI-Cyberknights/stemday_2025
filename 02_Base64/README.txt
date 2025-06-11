@@ -14,5 +14,5 @@ What to do:
 
 No command-line experience is needed — the script will walk you through it!
 
-🏁 Flag format: CCRI-XXX-###
+🏁 Flag format: CCRI-AAAA-1111
 

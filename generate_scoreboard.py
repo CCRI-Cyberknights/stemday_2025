@@ -5,12 +5,12 @@ from pathlib import Path
 
 XOR_KEY = "CTF4EVER"
 CHALLENGES = {
-    "#01 Stego": "CCRI-STE-101",
-    "#02 Base64": "CCRI-B64-102",
-    "#03 ROT13": "CCRI-ROT-303",
-    "#04 Vigenère": "CCRI-UGE-925",
-    "#05 Archive Password": "CCRI-BIN-401",
-    # ... add more as needed
+    "#01 Stego": "CCRI-STEG-1842",
+    "#02 Base64": "CCRI-BQEX-2102",
+    "#03 ROT13": "CCRI-ROTN-3303",
+    "#04 Vigenère": "CCRI-VIGY-4925",
+    "#05 Archive Password": "CCRI-ZIPP-5401",
+    "#06 Hashcat": "CCRI-ZIPP-5401"
 }
 
 # ==== XOR + BASE64 OBFUSCATION ====
@@ -40,12 +40,13 @@ def make_html(challenges, obfuscated_flags, key_b64):
         .complete input {{ background-color: #d4edda; }}
         input[type="text"] {{ width: 90%; padding: 5px; }}
         .status {{ font-weight: bold; margin-left: 5px; }}
+        input.invalid {{ background-color: #f8d7da; }}
     </style>
 </head>
 <body>
     <h1>CCRI CTF Flag Tracker</h1>
     <p>Enter the flag you found for each challenge below. Your progress will be saved automatically in your browser.</p>
-    <p><strong>Flag Format:</strong> CCRI-XXX-###</p>
+    <p><strong>Flag Format:</strong> CCRI-AAAA-1111</p>
     <h2 id="progress">0 of {len(challenges)} challenges completed</h2>
 
     <div id="challenges">
@@ -54,7 +55,7 @@ def make_html(challenges, obfuscated_flags, key_b64):
     for name in challenges:
         html += f"""        <div class="challenge" id="{name}-container">
             <label for="{name}"><strong>{name}</strong></label><br>
-            <input type="text" id="{name}" oninput="validate('{name}')">
+            <input type="text" id="{name}" maxlength="15" oninput="validate('{name}')">
             <span class="status" id="{name}-status"></span>
         </div>\n"""
 
@@ -87,13 +88,30 @@ def make_html(challenges, obfuscated_flags, key_b64):
                 const container = document.getElementById(id + "-container");
                 const status = document.getElementById(id + "-status");
                 const correct = xorDecrypt(correctFlags[id], xorKey);
-                if (stored && stored.toUpperCase() === correct) {
+
+                if (!stored || stored === "") {
+                    container.classList.remove("complete");
+                    input.classList.remove("invalid");
+                    status.textContent = "";
+                    return;
+                }
+
+                const isValid = /^CCRI-[A-Z]{4}-[0-9]{4}$/.test(stored);
+                if (!isValid) {
+                    container.classList.remove("complete");
+                    input.classList.add("invalid");
+                    status.textContent = "❌ Invalid format";
+                    status.style.color = "red";
+                } else if (stored.toUpperCase() === correct) {
                     input.value = stored;
                     container.classList.add("complete");
+                    input.classList.remove("invalid");
                     status.textContent = "✓ Correct";
+                    status.style.color = "green";
                     complete++;
                 } else {
                     container.classList.remove("complete");
+                    input.classList.remove("invalid");
                     status.textContent = "";
                 }
             });
@@ -126,7 +144,6 @@ def make_html(challenges, obfuscated_flags, key_b64):
 # ==== MAIN EXECUTION ====
 
 def main():
-    import os
     script_dir = Path(__file__).resolve().parent
     output_path = script_dir / "index_grid_obfuscated.html"
 

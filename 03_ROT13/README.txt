@@ -16,5 +16,5 @@ No need to type any commands — everything runs for you.
 
 📄 The message is stored in: `cipher.txt`
 
-🏁 Flag format: CCRI-XXX-###
+🏁 Flag format: CCRI-AAAA-1111
 

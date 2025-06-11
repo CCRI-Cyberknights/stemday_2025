@@ -19,5 +19,5 @@ What to do:
 
 If you get it right, the hidden flag will be revealed and saved to `flag.txt`.
 
-🏁 Flag format: CCRI-XXX-###
+🏁 Flag format: CCRI-AAAA-1111
 
