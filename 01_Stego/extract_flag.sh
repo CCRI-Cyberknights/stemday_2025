@@ -8,6 +8,11 @@ echo "🎯 Target image: squirrel.jpg"
 echo "🔍 Tool in use: steghide"
 echo "💡 Goal: Recover a hidden flag embedded in the image!"
 echo
+echo "🔧 Quick Note:"
+echo "   'steghide' is a Linux tool that can HIDE or EXTRACT messages inside image or audio files."
+echo "   We'll use it to try to extract a hidden message from squirrel.jpg using a password."
+echo
+read -p "Press ENTER to begin password testing..."
 
 while true; do
     read -p "🔑 Enter the password to try (or type 'exit' to quit): " pw
@@ -23,15 +28,19 @@ while true; do
         exit 0
     fi
 
-    # Remove previous extraction result
-    [ -f decoded_message.txt ] && rm decoded_message.txt
-
-    echo -ne "\n🔓 Attempting password authentication"
+    echo -ne "\n🔓 Trying password"
     for i in {1..3}; do sleep 0.4; echo -n "."; done
     echo
 
-    echo -ne "📦 Scanning squirrel.jpg for embedded content"
+    echo -ne "📦 Scanning squirrel.jpg for hidden data using steghide"
     for i in {1..4}; do sleep 0.3; echo -n "."; done
+    echo
+
+    echo
+    echo "🛠️ Running: steghide extract -sf squirrel.jpg -xf decoded_message.txt -p [your password]"
+    echo "   -sf = stego file (squirrel.jpg)"
+    echo "   -xf = extract to this file (decoded_message.txt)"
+    echo "   -p  = use this password"
     echo
 
     # Attempt extraction
@@ -46,7 +55,7 @@ while true; do
         echo "📁 A copy has been saved as decoded_message.txt"
         echo "🔎 Review the contents carefully. Only one string matches the CCRI-AAAA-1111 format."
         echo
-        read -p "Press ENTER to close this terminal..." done
+        read -p "Press ENTER to close this terminal..."
         exec $SHELL
     else
         echo

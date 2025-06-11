@@ -4,8 +4,16 @@ clear
 echo "🔓 ZIP Password Cracking"
 echo "==========================="
 echo
-echo "Target archive: secret.zip"
-echo "Wordlist: wordlist.txt"
+echo "📁 Target archive: secret.zip"
+echo "📜 Wordlist: wordlist.txt"
+echo
+echo "🔧 Quick Note:"
+echo "   We're going to test each password in wordlist.txt to see which one unlocks the ZIP file."
+echo "   Behind the scenes, the script runs: unzip -P [password] -t secret.zip"
+echo "   → '-P' supplies the password"
+echo "   → '-t' tests if the ZIP is valid (without fully extracting it)"
+echo
+read -p "Press ENTER to begin password testing..." junk
 echo
 
 found=0
@@ -64,6 +72,13 @@ if [[ "$decode" =~ ^[Nn]$ ]]; then
     exit 0
 fi
 
+echo
+echo "🧪 Base64 Detected:"
+echo "   The file we extracted (message_encoded.txt) contains Base64 — a way of encoding binary data as text."
+echo "   We'll now decode it using the 'base64' command to reveal the original message."
+echo
+read -p "Press ENTER to decode the Base64 content..." junk
+
 # Decoding animation
 echo
 echo "🔽 Decoding Base64:"
@@ -74,6 +89,10 @@ done
 echo -e "\n"
 
 # Decode the base64 message
+echo "🛠️ Running: base64 --decode message_encoded.txt"
+echo "   → This converts the encoded content back into readable text"
+echo
+
 decoded=$(base64 --decode message_encoded.txt 2>/dev/null)
 
 echo

@@ -4,15 +4,22 @@ clear
 echo "🔐 Vigenère Cipher Breaker"
 echo "==========================="
 echo
-echo "You've recovered a scrambled message from cipher.txt"
-echo "It appears to be encrypted using a repeating-key cipher."
+echo "📄 You've recovered a scrambled message from: cipher.txt"
+echo "🔍 Analysts believe it's encrypted using the Vigenère cipher — a classic cipher that uses a repeating keyword."
 echo
+echo "🔧 Quick Note:"
+echo "   The Vigenère cipher shifts each letter based on the letters in a keyword."
+echo "   For example, with the keyword 'KEY', the first letter shifts by K, the second by E, the third by Y, then repeats."
+echo
+echo "💡 Goal: Try different keywords until the decrypted message reveals a valid flag in the format: CCRI-AAAA-1111"
+echo
+read -p "Press ENTER to begin..." temp
 
 while true; do
-    read -p "Enter a keyword to try (or type 'exit' to quit): " key
+    read -p "🔑 Enter a keyword to try (or type 'exit' to quit): " key
 
     if [[ "$key" == "exit" ]]; then
-        echo "Exiting. Stay sharp, Agent."
+        echo "👋 Exiting. Stay sharp, Agent."
         break
     fi
 
@@ -20,6 +27,11 @@ while true; do
         echo "❌ Error: cipher.txt not found in this folder."
         exit 1
     fi
+
+    echo
+    echo "🛠️ Running Vigenère decryption with keyword: $key"
+    echo "   → This attempts to reverse the shifting pattern applied with the keyword."
+    echo
 
     # Run Python decoder using key and cipher.txt
     decoded=$(python3 - "$key" <<'EOF'

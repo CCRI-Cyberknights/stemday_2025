@@ -4,10 +4,13 @@ clear
 echo "🔐 ROT13 Decoder Terminal"
 echo "=========================="
 echo
-echo "You've recovered a scrambled message from cipher.txt"
-echo "Agency analysts believe it's been encoded using the ROT13 cipher — a letter shift cipher that scrambles the alphabet."
+echo "📄 You've recovered a scrambled message from: cipher.txt"
+echo "🔍 Agency analysts suspect it's been encoded using the ROT13 cipher."
 echo
-
+echo "🔧 Quick Note:"
+echo "   ROT13 is a simple Caesar cipher that shifts each letter 13 places."
+echo "   It's symmetrical — encoding and decoding are the same operation!"
+echo
 read -p "Press ENTER to begin decoding..." temp
 
 echo -ne "[🔄] Scanning content"
@@ -15,7 +18,7 @@ for i in {1..3}; do sleep 0.4; echo -n "."; done
 echo -e "\n[✅] ROT13 structure confirmed.\n"
 sleep 0.5
 
-echo "🌀 Running animated ROT13 decoder..."
+echo "🌀 Running animated ROT13 decoder using Python..."
 sleep 0.5
 
 # Inline Python animation
@@ -72,6 +75,5 @@ echo
 echo "⚠️  Multiple code-like values detected."
 echo "🔎 Only one matches the official flag format: CCRI-AAAA-1111"
 echo "🧠 Review the decoded message and copy the correct flag to submit on the scoreboard."
-
 echo
 read -p "Press ENTER to close this terminal..." done
