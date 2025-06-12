@@ -9,8 +9,9 @@ CHALLENGES = {
     "#02 Base64": "CCRI-BQEX-2102",
     "#03 ROT13": "CCRI-ROTN-3303",
     "#04 Vigenère": "CCRI-VIGY-4925",
-    "#05 Archive Password": "CCRI-ZIPP-5401",
-    "#06 Hashcat": "CCRI-ZIPP-5401"
+    "#05 Archive Password": "CCRI-ARCH-3479",
+    "#06 Hashcat": "CCRI-ZIPP-5401",
+    "#07 Extract from Binary": "CCRI-BINA-7091",
 }
 
 # ==== XOR + BASE64 OBFUSCATION ====

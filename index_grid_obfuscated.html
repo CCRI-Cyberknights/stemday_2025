@@ -18,7 +18,7 @@
     <h1>CCRI CTF Flag Tracker</h1>
     <p>Enter the flag you found for each challenge below. Your progress will be saved automatically in your browser.</p>
     <p><strong>Flag Format:</strong> CCRI-AAAA-1111</p>
-    <h2 id="progress">0 of 6 challenges completed</h2>
+    <h2 id="progress">0 of 7 challenges completed</h2>
 
     <div id="challenges">
         <div class="challenge" id="#01 Stego-container">
@@ -51,6 +51,11 @@
             <input type="text" id="#06 Hashcat" maxlength="15" oninput="validate('#06 Hashcat')">
             <span class="status" id="#06 Hashcat-status"></span>
         </div>
+        <div class="challenge" id="#07 Extract from Binary-container">
+            <label for="#07 Extract from Binary"><strong>#07 Extract from Binary</strong></label><br>
+            <input type="text" id="#07 Extract from Binary" maxlength="15" oninput="validate('#07 Extract from Binary')">
+            <span class="status" id="#07 Extract from Binary-status"></span>
+        </div>
     </div>
 
     <script>
@@ -62,8 +67,9 @@
             "#02 Base64": "ABcUfWgUFBcbeXQFdWQ=",
             "#03 ROT13": "ABcUfWgECgYNeXUHdWU=",
             "#04 Vigenère": "ABcUfWgADBUaeXINd2M=",
-            "#05 Archive Password": "ABcUfWgMDAITeXMAdWc=",
+            "#05 Archive Password": "ABcUfWgXFxELeXUAcm8=",
             "#06 Hashcat": "ABcUfWgMDAITeXMAdWc=",
+            "#07 Extract from Binary": "ABcUfWgUDBwCeXEEfGc=",
         };
 
         function xorDecrypt(encodedBase64, key) {
@@ -110,7 +116,7 @@
                     status.textContent = "";
                 }
             });
-            document.getElementById("progress").textContent = complete + " of 6 challenges completed";
+            document.getElementById("progress").textContent = complete + " of 7 challenges completed";
         }
 
         function validate(id) {
