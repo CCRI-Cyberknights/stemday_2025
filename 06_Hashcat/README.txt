@@ -1,21 +1,27 @@
-🧠 Challenge #06 – Hashcat ChainCrack
--------------------------------------
+🔓 Challenge 06: Hashcat ChainCrack
 
-Your mission is to recover the final agency flag by:
+You’ve intercepted 3 encrypted archive segments — each one locked behind a password that isn’t given. But someone also left behind a hashes.txt file full of MD5 hashes and a wordlist.txt of likely passwords.
 
-  1. Cracking multiple MD5 hashes with Hashcat.
-  2. Using each cracked password to “unlock” a segment.
-  3. Decoding the base64-encoded segment.
-  4. Assembling the parts into the final flag.
+This means the passwords are hidden — in plain sight — if you can crack them.
 
-Files in this folder:
-  • hashes.txt              ← MD5 hashes (one per line)
-  • wordlist.txt            ← Possible plaintexts for Hashcat
-  • segments/part1.zip      ← Encrypted ZIP containing segment1.txt
-  • segments/part2.zip      ← …segment2.txt
-  • segments/part3.zip      ← …segment3.txt
-  • run_chain_crack.sh      ← Guided Bash script
+Your mission:
 
-🔧 Tool: hashcat (mode 0: MD5, attack 0: straight)
+    Run the guided script: run_chain_crack.sh
 
-🚀 Let’s see how chaining multiple cracks can reveal a bigger secret!
+    It will use Hashcat to crack all 3 hashes using the provided wordlist.
+
+    Each cracked password will unlock one ZIP segment.
+
+    Each segment contains base64-encoded data.
+
+    The script decodes each segment and assembles them into 5 possible flags.
+
+Only one of the 5 follows the correct agency format: CCRI-AAAA-1111
+
+📁 Files in this folder:
+• hashes.txt ← 3 MD5 hashes to crack
+• wordlist.txt ← Possible password candidates
+• segments/ ← Folder with 3 encrypted ZIPs
+• run_chain_crack.sh ← Your interactive cracking assistant
+
+🧠 Tip: Watch how each successful crack gets you closer to the final goal. Cracking alone doesn’t solve the case — you’ll need to decode and assemble too!

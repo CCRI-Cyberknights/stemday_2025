@@ -10,7 +10,7 @@ Your objective is to analyze the file using forensic techniques and extract the 
 
 💡 What to Do:
 1. Run the interactive script (`analyze_binary.sh`) to help you extract strings from the binary.
-2. Inspect the output. Look for strings that match this format: `CCRI-XXXX-YYYY`.
+2. Inspect the output. Look for strings that match this format: `CCRI-AAAA-1111`.
 3. One of them is the real flag. Use your best judgment to pick the correct one.
 
 📦 Files Included:
