@@ -14,6 +14,7 @@ CHALLENGES = {
     "#07 Extract from Binary": "CCRI-BINA-7091",
     "#08 Fake Auth Log": "CCRI-LOGS-9310",
     "#09 Fix the Script": "CCRI-SCRP-1098",
+    "#10 Metadata": "CCRI-META-3481",
 }
 
 # ==== XOR + BASE64 OBFUSCATION ====
