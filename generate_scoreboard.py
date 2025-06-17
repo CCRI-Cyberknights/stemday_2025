@@ -13,6 +13,7 @@ CHALLENGES = {
     "#06 Hashcat": "CCRI-ZIPP-5401",
     "#07 Extract from Binary": "CCRI-BINA-7091",
     "#08 Fake Auth Log": "CCRI-LOGS-9310",
+    "#09 Fix the Script": "CCRI-SCRP-1098",
 }
 
 # ==== XOR + BASE64 OBFUSCATION ====

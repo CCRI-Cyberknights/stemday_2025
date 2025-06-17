@@ -18,7 +18,7 @@
     <h1>CCRI CTF Flag Tracker</h1>
     <p>Enter the flag you found for each challenge below. Your progress will be saved automatically in your browser.</p>
     <p><strong>Flag Format:</strong> CCRI-AAAA-1111</p>
-    <h2 id="progress">0 of 8 challenges completed</h2>
+    <h2 id="progress">0 of 9 challenges completed</h2>
 
     <div id="challenges">
         <div class="challenge" id="#01 Stego-container">
@@ -61,6 +61,11 @@
             <input type="text" id="#08 Fake Auth Log" maxlength="15" oninput="validate('#08 Fake Auth Log')">
             <span class="status" id="#08 Fake Auth Log-status"></span>
         </div>
+        <div class="challenge" id="#09 Fix the Script-container">
+            <label for="#09 Fix the Script"><strong>#09 Fix the Script</strong></label><br>
+            <input type="text" id="#09 Fix the Script" maxlength="15" oninput="validate('#09 Fix the Script')">
+            <span class="status" id="#09 Fix the Script-status"></span>
+        </div>
     </div>
 
     <script>
@@ -76,6 +81,7 @@
             "#06 Hashcat": "ABcUfWgMDAITeXMAdWc=",
             "#07 Extract from Binary": "ABcUfWgUDBwCeXEEfGc=",
             "#08 Fake Auth Log": "ABcUfWgaChUQeX8HdGY=",
+            "#09 Fix the Script": "ABcUfWgFBgATeXcEfG4=",
         };
 
         function xorDecrypt(encodedBase64, key) {
@@ -122,7 +128,7 @@
                     status.textContent = "";
                 }
             });
-            document.getElementById("progress").textContent = complete + " of 8 challenges completed";
+            document.getElementById("progress").textContent = complete + " of 9 challenges completed";
         }
 
         function validate(id) {
