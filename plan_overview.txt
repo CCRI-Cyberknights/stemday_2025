@@ -1,20 +1,37 @@
-1	Stego Decode	Forensics	Extract a flag from an image using steghide (already created)
-2	Base64 Decode	Crypto	Decode a flag from a .txt file using Base64
-3	ROT13 Puzzle	Crypto	Flag is encoded using ROT13; includes helper script
-4	Vigenère Decrypt	Crypto	Given ciphertext and keyword, decrypt using helper script
-5	Hidden ZIP Flag	Forensics	A ZIP file contains the flag, but the password is given elsewhere
-6	Hashcat Crack	Crypto	Use preconfigured hashcat to crack an MD5 password with rockyou.txt
-7	Extract from Binary	Forensics	Use strings on a binary file to find a readable flag
-8	Fake Auth Log	Forensics	Spot the login anomaly in a fake auth.log file
-9	Script Analysis	Reverse Eng.	Examine a Python/bash script to figure out what it outputs
-10	Metadata Flag	Forensics	Flag hidden in image metadata (via exiftool)
-11	Find the File	Recon	Use a helper script to search for a hidden file (e.g. .flag)
-12	Environment Variable	Recon	Script reveals a secret stored in a custom env variable
-13	Web Page Source Flag	Recon	Open index.html, find flag in source comments
-14	Custom Whois File	Recon	Search through whois.txt dump for the domain that has the flag
-15	Simulated DNS Dump	Recon	DNS zone file with flag in TXT record
-16	ICMP Payload Read	Forensics	Hex dump of ICMP payload contains flag (open with hex viewer)
-17	Caesar Cipher	Crypto	Brute-force Caesar-encrypted flag with script
-18	PDF with Hidden Text	Forensics	PDF has hidden text (copied from invisible font)
-19	Wrong Password Log	Forensics	Log file of failed logins contains the correct password once
-20	QR Code Decode	Recon	Flag is in a QR code image (viewed in browser, decoded externally or via script)
+=== ✅ Existing or Updated Challenge Ideas (Post-Review) ===
+
+01. Stego Decode            - Forensics     - Extract a flag from an image using steghide
+02. Base64 Decode           - Crypto        - Decode a flag from a .txt file using Base64
+03. ROT13 Puzzle            - Crypto        - Flag is encoded using ROT13; includes helper script
+04. Vigenère Decrypt        - Crypto        - Given ciphertext and keyword, decrypt using helper script
+05. Archive Password        - Forensics     - A ZIP file contains the flag, but the password is given elsewhere
+06. Hashcat Crack           - Crypto        - Use preconfigured hashcat to crack an MD5 password with rockyou.txt
+07. Extract from Binary     - Forensics     - Use strings on a binary file to find a readable flag
+08. Fake Auth Log           - Forensics     - Spot the login anomaly in a fake auth.log file
+09. Fix the Script          - Reverse Eng.  - Examine a broken script, fix the logic, and reveal a flag
+10. Metadata Flag           - Forensics     - Flag hidden in image metadata (via exiftool)
+11. Hidden Flag             - Recon         - Use a helper script to search for a hidden file (e.g. .flag)
+12. HTML Source Sleuth      - Recon         - Flag in HTML comment or hidden element in index.html
+13. Whois Detective         - Recon         - Search through whois.txt dump for the domain that has the flag
+14. DNS Zone Reveal         - Recon         - Simulated zone file includes TXT record with the flag
+15. ICMP Payload Read       - Forensics     - Hex dump of ICMP payload contains readable ASCII flag
+16. Caesar Cipher Cracker   - Crypto        - Script shows all 25 Caesar shifts; user spots readable flag
+17. PDF with Hidden Text    - Forensics     - Flag embedded in invisible text inside a PDF
+18. QR Code Decode          - Recon         - Flag is in a QR code image, decoded visually or with a script
+19. Suspicious Login Log    - Forensics     - Fake password log contains the correct password once
+20. Command Injection Sim   - Exploitation  - Script with insecure input reveals flag when command injection used
+
+=== 🧪 Additional NCL/NCAE-Inspired Challenge Concepts ===
+
+- FTP Banner Recon          - Simulated FTP banner contains version and embedded flag clue
+- Robots.txt Trap           - Explore a robots.txt file to find a disallowed flag location
+- Password Reuse Log        - Analyze logins and reused passwords to uncover flag
+- SHA256 Hash Match         - Match SHA256 hash with known list to extract flag
+- SUID Check (Simulated)    - Review fake permissions and identify dangerous SUID binary
+- Crontab Suspicion         - Fake crontab with a hint about where to look for the flag
+- Environment Variable Hunt - Echo environment variable to get the flag (optional simplified)
+- Directory Traversal Sim   - Discover flag in parent directory via traversal clue
+- Cracked CAPTCHA Image     - Simple OCR/decode of very readable CAPTCHA image
+- Social Media Leak         - Flag embedded in mock “post” from fake Twitter/Instagram dump
+- Spectrogram Audio Flag    - Audio file visualized to reveal embedded flag (advanced)
+- Corrupted Image Fix       - PNG with broken header, user “repairs” it and views flag
