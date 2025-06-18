@@ -15,6 +15,7 @@ CHALLENGES = {
     "#08 Fake Auth Log": "CCRI-LOGS-9310",
     "#09 Fix the Script": "CCRI-SCRP-1098",
     "#10 Metadata": "CCRI-META-3481",
+    "#11 Hidden Flag": "CCRI-HIDE-5742",
 }
 
 # ==== XOR + BASE64 OBFUSCATION ====

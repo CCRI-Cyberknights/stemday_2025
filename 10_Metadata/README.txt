@@ -12,5 +12,5 @@ Look for one that is clearly confirmed or valid.
 📂 Files:
  • capybara.jpg
 
-🚩 Flag format: CCRI-META-####
+🚩 Flag format: CCRI-AAAA-1111
 

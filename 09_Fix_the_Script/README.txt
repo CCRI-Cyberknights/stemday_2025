@@ -8,5 +8,5 @@ Right now it only prints a two-digit number at the end.
 Run the launcher script and follow the instructions.
 It will show you the broken code and ask you to fix it.
 
-🚩 Flag format: CCRI-SCRP-####
+🚩 Flag format: CCRI-AAAA-1111
 
