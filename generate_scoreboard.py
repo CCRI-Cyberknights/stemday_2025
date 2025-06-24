@@ -16,6 +16,7 @@ CHALLENGES = {
     "#09 Fix the Script": "CCRI-SCRP-1098",
     "#10 Metadata": "CCRI-META-3481",
     "#11 Hidden Flag": "CCRI-HIDE-5742",
+    "#12 QR Codes": "CCRI-QRCX-4821",
 }
 
 # ==== XOR + BASE64 OBFUSCATION ====
