@@ -18,7 +18,7 @@
     <h1>CCRI CTF Flag Tracker</h1>
     <p>Enter the flag you found for each challenge below. Your progress will be saved automatically in your browser.</p>
     <p><strong>Flag Format:</strong> CCRI-AAAA-1111</p>
-    <h2 id="progress">0 of 14 challenges completed</h2>
+    <h2 id="progress">0 of 15 challenges completed</h2>
 
     <div id="challenges">
         <div class="challenge" id="#01 Stego-container">
@@ -91,6 +91,11 @@
             <input type="text" id="#14 Subdomain Sweep" maxlength="15" oninput="validate('#14 Subdomain Sweep')">
             <span class="status" id="#14 Subdomain Sweep-status"></span>
         </div>
+        <div class="challenge" id="#15 Process Inspection-container">
+            <label for="#15 Process Inspection"><strong>#15 Process Inspection</strong></label><br>
+            <input type="text" id="#15 Process Inspection" maxlength="15" oninput="validate('#15 Process Inspection')">
+            <span class="status" id="#15 Process Inspection-status"></span>
+        </div>
     </div>
 
     <script>
@@ -112,6 +117,7 @@
             "#12 QR Codes": "ABcUfWgHFxEbeXIMd2c=",
             "#13 HTTP Headers": "ABcUfWgeBAUIeXEHc2Q=",
             "#14 Subdomain Sweep": "ABcUfWgQBB4AeXINd2E=",
+            "#15 Process Inspection": "ABcUfWgEBAQNeXQNcGI=",
         };
 
         function xorDecrypt(encodedBase64, key) {
@@ -158,7 +164,7 @@
                     status.textContent = "";
                 }
             });
-            document.getElementById("progress").textContent = complete + " of 14 challenges completed";
+            document.getElementById("progress").textContent = complete + " of 15 challenges completed";
         }
 
         function validate(id) {

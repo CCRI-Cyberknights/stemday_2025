@@ -19,6 +19,7 @@ CHALLENGES = {
     "#12 QR Codes": "CCRI-QRCX-4821",
     "#13 HTTP Headers": "CCRI-HAWK-7362",
     "#14 Subdomain Sweep": "CCRI-FALC-4927",
+    "#15 Process Inspection": "CCRI-RAVN-2954",
 }
 
 # ==== XOR + BASE64 OBFUSCATION ====
