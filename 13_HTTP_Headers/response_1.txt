@@ -1,0 +1,22 @@
+HTTP/1.1 200 OK
+Date: Sun, 30 Jun 2025 15:45:00 GMT
+Server: Liber8-Server/2.3.1
+Content-Type: text/html; charset=UTF-8
+Cache-Control: no-store
+X-Powered-By: PHP/8.1.12
+Set-Cookie: sessionid=98asd765asd8; HttpOnly; Secure
+X-Flag: LBR8-WOLF-8421
+X-Frame-Options: SAMEORIGIN
+X-Content-Type-Options: nosniff
+
+<html>
+  <head><title>Liber8 Portal</title></head>
+  <body>
+    <h1>Welcome to Liber8</h1>
+    <p>System maintenance is underway. Some services may be unavailable.</p>
+  </body>
+</html>
+
+<!-- Debug: Temporary caching enabled -->
+<!-- Developer note: Remove X-Test headers before release -->
+
