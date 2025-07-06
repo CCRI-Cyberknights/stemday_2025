@@ -2,7 +2,7 @@
 
 Parrot Linux Home Edition VM designed for a **guided Capture The Flag (CTF)** experience for high school students.  
 
-This repository is for **administrators and collaborators** creating and managing the CTF content. Students will receive a separate, simplified fork of this project that will be unguided to take home, baked into a usb stick with Parrot Home. 
+This repository is for **administrators and collaborators** creating and managing the CTF content. Students will receive a separate, simplified fork of this project that will be unguided to take home, baked into a USB stick with Parrot Home. 
 
 ---
 
@@ -15,6 +15,7 @@ Desktop/
 │   ├── web_version/        # Student-facing web portal (auto-generated)
 │   ├── web_version_admin/  # Admin-only tools and templates
 │   ├── README.md
+│   ├── CONTRIBUTING.md
 │   └── generate_scoreboard.py
 ├── capybara.jpg            # Placeholder/test images
 └── squirrel.jpg
@@ -61,3 +62,4 @@ Pull requests are welcome for:
 - UI improvements to the web portal.  
 - Enhancements to admin tools (e.g., mass flag updates).  
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for collaboration details.
