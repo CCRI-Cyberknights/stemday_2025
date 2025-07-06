@@ -19,6 +19,13 @@ echo
 root_dir="junk"
 current_dir="$root_dir"
 
+# Ensure root_dir exists
+if [[ ! -d "$root_dir" ]]; then
+    echo "❌ ERROR: Folder '$root_dir' not found in this directory!"
+    read -p "Press ENTER to close this terminal..." junk
+    exit 1
+fi
+
 while true; do
     clear
     echo "🗂️  Interactive Hidden File Explorer"
@@ -39,9 +46,7 @@ while true; do
             echo "📁 Contents of '$current_dir':"
             echo "--------------------------------------"
             ls -a "$current_dir" | sort
-            read -p "Press ENTER to continue."
-            ;;
-
+            read -p "Press ENTER to continue." ;;
         2)
             clear
             echo "📂 Subdirectories in '$current_dir':"
@@ -62,9 +67,7 @@ while true; do
                     echo "❌ That is not a valid selection."
                     read -p "Press ENTER to continue."
                 fi
-            fi
-            ;;
-
+            fi ;;
         3)
             clear
             echo "📄 Files in '$current_dir':"
@@ -87,24 +90,22 @@ while true; do
                     cat "$filepath"
                     echo
                     read -p "Would you like to save this output to results.txt? (y/n): " save_choice
-                    if [[ "$save_choice" == "y" || "$save_choice" == "Y" ]]; then
+                    if [[ "$save_choice" =~ ^[Yy]$ ]]; then
                         echo >> results.txt
                         echo "----- $filepath -----" >> results.txt
                         cat "$filepath" >> results.txt
-                        echo "Saved to results.txt ✅"
+                        echo "✅ Saved to results.txt"
                     fi
                 else
                     echo "❌ That is not a valid selection."
                     read -p "Press ENTER to continue."
                 fi
                 read -p "Press ENTER to continue."
-            fi
-            ;;
-
+            fi ;;
         4)
             if [[ "$current_dir" != "$root_dir" ]]; then
                 parent_dir="$(dirname "$current_dir")"
-                # Ensure we never move above root_dir
+                # Prevent moving above root_dir
                 if [[ "$parent_dir" == "$root_dir"* ]]; then
                     current_dir="$parent_dir"
                 else
@@ -113,18 +114,15 @@ while true; do
             else
                 echo "⚠️ You're already at the top level ($root_dir)."
                 read -p "Press ENTER to continue."
-            fi
-            ;;
-
+            fi ;;
         5)
             echo "Exiting. Good luck finding the real flag!"
-            break
-            ;;
-
+            break ;;
         *)
             echo "❌ Invalid option. Please enter a number from 1 to 5."
-            read -p "Press ENTER to continue."
-            ;;
+            read -p "Press ENTER to continue." ;;
     esac
-
 done
+
+# Clean exit for web hub
+exec $SHELL

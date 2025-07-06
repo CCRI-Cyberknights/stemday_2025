@@ -16,7 +16,7 @@ echo "   We'll match words from the wordlist to hash values — like solving a d
 echo
 read -p "Press ENTER to begin Hashcat cracking..." junk
 
-echo -e "\n[🧹] Clearing previous Hashcat outputs and decoded data..."
+# --- Pre-flight checks ---
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR" || { echo "❌ Failed to change to script directory: $SCRIPT_DIR"; exit 1; }
 
@@ -28,6 +28,19 @@ EXTRACTED="$SCRIPT_DIR/extracted"
 ASSEMBLED="$SCRIPT_DIR/assembled_flag.txt"
 DECODED_SEGMENTS="$SCRIPT_DIR/decoded_segments"
 
+if [[ ! -f "$HASHES" || ! -f "$WORDLIST" ]]; then
+    echo "❌ ERROR: Required files hashes.txt or wordlist.txt are missing."
+    read -p "Press ENTER to close this terminal..." junk
+    exit 1
+fi
+
+if [[ ! -d "$SEGMENTS" ]]; then
+    echo "❌ ERROR: Segments folder is missing."
+    read -p "Press ENTER to close this terminal..." junk
+    exit 1
+fi
+
+echo -e "\n[🧹] Clearing previous Hashcat outputs and decoded data..."
 rm -f "$POTFILE" "$ASSEMBLED"
 rm -rf "$EXTRACTED" "$DECODED_SEGMENTS"
 mkdir -p "$EXTRACTED" "$DECODED_SEGMENTS"
@@ -130,3 +143,4 @@ fi
 echo
 read -p "🔎 Review the flags above. Only ONE matches the CCRI format: CCRI-AAAA-1111
 Press ENTER to close this terminal..." junk
+exec $SHELL

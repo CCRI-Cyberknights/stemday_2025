@@ -16,6 +16,19 @@ echo
 read -p "Press ENTER to begin password testing..." junk
 echo
 
+# Pre-flight checks
+if [[ ! -f secret.zip ]]; then
+    echo "❌ ERROR: secret.zip not found in this folder."
+    read -p "Press ENTER to close this terminal..."
+    exit 1
+fi
+
+if [[ ! -f wordlist.txt ]]; then
+    echo "❌ ERROR: wordlist.txt not found in this folder."
+    read -p "Press ENTER to close this terminal..."
+    exit 1
+fi
+
 found=0
 correct_pass=""
 
@@ -34,6 +47,7 @@ done < wordlist.txt
 
 if [[ "$found" -eq 0 ]]; then
     echo -e "\n❌ Password not found in the list."
+    read -p "Press ENTER to close this terminal..."
     exit 1
 fi
 
@@ -50,6 +64,7 @@ unzip -P "$correct_pass" secret.zip >/dev/null 2>&1
 
 if [[ ! -f message_encoded.txt ]]; then
     echo "❌ Extraction failed."
+    read -p "Press ENTER to close this terminal..."
     exit 1
 fi
 
@@ -69,6 +84,7 @@ done
 
 if [[ "$decode" =~ ^[Nn]$ ]]; then
     echo "❌ Skipping Base64 decoding. You can decode it manually later using: base64 --decode message_encoded.txt"
+    read -p "Press ENTER to close this terminal..."
     exit 0
 fi
 
@@ -94,6 +110,13 @@ echo "   → This converts the encoded content back into readable text"
 echo
 
 decoded=$(base64 --decode message_encoded.txt 2>/dev/null)
+status=$?
+
+if [[ $status -ne 0 || -z "$decoded" ]]; then
+    echo "❌ Decoding failed. The file might be corrupted or not properly base64-encoded."
+    read -p "Press ENTER to close this terminal..."
+    exit 1
+fi
 
 echo
 echo "🧾 Decoded Message:"
@@ -107,4 +130,5 @@ echo "💾 Decoded message saved to: decoded_output.txt"
 
 echo
 echo "🧠 Pick the valid flag from the list (format: CCRI-AAAA-1111) and enter it into the scoreboard."
-read -p "Press ENTER to close this terminal..." done
+read -p "Press ENTER to close this terminal..."
+exec $SHELL

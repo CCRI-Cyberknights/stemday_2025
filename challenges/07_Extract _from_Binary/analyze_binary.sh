@@ -10,19 +10,25 @@ echo
 echo "The goal is to uncover a hidden flag from inside a compiled program."
 echo "We'll preview some of the binary contents and extract possible flag candidates."
 echo
-echo "Press ENTER to begin extracting strings from the binary..."
-read
+read -p "Press ENTER to begin extracting strings from the binary..." junk
+
+# Check for target binary
+if [[ ! -f hidden_flag ]]; then
+    echo "❌ ERROR: The file 'hidden_flag' was not found in this folder."
+    read -p "Press ENTER to close this terminal..." junk
+    exit 1
+fi
 
 OUTFILE="extracted_strings.txt"
 strings hidden_flag > "$OUTFILE"
-echo "\n📄 Running 'strings' on: hidden_flag"
+echo -e "\n📄 Running 'strings' on: hidden_flag"
 echo "✅ All strings saved to: $OUTFILE"
 
 # Show preview
 PREVIEW_LINES=15
 echo -e "\n🔍 Previewing the first $PREVIEW_LINES lines:"
 echo "--------------------------------------------------"
-head -n $PREVIEW_LINES "$OUTFILE"
+head -n "$PREVIEW_LINES" "$OUTFILE"
 echo "--------------------------------------------------"
 
 # Animation/break
@@ -52,4 +58,5 @@ else
 fi
 
 echo -e "\n✅ Done. You may now inspect $OUTFILE or try other tools!"
-read -p "Press ENTER to close..."
+read -p "Press ENTER to close this terminal..."
+exec $SHELL

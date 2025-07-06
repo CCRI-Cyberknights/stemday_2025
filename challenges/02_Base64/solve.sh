@@ -34,9 +34,12 @@ echo
 
 # Perform actual decoding
 decoded=$(base64 --decode encoded.txt 2>/dev/null)
+status=$?
 
-if [[ -z "$decoded" ]]; then
-    echo -e "\n⚠️ Decoding failed! This may not be valid base64, or the file is malformed."
+if [[ $status -ne 0 || -z "$decoded" ]]; then
+    echo -e "\n❌ Decoding failed! This may not be valid base64, or the file is malformed."
+    echo "💡 Tip: Ensure 'encoded.txt' exists and contains valid base64 text."
+    read -p "Press ENTER to close this terminal..."
     exit 1
 fi
 
@@ -54,4 +57,5 @@ echo "🧠 Only one of them fits the official CCRI flag format: CCRI-AAAA-1111"
 echo "📋 Manually copy the correct flag into the scoreboard when ready."
 echo
 
-read -p "Press ENTER to close this terminal..." close
+read -p "Press ENTER to close this terminal..."
+exec $SHELL

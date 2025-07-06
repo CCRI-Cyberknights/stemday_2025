@@ -14,6 +14,7 @@ ADMIN_JSON = os.path.join(ADMIN_DIR, "challenges.json")
 TEMPLATES_FOLDER = os.path.join(ADMIN_DIR, "templates")
 STATIC_FOLDER = os.path.join(ADMIN_DIR, "static")
 SERVER_SOURCE = os.path.join(ADMIN_DIR, "server.py")
+START_SCRIPT_SOURCE = os.path.join(ADMIN_DIR, "start_web_hub.sh")
 ENCODE_KEY = "CTF4EVER"
 
 def xor_encode(plaintext, key):
@@ -26,7 +27,6 @@ def xor_encode(plaintext, key):
 def make_scripts_executable(challenges_data):
     """Set chmod +x on all helper scripts in the student folder"""
     for meta in challenges_data.values():
-        # Fix folder path resolution
         relative_folder = meta["folder"].lstrip("./").lstrip("../")
         folder = os.path.join(BASE_DIR, relative_folder)
         script_path = os.path.join(folder, meta["script"])
@@ -68,7 +68,7 @@ def prepare_web_version():
         json.dump(student_data, f, indent=4)
     print(f"✅ Student challenges.json created at {student_json_path}")
 
-    # Copy templates & static files (allow overwrite if folder exists)
+    # Copy templates & static files
     print("📂 Copying templates and static assets...")
     shutil.copytree(
         TEMPLATES_FOLDER,
@@ -80,6 +80,13 @@ def prepare_web_version():
         os.path.join(STUDENT_DIR, "static"),
         dirs_exist_ok=True
     )
+
+    # Copy start_web_hub.sh and set executable
+    print("📂 Copying start_web_hub.sh...")
+    start_script_dest = os.path.join(STUDENT_DIR, "start_web_hub.sh")
+    shutil.copy2(START_SCRIPT_SOURCE, start_script_dest)
+    os.chmod(start_script_dest, os.stat(start_script_dest).st_mode | stat.S_IXUSR)
+    print(f"✅ Copied and made executable: {start_script_dest}")
 
     # Compile server.py to server.pyc
     print("⚙️ Compiling server.py for student version...")

@@ -15,6 +15,13 @@ echo "💡 Goal: Try different keywords until the decrypted message reveals a va
 echo
 read -p "Press ENTER to begin..." temp
 
+# Check for cipher.txt first
+if [[ ! -f cipher.txt ]]; then
+    echo "❌ ERROR: cipher.txt not found in this folder."
+    read -p "Press ENTER to close this terminal..." temp
+    exit 1
+fi
+
 while true; do
     read -p "🔑 Enter a keyword to try (or type 'exit' to quit): " key
 
@@ -23,9 +30,9 @@ while true; do
         break
     fi
 
-    if [[ ! -f cipher.txt ]]; then
-        echo "❌ Error: cipher.txt not found in this folder."
-        exit 1
+    if [[ -z "$key" ]]; then
+        echo "⚠️ Please enter a keyword or type 'exit'."
+        continue
     fi
 
     echo
@@ -69,7 +76,7 @@ def vigenere_decrypt(ciphertext, key):
 
 print(vigenere_decrypt(ciphertext, key))
 EOF
-)
+    )
 
     echo
     echo "📄 Decoded Output:"
@@ -84,7 +91,7 @@ EOF
         echo "📁 Decoded output saved to: decoded_output.txt"
         break
     else
-        echo "❌ No valid CCRI flag format found. Try another key."
+        echo "❌ No valid CCRI flag format found. Try another keyword."
     fi
 
     echo
@@ -96,4 +103,5 @@ EOF
 done
 
 echo
-read -p "Press ENTER to close this terminal..." close
+read -p "Press ENTER to close this terminal..."
+exec $SHELL

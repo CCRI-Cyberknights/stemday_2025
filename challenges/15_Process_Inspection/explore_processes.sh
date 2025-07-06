@@ -32,6 +32,13 @@ echo
 echo "💡 Hint: The real flag starts with CCRI- and is in a --flag= argument."
 echo
 
+# Verify ps_dump.txt exists
+if [[ ! -f ps_dump.txt ]]; then
+    echo "❌ ERROR: ps_dump.txt not found in this folder!"
+    read -p "Press ENTER to exit..." junk
+    exec $SHELL
+fi
+
 # Build dynamic list of unique COMMAND entries from ps_dump.txt
 mapfile -t processes < <(
     awk 'NR>1 && $11 ~ /^\// {print $11}' ps_dump.txt | sort | uniq
@@ -87,3 +94,6 @@ while true; do
         echo "❌ Invalid choice. Please select a valid process."
     fi
 done
+
+# Clean exit for web hub
+exec $SHELL

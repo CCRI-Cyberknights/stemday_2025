@@ -112,21 +112,13 @@ def run_script(challenge_id):
             'gnome-terminal',
             '--working-directory', folder,
             '--',
-            'bash', '-c', f'"{script_path}"; echo "Press ENTER to close..."; read'
+            'bash', script_path
         ])
         return jsonify({"status": "success"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-# === Auto-port fallback ===
-def get_free_port(preferred_port=5000):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        if s.connect_ex(('localhost', preferred_port)) != 0:
-            return preferred_port
-        else:
-            return 5050
-
 if __name__ == '__main__':
-    port = get_free_port()
-    print(f"🌐 Student hub running on http://127.0.0.1:{port}")
-    app.run(host='127.0.0.1', port=port, debug=False)
+    print("🌐 Student hub running on http://127.0.0.1:5000")
+    app.run(host='127.0.0.1', port=5000, debug=False)
+

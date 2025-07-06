@@ -1,4 +1,5 @@
 #!/bin/bash
+
 clear
 echo "🧪 Challenge #09 – Fix the Flag! (Bash Edition)"
 echo "----------------------------------------------"
@@ -21,6 +22,14 @@ EOF
 
 echo
 echo "----------------------------------------------"
+
+# Check for broken_flag.sh
+if [[ ! -f broken_flag.sh ]]; then
+    echo "❌ ERROR: missing required file 'broken_flag.sh'."
+    read -p "Press ENTER to close this terminal..." junk
+    exit 1
+fi
+
 echo "Let’s run that script and see what happens:"
 echo
 bash broken_flag.sh
@@ -55,7 +64,7 @@ while true; do
             echo
             echo "📄 Flag saved to: flag.txt"
             echo
-            read -p "Press ENTER to finish..."
+            read -p "Press ENTER to finish..." junk
             break
             ;;
         "-")
@@ -81,3 +90,6 @@ while true; do
     echo "That’s not the correct flag. Try again!"
     echo
 done
+
+# Clean exit for web hub
+exec $SHELL

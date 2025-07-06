@@ -12,7 +12,22 @@ echo
 
 responses=(response_1.txt response_2.txt response_3.txt response_4.txt response_5.txt)
 
+# Check for missing files
+missing=0
+for f in "${responses[@]}"; do
+    if [[ ! -f "$f" ]]; then
+        echo "⚠️ WARNING: '$f' not found in this folder!"
+        missing=1
+    fi
+done
+if [[ "$missing" -eq 1 ]]; then
+    echo
+    read -p "⚠️ One or more response files are missing. Press ENTER to exit." junk
+    exit 1
+fi
+
 while true; do
+    echo
     echo "Available HTTP responses:"
     for i in "${!responses[@]}"; do
         echo "$((i+1)). ${responses[$i]}"
@@ -34,5 +49,9 @@ while true; do
         break
     else
         echo "❌ Invalid choice. Please select 1-6."
+        read -p "Press ENTER to continue." junk
     fi
 done
+
+# Clean exit for web hub
+exec $SHELL

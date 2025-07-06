@@ -43,10 +43,11 @@ while true; do
     echo "   -p  = use this password"
     echo
 
-    # Attempt extraction
-    steghide extract -sf squirrel.jpg -xf decoded_message.txt -p "$pw" > /dev/null 2>&1
+    # Attempt extraction (force non-interactive to prevent hanging)
+    steghide extract -sf squirrel.jpg -xf decoded_message.txt -p "$pw" -f <<< "" > /dev/null 2>&1
+    status=$?
 
-    if [[ -f decoded_message.txt ]]; then
+    if [[ $status -eq 0 && -s decoded_message.txt ]]; then
         echo
         echo "🎉 SUCCESS! Hidden message recovered:"
         echo "----------------------------"
@@ -62,5 +63,7 @@ while true; do
         echo "❌ Extraction failed. No data recovered or incorrect password."
         echo "🔁 Try again with a different password."
         echo
+        # Clean up any empty/partial file
+        rm -f decoded_message.txt
     fi
 done

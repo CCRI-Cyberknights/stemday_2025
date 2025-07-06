@@ -27,6 +27,11 @@ import time
 import os
 import sys
 
+# Check if file exists and is non-empty
+if not os.path.isfile("cipher.txt") or os.path.getsize("cipher.txt") == 0:
+    print("\n❌ ERROR: cipher.txt is missing or empty.")
+    sys.exit(1)
+
 with open("cipher.txt", "r") as f:
     encoded = f.read()
 
@@ -71,9 +76,17 @@ print("-----------------------------")
 print("📁 Saved to: decoded_output.txt")
 EOF
 
+# Check if decoding failed
+if [[ $? -ne 0 ]]; then
+    echo -e "\n⚠️ ROT13 decoding failed. Check if cipher.txt exists and is valid."
+    read -p "Press ENTER to close this terminal..."
+    exit 1
+fi
+
 echo
 echo "⚠️  Multiple code-like values detected."
 echo "🔎 Only one matches the official flag format: CCRI-AAAA-1111"
 echo "🧠 Review the decoded message and copy the correct flag to submit on the scoreboard."
 echo
-read -p "Press ENTER to close this terminal..." done
+read -p "Press ENTER to close this terminal..."
+exec $SHELL
