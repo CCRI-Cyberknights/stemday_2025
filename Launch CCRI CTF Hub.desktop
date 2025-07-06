@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Name[en_US]=Launch CCRI CTF Hub
+Exec=/home/ccri_admin/Desktop/CCRI_CTF/web_version/start_web_hub.sh
+Icon=firefox-esr
+Icon[en_US]=firefox-esr
+Name=Launch CCRI CTF Hub

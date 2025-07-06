@@ -1,14 +1,63 @@
-# stemday2025
-STEM Day VM
+# 🌱 stemday2025: STEM Day CTF VM (Admin)
 
-Parrot Linux Home Edition with just installed tools for interaction, no sudo on non-admin account.
+Parrot Linux Home Edition VM designed for a **guided Capture The Flag (CTF)** experience for high school students.  
 
-Folder structure is a Desktop folder where the kids will interact with some things to read and then the scripts will simulate either some short prompts for information or just run a "this is what would happen but visualize it for your benefit" in a game sense.
+This repository is for **administrators and collaborators** creating and managing the CTF content. Students will receive a separate, simplified fork of this project that will be unguided to take home, baked into a usb stick with Parrot Home. 
 
-Once the script runs there will be 5 choices of flags, which the script will also export into a separate text file for easier copy/paste purposes.
+---
 
-Kids will paste the flag into the verification offline html file, the correct answers of which are generated in a python script that obfuscates the correct flag in base64 and further xor encrypted, since we’re showing them how to base64 decode, and the VM has internet access.
+## 🗂️ Folder Structure  
 
-The VM runs off a script that starts the VM and waits for a shutdown signal to then reset to a given snapshot for the next group of students. There is an exit file on the desktop that is password protected with the admin password to exit the loop, since all the VirtualBox UI elements are removed, the host key will be non-default and the only way out of it would be to ctrl-alt-delete (something we can’t bypass).
+```
+Desktop/
+├── CCRI_CTF/               # Main CTF folder (shared with collaborators)
+│   ├── challenges/         # All 15 interactive challenges
+│   ├── web_version/        # Student-facing web portal (auto-generated)
+│   ├── web_version_admin/  # Admin-only tools and templates
+│   ├── README.md
+│   └── generate_scoreboard.py
+├── capybara.jpg            # Placeholder/test images
+└── squirrel.jpg
+```
 
-The terminal and document fonts are Noto Mono Regular 12, so that emojis show up.
+---
+
+## 🚀 Admin Workflow  
+
+### 🛠 Build the Student Web Hub
+Run this from inside the VM to update `web_version/` after editing:  
+```bash
+cd ~/Desktop/CCRI_CTF/web_version_admin/admin_tools
+python3 recode_flags.py
+```
+This will:  
+✅ Obfuscate correct flags (Base64 + XOR).  
+✅ Rebuild the student Flask server with secure settings.  
+✅ Clear any stale files in `web_version/`.  
+
+### 🧪 Test as Admin
+Start the admin Flask server to preview challenges:  
+```bash
+cd ~/Desktop/CCRI_CTF/web_version_admin
+python3 server.py
+```
+This version displays flags in plain text for easier debugging.
+
+---
+
+## 🛡️ Security Model  
+
+- Students run in a **non-admin account (no sudo)**.  
+- The VM auto-resets to a snapshot between sessions.  
+- An **exit script** (desktop shortcut) requires the admin password to leave the loop.  
+- Correct flags are **obfuscated** in the student web portal but visible to admins.  
+
+---
+
+## 🧑‍💻 Contributing  
+
+Pull requests are welcome for:  
+- New challenges.  
+- UI improvements to the web portal.  
+- Enhancements to admin tools (e.g., mass flag updates).  
+

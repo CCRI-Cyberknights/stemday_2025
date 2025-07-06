@@ -1,0 +1,92 @@
+{
+    "01_Stego": {
+        "name": "Stego Decode",
+        "folder": "../challenges/01_Stego",
+        "script": "extract_flag.sh",
+        "flag": "ABcUfWgFERcEeXcMcWQ="
+    },
+    "02_Base64": {
+        "name": "Base64 Decoder",
+        "folder": "../challenges/02_Base64",
+        "script": "solve.sh",
+        "flag": "ABcUfWgUFBcbeXQFdWQ="
+    },
+    "03_ROT13": {
+        "name": "ROT13 Explorer",
+        "folder": "../challenges/03_ROT13",
+        "script": "decode_rot13.sh",
+        "flag": "ABcUfWgECgYNeXUHdWU="
+    },
+    "04_Vigenere": {
+        "name": "Vigen\u00e8re Cipher",
+        "folder": "../challenges/04_Vigen\u00e8re",
+        "script": "break_vigenere.sh",
+        "flag": "ABcUfWgADBUaeXINd2M="
+    },
+    "05_ArchivePassword": {
+        "name": "Archive Password Cracker",
+        "folder": "../challenges/05_Archive_Password",
+        "script": "crack_zip.sh",
+        "flag": "ABcUfWgXFxELeXUAcm8="
+    },
+    "06_Hashcat": {
+        "name": "Hashcat Challenge",
+        "folder": "../challenges/06_Hashcat",
+        "script": "run_chain_crack.sh",
+        "flag": "ABcUfWgMDAITeXMAdWc="
+    },
+    "07_ExtractBinary": {
+        "name": "Extract from Binary",
+        "folder": "../challenges/07_Extract _from_Binary",
+        "script": "analyze_binary.sh",
+        "flag": "ABcUfWgUDBwCeXEEfGc="
+    },
+    "08_FakeAuthLog": {
+        "name": "Fake Auth Log",
+        "folder": "../challenges/08_Fake_Auth_Log",
+        "script": "investigate_authlog.sh",
+        "flag": "ABcUfWgaChUQeX8HdGY="
+    },
+    "09_FixScript": {
+        "name": "Fix the Script",
+        "folder": "../challenges/09_Fix_the_Script",
+        "script": "script_runner.sh",
+        "flag": "ABcUfWgFBgATeXcEfG4="
+    },
+    "10_Metadata": {
+        "name": "Metadata Explorer",
+        "folder": "../challenges/10_Metadata",
+        "script": "inspect_metadata.sh",
+        "flag": "ABcUfWgbAAYCeXUAfWc="
+    },
+    "11_HiddenFlag": {
+        "name": "Hidden Flag Hunt",
+        "folder": "../challenges/11_Hidden_Flag",
+        "script": "search_for_flag.sh",
+        "flag": "ABcUfWgeDBYGeXMDcWQ="
+    },
+    "12_QRCodes": {
+        "name": "QR Codes Puzzle",
+        "folder": "../challenges/12_QR_Codes",
+        "script": "generate_qr_flags.sh",
+        "flag": "ABcUfWgHFxEbeXIMd2c="
+    },
+    "13_HTTPHeaders": {
+        "name": "HTTP Headers Analysis",
+        "folder": "../challenges/13_HTTP_Headers",
+        "script": "investigate_headers.sh",
+        "flag": "ABcUfWgeBAUIeXEHc2Q="
+    },
+    "14_SubdomainSweep": {
+        "name": "Subdomain Sweep",
+        "folder": "../challenges/14_Subdomain _Sweep",
+        "script": "explore_subdomains.sh",
+        "flag": "ABcUfWgQBB4AeXINd2E="
+    },
+    "15_ProcessInspection": {
+        "name": "Process Inspection",
+        "folder": "../challenges/15_Process_Inspection",
+        "script": "explore_processes.sh",
+        "flag": "ABcUfWgEBAQNeXQNcGI="
+    }
+}
