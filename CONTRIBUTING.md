@@ -1,99 +1,87 @@
-# 🚀 `stemday2025` Contributor Guide
+# 🌟 `stemday2025` Contributor Guide (Org-Only)
 
-Welcome to the **STEM Day VM Project**! This repo powers a custom-built **Parrot Linux CTF experience** for high school students.  
+Welcome to the **CCRI CyberKnights STEM Day VM Project!** 🎉
+This repository powers a custom **Parrot Linux Capture The Flag (CTF)** experience for high school students.
 
-We’re building a **gamified cybersecurity “gym”** where students solve challenges inside a locked-down Linux VM.  
+👥 **This repo is for CCRI CyberKnights club members only.**
 
----
-
-## 📦 Project Overview
-
-- 🐦 **Parrot Linux Home Edition** base  
-- 🔒 No `sudo` access for students  
-- 🖥️ All interaction happens in a Desktop folder with scripts, data files, and a web portal  
-- 🎮 Each script simulates a security scenario (with prompts and visuals)  
-- 🏁 Students paste flags into an offline HTML **flag tracker**  
-- 🔐 Admin-only features are separated into a `web_version_admin` folder  
-- ♻️ VM resets to a snapshot between student groups  
-- 🔓 Exiting the loop requires an admin password  
+A **public “take-home” version** for students will be hosted separately without admin tools or guiding scripts.
 
 ---
 
-## 🧑‍💻 How to Contribute  
+## 🗂️ Project Structure
 
-This repo is owned by **CCRI CyberKnights**, and collaborators don’t have direct commit rights to `main`. To contribute:  
-
-✅ **Fork the repo** → make changes → submit a Pull Request (PR).  
-
-This keeps `main` clean and lets us review edits before merging.  
-
----
-
-### 📝 Step 1: Fork the Repo
-
-1. Go to: [https://github.com/CCRI-Cyberknights/stemday2025](https://github.com/CCRI-Cyberknights/stemday2025)  
-2. Click the **“Fork”** button (top right) to copy the repo into your GitHub account  
-
----
-
-### 💻 Step 2: Clone Your Fork
-
-Open a terminal:  
-
-\`\`\`bash
-git clone https://github.com/<your-username>/stemday2025.git
-cd stemday2025
-\`\`\`
+```
+Desktop/
+├── CCRI_CTF/                     # Main CTF folder (club development)
+│   ├── challenges/               # All interactive CTF challenges
+│   ├── web_version/              # Student-facing web portal (auto-generated)
+│   ├── web_version_admin/        # Admin-only tools and templates
+│   ├── README.md                  # Admin README (project overview)
+│   ├── CONTRIBUTING.md            # Club collaboration guide
+│   ├── Launch CCRI CTF Hub.desktop # Shortcut to launch the student hub
+│   ├── generate_scoreboard.py     # Admin utility scripts
+│   ├── generate_qr_flags.sh       # Admin utility scripts
+│   ├── generate_fake_authlog.py   # Admin utility scripts
+│   ├── binary_flag.c              # Supporting code for binary challenge
+│   ├── index_grid_obfuscated.html # Web portal prototype
+│   ├── plan_overview.txt          # Project planning notes
+│   ├── main_web_portal_idea.txt   # Web portal design notes
+│   ├── capybara.jpg               # Assets and placeholder/test images
+│   ├── squirrel.jpg               # Assets and placeholder/test images
+└── (etc.)                         # Misc admin/dev tools
+```
 
 ---
 
-### 🌱 Step 3: Create a Branch
+## 🚀 Workflow for Club Members
 
-Make a new branch for your changes:  
+### 🛠 Editing Content
 
-\`\`\`bash
-git checkout -b my-cool-update
-\`\`\`
+1. Clone the repo directly (as a club member you already have access):
 
----
+   ```bash
+   git clone https://github.com/CCRI-Cyberknights/stemday2025.git
+   cd stemday2025
+   ```
+2. Create a feature branch for your changes:
 
-### ✏️ Step 4: Make Your Changes
-
-- Edit scripts in `challenges/` or admin tools in `web_version_admin/`  
-- Keep in mind: students will only see the `web_version` folder  
-
----
-
-### 💾 Step 5: Commit and Push
-
-\`\`\`bash
-git add .
-git commit -m "Describe what you changed"
-git push origin my-cool-update
-\`\`\`
+   ```bash
+   git checkout -b feature/my-changes
+   ```
+3. Edit scripts, admin tools, or challenge folders.
+4. Test your changes in the VM.
 
 ---
 
-### 🔄 Step 6: Open a Pull Request (PR)
+### 🔄 Submitting Changes
 
-1. Go to your fork on GitHub  
-2. Click **“Compare & pull request”**  
-3. Describe what you changed  
-4. Submit the PR  
+* Commit and push your branch:
 
-We’ll review and merge it if everything looks good ✅  
-
----
-
-## ⚠️ Guidelines
-
-✅ Keep all scripts runnable directly from the VM **and** the web portal  
-✅ Don’t hardcode absolute paths – use relative paths  
-✅ Avoid exposing admin-only flags in plaintext in student-facing folders  
-✅ Test your changes in a fresh clone if possible  
+  ```bash
+  git add .
+  git commit -m "Add new challenge or fix admin tool"
+  git push origin feature/my-changes
+  ```
+* Open a Pull Request (PR) for review.
+* Club admins will merge your branch into `main` once approved.
 
 ---
 
-## 🚨 Direct Commits Are Disabled  
+## 🛡️ Rules for Contributors
 
-Only core maintainers (like the admin account) can push directly to `main`. All other edits must come in via Pull Requests.  
+✅ Keep admin-only flags and tools **out of `web_version/`**
+✅ Test all scripts from both the folder and the web portal
+✅ Use relative paths (avoid absolute paths) for portability
+✅ Don’t commit generated `.pyc` files or student-only folders
+
+---
+
+## 📣 About the Public Repo
+
+Students will later get a **separate public repo** with only the student-facing web portal and challenges (no admin scripts).
+This repo stays **private** for club development and admin workflows.
+
+---
+
+## 🙌 Thanks for contributing to CCRI CyberKnights STEM Day CTF!
