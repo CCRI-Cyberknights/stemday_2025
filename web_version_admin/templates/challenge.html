@@ -48,10 +48,8 @@
             fetch(`/run_script/{{ challenge_id }}`, { method: 'POST' })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.status === "success") {
-                        alert("✅ Helper script launched.");
-                    } else {
-                        alert("❌ Failed to launch script: " + data.message);
+                    if (data.status !== "success") {
+                        console.error("Failed to launch script:", data.message);
                     }
                 });
         }
@@ -60,10 +58,8 @@
             fetch(`/open_folder/{{ challenge_id }}`, { method: 'POST' })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.status === "success") {
-                        alert("📂 Folder opened.");
-                    } else {
-                        alert("❌ Failed to open folder: " + data.message);
+                    if (data.status !== "success") {
+                        console.error("Failed to open folder:", data.message);
                     }
                 });
         }
@@ -81,7 +77,6 @@
                 if (data.status === "correct") {
                     status.textContent = "🎉 Correct flag!";
                     status.style.color = "green";
-                    // Save progress to localStorage
                     localStorage.setItem("{{ challenge_id }}", flag);
                 } else if (data.status === "incorrect") {
                     status.textContent = "❌ Incorrect flag.";

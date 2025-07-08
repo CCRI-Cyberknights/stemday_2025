@@ -35,3 +35,76 @@
 - Social Media Leak         - Flag embedded in mock “post” from fake Twitter/Instagram dump
 - Spectrogram Audio Flag    - Audio file visualized to reveal embedded flag (advanced)
 - Corrupted Image Fix       - PNG with broken header, user “repairs” it and views flag
+
+### 🗝 **Cryptography**
+1. **ROT47 Decoder**
+   * A message is scrambled using ROT47 instead of ROT13. Students decode it with a Python one-liner or online tool.
+2. **XOR Cipher Puzzle**
+   * Students find a key hidden in a hint file and use it to XOR-decrypt a message.
+3. **Substitution Cipher**
+   * An old-school cipher.txt that requires frequency analysis to figure out.
+---
+
+### 🔑 **Password Cracking**
+4. **ZIP Archive Bruteforce**
+   * A password-protected ZIP with the flag inside. Students use `fcrackzip` or a script to crack it.
+5. **Shadow File Puzzle**
+   * A fake `/etc/shadow` is provided. Students use `john` to crack the hashed password.
+6. **Simple Web Login Bypass**
+   * A login form vulnerable to bypass with a common admin password like `admin:admin` or an empty password.
+
+---
+
+### 🔬 **Forensics**
+7. **Hidden Image in Audio File**
+   * An `.mp3` file with an image hidden inside using `steghide`.
+8. **Hex Viewer Challenge**
+   * A binary contains the flag embedded in plain text. Students use `xxd` or `hexedit` to find it.
+
+---
+
+### 📜 **Log Analysis**
+9. **Anomalous Login Detection**
+   * Students analyze `auth.log` for a suspicious login (wrong PID or odd time).
+10. **Web Server Logs**
+    * A fake `access.log` shows someone accessing `/flag.txt`. Students find the IP and file path.
+
+---
+
+### 🌐 **Network Traffic Analysis**
+11. **Analyze PCAP for HTTP Flag**
+    * Flag transmitted over HTTP in plain text inside a `.pcap`. Students use Wireshark to extract it.
+12. **FTP Password Recovery**
+    * A `.pcap` file shows an FTP login. Students pull the credentials from the capture.
+
+---
+
+### 🔎 **Scanning & Reconnaissance**
+13. **robots.txt Recon**
+    * A fake website has a `robots.txt` file revealing `/super-secret/flag.txt`.
+14. **Nmap Scan Puzzle**
+    * Students scan a local simulated service to find an open port serving a flag.
+
+---
+
+### 🖥 **Web Application Exploitation**
+15. **Reflected XSS**
+    * A fake web form reflects input unsanitized. Students use `<script>` to trigger an alert (flag appears in the alert).
+16. **SQL Injection**
+    * A vulnerable login lets students bypass authentication with `OR '1'='1'`.
+
+---
+
+### 📶 **Wireless Access**
+17. **WPA2 Handshake Crack**
+    * A `.cap` file contains a captured handshake. Students run `aircrack-ng` with a wordlist to recover the password.
+
+---
+
+### 🛠 **Enumeration & Exploitation**
+18. **SUID Binary Exploit**
+    * A SUID binary has a weak command that allows privilege escalation to read a protected flag file.
+19. **Find Hidden Files**
+    * Students use `find` or `ls -la` to discover a hidden `.flag` file.
+20. **World-Writable File Exploit**
+    * A file has world-writable permissions allowing students to overwrite and reveal the flag.

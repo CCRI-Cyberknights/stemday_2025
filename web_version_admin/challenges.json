@@ -79,7 +79,7 @@
   "12_QRCodes": {
     "name": "QR Codes Puzzle",
     "folder": "../challenges/12_QR_Codes",
-    "script": "generate_qr_flags.sh",
+    "script": "qr_code_explorer.sh",
     "flag": "CCRI-QRCX-4821",
     "key": "CTF4EVER"
   },
@@ -102,6 +102,13 @@
     "folder": "../challenges/15_Process_Inspection",
     "script": "explore_processes.sh",
     "flag": "CCRI-RAVN-2954",
+    "key": "CTF4EVER"
+  },
+  "16_Hex_Hunting": {
+    "name": "Hex Hunting",
+    "folder": "../challenges/16_Hex_Hunting",
+    "script": "inspect_binary.sh",
+    "flag": "CCRI-HEXG-2718",
     "key": "CTF4EVER"
   }
 }
