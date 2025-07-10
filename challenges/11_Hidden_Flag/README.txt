@@ -1,23 +1,27 @@
-🧠 Challenge #11 – Find the File
+🧠 Challenge 11: Hidden File Hunt
+=================================
 
-Somewhere in this folder structure lies a hidden file containing the next flag.
+Somewhere in this folder structure lies a **hidden file** containing the real agency flag.  
 
-But beware — not all flags are real. Four fakes were planted to confuse intruders.
+But beware — four **fake flags** have been planted to confuse intruders. Only one follows the official format.  
 
-🎯 Your mission:
-Use the helper script or your own command-line skills to uncover hidden files and locate the **one real flag**.
+🎯 **Your Mission:**  
+Explore the directory tree, uncover hidden files, and locate the *one* valid flag.  
 
-Only one follows the official format:
-  CCRI-AAAA-1111
-  
-🚫 The rest may look similar but use the wrong prefix or order:
-  FLAG-HIDE-####
-  HIDE-####-CODE
-  etc.
+✅ Official flag format: `CCRI-AAAA-1111`  
+❌ Fake flags may look similar but use the wrong prefix or order:  
+   - `FLAG-HIDE-####`  
+   - `HIDE-####-CODE`  
+   - etc.  
 
-🛠 Try using commands like:
-  find, ls -a, cat
+🛠️ **Tools at your disposal:**  
+- `find`, `ls -a`, `cat` — search for hidden files manually  
+- Or use the interactive helper script:  
+  `./search_for_flag.sh`  
 
-📂 Start with the helper:
-  ./search_for_flag.sh
+📂 **Folder to explore:** `junk/`  
+
+---
+
+👀 Look carefully. The real flag isn’t always in the obvious place.
 

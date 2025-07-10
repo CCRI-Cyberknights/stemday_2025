@@ -1,10 +1,13 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, Markup
 import subprocess
 import json
 import os
 import base64
 import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
+
+# New import for Markdown support
+import markdown
 
 app = Flask(__name__)
 
@@ -40,10 +43,12 @@ def challenge_view(challenge_id):
 
     # Read README.txt if it exists
     readme_path = os.path.join(folder, 'README.txt')
-    readme_content = ""
+    readme_html = ""
     if os.path.exists(readme_path):
         with open(readme_path, 'r', encoding='utf-8') as f:
-            readme_content = f.read()
+            raw_readme = f.read()
+            # Convert Markdown to HTML
+            readme_html = Markup(markdown.markdown(raw_readme))
 
     # List other files (excluding README and hidden files)
     file_list = [
@@ -57,7 +62,7 @@ def challenge_view(challenge_id):
         'challenge.html',
         challenge_id=challenge_id,
         challenge=challenge,
-        readme=readme_content,
+        readme=readme_html,  # Pass rendered HTML
         files=file_list
     )
 

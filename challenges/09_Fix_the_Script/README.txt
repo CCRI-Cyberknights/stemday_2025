@@ -1,12 +1,19 @@
-🧠 Challenge #09 – Fix the Flag! (Bash Edition)
------------------------------------------------
+🧠 Challenge 09: Fix the Flag! (Bash Edition)
+==============================================
 
-A Bash script is supposed to print the full agency flag... but it's broken!
+You’ve discovered a **broken Bash script** that’s supposed to print the agency’s flag — but something’s gone wrong.  
 
-Right now it only prints a two-digit number at the end.
+Right now it only prints a **two-digit number** at the end instead of a full flag. Your mission is to analyze the buggy code and fix it so the correct flag appears.  
 
-Run the launcher script and follow the instructions.
-It will show you the broken code and ask you to fix it.
+🛠️ **What you’ll do:**  
+1. Run the interactive helper: `fix_flag.sh`  
+2. Inspect the broken Bash logic.  
+3. Choose the correct operation to repair the calculation.  
+4. Reveal and save the real flag.  
 
-🚩 Flag format: CCRI-AAAA-1111
+📂 **Files in this folder:**  
+- `broken_flag.sh` → The buggy Bash script  
+- `fix_flag.sh` → Your guided code-fixing assistant  
+
+🚩 **Flag format:** `CCRI-AAAA-1111`
 

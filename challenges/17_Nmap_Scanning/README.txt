@@ -1,32 +1,36 @@
-🛰️ Challenge #17 – Nmap Scan Puzzle
---------------------------------------
+🛰️ Challenge 17: Nmap Scan Puzzle
+==================================
 
-Several mysterious services are running on this system.
+Several simulated services are running locally on this system.  
+Your mission is to uncover the **REAL flag** hidden among them.
 
-Your mission is to:
+🎯 **Your Mission:**  
+1️⃣ Run the provided helper script to scan for open ports in the range **8000–8100**.  
+2️⃣ Explore the discovered services and inspect their responses.  
+3️⃣ Identify the **one true flag** and submit it to the scoreboard.  
 
-1️⃣ Scan localhost (**127.0.0.1**) for open ports in the range **8000–8100**.  
-2️⃣ Connect to each discovered service and inspect the responses.  
-3️⃣ Identify the **REAL flag** and submit it to the scoreboard.
+⚠️ **Not every open port contains a flag:**  
+- Some return random junk text (e.g., error pages, developer APIs).  
+- Four ports return **decoy flags** with slightly wrong formats.  
+- Only **one port** contains the real flag in this format:  
 
-⚠️ Not every open port contains a flag:
-- Some ports return random junk text (e.g., error pages, dev APIs).
-- Four ports return **decoy flags** with slightly wrong formats.
-- Only **one port** contains the **REAL flag** in this format:
+   ✅ **CCRI-AAAA-1111**
 
-🎯 Flag Format:
+🛠️ **Start Here:**  
+Run the guided script:  
 
-CCRI-AAAA-1111
+./scan\_services.sh
 
-🔧 **Tools Available:**
-- Nmap
-- curl
-- A web browser
+The script will:  
+- Use **nmap** to scan for open ports.  
+- Let you explore each service one by one.  
+- Save interesting responses to a file for later review.  
 
-💡 **Hints:**
-- Limit your scan to **ports 8000–8100** for faster results.
-- You can check a port using `curl`, for example:
+💡 **Tip:** Pay close attention to the format of each flag. Only one matches the official CCRI style.  
 
-curl http://localhost:<port>
+📂 **Files Provided:**  
+• `scan_services.sh` → Guided scanning and exploration tool  
 
+---
 
+🚀 **Objective:** Find the correct flag and paste it into the scoreboard.

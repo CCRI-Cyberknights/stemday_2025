@@ -2,18 +2,33 @@
 
 clear
 echo "🔐 Vigenère Cipher Breaker"
-echo "==========================="
+echo "==============================="
 echo
-echo "📄 You've recovered a scrambled message from: cipher.txt"
-echo "🔍 Analysts believe it's encrypted using the Vigenère cipher — a classic cipher that uses a repeating keyword."
+echo "📄 Encrypted message: cipher.txt"
+echo "🎯 Goal: Decrypt it and find the CCRI flag."
 echo
-echo "🔧 Quick Note:"
-echo "   The Vigenère cipher shifts each letter based on the letters in a keyword."
-echo "   For example, with the keyword 'KEY', the first letter shifts by K, the second by E, the third by Y, then repeats."
+echo "💡 What is Vigenère?"
+echo "   ➡️ A cipher that uses a repeating keyword to shift each letter."
+echo "   ➡️ For example, with keyword 'KEY':"
+echo "         Plain:  HELLO WORLD"
+echo "         Cipher: RIJVS UYVJN"
 echo
-echo "💡 Goal: Try different keywords until the decrypted message reveals a valid flag in the format: CCRI-AAAA-1111"
+echo "   Each letter in the keyword decides how far to shift the plaintext letters."
 echo
-read -p "Press ENTER to begin..." temp
+read -p "Press ENTER to learn how we’ll decode this..." temp
+
+# Explain decryption command
+clear
+echo "🛠️ Behind the Scenes"
+echo "-----------------------------"
+echo "We’ll use this Python helper:"
+echo
+echo "   python3 vigenere_decode.py [keyword]"
+echo
+echo "🔑 It reverses the shifting pattern based on your keyword."
+echo "   If the keyword is correct, the flag will appear!"
+echo
+read -p "Press ENTER to begin keyword testing..." temp
 
 # Check for cipher.txt first
 if [[ ! -f cipher.txt ]]; then
@@ -22,11 +37,13 @@ if [[ ! -f cipher.txt ]]; then
     exit 1
 fi
 
+# Start keyword attempt loop
 while true; do
     read -p "🔑 Enter a keyword to try (or type 'exit' to quit): " key
 
     if [[ "$key" == "exit" ]]; then
-        echo "👋 Exiting. Stay sharp, Agent."
+        echo
+        echo "👋 Exiting. Stay sharp, Agent!"
         break
     fi
 
@@ -36,11 +53,10 @@ while true; do
     fi
 
     echo
-    echo "🛠️ Running Vigenère decryption with keyword: $key"
-    echo "   → This attempts to reverse the shifting pattern applied with the keyword."
-    echo
+    echo "🔓 Attempting decryption with keyword: $key"
+    sleep 0.5
 
-    # Run Python decoder using key and cipher.txt
+    # Run Python decoder
     decoded=$(python3 - "$key" <<'EOF'
 import sys
 from itertools import cycle
@@ -86,16 +102,17 @@ EOF
     echo
 
     if echo "$decoded" | grep -qE 'CCRI-[A-Z]{4}-[0-9]{4}'; then
-        echo "✅ Valid flag format detected!"
+        echo "✅ Flag found in decrypted text!"
         echo "$decoded" > decoded_output.txt
-        echo "📁 Decoded output saved to: decoded_output.txt"
+        echo "📁 Saved to: decoded_output.txt"
+        echo "📋 Copy the CCRI flag and submit it on the scoreboard."
         break
     else
-        echo "❌ No valid CCRI flag format found. Try another keyword."
+        echo "❌ No valid CCRI flag format detected."
     fi
 
     echo
-    read -p "Try another keyword? (Y/n): " again
+    read -p "🔁 Try another keyword? (Y/n): " again
     while [[ ! "$again" =~ ^[YyNn]?$ ]]; do
         read -p "Please enter Y or N: " again
     done

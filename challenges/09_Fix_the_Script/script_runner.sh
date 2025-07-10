@@ -2,9 +2,9 @@
 
 clear
 echo "🧪 Challenge #09 – Fix the Flag! (Bash Edition)"
-echo "----------------------------------------------"
+echo "==============================================="
 echo
-echo "You found a broken Bash script! Here’s what it looks like:"
+echo "📄 You found a broken Bash script! Here’s what it looks like:"
 echo
 
 # Display the script contents as a code block
@@ -21,7 +21,7 @@ echo "Your flag is: CCRI-SCRP-$code"
 EOF
 
 echo
-echo "----------------------------------------------"
+echo "==============================================="
 
 # Check for broken_flag.sh
 if [[ ! -f broken_flag.sh ]]; then
@@ -30,28 +30,39 @@ if [[ ! -f broken_flag.sh ]]; then
     exit 1
 fi
 
-echo "Let’s run that script and see what happens:"
+# Explain
+echo "🧐 The original script tries to calculate a flag code by subtracting two numbers."
+echo "⚠️ But the result isn’t in the correct 4-digit format!"
 echo
-bash broken_flag.sh
-echo
-echo "⚠️  Uh-oh! That’s not a 4-digit flag. The math must be wrong."
-echo
+read -p "Press ENTER to run the script and see what happens..." junk
 
-# Loop until correct operator
+echo
+echo "💻 Running: bash broken_flag.sh"
+echo "----------------------------------------------"
+bash broken_flag.sh
+echo "----------------------------------------------"
+echo
+sleep 1
+echo "😮 Uh-oh! That’s not a valid 4-digit flag code. The math must be wrong."
+echo
+sleep 0.5
+
+# Interactive repair loop
 while true; do
-    echo "----------------------------------------------"
-    echo "🛠️  Fix the broken line:"
+    echo "🛠️  Your task: Fix the broken line in the script."
+    echo
     echo "    code=\$((part1 - part2))"
     echo
-    echo "Which operator should we use instead of '-'?"
-    echo "Choices: +   -   *   /"
+    echo "👉 Which operator should we use instead of '-' to calculate the flag?"
+    echo "   Choices: +   -   *   /"
     read -p "Enter your choice: " op
-    echo "----------------------------------------------"
+    echo
 
     case "$op" in
         "+")
-            echo "✅ Correct! Updating the script..."
-
+            echo "✅ Correct! Adding the two parts together gives us the proper flag code."
+            sleep 0.5
+            echo "🔧 Updating the script with '+'..."
             # Use a robust sed that handles whitespace
             sed -i 's/code=.*part1 - part2.*/code=$((part1 + part2))/' broken_flag.sh
 
@@ -59,25 +70,23 @@ while true; do
             echo "🎉 Re-running the fixed script..."
             flag_output=$(bash broken_flag.sh | grep "CCRI-SCRP")
 
+            echo "----------------------------------------------"
             echo "$flag_output"
+            echo "----------------------------------------------"
+            echo "📄 Flag saved to: flag.txt"
             echo "$flag_output" > flag.txt
             echo
-            echo "📄 Flag saved to: flag.txt"
-            echo
-            read -p "Press ENTER to finish..." junk
+            read -p "🎯 Copy the flag and enter it in the scoreboard when ready. Press ENTER to finish..." junk
             break
             ;;
         "-")
-            echo "❌ Still wrong! That’s the original problem."
-            result=$((900 - 198))
+            echo "❌ That’s still the original mistake. Subtracting gives: CCRI-SCRP-$((900 - 198))"
             ;;
         "*")
-            echo "❌ Nope! That multiplies them."
-            result=$((900 * 198))
+            echo "❌ Nope! Multiplying gives: CCRI-SCRP-$((900 * 198)) (way too big!)."
             ;;
         "/")
-            echo "❌ Not quite! That divides them."
-            result=$((900 / 198))
+            echo "❌ Not quite! Dividing gives: CCRI-SCRP-$((900 / 198)) (too small)."
             ;;
         *)
             echo "❌ Invalid choice. Use one of: +  -  *  /"
@@ -86,8 +95,7 @@ while true; do
     esac
 
     echo
-    echo "If you used '$op', the result would be: CCRI-SCRP-$result"
-    echo "That’s not the correct flag. Try again!"
+    echo "🧠 That result isn’t correct. Try another operator!"
     echo
 done
 

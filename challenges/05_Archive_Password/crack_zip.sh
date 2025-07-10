@@ -1,20 +1,24 @@
 #!/bin/bash
 
 clear
-echo "🔓 ZIP Password Cracking"
-echo "==========================="
+echo "🔓 ZIP Password Cracking Challenge"
+echo "======================================"
 echo
 echo "📁 Target archive: secret.zip"
 echo "📜 Wordlist: wordlist.txt"
 echo
-echo "🔧 Quick Note:"
-echo "   We're going to test each password in wordlist.txt to see which one unlocks the ZIP file."
-echo "   Behind the scenes, the script runs: unzip -P [password] -t secret.zip"
-echo "   → '-P' supplies the password"
-echo "   → '-t' tests if the ZIP is valid (without fully extracting it)"
+echo "🎯 Goal: Crack the ZIP file’s password and decode the message inside."
+echo
+echo "💡 How this works:"
+echo "   ➡️ We’ll test each password in wordlist.txt by running:"
+echo
+echo "      unzip -P [password] -t secret.zip"
+echo
+echo "   🛠 Breakdown:"
+echo "      -P [password] → Supplies the password"
+echo "      -t            → Tests if the ZIP is valid without extracting"
 echo
 read -p "Press ENTER to begin password testing..." junk
-echo
 
 # Pre-flight checks
 if [[ ! -f secret.zip ]]; then
@@ -32,13 +36,16 @@ fi
 found=0
 correct_pass=""
 
+echo
+echo "🔍 Starting password scan..."
+sleep 0.5
+
 # Try each password and display it
 while read -r pw; do
-    # Clear line properly by padding with spaces
     printf "\r[🔐] Trying password: %-20s" "$pw"
     sleep 0.05
     if unzip -P "$pw" -t secret.zip 2>/dev/null | grep -q "OK"; then
-        echo -e "\n\n✅ Password found: $pw"
+        echo -e "\n\n✅ Password found: \"$pw\""
         correct_pass="$pw"
         found=1
         break
@@ -46,20 +53,22 @@ while read -r pw; do
 done < wordlist.txt
 
 if [[ "$found" -eq 0 ]]; then
-    echo -e "\n❌ Password not found in the list."
+    echo -e "\n❌ Password not found in wordlist.txt."
+    echo "💡 Tip: You might need a bigger or different wordlist."
     read -p "Press ENTER to close this terminal..."
     exit 1
 fi
 
-# Ask to proceed
+# Confirm extraction
 echo
-read -p "Proceed to extract the ZIP archive? [Y/n] " go
+read -p "Do you want to extract the ZIP archive now? [Y/n] " go
 while [[ ! "$go" =~ ^[YyNn]?$ ]]; do
     read -p "Please enter Y or N: " go
 done
 [[ "$go" =~ ^[Nn]$ ]] && exit 0
 
-# Extract the ZIP archive using the found password
+echo
+echo "📦 Extracting secret.zip..."
 unzip -P "$correct_pass" secret.zip >/dev/null 2>&1
 
 if [[ ! -f message_encoded.txt ]]; then
@@ -68,14 +77,14 @@ if [[ ! -f message_encoded.txt ]]; then
     exit 1
 fi
 
-# Show base64 content first
+# Display base64 content
 echo
-echo "📦 Extracted Base64 Data:"
-echo "-----------------------------"
+echo "📄 Extracted Base64 Data:"
+echo "-------------------------------"
 cat message_encoded.txt
-echo "-----------------------------"
+echo "-------------------------------"
 
-# Prompt before decoding
+# Prompt for decoding
 echo
 read -p "Would you like to decode the Base64 message now? [Y/n] " decode
 while [[ ! "$decode" =~ ^[YyNn]?$ ]]; do
@@ -83,52 +92,54 @@ while [[ ! "$decode" =~ ^[YyNn]?$ ]]; do
 done
 
 if [[ "$decode" =~ ^[Nn]$ ]]; then
-    echo "❌ Skipping Base64 decoding. You can decode it manually later using: base64 --decode message_encoded.txt"
+    echo "⚠️ Skipping Base64 decoding. You can run:"
+    echo "    base64 --decode message_encoded.txt"
+    echo "later if needed."
     read -p "Press ENTER to close this terminal..."
     exit 0
 fi
 
+# Decoding phase
 echo
-echo "🧪 Base64 Detected:"
-echo "   The file we extracted (message_encoded.txt) contains Base64 — a way of encoding binary data as text."
-echo "   We'll now decode it using the 'base64' command to reveal the original message."
+echo "🧪 Base64 Detected!"
+echo "   Base64 encodes binary data as text for safe transmission."
 echo
-read -p "Press ENTER to decode the Base64 content..." junk
+echo "🔓 Decoding Base64 using:"
+echo "    base64 --decode message_encoded.txt"
+read -p "Press ENTER to start decoding..." junk
 
 # Decoding animation
 echo
-echo "🔽 Decoding Base64:"
-for i in {1..20}; do
-    sleep 0.05
-    echo -n "█"
+echo "🔽 Decoding..."
+for i in {1..30}; do
+    sleep 0.03
+    printf "█"
 done
 echo -e "\n"
 
-# Decode the base64 message
-echo "🛠️ Running: base64 --decode message_encoded.txt"
-echo "   → This converts the encoded content back into readable text"
-echo
-
+# Perform actual decoding
 decoded=$(base64 --decode message_encoded.txt 2>/dev/null)
 status=$?
 
 if [[ $status -ne 0 || -z "$decoded" ]]; then
-    echo "❌ Decoding failed. The file might be corrupted or not properly base64-encoded."
+    echo "❌ Decoding failed. The file may not be valid Base64."
     read -p "Press ENTER to close this terminal..."
     exit 1
 fi
 
+# Display decoded message
 echo
 echo "🧾 Decoded Message:"
-echo "-----------------------------"
+echo "-------------------------------"
 echo "$decoded"
-echo "-----------------------------"
+echo "-------------------------------"
+echo
 
 # Save decoded output
 echo "$decoded" > decoded_output.txt
-echo "💾 Decoded message saved to: decoded_output.txt"
+echo "💾 Decoded output saved as: decoded_output.txt"
 
 echo
-echo "🧠 Pick the valid flag from the list (format: CCRI-AAAA-1111) and enter it into the scoreboard."
+echo "🧠 Find the CCRI flag (format: CCRI-AAAA-1111) and submit it to the scoreboard."
 read -p "Press ENTER to close this terminal..."
 exec $SHELL

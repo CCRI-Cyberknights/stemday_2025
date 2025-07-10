@@ -1,17 +1,24 @@
 🕵️ Challenge 08: Fake Auth Log Investigation
+==============================================
 
-You've recovered a suspicious-looking system log named auth.log.
+You’ve recovered a suspicious system log: `auth.log`.  
 
-It contains hundreds of fake SSH login records — but somewhere within the noise, one line hides a real flag. The trick? Some of the log entries have weird-looking process IDs (PIDs) that don’t follow normal number formatting. Only one of them is a valid CCRI flag.
+It’s packed with fake SSH login records — but buried in the noise is **one hidden flag**.  
 
-Your mission:
+🔑 The clue? Some entries have **odd-looking process IDs (PIDs)** that don’t follow normal number patterns. Only **one** of these anomalies contains the valid flag.  
 
-    Run investigate_authlog.sh in the terminal.
+🛠️ **Tools You’ll Use:**  
+- `grep` – Scan for suspicious entries in system logs.  
 
-    The script will scan the log and flag suspicious entries for you.
+🧠 **Your steps:**  
+1. Run the interactive helper: `investigate_authlog.sh`  
+2. The script will scan `auth.log` and highlight suspicious entries.  
+3. Review the findings and search for patterns or keywords.  
+4. Identify the **real flag** in the format: `CCRI-AAAA-1111`  
 
-    Use the guided prompts to examine the log and uncover anomalies.
+📂 **Files in this folder:**  
+- `auth.log` → Fake system log to investigate  
+- `investigate_authlog.sh` → Your guided log analysis assistant  
 
-    Identify the correct flag in this format: CCRI-AAAA-1111
+💡 **Tip:** Not every strange PID hides a flag. Look for the **agency’s exact format** and don’t get distracted by decoys.  
 
-🧠 Tip: Not all strange-looking entries are real. Only one matches the agency’s standard. Trust the format — not the noise.

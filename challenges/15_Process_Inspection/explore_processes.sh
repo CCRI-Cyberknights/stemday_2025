@@ -2,9 +2,7 @@
 
 # Auto-relaunch in a bigger terminal window
 if [[ -z "$BIGGER_TERMINAL" ]]; then
-    # Mark that we're already in the bigger terminal if we relaunch
     export BIGGER_TERMINAL=1
-
     echo "🔄 Launching in a larger terminal window for better visibility..."
     sleep 1
 
@@ -25,72 +23,82 @@ fi
 # Main script starts here
 clear
 echo "🖥️ Process Inspection"
-echo "---------------------------------"
-echo "You've obtained a snapshot of running processes."
-echo "Choose a process to view its details."
+echo "================================="
 echo
-echo "💡 Hint: The real flag starts with CCRI- and is in a --flag= argument."
+echo "You've obtained a snapshot of running processes (ps_dump.txt)."
 echo
+echo "🎯 Your goal: Find the rogue process hiding a flag in a --flag= argument!"
+echo
+echo "💡 Tip: The real flag starts with CCRI-AAAA-1111."
+echo "   You'll inspect processes one by one to uncover hidden details."
+echo
+read -p "Press ENTER to start exploring..." junk
+clear
 
-# Verify ps_dump.txt exists
+# Check for ps_dump.txt
 if [[ ! -f ps_dump.txt ]]; then
     echo "❌ ERROR: ps_dump.txt not found in this folder!"
     read -p "Press ENTER to exit..." junk
     exit 1
 fi
 
-# Build dynamic list of unique COMMAND entries from ps_dump.txt
-mapfile -t processes < <(
-    awk 'NR>1 && $11 ~ /^\// {print $11}' ps_dump.txt | sort | uniq
-)
+# Build unique process list
+mapfile -t processes < <(awk 'NR>1 && $11 ~ /^\// {print $11}' ps_dump.txt | sort | uniq)
 
 while true; do
-    echo "Processes:"
+    echo "================================="
+    echo "📂 Process List (from ps_dump.txt):"
     for i in "${!processes[@]}"; do
         echo "$((i+1)). ${processes[$i]}"
     done
     echo "$(( ${#processes[@]} + 1 )). Exit"
     echo
-
     read -p "Select a process to inspect (1-${#processes[@]}): " choice
 
     if [[ "$choice" -ge 1 && "$choice" -le "${#processes[@]}" ]]; then
+        proc_name="${processes[$((choice-1))]}"
         echo
-        echo "🔍 Inspecting ${processes[$((choice-1))]} ..."
-        echo "---------------------------------"
-        echo "USER       PID %CPU %MEM   VSZ    RSS  TTY  STAT  START   TIME  COMMAND"
-        echo "-----      --- ---- ----   ----   ---- ---  ----  -----   ----  -------"
-        process_output=$(grep "${processes[$((choice-1))]}" ps_dump.txt | sed 's/--/\n    --/g')
-        echo "$process_output"
-        echo "---------------------------------"
+        echo "🔍 Inspecting process: $proc_name"
+        echo "   → Command: grep \"$proc_name\" ps_dump.txt | sed 's/--/\n    --/g'"
+        echo "================================="
+        sleep 0.5
+
+        # Display details with flags indented
+        grep "$proc_name" ps_dump.txt | sed 's/--/\n    --/g'
+        echo "================================="
 
         while true; do
             echo "Options:"
             echo "1. Return to process list"
-            echo "2. Save this output to a file"
+            echo "2. Save this output to a file (process_output.txt)"
             echo
             read -p "Choose an option (1-2): " save_choice
 
             if [[ "$save_choice" == "1" ]]; then
+                clear
                 break
             elif [[ "$save_choice" == "2" ]]; then
-                out_file="process_output.txt"
-                echo "$process_output" > "$out_file"
-                echo "✅ Process details saved to $out_file"
+                echo "💾 Saving output to process_output.txt..."
+                grep "$proc_name" ps_dump.txt | sed 's/--/\n    --/g' > process_output.txt
+                echo "✅ Saved successfully."
+                read -p "Press ENTER to continue." junk
+                clear
                 break
             else
                 echo "❌ Invalid choice. Please select 1 or 2."
             fi
         done
 
-        clear
     elif [[ "$choice" -eq "$(( ${#processes[@]} + 1 ))" ]]; then
+        echo
         echo "👋 Exiting. Good luck identifying the rogue process!"
         break
     else
         echo "❌ Invalid choice. Please select a valid process."
+        read -p "Press ENTER to continue." junk
+        clear
     fi
 done
 
-# Clean exit for web hub
+# Clean exit
 exit 0

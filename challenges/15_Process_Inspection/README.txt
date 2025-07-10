@@ -1,19 +1,27 @@
-🖥️ Challenge #15 – Process Inspection
--------------------------------------------
+🖥️ Challenge 15: Process Inspection
+====================================
 
-Your mission: Investigate a compromised system and identify the rogue process used by Liber8 to exfiltrate data.
+Liber8 operatives have planted a rogue process on a compromised system to exfiltrate sensitive data.  
+You’ve obtained a snapshot of the system’s running processes. Hidden within the **command-line arguments** of five suspicious processes are “flags” — but only ONE of them is authentic. The rest are decoys.  
 
-You’ve obtained a snapshot of the running processes on the target system. Five suspicious processes appear to include "flags" in their command-line arguments, but only ONE of these flags is the **real agency flag**—the others are decoys.
+🎯 **Your Mission:**  
+1. Investigate each process in the snapshot.  
+2. Examine their command-line arguments for embedded flags.  
+3. Identify which one matches the official agency flag format.  
 
-🗂️ Files in this folder:
-  • ps_dump.txt             ← Snapshot of running processes
-  • explore_processes.sh    ← Guided helper script
+🗂️ **Files in this folder:**  
+• ps_dump.txt – Snapshot of running processes  
+• explore_processes.sh – Interactive helper script  
 
-💡 Hint: The real flag starts with **CCRI-** and uses this format:  
-       **CCRI-AAAA-1111**  
-The fake flags have different prefixes.
+💡 **Hint:**  
+The real flag follows the agency format:  
+   `CCRI-AAAA-1111`  
+Fake flags use other prefixes or slightly altered structures.  
 
-👩‍💻 Tip: Use the helper script to filter and search the process list for possible flags.
+👩‍💻 **Tip:** Use the guided helper script to filter, search, and explore process details.  
+It will highlight arguments and save interesting results for later review.  
 
-🚀 Begin your investigation and identify the rogue process!
+---
+
+🚀 *Start your investigation and uncover the rogue process now!*
 

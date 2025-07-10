@@ -4,11 +4,67 @@
     <meta charset="UTF-8">
     <title>{{ challenge.name }} - CCRI CTF Hub</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background: #f9f9f9;
+        }
+        h1 {
+            color: #333;
+        }
+        .actions {
+            margin: 15px 0;
+        }
+        .actions button {
+            margin-right: 10px;
+        }
+        .readme {
+            background: #f1f1f1;
+            padding: 15px;
+            border-radius: 6px;
+            white-space: normal;
+            word-wrap: break-word;
+        }
+        .readme h1, .readme h2, .readme h3 {
+            margin-top: 15px;
+            color: #222;
+        }
+        .readme p {
+            margin: 10px 0;
+        }
+        .readme code {
+            background: #eaeaea;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        .readme pre {
+            background: #eaeaea;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .readme ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .readme strong {
+            font-weight: bold;
+        }
+        #flagInput {
+            width: 300px;
+            padding: 5px;
+            margin-top: 5px;
+        }
+        #flagStatus {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <h1>{{ challenge.name }}</h1>
-    <p><strong>ID:</strong> {{ challenge_id }}</p>
-    <p><strong>Folder:</strong> {{ challenge.folder }}</p>
 
     <div class="actions">
         <button onclick="runScript()">🖥 Run Helper Script</button>
@@ -18,9 +74,11 @@
 
     <hr>
 
-    <h2>📖 README</h2>
+    <h2>📖 Challenge Details</h2>
     {% if readme %}
-    <pre class="readme">{{ readme }}</pre>
+    <div class="readme">
+        {{ readme|safe }}
+    </div>
     {% else %}
     <p><em>No README.txt found in this folder.</em></p>
     {% endif %}
@@ -88,7 +146,6 @@
             });
         }
 
-        // On page load: prefill flag if already saved
         document.addEventListener("DOMContentLoaded", () => {
             const savedFlag = localStorage.getItem("{{ challenge_id }}");
             if (savedFlag) {

@@ -1,27 +1,30 @@
-🔓 Challenge 06: Hashcat ChainCrack
+🔓 Hashcat ChainCrack
+----------------------
 
-You’ve intercepted 3 encrypted archive segments — each one locked behind a password that isn’t given. But someone also left behind a hashes.txt file full of MD5 hashes and a wordlist.txt of likely passwords.
+You’ve intercepted 3 encrypted archive segments — each one locked behind a password. Alongside them, you found:  
 
-This means the passwords are hidden — in plain sight — if you can crack them.
+- `hashes.txt` – A list of MD5 hashes hiding the passwords.  
+- `wordlist.txt` – Likely password candidates.  
 
-Your mission:
+Your task is to crack the hashes, extract the segments, decode them, and assemble the final flag.  
 
-    Run the guided script: run_chain_crack.sh
+🧠 **Your mission:**  
+1. Run the helper script: `run_chain_crack.sh`  
+2. The script will:  
+   • Use **Hashcat** to crack all 3 hashes using the provided wordlist.  
+   • Unlock each ZIP segment with its cracked password.  
+   • Decode the base64-encoded data in each segment.  
+   • Reassemble all decoded parts into **5 possible flags**.  
 
-    It will use Hashcat to crack all 3 hashes using the provided wordlist.
+Only **one** of the 5 matches the official format: `CCRI-AAAA-1111`  
 
-    Each cracked password will unlock one ZIP segment.
+📂 **Files in this folder:**  
+- `hashes.txt` – 3 MD5 hashes to crack  
+- `wordlist.txt` – Possible passwords  
+- `segments/` – Folder with 3 encrypted ZIP files  
+- `run_chain_crack.sh` – Your interactive cracking assistant  
 
-    Each segment contains base64-encoded data.
+💡 **Tip:** Watch how each successful crack gets you closer to the goal. Cracking alone doesn’t solve the case — decoding and assembling are just as critical!  
 
-    The script decodes each segment and assembles them into 5 possible flags.
+🏁 **Flag format:** CCRI-AAAA-1111
 
-Only one of the 5 follows the correct agency format: CCRI-AAAA-1111
-
-📁 Files in this folder:
-• hashes.txt ← 3 MD5 hashes to crack
-• wordlist.txt ← Possible password candidates
-• segments/ ← Folder with 3 encrypted ZIPs
-• run_chain_crack.sh ← Your interactive cracking assistant
-
-🧠 Tip: Watch how each successful crack gets you closer to the final goal. Cracking alone doesn’t solve the case — you’ll need to decode and assemble too!

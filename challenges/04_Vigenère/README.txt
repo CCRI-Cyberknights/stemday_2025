@@ -1,18 +1,20 @@
-🧩 Challenge 04: Vigenère Cipher
+🧩 Vigenère Cipher Challenge
+-----------------------------
 
-You’ve recovered a scrambled message from an intercepted communication. Analysts believe it’s been encoded using the Vigenère cipher — a letter-based cipher that scrambles messages using a repeating keyword.
+You’ve recovered a scrambled message from an intercepted communication. Analysts suspect it was encoded using the **Vigenère cipher** — a classic encryption method that scrambles letters based on a repeating keyword.  
 
-🧠 Your task: Decrypt the message and recover the real agency flag.
+🧠 **Your mission:** Decrypt the message and recover the real agency flag.  
 
-🔐 Hint:
-What’s the opposite of logout?
+🔐 **Hint:**  
+What’s the opposite of logout?  
+👉 Try that word as a possible keyword for decoding.  
 
-💡 Answer that riddle and try using that word to decode the file.
+📂 Files in this folder:
+- `cipher.txt` – The encrypted message.
+- `break_vigenere.sh` – A helper script that guides you through decoding.  
 
-📄 Encrypted file: cipher.txt  
-🖥️ Script to run: break_vigenere.sh
-
-🚫 Not every decoded result will be valid.
-Only one flag matches the official format: CCRI-AAAA-1111
+🚨 **Note:** Not every decoded result will be valid.  
+Only one flag fits the official format: **CCRI-AAAA-1111**.  
 
 Good luck, Agent. 🕵️
+

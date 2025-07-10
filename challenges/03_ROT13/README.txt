@@ -1,20 +1,18 @@
-🔐 Challenge 03: ROT13
-----------------------
+🔐 ROT13 Decode Challenge
+--------------------------
 
-An intercepted note was found in the logs of a compromised account. It’s readable... sort of. But every letter looks just a bit off — like someone twisted the alphabet around.
+An intercepted note was found in the logs of a compromised account. It’s readable… sort of. But every letter seems slightly off — like the alphabet has been twisted.  
 
-This challenge introduces **ROT13**, a simple cipher that shifts each letter by 13 places. It was once used to obscure messages without really encrypting them — but it’s still great for hiding things from casual observers.
+This challenge introduces **ROT13**, a simple substitution cipher that shifts each letter 13 places.  
+- 🔄 It’s symmetrical: applying ROT13 twice restores the original message.  
+- 🕵️‍♂️ While not secure by today’s standards, it’s still used to obscure text from casual readers.  
 
-Your task: decode the scrambled message and find the hidden flag.
+📂 Files in this folder:
+- `cipher.txt` – The scrambled message.
+- `decode_rot13.sh` – A helper script that guides you through decoding.  
+- (The decoded result will be saved as `decoded_output.txt`.)  
 
-What to do:
-1. Double-click the `decode_rot13.sh` script in this folder.
-2. When prompted, choose **“Run in Terminal”**.
-3. Let the script guide you through decoding the message.
+💡 **Hint:** The flag will stand out in the format **CCRI-AAAA-1111**.  
 
-No need to type any commands — everything runs for you.
-
-📄 The message is stored in: `cipher.txt`
-
-🏁 Flag format: CCRI-AAAA-1111
+🏁 Flag format: **CCRI-AAAA-1111**
 

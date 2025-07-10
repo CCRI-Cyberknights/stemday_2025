@@ -1,33 +1,38 @@
 #!/bin/bash
 
 clear
-echo "🔐 ROT13 Decoder Terminal"
-echo "=========================="
+echo "🔐 ROT13 Decoder Helper"
+echo "==========================="
 echo
-echo "📄 You've recovered a scrambled message from: cipher.txt"
-echo "🔍 Agency analysts suspect it's been encoded using the ROT13 cipher."
+echo "📄 File to analyze: cipher.txt"
+echo "🎯 Goal: Decode this message and find the hidden CCRI flag."
 echo
-echo "🔧 Quick Note:"
-echo "   ROT13 is a simple Caesar cipher that shifts each letter 13 places."
-echo "   It's symmetrical — encoding and decoding are the same operation!"
+echo "💡 What is ROT13?"
+echo "   ➡️ A simple Caesar cipher that shifts each letter 13 places in the alphabet."
+echo "   ➡️ Encoding and decoding use the same operation because 13+13=26 (a full loop!)."
 echo
-read -p "Press ENTER to begin decoding..." temp
+read -p "Press ENTER to learn how the decoder works..."
 
-echo -ne "[🔄] Scanning content"
-for i in {1..3}; do sleep 0.4; echo -n "."; done
-echo -e "\n[✅] ROT13 structure confirmed.\n"
-sleep 0.5
+# Explain the decoding process
+clear
+echo "🛠️ Behind the Scenes"
+echo "---------------------------"
+echo "We’ll use a Python helper to process each character:"
+echo
+echo "   For every letter in cipher.txt:"
+echo "     ➡️ Rotate it forward by 13 places (A→N, N→A)."
+echo
+echo "💻 The Python decoder also animates this process so you can watch it work."
+echo
+read -p "Press ENTER to launch the animated decoder..." temp
 
-echo "🌀 Running animated ROT13 decoder using Python..."
-sleep 0.5
-
-# Inline Python animation
+# Run the Python decoder
 python3 - <<'EOF'
 import time
 import os
 import sys
 
-# Check if file exists and is non-empty
+# Check if cipher.txt exists
 if not os.path.isfile("cipher.txt") or os.path.getsize("cipher.txt") == 0:
     print("\n❌ ERROR: cipher.txt is missing or empty.")
     sys.exit(1)
@@ -54,8 +59,8 @@ def animate_rot13(encoded_text):
                     rotated = rotated.upper()
                 decoded_chars[i] = rotated
                 os.system("clear")
-                print("🔐 ROT13 Decoder Terminal")
-                print("==========================\n")
+                print("🔐 ROT13 Decoder Helper")
+                print("===========================\n")
                 print("🌀 Decrypting:\n")
                 print("".join(decoded_chars))
                 time.sleep(0.02)
@@ -64,11 +69,11 @@ def animate_rot13(encoded_text):
 
 final_message = animate_rot13(encoded)
 
-# Save final output
+# Save decoded output
 with open("decoded_output.txt", "w") as f_out:
     f_out.write(final_message)
 
-# Final display
+# Display the result
 print("\n✅ Final Decoded Message:")
 print("-----------------------------")
 print(final_message)
@@ -76,17 +81,16 @@ print("-----------------------------")
 print("📁 Saved to: decoded_output.txt")
 EOF
 
-# Check if decoding failed
+# Check for Python failure
 if [[ $? -ne 0 ]]; then
-    echo -e "\n⚠️ ROT13 decoding failed. Check if cipher.txt exists and is valid."
+    echo -e "\n⚠️ ROT13 decoding failed. Make sure cipher.txt exists and is valid."
     read -p "Press ENTER to close this terminal..."
     exit 1
 fi
 
 echo
-echo "⚠️  Multiple code-like values detected."
-echo "🔎 Only one matches the official flag format: CCRI-AAAA-1111"
-echo "🧠 Review the decoded message and copy the correct flag to submit on the scoreboard."
+echo "🧠 Look carefully: Only one string matches the CCRI flag format: CCRI-AAAA-1111"
+echo "📋 Copy the correct flag and paste it into the scoreboard when ready."
 echo
 read -p "Press ENTER to close this terminal..."
 exec $SHELL

@@ -18,25 +18,42 @@
             box-shadow: 0 0 5px rgba(0,0,0,0.1);
             position: relative;
             text-align: center;
+            transition: transform 0.2s ease;
+        }
+        .challenge-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
         .challenge-card.completed {
             background-color: #d4edda; /* light green */
             border: 2px solid #28a745;
+            position: relative;
         }
         .challenge-card.completed::after {
-            content: "✓";
+            content: "✅"; /* Bigger checkmark */
             position: absolute;
             top: 8px;
             right: 8px;
-            font-size: 1.5em;
+            font-size: 2em;
             color: #28a745;
         }
         .progress {
             font-weight: bold;
             margin-bottom: 10px;
         }
-        button {
-            margin: 5px;
+        .view-btn {
+            margin: 8px;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .view-btn:hover {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
         }
     </style>
 </head>
@@ -50,11 +67,8 @@
     <div class="grid">
         {% for cid, meta in challenges.items() %}
         <div class="challenge-card" id="{{ cid }}">
-            <h3>{{ meta.name }}</h3>
-            <p><strong>ID:</strong> {{ cid }}</p>
-            <button onclick="location.href='/challenge/{{ cid }}'">📖 View Challenge</button>
-            <button onclick="runScript('{{ cid }}', this)">🖥 Run Helper Script</button>
-            <button onclick="openFolder('{{ cid }}', this)">📂 Open Folder</button>
+            <h3>{{ loop.index }}. {{ meta.name }}</h3>
+            <button class="view-btn" onclick="location.href='/challenge/{{ cid }}'">🚀 Start Challenge</button>
         </div>
         {% endfor %}
     </div>
@@ -76,46 +90,6 @@
             document.getElementById("progress-counter").textContent =
                 `${completed} of ${total} challenges completed`;
         });
-
-        function runScript(challengeId, button) {
-            const originalText = button.textContent;
-            fetch(`/run_script/${challengeId}`, { method: 'POST' })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === "success") {
-                        button.textContent = "✅ Script Running...";
-                    } else {
-                        button.textContent = "❌ Failed";
-                        console.error("Failed to launch script: " + data.message);
-                    }
-                    setTimeout(() => button.textContent = originalText, 2000);
-                })
-                .catch(err => {
-                    button.textContent = "⚠️ Error";
-                    console.error("Error launching script:", err);
-                    setTimeout(() => button.textContent = originalText, 2000);
-                });
-        }
-
-        function openFolder(challengeId, button) {
-            const originalText = button.textContent;
-            fetch(`/open_folder/${challengeId}`, { method: 'POST' })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === "success") {
-                        button.textContent = "📂 Folder Opened";
-                    } else {
-                        button.textContent = "❌ Failed";
-                        console.error("Failed to open folder: " + data.message);
-                    }
-                    setTimeout(() => button.textContent = originalText, 2000);
-                })
-                .catch(err => {
-                    button.textContent = "⚠️ Error";
-                    console.error("Error opening folder:", err);
-                    setTimeout(() => button.textContent = originalText, 2000);
-                });
-        }
     </script>
 </body>
 </html>

@@ -1,23 +1,18 @@
 🕵️ Stego Decode Challenge
--------------------------
+--------------------------
 
-Your mission is to extract a secret flag hidden inside an image file.
+Your mission: extract a secret flag hidden inside an image file.  
 
-But this flag isn’t in the visible part of the image — you won’t see it by just opening the picture. Instead, it’s been embedded in the raw data of the file using a technique called:
+The picture looks completely normal, but it’s been altered using *steganography* — a technique for hiding data inside files.  
 
-    Steganography
+🔧 You’ll use `steghide`, a tool that extracts hidden content (if you supply the correct password).  
 
-That means the image looks completely normal, but it secretly contains a message hidden beneath the surface — invisible to the eye.
+💡 **Hint:** The password is the most common one in the world.  
 
-🔧 A tool called `steghide` can extract that message — but only if you provide the correct password.
+📂 Files in this folder:
+- `squirrel.jpg` – The suspicious image.
+- `extract_flag.sh` – A helper script that guides you through the process.
+- (The flag will be saved as `flag.txt` when you succeed.)
 
-What to do:
-1. Double-click the `extract_flag.sh` script in this folder.
-2. When prompted, choose **“Run in Terminal”**.
-3. Try guessing the password.
-   💡 Hint: it’s the most common password in the world.
-
-If you get it right, the hidden flag will be revealed and saved to `flag.txt`.
-
-🏁 Flag format: CCRI-AAAA-1111
+🏁 Flag format: **CCRI-AAAA-1111**
 

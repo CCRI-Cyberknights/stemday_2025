@@ -42,3 +42,39 @@ button {
 button:hover {
     background-color: #005a9e;
 }
+
+/* 📝 Markdown Styling */
+.readme {
+    background: #f1f1f1;
+    padding: 15px;
+    border-radius: 6px;
+    margin-top: 10px;
+    overflow-x: auto;
+    font-family: system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+}
+
+.readme h1, .readme h2, .readme h3 {
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    color: #333;
+}
+
+.readme p {
+    margin: 0.5em 0;
+}
+
+.readme code {
+    background: #eaeaea;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+.readme pre {
+    background: #272822;
+    color: #f8f8f2;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+}

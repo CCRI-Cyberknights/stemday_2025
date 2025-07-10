@@ -1,61 +1,71 @@
 #!/bin/bash
 
 clear
-echo "🧩 Base64 Decoder Terminal"
-echo "=========================="
+echo "🧩 Base64 Decoder Helper"
+echo "==========================="
 echo
-echo "📄 Recovered fragment: encoded.txt"
-echo "🔍 Analysts believe this file contains a message encoded in base64 format."
-echo "💡 Goal: Decode the file and identify the hidden CCRI flag."
+echo "📄 File to analyze: encoded.txt"
+echo "🎯 Goal: Decode this file and find the hidden CCRI flag."
 echo
-echo "🔧 Quick Note:"
-echo "   'base64' is a Linux tool that can encode or decode data using the Base64 scheme."
-echo "   We'll use it with the '--decode' option to turn gibberish-looking text back into readable form."
+echo "💡 What is Base64?"
+echo "   ➡️ A text-based encoding scheme that turns binary data into readable text."
+echo "   Used to safely transmit data over systems that handle text better than raw binary."
 echo
-read -p "Press ENTER to begin the scan..." junk
+echo "🔧 We'll use the Linux tool 'base64' to reverse the encoding."
+echo
+read -p "Press ENTER to learn how this works..."
 
-# Simulated analysis
-echo -ne "\n[🔍] Scanning file for suspicious patterns"
-for i in {1..3}; do sleep 0.4; echo -n "."; done
-echo -e "\n[✅] Base64 structure confirmed."
+# Explain the decoding command
+clear
+echo "🛠️ Behind the Scenes"
+echo "---------------------------"
+echo "To decode the file, we’ll run:"
+echo
+echo "   base64 --decode encoded.txt"
+echo
+echo "🔑 Breakdown:"
+echo "   base64         → Call the Base64 tool"
+echo "   --decode       → Switch from encoding to decoding"
+echo "   encoded.txt    → Input file to decode"
+echo
+read -p "Press ENTER to begin decoding..." junk
+
+# Simulate analysis
+echo
+echo "🔍 Checking file for Base64 structure..."
+sleep 1
+echo "✅ Structure confirmed!"
 sleep 0.5
 
-echo -ne "[🔄] Preparing decoding pipeline"
-for i in {1..3}; do sleep 0.3; echo -n "."; done
-echo -e "\n[✅] Decoding initialized."
-sleep 0.5
-
-echo -ne "[⏳] Decoding content using:"
 echo
-echo "    base64 --decode encoded.txt"
-echo "    → '--decode' tells it to convert from encoded form back to plain text."
-for i in {1..3}; do sleep 0.4; echo -n "."; done
-echo
+echo "⏳ Decoding content using:"
+echo "   base64 --decode encoded.txt"
+sleep 1
 
-# Perform actual decoding
+# Perform decoding
 decoded=$(base64 --decode encoded.txt 2>/dev/null)
 status=$?
 
 if [[ $status -ne 0 || -z "$decoded" ]]; then
-    echo -e "\n❌ Decoding failed! This may not be valid base64, or the file is malformed."
-    echo "💡 Tip: Ensure 'encoded.txt' exists and contains valid base64 text."
+    echo
+    echo "❌ Decoding failed! This may not be valid Base64, or the file is corrupted."
+    echo "💡 Tip: Ensure 'encoded.txt' exists and contains proper Base64 text."
     read -p "Press ENTER to close this terminal..."
     exit 1
 fi
 
 # Display and save decoded output
-echo -e "\n📄 Decoded Message:"
-echo "------------------------"
+echo
+echo "📄 Decoded Message:"
+echo "-----------------------------"
 echo "$decoded"
-echo "------------------------"
+echo "-----------------------------"
 echo "$decoded" > decoded_output.txt
 
 echo
-echo "📁 A copy of the decoded message has been saved to: decoded_output.txt"
-echo "🔎 Multiple code-like strings may be present."
-echo "🧠 Only one of them fits the official CCRI flag format: CCRI-AAAA-1111"
-echo "📋 Manually copy the correct flag into the scoreboard when ready."
+echo "📁 Decoded output saved as: decoded_output.txt"
+echo "🔎 Look for a string matching this format: CCRI-AAAA-1111"
+echo "🧠 This is your flag. Copy it into the scoreboard!"
 echo
-
 read -p "Press ENTER to close this terminal..."
 exec $SHELL

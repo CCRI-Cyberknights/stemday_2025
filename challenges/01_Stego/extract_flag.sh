@@ -1,21 +1,36 @@
 #!/bin/bash
 
 clear
-echo "🕵️ Stego Decode Terminal"
-echo "========================="
+echo "🕵️ Stego Decode Helper"
+echo "=========================="
 echo
 echo "🎯 Target image: squirrel.jpg"
-echo "🔍 Tool in use: steghide"
-echo "💡 Goal: Recover a hidden flag embedded in the image!"
+echo "🔍 Tool: steghide"
 echo
-echo "🔧 Quick Note:"
-echo "   'steghide' is a Linux tool that can HIDE or EXTRACT messages inside image or audio files."
-echo "   We'll use it to try to extract a hidden message from squirrel.jpg using a password."
+echo "💡 What is steghide?"
+echo "   ➡️ A Linux tool that can HIDE or EXTRACT secret data inside images or audio files."
+echo "   We'll use it to try and extract a hidden message from squirrel.jpg."
+echo
+read -p "Press ENTER to learn how this works..."
+
+# Explain the extraction command
+clear
+echo "🛠️ Behind the Scenes"
+echo "---------------------------"
+echo "When we try a password, this command will run:"
+echo
+echo "   steghide extract -sf squirrel.jpg -xf decoded_message.txt -p [your password]"
+echo
+echo "🔑 Breakdown:"
+echo "   -sf squirrel.jpg   → Stego file (the image to scan)"
+echo "   -xf decoded_message.txt → Extract to this file"
+echo "   -p [password]      → Try this password for extraction"
 echo
 read -p "Press ENTER to begin password testing..."
 
+# Begin password testing loop
 while true; do
-    read -p "🔑 Enter the password to try (or type 'exit' to quit): " pw
+    read -p "🔑 Enter a password to try (or type 'exit' to quit): " pw
 
     if [[ -z "$pw" ]]; then
         echo "⚠️ You must enter something. Try again."
@@ -23,44 +38,41 @@ while true; do
     fi
 
     if [[ "$pw" == "exit" ]]; then
-        echo "👋 Exiting... good luck on your next mission."
+        echo
+        echo "👋 Exiting... good luck on your next mission!"
         read -p "Press ENTER to close this window..."
         exit 0
     fi
 
-    echo -ne "\n🔓 Trying password"
-    for i in {1..3}; do sleep 0.4; echo -n "."; done
+    echo
+    echo "🔓 Trying password: $pw"
+    sleep 0.5
+    echo "📦 Scanning squirrel.jpg for hidden data..."
+    sleep 1
+
+    # Show command (simulated)
+    echo
+    echo "💻 Running: steghide extract -sf squirrel.jpg -xf decoded_message.txt -p \"$pw\""
     echo
 
-    echo -ne "📦 Scanning squirrel.jpg for hidden data using steghide"
-    for i in {1..4}; do sleep 0.3; echo -n "."; done
-    echo
-
-    echo
-    echo "🛠️ Running: steghide extract -sf squirrel.jpg -xf decoded_message.txt -p [your password]"
-    echo "   -sf = stego file (squirrel.jpg)"
-    echo "   -xf = extract to this file (decoded_message.txt)"
-    echo "   -p  = use this password"
-    echo
-
-    # Attempt extraction (force non-interactive to prevent hanging)
+    # Attempt extraction (force non-interactive, suppress errors)
     steghide extract -sf squirrel.jpg -xf decoded_message.txt -p "$pw" -f <<< "" > /dev/null 2>&1
     status=$?
 
     if [[ $status -eq 0 && -s decoded_message.txt ]]; then
         echo
-        echo "🎉 SUCCESS! Hidden message recovered:"
+        echo "🎉 ✅ SUCCESS! Hidden message recovered:"
         echo "----------------------------"
         cat decoded_message.txt
         echo "----------------------------"
-        echo "📁 A copy has been saved as decoded_message.txt"
-        echo "🔎 Review the contents carefully. Only one string matches the CCRI-AAAA-1111 format."
+        echo "📁 Saved as decoded_message.txt"
+        echo "💡 Look for a string like CCRI-ABCD-1234 to use as your flag."
         echo
         read -p "Press ENTER to close this terminal..."
         exec $SHELL
     else
         echo
-        echo "❌ Extraction failed. No data recovered or incorrect password."
+        echo "❌ Extraction failed. No hidden data or incorrect password."
         echo "🔁 Try again with a different password."
         echo
         # Clean up any empty/partial file
