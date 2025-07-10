@@ -2,8 +2,9 @@ from flask import Flask, render_template, request, jsonify
 import subprocess
 import json
 import os
-import socket
 import base64
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 app = Flask(__name__)
 
@@ -22,7 +23,7 @@ def xor_decode(encoded_base64, key):
         for i, b in enumerate(decoded_bytes)
     )
 
-# === Routes ===
+# === Flask Routes ===
 @app.route('/')
 def index():
     """Main grid of all challenges"""
@@ -145,17 +146,65 @@ JUNK_RESPONSES = {
     8098: "Server under maintenance.\nPlease retry in 5 minutes."
 }
 
-@app.route('/ports/<int:port>')
-def simulate_ports(port):
-    """Simulate open ports for Nmap Scan Puzzle"""
-    if port in FAKE_FLAGS:
-        return FAKE_FLAGS[port]
-    elif port in JUNK_RESPONSES:
-        return JUNK_RESPONSES[port]
-    else:
-        return "Connection refused", 404
+SERVICE_NAMES = {
+    8001: "dev-http",
+    8004: "flag-api",
+    8009: "secure-api",
+    8015: "maintenance",
+    8020: "apache",
+    8023: "flag-api",
+    8028: "debug-service",
+    8033: "help-service",
+    8039: "http",
+    8045: "maintenance",
+    8047: "flag-api",
+    8051: "iot-server",
+    8058: "http",
+    8064: "dev-api",
+    8072: "flag-api",
+    8077: "secure-api",
+    8083: "http",
+    8089: "test-service",
+    8095: "flag-api",
+    8098: "maintenance"
+}
 
+# === Start Real Services on Ports 8000–8100 ===
+ALL_PORTS = {}
+ALL_PORTS.update(FAKE_FLAGS)
+ALL_PORTS.update(JUNK_RESPONSES)
+
+class PortHandler(BaseHTTPRequestHandler):
+    """Custom HTTP handler for simulated ports"""
+    def do_GET(self):
+        response = ALL_PORTS.get(self.server.server_port, "Connection refused")
+        service_name = SERVICE_NAMES.get(self.server.server_port, "http")
+        banner = f"👋 Welcome to {service_name}\n\n"
+        self.send_response(200)
+        self.send_header("Content-type", "text/plain; charset=utf-8")
+        self.send_header("Server", service_name)  # Hint Nmap
+        self.send_header("X-Service-Name", service_name)  # Custom header for Nmap
+        self.end_headers()
+        self.wfile.write((banner + response).encode("utf-8"))
+
+    def log_message(self, format, *args):
+        # Suppress logging
+        return
+
+def start_fake_service(port):
+    """Start a lightweight HTTP server on the given port"""
+    try:
+        server = HTTPServer(('0.0.0.0', port), PortHandler)
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        print(f"🛰️  Simulated service running on port {port} ({SERVICE_NAMES.get(port, 'http')})")
+    except OSError as e:
+        print(f"❌ Could not bind port {port}: {e}")
+
+# Launch all fake services
+for port in ALL_PORTS.keys():
+    start_fake_service(port)
+
+# === Start Flask Hub ===
 if __name__ == '__main__':
     print("🌐 Student hub running on http://127.0.0.1:5000")
     app.run(host='127.0.0.1', port=5000, debug=False)
-

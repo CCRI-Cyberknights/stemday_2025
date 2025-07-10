@@ -5,20 +5,128 @@ echo "--------------------------------------"
 echo "Several simulated services are running locally (within your CTF app)."
 echo
 echo "🎯 Your goal: Scan localhost (127.0.0.1) for open ports in the range 8000–8100, and find the REAL flag."
-echo
 echo "⚠️ Some ports contain random junk responses. Only one flag is correct."
+echo
 
 read -p "Press ENTER to begin your scan..."
 
+# Run nmap and capture raw results
 echo
 echo "📡 Running nmap on localhost (127.0.0.1)..."
-nmap -p8000-8100 localhost
+raw_scan=$(nmap -sV --version-light -p8000-8100 localhost)
+
+# Map ports to service names
+declare -A port_services
+port_services=(
+  [8001]="dev-http"
+  [8004]="flag-api"
+  [8009]="secure-api"
+  [8015]="maintenance"
+  [8020]="apache"
+  [8023]="flag-api"
+  [8028]="debug-service"
+  [8033]="help-service"
+  [8039]="http"
+  [8045]="maintenance"
+  [8047]="flag-api"
+  [8051]="iot-server"
+  [8058]="http"
+  [8064]="dev-api"
+  [8072]="flag-api"
+  [8077]="secure-api"
+  [8083]="http"
+  [8089]="test-service"
+  [8095]="flag-api"
+  [8098]="maintenance"
+)
+
+# Pretty print the scan results
+echo
+echo "📝 Nmap Scan Results:"
+echo "--------------------------------------"
+echo "$raw_scan" | while IFS= read -r line; do
+    if [[ "$line" =~ ^8[0-9]{3}/tcp[[:space:]]+open ]]; then
+        port=$(echo "$line" | awk '{split($1,p,"/"); print p[1]}')
+        service="${port_services[$port]}"
+        printf "%-9s %-5s %-15s %s\n" "$port/tcp" "open" "$service" "CustomSim/1.0"
+    else
+        echo "$line"
+    fi
+done
 
 echo
-echo "✅ Scan complete. Now connect to each discovered port using curl or a browser."
+echo "✅ Scan complete."
 echo
-echo "Example: curl http://localhost:<port>"
-echo
-echo "When you’ve found the real flag, return to the CTF portal and submit it."
 
-read -p "Press ENTER when done to continue..."
+# Pause before interactive menu
+read -p "📖 Review the scan results above. Press ENTER to explore open ports..."
+
+# Extract list of open ports
+mapfile -t open_ports < <(echo "$raw_scan" | awk '/open/{split($1,p,"/"); print p[1]}')
+
+# Check if any ports were found
+if [[ "${#open_ports[@]}" -eq 0 ]]; then
+    echo "❌ No open ports found in the range 8000–8100."
+    read -p "Press ENTER to exit..."
+    exit 1
+fi
+
+# Interactive exploration
+while true; do
+    echo "--------------------------------------"
+    echo "Open ports detected:"
+    for i in "${!open_ports[@]}"; do
+        port="${open_ports[$i]}"
+        service="${port_services[$port]:-unknown}"
+        printf "%2d. %s (%s)\n" $((i+1)) "$port" "$service"
+    done
+    echo "$(( ${#open_ports[@]} + 1 )). Exit"
+    echo
+
+    read -p "Select a port to explore (1-$(( ${#open_ports[@]} + 1 ))): " choice
+
+    if [[ "$choice" -ge 1 && "$choice" -le "${#open_ports[@]}" ]]; then
+        port="${open_ports[$((choice-1))]}"
+        service="${port_services[$port]:-unknown}"
+        echo
+        echo "🌐 Connecting to http://localhost:$port ..."
+        echo "Service: $service"
+        echo "--------------------------------------"
+        response=$(curl -s http://localhost:$port)
+        echo "$response"
+        echo "--------------------------------------"
+        echo
+
+        # Offer to save response
+        while true; do
+            echo "Options:"
+            echo "1. Return to port list"
+            echo "2. Save this response to a file"
+            echo
+
+            read -p "Choose an option (1-2): " sub_choice
+            if [[ "$sub_choice" == "1" ]]; then
+                break
+            elif [[ "$sub_choice" == "2" ]]; then
+                out_file="nmap_flag_response.txt"
+                echo "Port: $port" > "$out_file"
+                echo "Service: $service" >> "$out_file"
+                echo "Response:" >> "$out_file"
+                echo "$response" >> "$out_file"
+                echo "✅ Response saved to $out_file"
+                break
+            else
+                echo "❌ Invalid choice. Please select 1 or 2."
+            fi
+        done
+        clear
+
+    elif [[ "$choice" -eq $(( ${#open_ports[@]} + 1 )) ]]; then
+        echo "👋 Exiting helper. Return to the CTF portal to submit your flag."
+        break
+    else
+        echo "❌ Invalid choice. Please select a valid port."
+    fi
+done
+
+exit 0

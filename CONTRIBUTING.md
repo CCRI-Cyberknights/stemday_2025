@@ -57,7 +57,7 @@ Run these commands in your VM:
 
 ```bash
 sudo apt update
-sudo apt install -y git python3 python3-pip python3-venv exiftool zbar-tools steghide hashcat unzip
+sudo apt install -y git python3 python3-pip python3-venv exiftool zbar-tools steghide hashcat unzip nmap
 ```
 
 ### ⚙️ Configure Git (First Time Only)
