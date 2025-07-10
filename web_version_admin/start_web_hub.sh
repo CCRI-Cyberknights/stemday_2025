@@ -9,9 +9,17 @@ if lsof -i:5000 >/dev/null 2>&1; then
     echo "🌐 Web server already running on port 5000."
 else
     echo "🌐 Starting web server on port 5000..."
-    nohup python3 server.pyc >/dev/null 2>&1 &
-    sleep 1  # Give it a moment to start
+    if [ -f "server.pyc" ]; then
+        nohup python3 server.pyc >/dev/null 2>&1 &
+    else
+        nohup python3 server.py >/dev/null 2>&1 &
+    fi
+    sleep 2  # Give it a moment to start
 fi
+
+echo
+echo "📡 Note: All simulated ports (8000–8100) for Nmap scanning are handled *inside* the CTF hub."
+echo "         You don’t need to start any additional services."
 
 # Launch Firefox to the hub (reuse window if already running)
 if pgrep -x "firefox" >/dev/null 2>&1; then
@@ -22,4 +30,5 @@ else
     firefox http://localhost:5000 >/dev/null 2>&1 &
 fi
 
+echo
 echo "✅ CCRI CTF Student Hub is ready!"

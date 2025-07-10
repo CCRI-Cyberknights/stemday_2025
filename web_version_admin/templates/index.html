@@ -53,8 +53,8 @@
             <h3>{{ meta.name }}</h3>
             <p><strong>ID:</strong> {{ cid }}</p>
             <button onclick="location.href='/challenge/{{ cid }}'">📖 View Challenge</button>
-            <button onclick="runScript('{{ cid }}')">🖥 Run Helper Script</button>
-            <button onclick="openFolder('{{ cid }}')">📂 Open Folder</button>
+            <button onclick="runScript('{{ cid }}', this)">🖥 Run Helper Script</button>
+            <button onclick="openFolder('{{ cid }}', this)">📂 Open Folder</button>
         </div>
         {% endfor %}
     </div>
@@ -77,27 +77,43 @@
                 `${completed} of ${total} challenges completed`;
         });
 
-        function runScript(challengeId) {
+        function runScript(challengeId, button) {
+            const originalText = button.textContent;
             fetch(`/run_script/${challengeId}`, { method: 'POST' })
                 .then(res => res.json())
                 .then(data => {
                     if (data.status === "success") {
-                        alert("✅ Helper script launched.");
+                        button.textContent = "✅ Script Running...";
                     } else {
-                        alert("❌ Failed to launch script: " + data.message);
+                        button.textContent = "❌ Failed";
+                        console.error("Failed to launch script: " + data.message);
                     }
+                    setTimeout(() => button.textContent = originalText, 2000);
+                })
+                .catch(err => {
+                    button.textContent = "⚠️ Error";
+                    console.error("Error launching script:", err);
+                    setTimeout(() => button.textContent = originalText, 2000);
                 });
         }
 
-        function openFolder(challengeId) {
+        function openFolder(challengeId, button) {
+            const originalText = button.textContent;
             fetch(`/open_folder/${challengeId}`, { method: 'POST' })
                 .then(res => res.json())
                 .then(data => {
                     if (data.status === "success") {
-                        alert("📂 Folder opened.");
+                        button.textContent = "📂 Folder Opened";
                     } else {
-                        alert("❌ Failed to open folder: " + data.message);
+                        button.textContent = "❌ Failed";
+                        console.error("Failed to open folder: " + data.message);
                     }
+                    setTimeout(() => button.textContent = originalText, 2000);
+                })
+                .catch(err => {
+                    button.textContent = "⚠️ Error";
+                    console.error("Error opening folder:", err);
+                    setTimeout(() => button.textContent = originalText, 2000);
                 });
         }
     </script>

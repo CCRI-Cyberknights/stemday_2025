@@ -118,6 +118,43 @@ def run_script(challenge_id):
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+# === Simulated Open Ports (Challenge #17) ===
+FAKE_FLAGS = {
+    8004: "NMAP-PORT-4312",       # fake
+    8023: "SCAN-4312-PORT",       # fake
+    8047: "CCRI-SCAN-8472",       # ✅ REAL FLAG
+    8072: "OPEN-SERVICE-9281",    # fake
+    8095: "HTTP-7721-SERVER"      # fake
+}
+
+JUNK_RESPONSES = {
+    8001: "Welcome to Dev HTTP Server v1.3\nPlease login to continue.",
+    8009: "🔒 Unauthorized: API key required.",
+    8015: "503 Service Unavailable\nTry again later.",
+    8020: "<html><body><h1>It works!</h1><p>Apache2 default page.</p></body></html>",
+    8028: "DEBUG: Connection established successfully.",
+    8033: "💡 Tip: Scan only the ports you really need.",
+    8039: "ERROR 400: Bad request syntax.",
+    8045: "System maintenance in progress. Expected downtime: 13 minutes.",
+    8051: "Welcome to Experimental IoT Server (beta build).",
+    8058: "Python HTTP Server: directory listing not allowed.",
+    8064: "💻 Dev API v0.1 — POST requests only.",
+    8077: "403 Forbidden: You don’t have permission to access this resource.",
+    8083: "Error 418: I’m a teapot.",
+    8089: "Hello World!\nTest endpoint active.",
+    8098: "Server under maintenance.\nPlease retry in 5 minutes."
+}
+
+@app.route('/ports/<int:port>')
+def simulate_ports(port):
+    """Simulate open ports for Nmap Scan Puzzle"""
+    if port in FAKE_FLAGS:
+        return FAKE_FLAGS[port]
+    elif port in JUNK_RESPONSES:
+        return JUNK_RESPONSES[port]
+    else:
+        return "Connection refused", 404
+
 if __name__ == '__main__':
     print("🌐 Student hub running on http://127.0.0.1:5000")
     app.run(host='127.0.0.1', port=5000, debug=False)

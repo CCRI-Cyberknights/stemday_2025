@@ -110,6 +110,12 @@
     "script": "inspect_binary.sh",
     "flag": "CCRI-HEXG-2718",
     "key": "CTF4EVER"
+  },
+  "17_Nmap_Scanning": {
+    "name": "Nmap Scanning",
+    "folder": "../challenges/17_Nmap_Scanning",
+    "script": "helper_scan.sh",
+    "flag": "CCRI-SCAN-8472",
+    "key": "CTF4EVER"
   }
 }
-

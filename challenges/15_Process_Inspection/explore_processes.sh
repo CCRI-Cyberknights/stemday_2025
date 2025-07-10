@@ -9,13 +9,13 @@ if [[ -z "$BIGGER_TERMINAL" ]]; then
     sleep 1
 
     if command -v xfce4-terminal >/dev/null 2>&1; then
-        xfce4-terminal --geometry=120x40 --hold -e "$0"
+        xfce4-terminal --geometry=120x40 -e "bash -c 'exec \"$0\"'"
         exit
     elif command -v gnome-terminal >/dev/null 2>&1; then
-        gnome-terminal --geometry=120x40 -- bash -c "$0; exec bash"
+        gnome-terminal --geometry=120x40 -- bash -c "exec \"$0\""
         exit
     elif command -v konsole >/dev/null 2>&1; then
-        konsole --geometry 120x40 -e "$0"
+        konsole --geometry 120x40 -e "bash -c 'exec \"$0\"'"
         exit
     else
         echo "⚠️ Could not detect a graphical terminal. Continuing in current terminal."
@@ -36,7 +36,7 @@ echo
 if [[ ! -f ps_dump.txt ]]; then
     echo "❌ ERROR: ps_dump.txt not found in this folder!"
     read -p "Press ENTER to exit..." junk
-    exec $SHELL
+    exit 1
 fi
 
 # Build dynamic list of unique COMMAND entries from ps_dump.txt
@@ -58,15 +58,12 @@ while true; do
         echo
         echo "🔍 Inspecting ${processes[$((choice-1))]} ..."
         echo "---------------------------------"
-        # Add a header to explain the fields
         echo "USER       PID %CPU %MEM   VSZ    RSS  TTY  STAT  START   TIME  COMMAND"
         echo "-----      --- ---- ----   ----   ---- ---  ----  -----   ----  -------"
-        # Capture and display process details
         process_output=$(grep "${processes[$((choice-1))]}" ps_dump.txt | sed 's/--/\n    --/g')
         echo "$process_output"
         echo "---------------------------------"
 
-        # Offer to save output
         while true; do
             echo "Options:"
             echo "1. Return to process list"
@@ -96,4 +93,4 @@ while true; do
 done
 
 # Clean exit for web hub
-exec $SHELL
+exit 0
