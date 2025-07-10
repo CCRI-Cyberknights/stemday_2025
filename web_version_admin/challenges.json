@@ -117,5 +117,12 @@
     "script": "helper_scan.sh",
     "flag": "CCRI-SCAN-8472",
     "key": "CTF4EVER"
+  },
+  "18_Pcap_Search": {
+    "name": "Pcap Search",
+    "folder": "../challenges/18_Pcap_Search",
+    "script": "analyze_pcap.sh",
+    "flag": "CCRI-NETW-7315",
+    "key": "CTF4EVER"
   }
 }
