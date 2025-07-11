@@ -1,3 +1,10 @@
+#!/bin/bash
+
+# === Bash Wrapper for Web Version Builder ===
+echo "🚀 Starting Web Version Build Process..."
+
+# Use Python3 to execute the embedded script
+/usr/bin/env python3 <<'EOF'
 import json
 import base64
 import os
@@ -99,3 +106,10 @@ def prepare_web_version():
 if __name__ == "__main__":
     print(f"📂 Detected BASE_DIR: {BASE_DIR}")
     prepare_web_version()
+EOF
+
+echo "✅ Build process finished."
+
+# Pause to review output
+echo
+read -p "📖 Press ENTER to exit..."
