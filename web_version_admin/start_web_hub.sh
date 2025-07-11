@@ -42,14 +42,30 @@ echo
 echo "📡 Note: All simulated ports (8000–8100) for Nmap scanning are handled *inside* the CTF hub."
 echo "         You don’t need to start any additional services."
 
-# === Launch Firefox to the hub ===
-if pgrep -x "firefox" >/dev/null 2>&1; then
-    echo "🦊 Firefox already running. Opening new tab..."
-    firefox --new-tab http://localhost:5000 >/dev/null 2>&1 &
+# === Wait for Flask server to respond before launching browser ===
+echo "⏳ Waiting for web server to start..."
+for i in {1..10}; do
+    if curl -s http://localhost:5000 >/dev/null 2>&1; then
+        echo "🌐 Web server is up!"
+        break
+    else
+        sleep 1
+    fi
+done
+
+# === Launch browser to the hub ===
+export DISPLAY=:0
+
+if command -v xdg-open >/dev/null 2>&1; then
+    echo "🌐 Opening default browser to http://localhost:5000..."
+    setsid xdg-open http://localhost:5000 >/dev/null 2>&1 &
 else
-    echo "🦊 Launching Firefox to http://localhost:5000..."
-    firefox http://localhost:5000 >/dev/null 2>&1 &
+    echo "🦊 Opening Firefox to http://localhost:5000..."
+    setsid firefox http://localhost:5000 >/dev/null 2>&1 &
 fi
 
 echo
 echo "✅ CCRI CTF Student Hub is ready!"
+
+# === Keep script alive for a moment to avoid launcher killing child processes ===
+sleep 2
