@@ -31,7 +31,7 @@
     "name": "Archive Password Cracker",
     "folder": "../challenges/05_Archive_Password",
     "script": "crack_zip.sh",
-    "flag": "CCRI-ARCH-3479",
+    "flag": "CCRI-ARCH-5401",
     "key": "CTF4EVER"
   },
   "06_Hashcat": {

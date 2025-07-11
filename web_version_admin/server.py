@@ -153,24 +153,24 @@ JUNK_RESPONSES = {
 
 SERVICE_NAMES = {
     8001: "dev-http",
-    8004: "flag-api",
+    8004: "configd",
     8009: "secure-api",
     8015: "maintenance",
     8020: "apache",
-    8023: "flag-api",
+    8023: "metricsd",
     8028: "debug-service",
     8033: "help-service",
     8039: "http",
     8045: "maintenance",
-    8047: "flag-api",
+    8047: "sysmon-api",       # ✅ real flag is here, neutral name
     8051: "iot-server",
     8058: "http",
     8064: "dev-api",
-    8072: "flag-api",
+    8072: "update-agent",
     8077: "secure-api",
     8083: "http",
     8089: "test-service",
-    8095: "flag-api",
+    8095: "metrics-gateway",
     8098: "maintenance"
 }
 
@@ -184,7 +184,7 @@ class PortHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         response = ALL_PORTS.get(self.server.server_port, "Connection refused")
         service_name = SERVICE_NAMES.get(self.server.server_port, "http")
-        banner = f"👋 Welcome to {service_name}\n\n"
+        banner = f"👋 Welcome to {service_name} Service\n\n"
         self.send_response(200)
         self.send_header("Content-type", "text/plain; charset=utf-8")
         self.send_header("Server", service_name)  # Hint Nmap
