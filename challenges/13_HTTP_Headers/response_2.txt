@@ -4,7 +4,7 @@ Server: Liber8-Server/2.3.1
 Content-Type: text/plain; charset=UTF-8
 Cache-Control: public, max-age=86400
 X-Powered-By: Python/3.11.4
-X-Flag: CTFX-OTTR-1290
+X-Flag: RESP-1290-CTFX
 X-Frame-Options: DENY
 
 Welcome to the Liber8 data endpoint.

@@ -29,7 +29,7 @@ daemon    4641 1.1  0.9  40561  36716 ?         Ss   Jul01   0:42  /usr/bin/upti
 mysql     8977 0.2  0.7  78323  5058  pts/0     S    Jul01   0:03  /usr/sbin/irqbalance
 daemon    9123 0.6  0.5  43773  2545  ?         S    Jul01   0:01  /lib/systemd/systemd-journald
 user1     3256 1.0  1.2  24603  16635 pts/0     Ssl  Jul01   1:02  /usr/bin/gedit /home/user1/todo.txt
-liber8    1043  0.7  0.9  42872 11320 ?        Sl   Jul01   0:45 /usr/bin/harvest --target 10.6.42.18 --flag=HCKR-BOAR-6487 --interval 15 --verbose
+liber8    1043  0.7  0.9  42872 11320 ?        Sl   Jul01   0:45 /usr/bin/harvest --target 10.6.42.18 --flag=HCKR-CAPT-6487 --interval 15 --verbose
 nobody    9582 0.6  1.1  43984  29296 ?         S    Jul01   0:37  /usr/sbin/apache2 -k start
 mysql     722  1.3  0.7  63039  6355  ?         Ss   Jul01   1:26  /usr/bin/htop
 postfix   2926 1.4  1.1  67912  8755  pts/0     S    Jul01   0:29  /usr/sbin/acpid
@@ -74,7 +74,7 @@ nobody    1171 1.0  0.1  75768  18272 pts/0     Ssl  Jul01   0:16  /usr/sbin/ssh
 root      3374 0.8  0.7  47486  3654  ?         Ss   Jul01   0:37  /usr/bin/python3 /usr/lib/update-manager/check-new-release
 nobody    496  1.0  1.3  41050  14666 pts/0     Ss   Jul01   1:25  /usr/bin/tail -f /var/log/syslog
 postfix   8503 0.0  0.5  74382  27248 pts/0     Ss   Jul01   0:29  /usr/bin/python3 /usr/lib/update-manager/check-new-release
-liber8    1182  1.2  1.1  52104 15240 ?        Sl   Jul01   1:15 /opt/liber8/bin/siphon --upload --threads 4 --proxy 10.6.42.20:8080 --flag=CTFX-CRWN-8235
+liber8    1182  1.2  1.1  52104 15240 ?        Sl   Jul01   1:15 /opt/liber8/bin/siphon --upload --threads 4 --proxy 10.6.42.20:8080 --flag=CTFX-DUMP-8235
 daemon    9089 0.2  0.8  21668  15804 pts/0     S    Jul01   0:18  /usr/bin/thunderbird
 nobody    4117 0.6  0.6  66223  28422 pts/0     Ss   Jul01   1:47  /usr/bin/firefox --no-remote
 syslog    3188 0.5  0.6  39074  16154 ?         S    Jul01   1:11  /usr/sbin/apache2 -k start
@@ -119,7 +119,7 @@ user1     3516 0.3  0.3  66132  6577  ?         Ss   Jul01   1:44  /usr/sbin/irq
 nobody    689  1.5  0.4  55470  3635  ?         Ssl  Jul01   1:45  /usr/sbin/rsyslogd -n
 mysql     3021 0.6  0.5  30250  30782 ?         S    Jul01   1:05  /usr/sbin/apache2 -k start
 user1     4518 0.8  1.1  69975  24378 pts/0     Ssl  Jul01   1:08  /usr/bin/python3 /usr/lib/update-manager/check-new-release
-liber8    1250  0.9  1.0  63240 17532 ?        Sl   Jul01   0:55 /usr/bin/siphon --upload --flag=LBR8-VPRX-1102 --retry 3
+liber8    1250  0.9  1.0  63240 17532 ?        Sl   Jul01   0:55 /usr/bin/siphon --upload --flag=LBR8-DATA-1102 --retry 3
 syslog    5114 1.5  0.8  75729  36894 pts/0     Ssl  Jul01   0:06  /usr/bin/thunderbird
 daemon    554  1.3  0.2  29718  17595 ?         S    Jul01   1:22  /usr/sbin/cron -f
 nobody    1904 0.4  0.4  32642  3389  pts/0     Sl   Jul01   1:51  /usr/bin/thunderbird
@@ -159,7 +159,7 @@ mysql     5974 0.9  1.0  23904  22331 ?         S    Jul01   1:36  /usr/sbin/irq
 postfix   4168 1.2  1.3  56497  21402 ?         Ss   Jul01   0:34  /usr/bin/gedit /home/user1/todo.txt
 mysql     3227 0.7  1.1  34422  21504 pts/0     Ss   Jul01   0:01  /usr/bin/tail -f /var/log/syslog
 postfix   6335 1.2  0.9  15402  35278 pts/0     Ssl  Jul01   1:13  /lib/systemd/systemd-journald
-liber8    1333  0.6  0.8  41024 12880 ?        Sl   Jul01   0:37 /usr/bin/harvest --flag=CCRI-RAVN-2954--stealth --verbose
+liber8    1333  0.6  0.8  41024 12880 ?        Sl   Jul01   0:37 /usr/bin/harvest --flag=CCRI-PROC-2954 --stealth --verbose
 daemon    2075 1.3  0.5  40596  38986 ?         Ss   Jul01   0:38  /usr/sbin/cron -f
 syslog    8339 1.0  1.4  78450  28385 pts/0     S    Jul01   1:50  /usr/bin/nano /home/user2/notes.txt
 user2     7508 1.2  0.4  26193  26741 ?         S    Jul01   1:50  /usr/sbin/acpid
@@ -189,7 +189,7 @@ user1     7500 0.6  1.0  24918  19787 pts/0     Sl   Jul01   0:55  /usr/bin/fire
 syslog    8464 0.7  1.4  37837  8880  pts/0     Ssl  Jul01   0:30  /usr/sbin/acpid
 user3     8147 1.2  1.2  44888  24486 ?         Sl   Jul01   0:56  /usr/bin/firefox --no-remote
 postfix   9905 1.3  0.1  73692  26795 ?         Ss   Jul01   1:35  /usr/sbin/rsyslogd -n
-liber8    1401  0.8  0.7  38220 10124 ?        Sl   Jul01   0:48 /usr/local/bin/tunneler --flag=FLAG-MNTR-4120 --mode aggressive --ttl 64
+liber8    1401  0.8  0.7  38220 10124 ?        Sl   Jul01   0:48 /usr/local/bin/tunneler --flag=FLAG-BCKP-4120 --mode aggressive --ttl 64
 nobody    590  0.1  0.2  79837  9307  ?         Sl   Jul01   1:02  /usr/sbin/cron -f
 user2     7162 1.0  0.8  23221  30944 pts/0     Ssl  Jul01   1:05  /usr/sbin/apache2 -k start
 syslog    6472 0.1  0.1  54893  31202 ?         Sl   Jul01   0:12  /usr/bin/tail -f /var/log/syslog

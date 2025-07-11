@@ -4,7 +4,7 @@ Server: Liber8-Server/2.3.1
 Content-Type: text/html; charset=UTF-8
 Cache-Control: no-store
 X-Powered-By: Go HTTP Server/1.19
-X-Flag: HACK-DRGN-5018
+X-Flag: HACK-6633-PROT
 X-Frame-Options: SAMEORIGIN
 
 <html>

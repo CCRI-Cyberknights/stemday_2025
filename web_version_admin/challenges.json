@@ -87,21 +87,21 @@
     "name": "HTTP Headers Analysis",
     "folder": "../challenges/13_HTTP_Headers",
     "script": "investigate_headers.sh",
-    "flag": "CCRI-HAWK-7362",
+    "flag": "CCRI-HEAD-7362",
     "key": "CTF4EVER"
   },
   "14_SubdomainSweep": {
     "name": "Subdomain Sweep",
     "folder": "../challenges/14_Subdomain _Sweep",
     "script": "explore_subdomains.sh",
-    "flag": "CCRI-FALC-4927",
+    "flag": "CCRI-SUBD-4927",
     "key": "CTF4EVER"
   },
   "15_ProcessInspection": {
     "name": "Process Inspection",
     "folder": "../challenges/15_Process_Inspection",
     "script": "explore_processes.sh",
-    "flag": "CCRI-RAVN-2954",
+    "flag": "CCRI-PROC-2954",
     "key": "CTF4EVER"
   },
   "16_Hex_Hunting": {

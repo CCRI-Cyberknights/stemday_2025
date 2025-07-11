@@ -4,7 +4,7 @@ Server: Liber8-Server/2.3.1
 Content-Type: application/json
 Cache-Control: no-cache
 X-Powered-By: Node.js/18.16.0
-X-Flag: FLAG-EAGL-6633
+X-Flag: CTFX-8421-SRVR
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
 
