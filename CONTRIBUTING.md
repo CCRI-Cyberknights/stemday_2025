@@ -100,7 +100,7 @@ To generate the student-facing version (removes admin tools):
 
 ```bash
 cd CCRI_CTF/web_version_admin/create_website
-build_web_version.sh
+./build_web_version.sh
 ```
 
 This creates an obfuscated, student-ready web portal in `CCRI_CTF/web_version/`.  
