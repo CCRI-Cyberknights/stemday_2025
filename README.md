@@ -49,7 +49,7 @@ To make the CTF experience accessible to students:
 
    ```bash
    cd CCRI_CTF/web_version_admin/create_website
-   python3 create_hub.py
+   ./build_web_version.sh
    ```  
 
    This will obfuscate flags and build the student web portal in `CCRI_CTF/web_version/`.  
@@ -70,7 +70,7 @@ To make the CTF experience accessible to students:
 
   ```bash
   cd CCRI_CTF/web_version_admin/create_website
-  python3 create_hub.py
+  ./build_web_version.sh
   ```
 
 - **Test in folder mode and web portal mode** before distributing.  
