@@ -65,7 +65,7 @@ Take your time. Experiment. Break things. That’s how you learn.
 
 This CTF is built for:  
 - **Parrot OS Home Edition** running in VirtualBox.  
-- A system with at least **2 GB RAM and 2 CPUs assigned to the VM**.  
+- A system with at least **4 GB RAM and 2 CPUs assigned to the VM**.  
 
 ---
 
