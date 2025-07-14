@@ -68,7 +68,7 @@
         {% for cid, meta in challenges.items() %}
         <div class="challenge-card" id="{{ cid }}">
             <h3>{{ loop.index }}. {{ meta.name }}</h3>
-            <button class="view-btn" onclick="location.href='/challenge/{{ cid }}'">🚀 Start Challenge</button>
+            <button class="view-btn" onclick="location.href='{{ url_for('challenge_view', challenge_id=cid) }}'">🚀 Start Challenge</button>
         </div>
         {% endfor %}
     </div>

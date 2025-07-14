@@ -1,0 +1,41 @@
+# === Ignore build artifacts and random files ===
+*.pyc
+__pycache__/
+*.bak
+*.swp
+*.log
+*binary_flag.c
+
+# Ignore compiled binaries and temp C files
+*.o
+*.out
+*.class
+
+# Ignore images and test files in root
+*.jpg
+*.png
+
+# Ignore Linux desktop launchers
+*.desktop
+
+# === Ignore web_version student build ===
+web_version/
+
+# === Keep admin files and challenges ===
+!web_version_admin/
+!challenges/
+
+# === Ignore custom scripts in root ===
+generate_*
+hex_script.sh
+make_pcap_traffic.py
+main_web_portal_idea.txt
+plan_overview.txt
+index_grid_obfuscated.html
+
+# === Keep docs and licensing ===
+!README.md
+!LICENSE
+!CONTRIBUTING.md
+!Launch CCRI CTF Hub.desktop
+!copy_ccri_ctf.sh

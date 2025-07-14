@@ -88,7 +88,7 @@
     <ul>
         {% for file in files %}
         <li>
-            <a href="{{ url_for('static', filename='../' + challenge.folder + '/' + file) }}" target="_blank">{{ file }}</a>
+            <a href="{{ url_for('get_challenge_file', challenge_id=challenge_id, filename=file) }}" target="_blank">{{ file }}</a>
         </li>
         {% endfor %}
     </ul>

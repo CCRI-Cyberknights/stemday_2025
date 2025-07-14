@@ -1,10 +1,30 @@
 #!/bin/bash
+# build_web_version.sh - Build the student web hub from admin version
 
-# === Bash Wrapper for Web Version Builder ===
+set -e
+
 echo "🚀 Starting Web Version Build Process..."
 
-# Use Python3 to execute the embedded script
-/usr/bin/env python3 <<'EOF'
+# === Helper: Find Project Root ===
+find_project_root() {
+    local dir="$PWD"
+    while [[ "$dir" != "/" ]]; do
+        if [[ -f "$dir/.ccri_ctf_root" ]]; then
+            echo "$dir"
+            return 0
+        fi
+        dir="$(dirname "$dir")"
+    done
+    echo "❌ ERROR: Could not find .ccri_ctf_root marker. Are you inside the CTF repo?" >&2
+    exit 1
+}
+
+PROJECT_ROOT="$(find_project_root)"
+WEB_ADMIN_DIR="$PROJECT_ROOT/web_version_admin"
+WEB_STUDENT_DIR="$PROJECT_ROOT/web_version"
+
+# === Run Embedded Python3 Script ===
+/usr/bin/env python3 <<EOF
 import json
 import base64
 import os
@@ -13,7 +33,7 @@ import py_compile
 import stat
 
 # === Dynamic Base Directory Detection ===
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+BASE_DIR = os.path.abspath("${PROJECT_ROOT}")
 ADMIN_DIR = os.path.join(BASE_DIR, "web_version_admin")
 STUDENT_DIR = os.path.join(BASE_DIR, "web_version")
 
@@ -101,7 +121,7 @@ def prepare_web_version():
     py_compile.compile(SERVER_SOURCE, cfile=compiled_path)
     print(f"✅ Compiled server saved as {compiled_path}")
 
-    print("\n🎉 Student web_version folder rebuilt successfully!\n")
+    print("\\n🎉 Student web_version folder rebuilt successfully!\\n")
 
 if __name__ == "__main__":
     print(f"📂 Detected BASE_DIR: {BASE_DIR}")
