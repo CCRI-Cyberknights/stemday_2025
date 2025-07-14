@@ -39,3 +39,5 @@ index_grid_obfuscated.html
 !CONTRIBUTING.md
 !Launch CCRI CTF Hub.desktop
 !copy_ccri_ctf.sh
+!start_web_hub.sh
+!stop_web_hub.sh
