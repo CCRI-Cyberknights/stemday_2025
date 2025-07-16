@@ -3,98 +3,71 @@ import os
 from Challenge import Challenge
 
 class ChallengeList:
-    """Class to manage a list of challenges.
+    """
+    Class to manage a list of challenges.
     
     Attributes:
         challenges (list): A list of Challenge objects.
         completed_challenges (list): A list of completed challenges.
         numOfChallenges (int): Total number of challenges.
-
-    Methods:
-        __init__: Initializes the ChallengeList by loading challenges from a JSON file.
-        load_challenges: Loads challenges from a JSON file and returns a list of Challenge objects.
-        get_challenges: Returns the list of challenges.
-        get_challenge_by_id: Returns a challenge object by its ID.
-        get_list_of_ids: Returns a list of challenge IDs.
     """
 
-    challenges = []
-    '''List of challenges managed by the ChallengeList class.'''
-    completed_challenges = []
-    '''List of completed challenges.'''
-    numOfChallenges = 0
-    '''Total number of challenges.'''
-
-    def __init__(self):
-        """Initializes the ChallengeList by loading challenges from a JSON file."""
-        self.challenges = self.load_challenges()
-        print (f"ChallengeList initialized with {len(self.challenges)} challenges.")
-        for challenge in self.challenges:
-            print(f"Loaded challenge: {challenge.__repr__()}")
-        self.numOfChallenges = len(self.challenges)
-
-    def load_challenges(self) -> list[Challenge]:
-        """Loads challenges from a JSON file and returns a list of Challenge objects."""
-        current_dir = os.path.dirname(os.path.abspath(__file__).replace("utils", ""))
-        # print(f"Current directory: {current_dir}")
-
-        challenges_path = os.path.join(current_dir, 'challenges.json')
-        print(f"Checking for challenges file at: {challenges_path}")
-
-        if not os.path.exists(challenges_path):
-            print(f"Challenges file not found at {challenges_path}.")
-            return []
-
-        with open(challenges_path, 'r') as f:
-            try:
-                data = json.load(f)
-                print(f"Loaded {len(data)} challenges from {challenges_path}")
-                # print("Challenges:", data)
-                print("Storing challenges in ChallengeList...")
-                challenges = []
-                order = 1
-                for key in data.keys():
-                    new_challenge = Challenge(
-                        id=key,
-                        ch_number=order,
-                        name=data[key]['name'],
-                        folder=data[key]['folder'],
-                        script=data[key]['script'],
-                        flag=data[key]['flag'],
-                        key=data[key]['key']
-                    )
-                    print(f"Creating Challenge object: {new_challenge.__repr__()}")
-                    challenges.append(new_challenge)
-                    order += 1
-
-                return challenges
-
-            except json.JSONDecodeError:
-                print("Error decoding JSON from challenges file.")
-                return []
-            
-    def get_challenges(self) -> list[Challenge]:
-        """Returns the list of challenges."""
-        return self.challenges
-    
-    def get_challenge_by_id(self, challenge_id) -> Challenge | None:
-        """Returns a challenge object by its ID.
-        
-        This function iterates through the list of challenges
-        and returns the first challenge that matches the given ID.
-
-        Args:
-            challenge_id (str): The ID of the challenge to retrieve.
-
-        Returns:
-            Challenge (Challenge | None): The challenge object if found, otherwise None.
-        
+    def __init__(self, challenges_file: str = "challenges.json"):
         """
-        for challenge in self.challenges:
-            if challenge.getId() == challenge_id:
-                return challenge
-        return None
-    
-    def get_list_of_ids(self) -> list[str]:
-        """Returns a list of challenge IDs."""
-        return [challenge.getId() for challenge in self.challenges]
+        Initializes the ChallengeList by loading challenges from a JSON file.
+        Optionally accepts a custom path to challenges.json.
+        """
+        self.challenges = []
+        self.completed_challenges = []
+        self.numOfChallenges = 0
+        
+        # Resolve path to JSON
+        base_dir = os.path.dirname(os.path.abspath(__file__).replace("utils", ""))
+        self.challenges_path = os.path.join(base_dir, challenges_file)
+
+        print(f"📖 Checking for challenges file at: {self.challenges_path}")
+        self.load_challenges()
+
+    def load_challenges(self):
+        """Loads challenges from a JSON file and populates the Challenge list."""
+        if not os.path.exists(self.challenges_path):
+            print(f"❌ ERROR: Challenges file not found at {self.challenges_path}")
+            return
+
+        try:
+            with open(self.challenges_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+        except json.JSONDecodeError as e:
+            print(f"❌ ERROR: Invalid JSON in {self.challenges_path}: {e}")
+            return
+
+        print(f"✅ Loaded {len(data)} challenges from {self.challenges_path}")
+        order = 1
+        for key, entry in data.items():
+            challenge = Challenge(
+                id=key,
+                ch_number=order,
+                name=entry['name'],
+                folder=os.path.normpath(entry['folder']),
+                script=entry['script'],
+                flag=entry['flag'],
+                key=entry['key']
+            )
+            print(f"➡️  Challenge #{order}: {challenge.getName()} (ID={key})")
+            self.challenges.append(challenge)
+            order += 1
+
+        self.numOfChallenges = len(self.challenges)
+        print(f"📦 ChallengeList initialized with {self.numOfChallenges} challenges.")
+
+    def get_challenges(self):
+        """Returns the list of Challenge objects."""
+        return self.challenges
+
+    def get_challenge_by_id(self, challenge_id):
+        """Retrieve a Challenge object by its ID."""
+        return next((c for c in self.challenges if c.getId() == challenge_id), None)
+
+    def get_list_of_ids(self):
+        """Return a list of all challenge IDs."""
+        return [c.getId() for c in self.challenges]

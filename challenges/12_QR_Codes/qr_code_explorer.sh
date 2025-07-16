@@ -1,5 +1,24 @@
 #!/bin/bash
 
+# === QR Code Explorer ===
+
+# Locate Project Root
+find_project_root() {
+    DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    while [ "$DIR" != "/" ]; do
+        if [ -f "$DIR/.ccri_ctf_root" ]; then
+            echo "$DIR"
+            return 0
+        fi
+        DIR="$(dirname "$DIR")"
+    done
+    echo "❌ ERROR: Could not find project root marker (.ccri_ctf_root)." >&2
+    exit 1
+}
+
+PROJECT_ROOT="$(find_project_root)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 clear
 
 echo "📦 QR Code Explorer"
@@ -28,13 +47,13 @@ echo
 read -p "Press ENTER to begin exploring." junk
 clear
 
-# QR code files
-qr_codes=(qr_01.png qr_02.png qr_03.png qr_04.png qr_05.png)
+# QR code files (resolved to script directory)
+qr_codes=("$SCRIPT_DIR/qr_01.png" "$SCRIPT_DIR/qr_02.png" "$SCRIPT_DIR/qr_03.png" "$SCRIPT_DIR/qr_04.png" "$SCRIPT_DIR/qr_05.png")
 
 while true; do
     echo "🗂️  Available QR codes:"
     for i in "${!qr_codes[@]}"; do
-        echo "$((i+1)). ${qr_codes[$i]}"
+        echo "$((i+1)). $(basename "${qr_codes[$i]}")"
     done
     echo "6. Exit Explorer"
     echo
@@ -53,7 +72,7 @@ while true; do
         txt_file="${file%.png}.txt"
 
         echo
-        echo "🖼️ Opening $file in image viewer for 20 seconds..."
+        echo "🖼️ Opening $(basename "$file") in image viewer for 20 seconds..."
         xdg-open "$file" >/dev/null 2>&1 & viewer_pid=$!
 
         sleep 20
@@ -61,7 +80,7 @@ while true; do
         kill "$viewer_pid" 2>/dev/null
 
         echo
-        echo "🔎 Scanning QR code in $file..."
+        echo "🔎 Scanning QR code in $(basename "$file")..."
         echo "💻 Running: zbarimg \"$file\""
         echo
 
@@ -75,7 +94,7 @@ while true; do
             echo "$result"
             echo "----------------------------"
             echo "$result" > "$txt_file"
-            echo "💾 Saved to: $txt_file"
+            echo "💾 Saved to: $(basename "$txt_file")"
         fi
 
         echo

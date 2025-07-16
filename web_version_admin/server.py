@@ -1,9 +1,9 @@
 try:
     # Flask 2.x: Markup is part of flask
-    from flask import Flask, render_template, request, jsonify, Markup
+    from flask import Flask, render_template, request, jsonify, Markup, send_from_directory
 except ImportError:
     # Flask 3.x: Markup moved to markupsafe
-    from flask import Flask, render_template, request, jsonify
+    from flask import Flask, render_template, request, jsonify, send_from_directory
     from markupsafe import Markup
 
 import subprocess
@@ -11,18 +11,17 @@ import json
 import os
 import base64
 import threading
+import logging
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from ChallengeList import ChallengeList
-
-# New import for Markdown support
 import markdown
 
+# === App Initialization ===
 app = Flask(__name__)
+DEBUG_MODE = os.environ.get("CCRI_DEBUG", "0") == "1"
+logging.basicConfig(level=logging.DEBUG if DEBUG_MODE else logging.INFO)
 
-# === Hardcoded XOR Key ===
-XOR_KEY = "CTF4EVER"
-
-# === Load student challenges.json ===
+# === Load Challenges ===
 try:
     print("Loading challenges from challenges.json...")
     challenges = ChallengeList()
@@ -42,37 +41,28 @@ def xor_decode(encoded_base64, key):
         for i, b in enumerate(decoded_bytes)
     )
 
-# === Flask Routes ===
+# === Routes ===
 @app.route('/')
 def index():
-    """Returns challenge overview page"""
     return render_template('index.html', challenges=challenges)
 
 @app.route('/challenge/<challenge_id>')
 def challenge_view(challenge_id):
-    """Returns challenge details page"""
-
-    # === Validate challenge_id ===
     selectedChallenge = challenges.get_challenge_by_id(challenge_id)
     if selectedChallenge is None:
         return "Challenge not found", 404
 
-    # Store challenge and folder info
     folder = selectedChallenge.getFolder()
-
-    # Read README.txt if it exists
-    readme_path = os.path.join(folder, 'README.txt')
     readme_html = ""
+    readme_path = os.path.join(folder, 'README.txt')
     if os.path.exists(readme_path):
         try:
             with open(readme_path, 'r', encoding='utf-8') as f:
                 raw_readme = f.read()
-                # Convert Markdown to HTML
                 readme_html = Markup(markdown.markdown(raw_readme))
         except Exception as e:
             readme_html = f"<p><strong>Error loading README:</strong> {e}</p>"
 
-    # List other files (excluding README and hidden files)
     file_list = [
         f for f in os.listdir(folder)
         if os.path.isfile(os.path.join(folder, f))
@@ -80,104 +70,100 @@ def challenge_view(challenge_id):
         and not f.startswith(".")
     ]
 
-    return render_template(
-        'challenge.html',
-        challenge_id=challenge_id,
-        challenge=selectedChallenge,
-        readme=readme_html,
-        files=file_list
-    )
+    return render_template('challenge.html', challenge=selectedChallenge, readme=readme_html, files=file_list)
+
+@app.route('/challenge/<challenge_id>/file/<path:filename>')
+def get_challenge_file(challenge_id, filename):
+    selectedChallenge = challenges.get_challenge_by_id(challenge_id)
+    if selectedChallenge is None:
+        return "Challenge not found", 404
+
+    folder = selectedChallenge.getFolder()
+    if not os.path.isfile(os.path.join(folder, filename)):
+        return "File not found", 404
+
+    return send_from_directory(folder, filename)
 
 @app.route('/submit_flag/<challenge_id>', methods=['POST'])
 def submit_flag(challenge_id):
-    """Validate submitted flag"""
-    # Store user provided flag
     data = request.get_json()
     submitted_flag = data.get('flag', '').strip().upper()
-    
-    # Get challenge by ID
+
     selectedChallenge = challenges.get_challenge_by_id(challenge_id)
     if selectedChallenge is None:
         return jsonify({"status": "error", "message": "Challenge not found"}), 404
 
-    # Get the correct flag for the challenge
     correct_flag = selectedChallenge.getFlag().strip().upper()
 
     if submitted_flag == correct_flag:
-        # Mark challenge as completed
-        for challenge in challenges.challenges:
-            if challenge.getId() == selectedChallenge.getId():
-                challenge.setComplete()
-                print(f"Challenge {selectedChallenge.getName()} completed by user.")
-                break
-        # Add challenge to completed challenges list
+        selectedChallenge.setComplete()
         if selectedChallenge.getId() not in challenges.completed_challenges:
-            print(f"Adding challenge {selectedChallenge.getName()} to completed challenges.")
             challenges.completed_challenges.append(selectedChallenge.getId())
-        # Return success response
+        print(f"✅ Challenge '{selectedChallenge.getName()}' completed.")
         return jsonify({"status": "correct"})
     else:
-        # Return incorrect response
-        print(f"Incorrect flag submitted for challenge {selectedChallenge.getName()}.")
+        print(f"❌ Incorrect flag for '{selectedChallenge.getName()}'.")
         return jsonify({"status": "incorrect"})
 
 @app.route('/open_folder/<challenge_id>', methods=['POST'])
 def open_folder(challenge_id):
-    """Open the challenge folder in the file manager"""
-    # === Validate challenge_id ===
     selectedChallenge = challenges.get_challenge_by_id(challenge_id)
     if selectedChallenge is None:
         return jsonify({"status": "error", "message": "Challenge not found"}), 404
 
     folder = selectedChallenge.getFolder()
     try:
-        # Try xdg-open first, fallback to gio open
-        try:
-            subprocess.Popen(['xdg-open', folder])
-        except FileNotFoundError:
-            subprocess.Popen(['gio', 'open', folder])
+        subprocess.Popen(['xdg-open', folder], shell=False)
         return jsonify({"status": "success"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
-    
+
 @app.route('/run_script/<challenge_id>', methods=['POST'])
 def run_script(challenge_id):
-    """Launch the helper script for this challenge in a terminal."""
-    # === Validate challenge_id ===
     selectedChallenge = challenges.get_challenge_by_id(challenge_id)
     if selectedChallenge is None:
         return jsonify({"status": "error", "message": "Challenge not found"}), 404
 
-    folder = selectedChallenge.getFolder()
-    script_name = selectedChallenge.getScript()
-    script_path = os.path.join(folder, script_name)
+    script_path = os.path.join(selectedChallenge.getFolder(), selectedChallenge.getScript())
 
     if not os.path.isfile(script_path):
-        return jsonify({"status": "error", "message": f"Script '{script_name}' not found."}), 404
+        return jsonify({"status": "error", "message": f"Script '{selectedChallenge.getScript()}' not found."}), 404
 
     try:
-        # Prefer x-terminal-emulator, fallback to common terminals
-        terminals = ["x-terminal-emulator", "gnome-terminal", "konsole", "xfce4-terminal", "lxterminal"]
-        for term in terminals:
+        # === Detect if running on Parrot OS and prefer parrot-terminal ===
+        if os.path.exists("/etc/parrot"):  # Parrot-specific marker file
+            print("🐦 Detected Parrot OS. Forcing parrot-terminal.")
+            subprocess.Popen([
+                "parrot-terminal",
+                "--working-directory", selectedChallenge.getFolder(),
+                "-e", f"bash \"{script_path}\""
+            ], shell=False)
+            return jsonify({"status": "success"})
+
+        # === Fallback for non-Parrot distros ===
+        fallback_terminals = ["gnome-terminal", "konsole", "xfce4-terminal", "lxterminal"]
+        for term in fallback_terminals:
             if subprocess.call(["which", term], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0:
-                subprocess.Popen([term, "--working-directory", folder, "-e", f"bash \"{script_path}\""])
+                subprocess.Popen([
+                    term,
+                    "--working-directory", selectedChallenge.getFolder(),
+                    "-e", f"bash \"{script_path}\""
+                ], shell=False)
                 return jsonify({"status": "success"})
 
-        # No terminal found
-        return jsonify({"status": "error", "message": "No terminal emulator found on this system."}), 500
+        return jsonify({"status": "error", "message": "No supported terminal emulator found."}), 500
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-# === Simulated Open Ports (Challenge #17) ===
+# === Simulated Open Ports ===
 FAKE_FLAGS = {
     8004: "NMAP-PORT-4312",
     8023: "SCAN-4312-PORT",
-    8047: "CCRI-SCAN-8472",       # ✅ REAL FLAG
+    8047: "CCRI-SCAN-8472",  # ✅ REAL FLAG
     8072: "OPEN-SERVICE-9281",
     8095: "HTTP-7721-SERVER"
 }
-
 SERVICE_NAMES = {
     8004: "configd",
     8023: "metricsd",
@@ -186,26 +172,20 @@ SERVICE_NAMES = {
     8095: "metrics-gateway"
 }
 
-ALL_PORTS = FAKE_FLAGS.copy()
-
 class PortHandler(BaseHTTPRequestHandler):
-    """Custom HTTP handler for simulated ports"""
     def do_GET(self):
         response = ALL_PORTS.get(self.server.server_port, "Connection refused")
-        service_name = SERVICE_NAMES.get(self.server.server_port, "http")
-        banner = f"👋 Welcome to {service_name} Service\n\n"
+        banner = f"👋 Welcome to {SERVICE_NAMES.get(self.server.server_port, 'http')} Service\n\n"
         self.send_response(200)
         self.send_header("Content-type", "text/plain; charset=utf-8")
-        self.send_header("Server", service_name)
+        self.send_header("Server", SERVICE_NAMES.get(self.server.server_port, "http"))
         self.end_headers()
         self.wfile.write((banner + response).encode("utf-8"))
 
     def log_message(self, format, *args):
-        # Suppress logging
-        return
+        return  # Silence logs
 
 def start_fake_service(port):
-    """Start a lightweight HTTP server on the given port"""
     try:
         server = HTTPServer(('0.0.0.0', port), PortHandler)
         threading.Thread(target=server.serve_forever, daemon=True).start()
@@ -213,11 +193,9 @@ def start_fake_service(port):
     except OSError as e:
         print(f"❌ Could not bind port {port}: {e}")
 
-# Start all fake services
-for port in ALL_PORTS:
+for port in FAKE_FLAGS:
     start_fake_service(port)
 
-# === Start Flask Hub ===
 if __name__ == '__main__':
     print("🌐 Student hub running on http://127.0.0.1:5000")
-    app.run(host='127.0.0.1', port=5000, debug=False)
+    app.run(host='127.0.0.1', port=5000, debug=False, threaded=True)

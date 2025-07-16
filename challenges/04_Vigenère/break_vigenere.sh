@@ -1,5 +1,24 @@
 #!/bin/bash
 
+# === Vigenère Cipher Breaker ===
+
+# === Locate Project Root ===
+find_project_root() {
+    DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    while [ "$DIR" != "/" ]; do
+        if [ -f "$DIR/.ccri_ctf_root" ]; then
+            echo "$DIR"
+            return 0
+        fi
+        DIR="$(dirname "$DIR")"
+    done
+    echo "❌ ERROR: Could not find project root marker (.ccri_ctf_root)." >&2
+    exit 1
+}
+
+PROJECT_ROOT="$(find_project_root)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 clear
 echo "🔐 Vigenère Cipher Breaker"
 echo "==============================="
@@ -15,7 +34,7 @@ echo "         Cipher: RIJVS UYVJN"
 echo
 echo "   Each letter in the keyword decides how far to shift the plaintext letters."
 echo
-read -p "Press ENTER to learn how we’ll decode this..." temp
+read -p "Press ENTER to learn how we’ll decode this..."
 
 # Explain decryption command
 clear
@@ -28,12 +47,15 @@ echo
 echo "🔑 It reverses the shifting pattern based on your keyword."
 echo "   If the keyword is correct, the flag will appear!"
 echo
-read -p "Press ENTER to begin keyword testing..." temp
+read -p "Press ENTER to begin keyword testing..."
 
 # Check for cipher.txt first
-if [[ ! -f cipher.txt ]]; then
+CIPHER_FILE="$SCRIPT_DIR/cipher.txt"
+OUTPUT_FILE="$SCRIPT_DIR/decoded_output.txt"
+
+if [[ ! -f "$CIPHER_FILE" ]]; then
     echo "❌ ERROR: cipher.txt not found in this folder."
-    read -p "Press ENTER to close this terminal..." temp
+    read -p "Press ENTER to close this terminal..."
     exit 1
 fi
 
@@ -57,15 +79,19 @@ while true; do
     sleep 0.5
 
     # Run Python decoder
-    decoded=$(python3 - "$key" <<'EOF'
+    decoded=$(python3 - "$key" <<EOF
 import sys
 from itertools import cycle
+import os
+
+# Paths
+cipher_file = "${CIPHER_FILE}"
+output_file = "${OUTPUT_FILE}"
 
 key = sys.argv[1]
-filename = "cipher.txt"
 
 try:
-    with open(filename, "r") as f:
+    with open(cipher_file, "r") as f:
         ciphertext = f.read()
 except FileNotFoundError:
     print("❌ cipher.txt not found.")
@@ -90,7 +116,13 @@ def vigenere_decrypt(ciphertext, key):
             result.append(char)
     return ''.join(result)
 
-print(vigenere_decrypt(ciphertext, key))
+plain_text = vigenere_decrypt(ciphertext, key)
+
+# Save to file
+with open(output_file, "w") as f_out:
+    f_out.write(plain_text)
+
+print(plain_text)
 EOF
     )
 
@@ -103,7 +135,6 @@ EOF
 
     if echo "$decoded" | grep -qE 'CCRI-[A-Z]{4}-[0-9]{4}'; then
         echo "✅ Flag found in decrypted text!"
-        echo "$decoded" > decoded_output.txt
         echo "📁 Saved to: decoded_output.txt"
         echo "📋 Copy the CCRI flag and submit it on the scoreboard."
         break

@@ -1,4 +1,28 @@
 #!/bin/bash
+
+# === Nmap Scan Puzzle ===
+
+# Locate Project Root
+find_project_root() {
+    DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    while [ "$DIR" != "/" ]; do
+        if [ -f "$DIR/.ccri_ctf_root" ]; then
+            echo "$DIR"
+            return 0
+        fi
+        DIR="$(dirname "$DIR")"
+    done
+    echo "❌ ERROR: Could not find project root marker (.ccri_ctf_root)." >&2
+    exit 1
+}
+
+PROJECT_ROOT="$(find_project_root)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR" || {
+    echo "❌ Failed to change to script directory: $SCRIPT_DIR"
+    exit 1
+}
+
 clear
 echo "🛰️ Nmap Scan Puzzle"
 echo "--------------------------------------"
@@ -117,7 +141,7 @@ while true; do
             if [[ "$sub_choice" == "1" ]]; then
                 break
             elif [[ "$sub_choice" == "2" ]]; then
-                out_file="nmap_flag_response.txt"
+                out_file="$SCRIPT_DIR/nmap_flag_response.txt"
                 {
                     echo "Port: $port"
                     echo "Service: $service"

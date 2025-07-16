@@ -1,5 +1,24 @@
 #!/bin/bash
 
+# === Base64 Decoder Helper ===
+
+# === Locate Project Root ===
+find_project_root() {
+    DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    while [ "$DIR" != "/" ]; do
+        if [ -f "$DIR/.ccri_ctf_root" ]; then
+            echo "$DIR"
+            return 0
+        fi
+        DIR="$(dirname "$DIR")"
+    done
+    echo "❌ ERROR: Could not find project root marker (.ccri_ctf_root)." >&2
+    exit 1
+}
+
+PROJECT_ROOT="$(find_project_root)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 clear
 echo "🧩 Base64 Decoder Helper"
 echo "==========================="
@@ -28,7 +47,7 @@ echo "   base64         → Call the Base64 tool"
 echo "   --decode       → Switch from encoding to decoding"
 echo "   encoded.txt    → Input file to decode"
 echo
-read -p "Press ENTER to begin decoding..." junk
+read -p "Press ENTER to begin decoding..."
 
 # Simulate analysis
 echo
@@ -39,11 +58,11 @@ sleep 0.5
 
 echo
 echo "⏳ Decoding content using:"
-echo "   base64 --decode encoded.txt"
+echo "   base64 --decode \"$SCRIPT_DIR/encoded.txt\""
 sleep 1
 
 # Perform decoding
-decoded=$(base64 --decode encoded.txt 2>/dev/null)
+decoded=$(base64 --decode "$SCRIPT_DIR/encoded.txt" 2>/dev/null)
 status=$?
 
 if [[ $status -ne 0 || -z "$decoded" ]]; then
@@ -60,10 +79,10 @@ echo "📄 Decoded Message:"
 echo "-----------------------------"
 echo "$decoded"
 echo "-----------------------------"
-echo "$decoded" > decoded_output.txt
+echo "$decoded" > "$SCRIPT_DIR/decoded_output.txt"
 
 echo
-echo "📁 Decoded output saved as: decoded_output.txt"
+echo "📁 Decoded output saved as: $SCRIPT_DIR/decoded_output.txt"
 echo "🔎 Look for a string matching this format: CCRI-AAAA-1111"
 echo "🧠 This is your flag. Copy it into the scoreboard!"
 echo

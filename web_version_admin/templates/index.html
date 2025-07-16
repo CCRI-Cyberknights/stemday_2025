@@ -1,59 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<title>🚀 CCRI CTF Hub</title>
-		<link
-			rel="stylesheet"
-			href="{{ url_for('static', filename='style.css') }}"
-		/>
-	</head>
-	<body>
-		<h1>🚀 CCRI CTF Student Hub</h1>
-		<p>Welcome to the web hub for solving CTF challenges.</p>
-		<p><strong>Flag Format:</strong> CCRI-AAAA-1111</p>
+  <head>
+    <meta charset="UTF-8" />
+    <title>🚀 CCRI CTF Hub</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <h1>🚀 CCRI CTF Student Hub</h1>
+    <p>Welcome to the web hub for solving CTF challenges.</p>
+    <p><strong>Flag Format:</strong> CCRI-AAAA-1111</p>
 
-		<h2 id="progress-counter" class="progress"
-			>{{ challenges.completed_challenges | length }} of {{ challenges.challenges | length }} challenges completed</h2
-		>
+    <h2 id="progress-counter" class="progress">
+      {{ challenges.completed_challenges | length }} of {{ challenges.challenges | length }} challenges completed
+    </h2>
 
-		<div class="grid">
-			{% for challenge in challenges.challenges %}
-			<div class="challenge-card" id="{{ challenge.id }}">
-				<h3>{{ challenge.ch_number }}. {{ challenge.name }}</h3>
-				{% if challenge.complete %}
-				<p class="completed">✅ Completed</p>
-				{% else %}
-				<button
-					class="view-btn"
-					onclick="location.href='/challenge/{{ challenge.id }}'"
-					>🚀 Start Challenge</button
-				>
-				{% endif %}
-			</div>
-			{% endfor %}
-		</div>
+    <div class="grid">
+      {% for challenge in challenges.challenges %}
+      <div class="challenge-card" id="{{ challenge.id }}">
+        <h3>{{ challenge.ch_number }}. {{ challenge.name }}</h3>
+        {% if challenge.complete %}
+        <p class="completed">✅ Completed</p>
+        {% else %}
+        <button
+          class="view-btn"
+          type="button"
+          onclick="window.location.href='/challenge/{{ challenge.id }}';"
+        >
+          🚀 Start Challenge
+        </button>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
 
-		<script>
-			document.addEventListener("DOMContentLoaded", () => {
-				let completed = 0;
-				const total = {{ challenges.challenges | length }};
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const total = {{ challenges.challenges | length }};
+        let completed = 0;
 
-				{% for challenge in challenges.challenges %}
-				const challengeId = "{{ challenge.id }}";
-				// Check if challenge was marked complete in localStorage
-				const savedFlag = localStorage.getItem(challengeId);
-				if (savedFlag) {
-					document
-						.getElementById(challengeId)
-						.classList.add("completed");
-					completed++;
-				}
-				{% endfor %}
+        // Update completed challenges from localStorage
+        {% for challenge in challenges.challenges %}
+        const challengeId = "{{ challenge.id }}";
+        const savedFlag = localStorage.getItem(challengeId);
+        if (savedFlag) {
+          document
+            .getElementById(challengeId)
+            .classList.add("completed");
+          completed++;
+        }
+        {% endfor %}
 
-				document.getElementById("progress-counter").textContent =
-					`${completed} of ${total} challenges completed`;
-			});
-		</script>
-	</body>
+        // Update progress counter
+        document.getElementById("progress-counter").textContent =
+          `${completed} of ${total} challenges completed`;
+      });
+    </script>
+  </body>
 </html>

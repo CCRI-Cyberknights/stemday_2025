@@ -1,5 +1,28 @@
 #!/bin/bash
 
+# === Process Inspection ===
+
+# Locate Project Root
+find_project_root() {
+    DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    while [ "$DIR" != "/" ]; do
+        if [ -f "$DIR/.ccri_ctf_root" ]; then
+            echo "$DIR"
+            return 0
+        fi
+        DIR="$(dirname "$DIR")"
+    done
+    echo "❌ ERROR: Could not find project root marker (.ccri_ctf_root)." >&2
+    exit 1
+}
+
+PROJECT_ROOT="$(find_project_root)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR" || {
+    echo "❌ Failed to change to script directory: $SCRIPT_DIR"
+    exit 1
+}
+
 # Auto-relaunch in a bigger terminal window
 if [[ -z "$BIGGER_TERMINAL" ]]; then
     export BIGGER_TERMINAL=1
@@ -36,14 +59,15 @@ read -p "Press ENTER to start exploring..." junk
 clear
 
 # Check for ps_dump.txt
-if [[ ! -f ps_dump.txt ]]; then
+PS_DUMP="$SCRIPT_DIR/ps_dump.txt"
+if [[ ! -f "$PS_DUMP" ]]; then
     echo "❌ ERROR: ps_dump.txt not found in this folder!"
     read -p "Press ENTER to exit..." junk
     exit 1
 fi
 
 # Build unique process list
-mapfile -t processes < <(awk 'NR>1 && $11 ~ /^\// {print $11}' ps_dump.txt | sort | uniq)
+mapfile -t processes < <(awk 'NR>1 && $11 ~ /^\// {print $11}' "$PS_DUMP" | sort | uniq)
 
 while true; do
     echo "================================="
@@ -64,7 +88,7 @@ while true; do
         sleep 0.5
 
         # Display details with flags indented
-        grep "$proc_name" ps_dump.txt | sed 's/--/\n    --/g'
+        grep "$proc_name" "$PS_DUMP" | sed 's/--/\n    --/g'
         echo "================================="
 
         while true; do
@@ -79,7 +103,7 @@ while true; do
                 break
             elif [[ "$save_choice" == "2" ]]; then
                 echo "💾 Saving output to process_output.txt..."
-                grep "$proc_name" ps_dump.txt | sed 's/--/\n    --/g' > process_output.txt
+                grep "$proc_name" "$PS_DUMP" | sed 's/--/\n    --/g' > "$SCRIPT_DIR/process_output.txt"
                 echo "✅ Saved successfully."
                 read -p "Press ENTER to continue." junk
                 clear
@@ -95,7 +119,7 @@ while true; do
         break
     else
         echo "❌ Invalid choice. Please select a valid process."
-        read -p "Press ENTER to continue." junk
+        read -p "Press ENTER to continue..." junk
         clear
     fi
 done

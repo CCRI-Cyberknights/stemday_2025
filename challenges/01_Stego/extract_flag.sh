@@ -1,5 +1,24 @@
 #!/bin/bash
 
+# === Stego Decode Helper ===
+
+# === Locate Project Root ===
+find_project_root() {
+    DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    while [ "$DIR" != "/" ]; do
+        if [ -f "$DIR/.ccri_ctf_root" ]; then
+            echo "$DIR"
+            return 0
+        fi
+        DIR="$(dirname "$DIR")"
+    done
+    echo "❌ ERROR: Could not find project root marker (.ccri_ctf_root)." >&2
+    exit 1
+}
+
+PROJECT_ROOT="$(find_project_root)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 clear
 echo "🕵️ Stego Decode Helper"
 echo "=========================="
@@ -52,20 +71,20 @@ while true; do
 
     # Show command (simulated)
     echo
-    echo "💻 Running: steghide extract -sf squirrel.jpg -xf decoded_message.txt -p \"$pw\""
+    echo "💻 Running: steghide extract -sf \"$SCRIPT_DIR/squirrel.jpg\" -xf \"$SCRIPT_DIR/decoded_message.txt\" -p \"$pw\""
     echo
 
     # Attempt extraction (force non-interactive, suppress errors)
-    steghide extract -sf squirrel.jpg -xf decoded_message.txt -p "$pw" -f <<< "" > /dev/null 2>&1
+    steghide extract -sf "$SCRIPT_DIR/squirrel.jpg" -xf "$SCRIPT_DIR/decoded_message.txt" -p "$pw" -f <<< "" > /dev/null 2>&1
     status=$?
 
-    if [[ $status -eq 0 && -s decoded_message.txt ]]; then
+    if [[ $status -eq 0 && -s "$SCRIPT_DIR/decoded_message.txt" ]]; then
         echo
         echo "🎉 ✅ SUCCESS! Hidden message recovered:"
         echo "----------------------------"
-        cat decoded_message.txt
+        cat "$SCRIPT_DIR/decoded_message.txt"
         echo "----------------------------"
-        echo "📁 Saved as decoded_message.txt"
+        echo "📁 Saved as decoded_message.txt in this folder"
         echo "💡 Look for a string like CCRI-ABCD-1234 to use as your flag."
         echo
         read -p "Press ENTER to close this terminal..."
@@ -76,6 +95,6 @@ while true; do
         echo "🔁 Try again with a different password."
         echo
         # Clean up any empty/partial file
-        rm -f decoded_message.txt
+        rm -f "$SCRIPT_DIR/decoded_message.txt"
     fi
 done

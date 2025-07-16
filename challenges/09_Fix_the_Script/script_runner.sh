@@ -1,5 +1,27 @@
 #!/bin/bash
 
+# === Fix the Flag! (Bash Edition) ===
+
+# === Locate Project Root ===
+find_project_root() {
+    DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    while [ "$DIR" != "/" ]; do
+        if [ -f "$DIR/.ccri_ctf_root" ]; then
+            echo "$DIR"
+            return 0
+        fi
+        DIR="$(dirname "$DIR")"
+    done
+    echo "❌ ERROR: Could not find project root marker (.ccri_ctf_root)." >&2
+    exit 1
+}
+
+PROJECT_ROOT="$(find_project_root)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+BROKEN_SCRIPT="$SCRIPT_DIR/broken_flag.sh"
+FLAG_OUTPUT_FILE="$SCRIPT_DIR/flag.txt"
+
 clear
 echo "🧪 Challenge #09 – Fix the Flag! (Bash Edition)"
 echo "==============================================="
@@ -24,7 +46,7 @@ echo
 echo "==============================================="
 
 # Check for broken_flag.sh
-if [[ ! -f broken_flag.sh ]]; then
+if [[ ! -f "$BROKEN_SCRIPT" ]]; then
     echo "❌ ERROR: missing required file 'broken_flag.sh'."
     read -p "Press ENTER to close this terminal..." junk
     exit 1
@@ -39,7 +61,7 @@ read -p "Press ENTER to run the script and see what happens..." junk
 echo
 echo "💻 Running: bash broken_flag.sh"
 echo "----------------------------------------------"
-bash broken_flag.sh
+bash "$BROKEN_SCRIPT"
 echo "----------------------------------------------"
 echo
 sleep 1
@@ -63,18 +85,17 @@ while true; do
             echo "✅ Correct! Adding the two parts together gives us the proper flag code."
             sleep 0.5
             echo "🔧 Updating the script with '+'..."
-            # Use a robust sed that handles whitespace
-            sed -i 's/code=.*part1 - part2.*/code=$((part1 + part2))/' broken_flag.sh
+            sed -i 's/code=.*part1 - part2.*/code=$((part1 + part2))/' "$BROKEN_SCRIPT"
 
             echo
             echo "🎉 Re-running the fixed script..."
-            flag_output=$(bash broken_flag.sh | grep "CCRI-SCRP")
+            flag_output=$(bash "$BROKEN_SCRIPT" | grep "CCRI-SCRP")
 
             echo "----------------------------------------------"
             echo "$flag_output"
             echo "----------------------------------------------"
-            echo "📄 Flag saved to: flag.txt"
-            echo "$flag_output" > flag.txt
+            echo "📄 Flag saved to: $FLAG_OUTPUT_FILE"
+            echo "$flag_output" > "$FLAG_OUTPUT_FILE"
             echo
             read -p "🎯 Copy the flag and enter it in the scoreboard when ready. Press ENTER to finish..." junk
             break

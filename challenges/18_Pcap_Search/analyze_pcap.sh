@@ -1,6 +1,29 @@
 #!/bin/bash
-clear
 
+# === PCAP Investigation Tool ===
+
+# Locate Project Root
+find_project_root() {
+    DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    while [ "$DIR" != "/" ]; do
+        if [ -f "$DIR/.ccri_ctf_root" ]; then
+            echo "$DIR"
+            return 0
+        fi
+        DIR="$(dirname "$DIR")"
+    done
+    echo "❌ ERROR: Could not find project root marker (.ccri_ctf_root)." >&2
+    exit 1
+}
+
+PROJECT_ROOT="$(find_project_root)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR" || {
+    echo "❌ Failed to change to script directory: $SCRIPT_DIR"
+    exit 1
+}
+
+clear
 echo "📡 PCAP Investigation Tool"
 echo "=============================="
 echo
@@ -31,7 +54,8 @@ sleep 0.5
 
 echo
 echo "📂 Checking for traffic.pcap file..."
-if [[ ! -f traffic.pcap ]]; then
+PCAP_FILE="$SCRIPT_DIR/traffic.pcap"
+if [[ ! -f "$PCAP_FILE" ]]; then
     echo "❌ ERROR: traffic.pcap not found in this folder!"
     read -p "Press ENTER to exit..."
     exit 1
@@ -40,13 +64,13 @@ echo "✅ traffic.pcap found!"
 sleep 0.5
 
 # Prepare notes file
-OUTFILE="pcap_notes.txt"
+OUTFILE="$SCRIPT_DIR/pcap_notes.txt"
 rm -f "$OUTFILE"
 
 # --- Extract TCP streams ---
 echo
 echo "🔍 Extracting unique TCP streams from the capture..."
-mapfile -t all_streams < <(tshark -r traffic.pcap -Y 'tcp' -T fields -e tcp.stream | sort -u)
+mapfile -t all_streams < <(tshark -r "$PCAP_FILE" -Y 'tcp' -T fields -e tcp.stream | sort -u)
 stream_count=${#all_streams[@]}
 
 echo "✅ Found $stream_count TCP streams in the capture."
@@ -83,7 +107,7 @@ flag_streams=()
 pattern1='[A-Z]{4}-[A-Z]{4}-[0-9]{4}'
 pattern2='[A-Z]{4}-[0-9]{4}-[A-Z]{4}'
 for sid in "${all_streams[@]}"; do
-    if tshark -r traffic.pcap -Y "tcp.stream==$sid" -T fields -e tcp.payload 2>/dev/null | \
+    if tshark -r "$PCAP_FILE" -Y "tcp.stream==$sid" -T fields -e tcp.payload 2>/dev/null | \
        xxd -r -p 2>/dev/null | strings | grep -E -q "$pattern1|$pattern2"; then
         flag_streams+=("$sid")
         printf "\n🔎 Found potential flag in Stream ID: %s\n" "$sid"
@@ -127,13 +151,13 @@ while true; do
         echo "-----------------------------------------"
 
         # Show endpoints
-        tshark -r traffic.pcap -Y "tcp.stream==$sid" -T fields \
+        tshark -r "$PCAP_FILE" -Y "tcp.stream==$sid" -T fields \
             -e frame.number -e ip.src -e tcp.srcport -e ip.dst -e tcp.dstport | head -n 1 | \
             awk '{printf "📨 From: %s:%s\n📬 To: %s:%s\n", $2, $3, $4, $5}'
 
         echo
         echo "📝 Payload Preview:"
-        tshark -r traffic.pcap -qz follow,tcp,ascii,$sid 2>/dev/null
+        tshark -r "$PCAP_FILE" -qz follow,tcp,ascii,$sid 2>/dev/null
         echo "-----------------------------------------"
 
         # Save option
@@ -150,11 +174,11 @@ while true; do
                     echo "🔖 Saving stream $sid summary..."
                     {
                         echo "🔗 Stream ID: $sid"
-                        tshark -r traffic.pcap -Y "tcp.stream==$sid" -T fields \
+                        tshark -r "$PCAP_FILE" -Y "tcp.stream==$sid" -T fields \
                             -e ip.src -e tcp.srcport -e ip.dst -e tcp.dstport | head -n 1 | \
                             awk '{printf "📨 From: %s:%s\n📬 To: %s:%s\n", $1, $2, $3, $4}'
                         echo "Payload:"
-                        tshark -r traffic.pcap -qz follow,tcp,ascii,$sid 2>/dev/null
+                        tshark -r "$PCAP_FILE" -qz follow,tcp,ascii,$sid 2>/dev/null
                         echo "-----------------------------------------"
                     } >> "$OUTFILE"
                     echo "✅ Saved to $OUTFILE"

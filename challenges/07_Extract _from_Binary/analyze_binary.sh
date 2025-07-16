@@ -1,5 +1,28 @@
 #!/bin/bash
 
+# === Binary Forensics Challenge ===
+
+# === Locate Project Root ===
+find_project_root() {
+    DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    while [ "$DIR" != "/" ]; do
+        if [ -f "$DIR/.ccri_ctf_root" ]; then
+            echo "$DIR"
+            return 0
+        fi
+        DIR="$(dirname "$DIR")"
+    done
+    echo "❌ ERROR: Could not find project root marker (.ccri_ctf_root)." >&2
+    exit 1
+}
+
+PROJECT_ROOT="$(find_project_root)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+TARGET_BINARY="$SCRIPT_DIR/hidden_flag"
+OUTFILE="$SCRIPT_DIR/extracted_strings.txt"
+TEMP_MATCHES="$SCRIPT_DIR/temp_matches.txt"
+
 clear
 echo "🧪 Binary Forensics Challenge"
 echo "============================="
@@ -16,18 +39,17 @@ echo
 read -p "Press ENTER to scan the binary for readable content..." junk
 
 # --- Pre-flight check ---
-if [[ ! -f hidden_flag ]]; then
+if [[ ! -f "$TARGET_BINARY" ]]; then
     echo
-    echo "❌ ERROR: The file 'hidden_flag' was not found in this folder."
+    echo "❌ ERROR: The file 'hidden_flag' was not found in $SCRIPT_DIR."
     read -p "Press ENTER to close this terminal..." junk
     exit 1
 fi
 
 # Run strings and save results
-OUTFILE="extracted_strings.txt"
 echo
-echo "🔍 Running: strings hidden_flag > $OUTFILE"
-strings hidden_flag > "$OUTFILE"
+echo "🔍 Running: strings \"$TARGET_BINARY\" > \"$OUTFILE\""
+strings "$TARGET_BINARY" > "$OUTFILE"
 sleep 0.5
 echo "✅ All extracted strings saved to: $OUTFILE"
 echo
@@ -45,9 +67,9 @@ read -p "Press ENTER to scan for flag patterns..." junk
 echo "🔎 Scanning for flag-like patterns (format: XXXX-YYYY-ZZZZ)..."
 sleep 0.5
 MATCH_PATTERN='\b([A-Z0-9]{4}-){2}[A-Z0-9]{4}\b'
-grep -E "$MATCH_PATTERN" "$OUTFILE" | tee temp_matches.txt
+grep -E "$MATCH_PATTERN" "$OUTFILE" | tee "$TEMP_MATCHES"
 
-COUNT=$(wc -l < temp_matches.txt)
+COUNT=$(wc -l < "$TEMP_MATCHES")
 if [[ "$COUNT" -gt 0 ]]; then
     echo -e "\n📌 Found $COUNT possible flag(s) matching that format!"
 else

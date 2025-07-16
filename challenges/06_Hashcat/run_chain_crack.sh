@@ -1,5 +1,31 @@
 #!/bin/bash
 
+# === Hashcat ChainCrack Demo ===
+
+# === Locate Project Root ===
+find_project_root() {
+    DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    while [ "$DIR" != "/" ]; do
+        if [ -f "$DIR/.ccri_ctf_root" ]; then
+            echo "$DIR"
+            return 0
+        fi
+        DIR="$(dirname "$DIR")"
+    done
+    echo "❌ ERROR: Could not find project root marker (.ccri_ctf_root)." >&2
+    exit 1
+}
+
+PROJECT_ROOT="$(find_project_root)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+HASHES="$SCRIPT_DIR/hashes.txt"
+WORDLIST="$SCRIPT_DIR/wordlist.txt"
+POTFILE="$SCRIPT_DIR/hashcat.potfile"
+SEGMENTS="$SCRIPT_DIR/segments"
+EXTRACTED="$SCRIPT_DIR/extracted"
+DECODED_SEGMENTS="$SCRIPT_DIR/decoded_segments"
+ASSEMBLED="$SCRIPT_DIR/assembled_flag.txt"
+
 clear
 echo "🔓 Hashcat ChainCrack Demo"
 echo "==============================="
@@ -18,17 +44,6 @@ echo
 read -p "Press ENTER to begin cracking the hashes..." junk
 
 # --- Pre-flight checks ---
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR" || { echo "❌ Failed to change to script directory: $SCRIPT_DIR"; exit 1; }
-
-HASHES="$SCRIPT_DIR/hashes.txt"
-WORDLIST="$SCRIPT_DIR/wordlist.txt"
-POTFILE="$SCRIPT_DIR/hashcat.potfile"
-SEGMENTS="$SCRIPT_DIR/segments"
-EXTRACTED="$SCRIPT_DIR/extracted"
-DECODED_SEGMENTS="$SCRIPT_DIR/decoded_segments"
-ASSEMBLED="$SCRIPT_DIR/assembled_flag.txt"
-
 if [[ ! -f "$HASHES" || ! -f "$WORDLIST" ]]; then
     echo "❌ ERROR: Required files hashes.txt or wordlist.txt are missing."
     read -p "Press ENTER to close this terminal..."
@@ -101,7 +116,7 @@ grep -Ff "$HASHES" "$POTFILE" | while IFS=: read -r hash pass; do
 
         decoded_file="$DECODED_SEGMENTS/decoded_${segment_file%.txt}.txt"
         echo
-        echo "🔽 Decoding Base64 with: base64 --decode $segfile"
+        echo "🔽 Decoding Base64 with: base64 --decode \"$segfile\""
         sleep 0.5
         base64 --decode "$segfile" > "$decoded_file" 2>/dev/null
 

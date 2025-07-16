@@ -1,4 +1,24 @@
 #!/bin/bash
+
+# === Subdomain Sweep ===
+
+# Locate Project Root
+find_project_root() {
+    DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    while [ "$DIR" != "/" ]; do
+        if [ -f "$DIR/.ccri_ctf_root" ]; then
+            echo "$DIR"
+            return 0
+        fi
+        DIR="$(dirname "$DIR")"
+    done
+    echo "❌ ERROR: Could not find project root marker (.ccri_ctf_root)." >&2
+    exit 1
+}
+
+PROJECT_ROOT="$(find_project_root)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 clear
 
 echo "🌐 Subdomain Sweep"
@@ -12,14 +32,15 @@ echo "🧠 Flag format: CCRI-AAAA-1111"
 echo "💡 In real CTFs, you'd use tools like curl, grep, or open the page in a browser to search for hidden data."
 echo
 
-domains=(alpha.liber8.local beta.liber8.local gamma.liber8.local delta.liber8.local omega.liber8.local)
+# Subdomains (base names only)
+domains=(alpha beta gamma delta omega)
 
 # --- Pre-flight check ---
 missing=0
 for domain in "${domains[@]}"; do
-    html_file="${domain}.html"
+    html_file="$SCRIPT_DIR/${domain}.liber8.local.html"
     if [[ ! -f "$html_file" ]]; then
-        echo "❌ ERROR: Missing file '$html_file'"
+        echo "❌ ERROR: Missing file '$(basename "$html_file")'"
         missing=1
     fi
 done
@@ -33,7 +54,7 @@ while true; do
     echo
     echo "📂 Available subdomains:"
     for i in "${!domains[@]}"; do
-        echo "$((i+1)). ${domains[$i]}"
+        echo "$((i+1)). ${domains[$i]}.liber8.local"
     done
     echo "6. Auto-scan all subdomains for flag patterns"
     echo "7. Exit"
@@ -42,9 +63,9 @@ while true; do
     read -p "Select an option (1-7): " choice
 
     if [[ "$choice" -ge 1 && "$choice" -le 5 ]]; then
-        file="${domains[$((choice-1))]}.html"
+        file="$SCRIPT_DIR/${domains[$((choice-1))]}.liber8.local.html"
         echo
-        echo "🌐 Opening http://${domains[$((choice-1))]} in your browser..."
+        echo "🌐 Opening $(basename "$file") in your browser..."
         xdg-open "$file" >/dev/null 2>&1 &
         echo
         echo "💻 Tip: View the page AND its source (Ctrl+U) for hidden data."
@@ -57,8 +78,7 @@ while true; do
         echo
         echo "🔎 Auto-scanning all subdomains for flags using:"
         echo "    grep -E 'CCRI-[A-Z]{4}-[0-9]{4}' *.html"
-        echo
-        grep -E 'CCRI-[A-Z]{4}-[0-9]{4}' *.html --color=always || echo "⚠️ No flags found in auto-scan."
+        grep -E 'CCRI-[A-Z]{4}-[0-9]{4}' "$SCRIPT_DIR"/*.html --color=always || echo "⚠️ No flags found in auto-scan."
         echo
         read -p "Press ENTER to return to the menu." junk
         clear

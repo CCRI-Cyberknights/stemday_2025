@@ -1,5 +1,24 @@
 #!/bin/bash
 
+# === ROT13 Decoder Helper ===
+
+# === Locate Project Root ===
+find_project_root() {
+    DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    while [ "$DIR" != "/" ]; do
+        if [ -f "$DIR/.ccri_ctf_root" ]; then
+            echo "$DIR"
+            return 0
+        fi
+        DIR="$(dirname "$DIR")"
+    done
+    echo "❌ ERROR: Could not find project root marker (.ccri_ctf_root)." >&2
+    exit 1
+}
+
+PROJECT_ROOT="$(find_project_root)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 clear
 echo "🔐 ROT13 Decoder Helper"
 echo "==========================="
@@ -24,20 +43,26 @@ echo "     ➡️ Rotate it forward by 13 places (A→N, N→A)."
 echo
 echo "💻 The Python decoder also animates this process so you can watch it work."
 echo
-read -p "Press ENTER to launch the animated decoder..." temp
+read -p "Press ENTER to launch the animated decoder..."
 
 # Run the Python decoder
-python3 - <<'EOF'
+python3 - <<EOF
 import time
 import os
 import sys
 
+# Path setup
+project_root = "${PROJECT_ROOT}"
+script_dir = "${SCRIPT_DIR}"
+cipher_file = os.path.join(script_dir, "cipher.txt")
+output_file = os.path.join(script_dir, "decoded_output.txt")
+
 # Check if cipher.txt exists
-if not os.path.isfile("cipher.txt") or os.path.getsize("cipher.txt") == 0:
-    print("\n❌ ERROR: cipher.txt is missing or empty.")
+if not os.path.isfile(cipher_file) or os.path.getsize(cipher_file) == 0:
+    print("\\n❌ ERROR: cipher.txt is missing or empty.")
     sys.exit(1)
 
-with open("cipher.txt", "r") as f:
+with open(cipher_file, "r") as f:
     encoded = f.read()
 
 def rot13_char(c):
@@ -60,8 +85,8 @@ def animate_rot13(encoded_text):
                 decoded_chars[i] = rotated
                 os.system("clear")
                 print("🔐 ROT13 Decoder Helper")
-                print("===========================\n")
-                print("🌀 Decrypting:\n")
+                print("===========================\\n")
+                print("🌀 Decrypting:\\n")
                 print("".join(decoded_chars))
                 time.sleep(0.02)
             decoded_chars[i] = rot13_char(c)
@@ -70,15 +95,15 @@ def animate_rot13(encoded_text):
 final_message = animate_rot13(encoded)
 
 # Save decoded output
-with open("decoded_output.txt", "w") as f_out:
+with open(output_file, "w") as f_out:
     f_out.write(final_message)
 
 # Display the result
-print("\n✅ Final Decoded Message:")
+print("\\n✅ Final Decoded Message:")
 print("-----------------------------")
 print(final_message)
 print("-----------------------------")
-print("📁 Saved to: decoded_output.txt")
+print(f"📁 Saved to: {output_file}")
 EOF
 
 # Check for Python failure
