@@ -1,30 +1,10 @@
 #!/bin/bash
-# build_web_version.sh - Build the student web hub from admin version
 
-set -e
-
+# === Bash Wrapper for Web Version Builder ===
 echo "🚀 Starting Web Version Build Process..."
 
-# === Helper: Find Project Root ===
-find_project_root() {
-    local dir="$PWD"
-    while [[ "$dir" != "/" ]]; do
-        if [[ -f "$dir/.ccri_ctf_root" ]]; then
-            echo "$dir"
-            return 0
-        fi
-        dir="$(dirname "$dir")"
-    done
-    echo "❌ ERROR: Could not find .ccri_ctf_root marker. Are you inside the CTF repo?" >&2
-    exit 1
-}
-
-PROJECT_ROOT="$(find_project_root)"
-WEB_ADMIN_DIR="$PROJECT_ROOT/web_version_admin"
-WEB_STUDENT_DIR="$PROJECT_ROOT/web_version"
-
-# === Run Embedded Python3 Script ===
-/usr/bin/env python3 <<EOF
+# Use Python3 to execute the embedded script
+/usr/bin/env python3 <<'EOF'
 import json
 import base64
 import os
@@ -33,7 +13,7 @@ import py_compile
 import stat
 
 # === Dynamic Base Directory Detection ===
-BASE_DIR = os.path.abspath("${PROJECT_ROOT}")
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 ADMIN_DIR = os.path.join(BASE_DIR, "web_version_admin")
 STUDENT_DIR = os.path.join(BASE_DIR, "web_version")
 
@@ -41,6 +21,7 @@ ADMIN_JSON = os.path.join(ADMIN_DIR, "challenges.json")
 TEMPLATES_FOLDER = os.path.join(ADMIN_DIR, "templates")
 STATIC_FOLDER = os.path.join(ADMIN_DIR, "static")
 SERVER_SOURCE = os.path.join(ADMIN_DIR, "server.py")
+START_SCRIPT_SOURCE = os.path.join(ADMIN_DIR, "start_web_hub.sh")
 ENCODE_KEY = "CTF4EVER"
 
 def xor_encode(plaintext, key):
@@ -107,13 +88,20 @@ def prepare_web_version():
         dirs_exist_ok=True
     )
 
+    # Copy start_web_hub.sh and set executable
+    print("📂 Copying start_web_hub.sh...")
+    start_script_dest = os.path.join(STUDENT_DIR, "start_web_hub.sh")
+    shutil.copy2(START_SCRIPT_SOURCE, start_script_dest)
+    os.chmod(start_script_dest, os.stat(start_script_dest).st_mode | stat.S_IXUSR)
+    print(f"✅ Copied and made executable: {start_script_dest}")
+
     # Compile server.py to server.pyc
     print("⚙️ Compiling server.py for student version...")
     compiled_path = os.path.join(STUDENT_DIR, "server.pyc")
     py_compile.compile(SERVER_SOURCE, cfile=compiled_path)
     print(f"✅ Compiled server saved as {compiled_path}")
 
-    print("\\n🎉 Student web_version folder rebuilt successfully!\\n")
+    print("\n🎉 Student web_version folder rebuilt successfully!\n")
 
 if __name__ == "__main__":
     print(f"📂 Detected BASE_DIR: {BASE_DIR}")

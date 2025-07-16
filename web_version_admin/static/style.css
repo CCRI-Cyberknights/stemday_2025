@@ -1,80 +1,320 @@
 body {
-    font-family: Arial, sans-serif;
-    background: #f5f5f5;
-    margin: 0;
-    padding: 20px;
+	font-family: Arial, sans-serif;
+	background: #292524;
+	margin: 0;
+	padding: 20px;
+	/* background-image: url('/static/assets/v-for-vigilence.jpg');
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: center; */
 }
 
 h1 {
-    text-align: center;
-    color: #333;
+	text-align: center;
+	color: #fff;
 }
 
 #challenges-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+	gap: 15px;
+	margin-top: 20px;
 }
 
-.challenge-card {
-    background: #fff;
-    border-radius: 8px;
-    padding: 15px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    text-align: center;
+h1,
+p,
+h2 {
+	color: #ffffff;
 }
 
-.challenge-card h2 {
-    margin: 0 0 10px;
+a {
+	color: #f3e600;
+	text-decoration: none;
 }
-
-button {
-    margin: 5px;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    background-color: #0078D4;
-    color: #fff;
-    cursor: pointer;
+a:hover {
+	color: #f3e7004b;
+	text-decoration: underline;
 }
-
-button:hover {
-    background-color: #005a9e;
+a:visited {
+	color: #6a009b;
 }
 
 /* 📝 Markdown Styling */
 .readme {
-    background: #f1f1f1;
-    padding: 15px;
-    border-radius: 6px;
-    margin-top: 10px;
-    overflow-x: auto;
-    font-family: system-ui, -apple-system, sans-serif;
-    line-height: 1.6;
+	background: #1e1e1e;
+	color: #f8f8f2;
+	padding: 15px 0px;
+	border-radius: 6px;
+	margin-top: 10px;
+	overflow-x: auto;
+	font-family: system-ui, -apple-system, sans-serif;
+	line-height: 1.6;
+	white-space: normal;
+	word-wrap: break-word;
 }
 
-.readme h1, .readme h2, .readme h3 {
-    margin-top: 1em;
-    margin-bottom: 0.5em;
-    color: #333;
+.readme h1,
+.readme h2,
+.readme h3 {
+	margin-top: 1em;
+	margin-bottom: 0.5em;
+	color: #eaeaea;
 }
 
 .readme p {
-    margin: 0.5em 0;
+	margin: 0.5em 0;
 }
 
 .readme code {
-    background: #eaeaea;
-    padding: 2px 4px;
-    border-radius: 4px;
-    font-family: monospace;
+	background: #eaeaea;
+	color: #272822;
+	padding: 2px 4px;
+	border-radius: 4px;
+	font-family: monospace;
 }
 
 .readme pre {
-    background: #272822;
-    color: #f8f8f2;
-    padding: 10px;
-    border-radius: 5px;
-    overflow-x: auto;
+	background: #272822;
+	color: #f8f8f2;
+	padding: 10px;
+	border-radius: 5px;
+	overflow-x: auto;
+}
+.readme ul {
+	margin: 10px 0;
+	padding-left: 20px;
+}
+.readme strong {
+	font-weight: bold;
+}
+
+#flagInput {
+	width: 300px;
+	padding: 5px;
+}
+#flagStatus {
+	margin-top: 10px;
+	font-weight: bold;
+}
+
+.grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+	gap: 15px;
+	margin-top: 20px;
+}
+.challenge-card {
+	background: transparent;
+	border: 2px solid #ccc;
+	color: #f3e600;
+	padding: 15px;
+	border-radius: 8px;
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+	position: relative;
+	text-align: center;
+	transition: transform 0.2s ease;
+	backdrop-filter: blur(3px);
+}
+.challenge-card:hover {
+	transform: scale(1.03);
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+.challenge-card.completed {
+	background-color: #d4edda; /* light green */
+	border: 2px solid #28a745;
+	position: relative;
+}
+.challenge-card.completed::after {
+	content: '✅'; /* Bigger checkmark */
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	font-size: 2em;
+	color: #28a745;
+}
+.progress {
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+.view-btn {
+	margin: 8px;
+	padding: 10px 16px;
+	border: none;
+	border-radius: 6px;
+	background: #1e1e1e;
+	color: #fff;
+	font-size: 1em;
+	cursor: pointer;
+	transition: background 0.3s ease;
+}
+.view-btn:hover {
+	background: linear-gradient(135deg, #6a009b, #48006a);
+}
+
+.actions {
+	margin: 15px 0;
+}
+.actions button {
+	margin-right: 10px;
+	height: 3em;
+	border: none;
+	border-radius: 15px;
+	color: rgb(0, 0, 0);
+	cursor: pointer;
+	background-color: #ffffff;
+	font-weight: 500;
+}
+
+/* Challenge Page Body */
+
+#challenge-wrapper {
+	background: #1e1e1e;
+	color: #f8f8f2;
+	padding: 20px;
+	border-radius: 6px;
+	margin-top: 20px;
+	overflow-x: auto;
+	font-family: system-ui, -apple-system, sans-serif;
+	line-height: 1.6;
+	white-space: normal;
+	word-wrap: break-word;
+	min-width: 24em;
+	max-width: 80em;
+
+	margin-left: auto;
+	margin-right: auto;
+
+	display: flex;
+	flex-direction: column;
+}
+
+/* #challenge-wrapper-section {
+	margin-bottom: 20px;
+	width: 100%;
+} */
+
+.challenge-wrapper-footer {
+	margin-left: auto;
+	margin-right: auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.challenge-wrapper-footer > * {
+	margin: 0;
+}
+
+/* .challenge-wrapper-footer button {
+	margin-top: 10px;
+	padding: 10px 20px;
+	border: 1px solid #ffffff;
+	border-radius: 6px;
+	background: #1e1e1e;
+	color: #ffffff;
+	font-size: 1em;
+	font-weight: bold;
+	cursor: pointer;
+	transition: background 0.3s ease;
+}
+.challenge-wrapper-footer button:hover {
+	background: linear-gradient(135deg, #6a009b, #48006a);
+	color: #f3e600;
+	transform: scale(1.03);
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+} */
+
+
+
+/* From Uiverse.io by vinodjangid07 */ 
+.input-wrapper {
+  width: fit-content;
+  height: 45px;
+  border-radius: 20px;
+  padding: 5px;
+  box-sizing: content-box;
+  display: flex;
+  align-items: center;
+  background-color: #292524;
+}
+
+.icon {
+  width: 30px;
+  fill: rgb(255, 255, 255);
+  margin-left: 8px;
+  transition: all 0.3s;
+}
+.input {
+  max-width: 225px;
+  height: 100%;
+  border: none;
+  outline: none;
+  padding-left: 15px;
+  background-color: #292524;
+  color: #50ff16ff;
+  font-size: 1em;
+}
+.input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px #292524 inset;
+  -webkit-text-fill-color: #ffffff;
+}
+.Subscribe-btn {
+  height: 100%;
+  width: 95px;
+  border: none;
+  border-radius: 15px;
+  color: rgb(0, 0, 0);
+  cursor: pointer;
+  background-color: #ffffff;
+  font-weight: 500;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.3s;
+}
+.arrow {
+  /* display: none; */
+  position: absolute;
+  margin-right: 150px;
+  transition: all 0.3s;
+}
+.input-wrapper:active .icon {
+  transform: scale(1.3);
+}
+.Subscribe-btn:hover {
+  color: white;
+}
+.Subscribe-btn:hover .arrow {
+  margin-right: 0;
+  animation: jello-vertical 0.9s both;
+  transform-origin: right;
+}
+
+@keyframes jello-vertical {
+  0% {
+    transform: scale3d(1, 1, 1);
+  }
+  30% {
+    transform: scale3d(0.75, 1.25, 1);
+  }
+  40% {
+    transform: scale3d(1.25, 0.75, 1);
+  }
+  50% {
+    transform: scale3d(0.85, 1.15, 1);
+  }
+  65% {
+    transform: scale3d(1.05, 0.95, 1);
+  }
+  75% {
+    transform: scale3d(0.95, 1.05, 1);
+  }
+  100% {
+    transform: scale3d(1, 1, 1);
+  }
+}
+.Subscribe-btn:active {
+  transform: scale(0.9);
 }
