@@ -33,5 +33,27 @@
 			</div>
 			{% endfor %}
 		</div>
+
+		<script>
+			document.addEventListener("DOMContentLoaded", () => {
+				let completed = 0;
+				const total = {{ challenges.challenges | length }};
+
+				{% for challenge in challenges.challenges %}
+				const challengeId = "{{ challenge.id }}";
+				// Check if challenge was marked complete in localStorage
+				const savedFlag = localStorage.getItem(challengeId);
+				if (savedFlag) {
+					document
+						.getElementById(challengeId)
+						.classList.add("completed");
+					completed++;
+				}
+				{% endfor %}
+
+				document.getElementById("progress-counter").textContent =
+					`${completed} of ${total} challenges completed`;
+			});
+		</script>
 	</body>
 </html>

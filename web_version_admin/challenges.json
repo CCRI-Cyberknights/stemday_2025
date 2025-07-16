@@ -22,7 +22,7 @@
   },
   "04_Vigenere": {
     "name": "Vigenère Cipher",
-    "folder": "../challenges/04_Vigenère",
+    "folder": "../challenges/04_Vigenere",
     "script": "break_vigenere.sh",
     "flag": "CCRI-VIGY-4925",
     "key": "CTF4EVER"
@@ -43,7 +43,7 @@
   },
   "07_ExtractBinary": {
     "name": "Extract from Binary",
-    "folder": "../challenges/07_Extract _from_Binary",
+    "folder": "../challenges/07_Extract_from_Binary",
     "script": "analyze_binary.sh",
     "flag": "CCRI-BINA-7091",
     "key": "CTF4EVER"
@@ -92,7 +92,7 @@
   },
   "14_SubdomainSweep": {
     "name": "Subdomain Sweep",
-    "folder": "../challenges/14_Subdomain _Sweep",
+    "folder": "../challenges/14_Subdomain_Sweep",
     "script": "explore_subdomains.sh",
     "flag": "CCRI-SUBD-4927",
     "key": "CTF4EVER"
