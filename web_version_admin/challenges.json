@@ -22,7 +22,7 @@
   },
   "04_Vigenere": {
     "name": "Vigenère Cipher",
-    "folder": "../challenges/04_Vigenere",
+    "folder": "../challenges/04_Vigenère",
     "script": "break_vigenere.sh",
     "flag": "CCRI-VIGY-4925",
     "key": "CTF4EVER"
