@@ -1,9 +1,9 @@
 try:
     # Flask 2.x: Markup is part of flask
-    from flask import Flask, render_template, request, jsonify, send_from_directory, Markup
+    from flask import Flask, render_template, request, jsonify, Markup
 except ImportError:
     # Flask 3.x: Markup moved to markupsafe
-    from flask import Flask, render_template, request, jsonify, send_from_directory
+    from flask import Flask, render_template, request, jsonify
     from markupsafe import Markup
 
 import subprocess
@@ -12,50 +12,27 @@ import os
 import base64
 import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from ChallengeList import ChallengeList
 
+# New import for Markdown support
 import markdown
 
-# === Helper: Find Project Root ===
-def find_project_root(marker=".ccri_ctf_root"):
-    """Walk upwards to locate the project root by marker file."""
-    dir_path = os.path.abspath(os.path.dirname(__file__))
-    while dir_path != "/":
-        if os.path.isfile(os.path.join(dir_path, marker)):
-            return dir_path
-        dir_path = os.path.dirname(dir_path)
-    raise RuntimeError(f"❌ Could not find project root marker '{marker}'. Are you inside the CTF repo?")
-
-# === Resolve BASE DIRECTORIES ===
-PROJECT_ROOT = find_project_root()
-WEB_ADMIN_DIR = os.path.join(PROJECT_ROOT, "web_version_admin")
-CHALLENGES_DIR = os.path.join(PROJECT_ROOT, "challenges")
-
-CHALLENGES_JSON_PATH = os.path.join(WEB_ADMIN_DIR, "challenges.json")
-TEMPLATES_DIR = os.path.join(WEB_ADMIN_DIR, "templates")
-STATIC_DIR = os.path.join(WEB_ADMIN_DIR, "static")
-
-app = Flask(__name__, template_folder=TEMPLATES_DIR, static_folder=STATIC_DIR)
+app = Flask(__name__)
 
 # === Hardcoded XOR Key ===
 XOR_KEY = "CTF4EVER"
 
 # === Load student challenges.json ===
 try:
-    with open(CHALLENGES_JSON_PATH, 'r', encoding='utf-8') as f:
-        raw_challenges = json.load(f)
+    print("Loading challenges from challenges.json...")
+    challenges = ChallengeList()
+    print(f"Loaded {challenges.numOfChallenges} challenges successfully.")
 except FileNotFoundError:
-    print(f"❌ ERROR: Could not find 'challenges.json' at {CHALLENGES_JSON_PATH}")
+    print("❌ ERROR: Could not find 'challenges.json' in the current directory!")
     exit(1)
 except json.JSONDecodeError:
-    print(f"❌ ERROR: 'challenges.json' contains invalid JSON!")
+    print("❌ ERROR: 'challenges.json' contains invalid JSON!")
     exit(1)
-
-# Normalize challenge folder paths relative to WEB_ADMIN_DIR
-challenges = {}
-for cid, meta in raw_challenges.items():
-    abs_folder_path = os.path.normpath(os.path.join(WEB_ADMIN_DIR, meta["folder"]))
-    meta["folder"] = abs_folder_path
-    challenges[cid] = meta
 
 # === Helper: XOR Decode ===
 def xor_decode(encoded_base64, key):
@@ -68,17 +45,20 @@ def xor_decode(encoded_base64, key):
 # === Flask Routes ===
 @app.route('/')
 def index():
-    """Main grid of all challenges"""
+    """Returns challenge overview page"""
     return render_template('index.html', challenges=challenges)
 
 @app.route('/challenge/<challenge_id>')
 def challenge_view(challenge_id):
-    """View a specific challenge"""
-    if challenge_id not in challenges:
+    """Returns challenge details page"""
+
+    # === Validate challenge_id ===
+    selectedChallenge = challenges.get_challenge_by_id(challenge_id)
+    if selectedChallenge is None:
         return "Challenge not found", 404
 
-    challenge = challenges[challenge_id]
-    folder = challenge['folder']
+    # Store challenge and folder info
+    folder = selectedChallenge.getFolder()
 
     # Read README.txt if it exists
     readme_path = os.path.join(folder, 'README.txt')
@@ -87,6 +67,7 @@ def challenge_view(challenge_id):
         try:
             with open(readme_path, 'r', encoding='utf-8') as f:
                 raw_readme = f.read()
+                # Convert Markdown to HTML
                 readme_html = Markup(markdown.markdown(raw_readme))
         except Exception as e:
             readme_html = f"<p><strong>Error loading README:</strong> {e}</p>"
@@ -102,43 +83,53 @@ def challenge_view(challenge_id):
     return render_template(
         'challenge.html',
         challenge_id=challenge_id,
-        challenge=challenge,
+        challenge=selectedChallenge,
         readme=readme_html,
         files=file_list
     )
 
-@app.route('/challenge_file/<challenge_id>/<path:filename>')
-def get_challenge_file(challenge_id, filename):
-    """Serve files from the challenge folder."""
-    if challenge_id not in challenges:
-        return "Challenge not found", 404
-
-    folder = challenges[challenge_id]['folder']
-    return send_from_directory(folder, filename)
-
 @app.route('/submit_flag/<challenge_id>', methods=['POST'])
 def submit_flag(challenge_id):
     """Validate submitted flag"""
+    # Store user provided flag
     data = request.get_json()
     submitted_flag = data.get('flag', '').strip().upper()
-
-    if challenge_id not in challenges:
+    
+    # Get challenge by ID
+    selectedChallenge = challenges.get_challenge_by_id(challenge_id)
+    if selectedChallenge is None:
         return jsonify({"status": "error", "message": "Challenge not found"}), 404
 
-    correct_flag = xor_decode(challenges[challenge_id]['flag'], XOR_KEY).upper()
+    # Get the correct flag for the challenge
+    correct_flag = selectedChallenge.getFlag().strip().upper()
 
     if submitted_flag == correct_flag:
+        # Mark challenge as completed
+        for challenge in challenges.challenges:
+            if challenge.getId() == selectedChallenge.getId():
+                challenge.setComplete()
+                print(f"Challenge {selectedChallenge.getName()} completed by user.")
+                break
+        # Add challenge to completed challenges list
+        if selectedChallenge.getId() not in challenges.completed_challenges:
+            print(f"Adding challenge {selectedChallenge.getName()} to completed challenges.")
+            challenges.completed_challenges.append(selectedChallenge.getId())
+        # Return success response
         return jsonify({"status": "correct"})
     else:
+        # Return incorrect response
+        print(f"Incorrect flag submitted for challenge {selectedChallenge.getName()}.")
         return jsonify({"status": "incorrect"})
 
 @app.route('/open_folder/<challenge_id>', methods=['POST'])
 def open_folder(challenge_id):
     """Open the challenge folder in the file manager"""
-    if challenge_id not in challenges:
+    # === Validate challenge_id ===
+    selectedChallenge = challenges.get_challenge_by_id(challenge_id)
+    if selectedChallenge is None:
         return jsonify({"status": "error", "message": "Challenge not found"}), 404
 
-    folder = challenges[challenge_id]['folder']
+    folder = selectedChallenge.getFolder()
     try:
         # Try xdg-open first, fallback to gio open
         try:
@@ -148,15 +139,17 @@ def open_folder(challenge_id):
         return jsonify({"status": "success"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
-
+    
 @app.route('/run_script/<challenge_id>', methods=['POST'])
 def run_script(challenge_id):
     """Launch the helper script for this challenge in a terminal."""
-    if challenge_id not in challenges:
+    # === Validate challenge_id ===
+    selectedChallenge = challenges.get_challenge_by_id(challenge_id)
+    if selectedChallenge is None:
         return jsonify({"status": "error", "message": "Challenge not found"}), 404
 
-    folder = challenges[challenge_id]['folder']
-    script_name = challenges[challenge_id]['script']
+    folder = selectedChallenge.getFolder()
+    script_name = selectedChallenge.getScript()
     script_path = os.path.join(folder, script_name)
 
     if not os.path.isfile(script_path):

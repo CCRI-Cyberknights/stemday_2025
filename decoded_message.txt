@@ -1,0 +1,10 @@
+🐿️ Debrief Log — Squirrel.jpg
+
+Recovered transmission data contains multiple flag-like entries. Only one matches the official CCRI format.
+
+- FLAG-IMG-888
+- CCRI-STE-101
+- CTFJ-001-XYZ
+- SNEK-HDN-777
+- CCRZ-SEC-111
+
