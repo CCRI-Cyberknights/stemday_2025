@@ -15,6 +15,7 @@ import logging
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import markdown
 import sys
+sys.dont_write_bytecode = True  # 🛡 prevent .pyc files in admin
 
 # === Base Directory ===
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -25,6 +26,17 @@ if BASE_DIR not in sys.path:
 
 # === Import backend logic ===
 from ChallengeList import ChallengeList
+
+# === Detect mode and select challenges.json path ===
+server_dir = os.path.dirname(os.path.abspath(__file__))
+if os.path.basename(server_dir) == "web_version_admin":
+    mode = "admin"
+    challenges_path = os.path.join(server_dir, "challenges.json")
+else:
+    mode = "student"
+    challenges_path = os.path.join(server_dir, "challenges.json")
+
+print(f"📖 Using challenges file at: {challenges_path}")
 
 # === App Initialization ===
 app = Flask(
@@ -37,7 +49,6 @@ DEBUG_MODE = os.environ.get("CCRI_DEBUG", "0") == "1"
 logging.basicConfig(level=logging.DEBUG if DEBUG_MODE else logging.INFO)
 
 # === Load Challenges ===
-challenges_path = os.path.join(BASE_DIR, "web_version", "challenges.json")
 try:
     print(f"Loading challenges from {challenges_path}...")
     challenges = ChallengeList(challenges_file=challenges_path)
@@ -69,7 +80,6 @@ def challenge_view(challenge_id):
 
     folder = selectedChallenge.getFolder()
     if not os.path.exists(folder):
-        # ⚠️ If challenge folder missing, return simple 404
         return f"⚠️ Challenge folder not found: {folder}", 404
 
     readme_html = ""
@@ -107,35 +117,53 @@ def get_challenge_file(challenge_id, filename):
 @app.route('/submit_flag/<challenge_id>', methods=['POST'])
 def submit_flag(challenge_id):
     data = request.get_json()
-    submitted_flag = data.get('flag', '')
+    submitted_flag = data.get('flag', '').strip()
     selectedChallenge = challenges.get_challenge_by_id(challenge_id)
 
     if selectedChallenge is None:
         print(f"❌ Challenge ID '{challenge_id}' not found.")
         return jsonify({"status": "error", "message": "Challenge not found"}), 404
 
-    # Get and normalize flags
-    submitted_flag_clean = submitted_flag.strip()
-    correct_flag = selectedChallenge.getFlag()
-    correct_flag_clean = correct_flag.strip()
+    print(f"🌐 Running in {mode.upper()} mode")
+    correct_flag = selectedChallenge.getFlag().strip()
 
-    # === Debug Output ===
+    # === Debug: Print mode and flags
     print("====== FLAG DEBUG ======")
-    print(f"📥 Raw submitted: '{submitted_flag}'")
-    print(f"📥 Clean submitted: '{submitted_flag_clean}'")
-    print(f"🎯 Raw correct:    '{correct_flag}'")
-    print(f"🎯 Clean correct:  '{correct_flag_clean}'")
+    print(f"🗂 Mode: {mode.upper()}")
+    print(f"📥 Submitted flag: '{submitted_flag}'")
+    print(f"🎯 Correct flag:   '{correct_flag}'")
     print("========================")
 
-    if submitted_flag == xor_decode(correct_flag, "CTF4EVER"):
-        selectedChallenge.setComplete()
-        if selectedChallenge.getId() not in challenges.completed_challenges:
-            challenges.completed_challenges.append(selectedChallenge.getId())
-        print(f"✅ Challenge '{selectedChallenge.getName()}' completed.")
-        return jsonify({"status": "correct"})
+    if mode == "admin":
+        if submitted_flag == correct_flag:
+            print(f"✅ MATCH (Admin): Submitted flag matches correct flag.")
+            selectedChallenge.setComplete()
+            if selectedChallenge.getId() not in challenges.completed_challenges:
+                challenges.completed_challenges.append(selectedChallenge.getId())
+            return jsonify({"status": "correct"})
+        else:
+            print(f"❌ MISMATCH (Admin): Submitted flag does not match correct flag.")
+            return jsonify({"status": "incorrect"}), 400
     else:
-        print(f"❌ Incorrect flag for '{selectedChallenge.getName()}'.")
-        return jsonify({"status": "incorrect"}), 400
+        try:
+            decoded_flag = xor_decode(
+                base64.b64decode(correct_flag),
+                "CTF4EVER"
+            ).strip()
+            print(f"🎯 Decoded correct flag (Student): '{decoded_flag}'")
+        except Exception as e:
+            print(f"⚠️ Decode failed: {e}")
+            return jsonify({"status": "error", "message": "Internal decoding error."}), 500
+
+        if submitted_flag == decoded_flag:
+            print(f"✅ MATCH (Student): Submitted flag matches decoded flag.")
+            selectedChallenge.setComplete()
+            if selectedChallenge.getId() not in challenges.completed_challenges:
+                challenges.completed_challenges.append(selectedChallenge.getId())
+            return jsonify({"status": "correct"})
+        else:
+            print(f"❌ MISMATCH (Student): Submitted flag does not match decoded flag.")
+            return jsonify({"status": "incorrect"}), 400
 
 @app.route('/open_folder/<challenge_id>', methods=['POST'])
 def open_folder(challenge_id):

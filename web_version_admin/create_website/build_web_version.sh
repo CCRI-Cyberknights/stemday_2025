@@ -107,12 +107,22 @@ def prepare_web_version():
     py_compile.compile(CHALLENGELIST_PY, cfile=os.path.join(STUDENT_DIR, "ChallengeList.pyc"))
     print("✅ Compiled backend .py files to .pyc in student folder")
 
+    # === Write mode marker ===
+    mode_file_path = os.path.join(STUDENT_DIR, ".mode")
+    with open(mode_file_path, "w", encoding="utf-8") as f:
+        f.write("student\n")
+    print(f"📄 Wrote mode marker: {mode_file_path}")
+
     print("\n🎉 Student web_version build completed successfully!\n")
 
 # === Main Execution ===
 print(f"📂 Using BASE_DIR: {BASE_DIR}")
 prepare_web_version()
 EOF
+
+# === Write mode marker for admin site ===
+echo "admin" > "$(dirname "$0")/../.mode"
+echo "📄 Wrote mode marker for admin site"
 
 echo "✅ Build process finished successfully."
 
