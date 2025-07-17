@@ -107,15 +107,27 @@ def get_challenge_file(challenge_id, filename):
 @app.route('/submit_flag/<challenge_id>', methods=['POST'])
 def submit_flag(challenge_id):
     data = request.get_json()
-    submitted_flag = data.get('flag', '').strip().upper()
-
+    submitted_flag = data.get('flag', '')
     selectedChallenge = challenges.get_challenge_by_id(challenge_id)
+
     if selectedChallenge is None:
+        print(f"❌ Challenge ID '{challenge_id}' not found.")
         return jsonify({"status": "error", "message": "Challenge not found"}), 404
 
-    correct_flag = selectedChallenge.getFlag().strip().upper()
+    # Get and normalize flags
+    submitted_flag_clean = submitted_flag.strip()
+    correct_flag = selectedChallenge.getFlag()
+    correct_flag_clean = correct_flag.strip()
 
-    if submitted_flag == correct_flag:
+    # === Debug Output ===
+    print("====== FLAG DEBUG ======")
+    print(f"📥 Raw submitted: '{submitted_flag}'")
+    print(f"📥 Clean submitted: '{submitted_flag_clean}'")
+    print(f"🎯 Raw correct:    '{correct_flag}'")
+    print(f"🎯 Clean correct:  '{correct_flag_clean}'")
+    print("========================")
+
+    if submitted_flag == xor_decode(correct_flag, "CTF4EVER"):
         selectedChallenge.setComplete()
         if selectedChallenge.getId() not in challenges.completed_challenges:
             challenges.completed_challenges.append(selectedChallenge.getId())
@@ -123,7 +135,7 @@ def submit_flag(challenge_id):
         return jsonify({"status": "correct"})
     else:
         print(f"❌ Incorrect flag for '{selectedChallenge.getName()}'.")
-        return jsonify({"status": "incorrect"})
+        return jsonify({"status": "incorrect"}), 400
 
 @app.route('/open_folder/<challenge_id>', methods=['POST'])
 def open_folder(challenge_id):

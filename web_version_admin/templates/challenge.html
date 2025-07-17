@@ -88,7 +88,7 @@
             placeholder="Enter flag (CCRI-XXXX-1234)"
           />
           <button type="button" class="Subscribe-btn" onclick="
-            const flag = document.getElementById('flagInput').value.trim().toUpperCase();
+            const flag = document.getElementById('flagInput').value.trim()
             fetch('/submit_flag/{{ challenge.id }}', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
