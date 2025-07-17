@@ -38,7 +38,7 @@ if [[ -d "$PROJECT_ROOT/web_version_admin" ]]; then
             ;;
         2)
             SERVER_DIR="$PROJECT_ROOT/web_version"
-            SERVER_FILE="server"
+            SERVER_FILE="server.pyc"
             ;;
         *)
             echo "❌ Invalid choice. Exiting."
@@ -48,7 +48,7 @@ if [[ -d "$PROJECT_ROOT/web_version_admin" ]]; then
 else
     echo "🎓 Student environment detected (web_version_admin not found)."
     SERVER_DIR="$PROJECT_ROOT/web_version"
-    SERVER_FILE="server"
+    SERVER_FILE="server.pyc"
 fi
 
 # === Launch Flask Server ===
@@ -64,11 +64,7 @@ if command -v lsof >/dev/null 2>&1 && lsof -i:5000 >/dev/null 2>&1; then
 else
     echo "🌐 Launching Flask web server from: $SERVER_PATH"
     LOG_FILE="$PROJECT_ROOT/web_server.log"
-    if [[ "$SERVER_FILE" == "server" ]]; then
-        nohup "$SERVER_PATH" > "$LOG_FILE" 2>&1 &
-    else
-        nohup python3 "$SERVER_PATH" > "$LOG_FILE" 2>&1 &
-    fi
+    nohup python3 "$SERVER_PATH" > "$LOG_FILE" 2>&1 &
     sleep 2
 
     # Verify server startup

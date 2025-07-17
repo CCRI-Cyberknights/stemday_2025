@@ -13,32 +13,47 @@ import base64
 import threading
 import logging
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from ChallengeList import ChallengeList
 import markdown
+import sys
+
+# === Base Directory ===
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
+# === Add BASE_DIR to sys.path for imports ===
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
+
+# === Import backend logic ===
+from ChallengeList import ChallengeList
 
 # === App Initialization ===
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    template_folder=os.path.join(BASE_DIR, "web_version", "templates"),
+    static_folder=os.path.join(BASE_DIR, "web_version", "static")
+)
+
 DEBUG_MODE = os.environ.get("CCRI_DEBUG", "0") == "1"
 logging.basicConfig(level=logging.DEBUG if DEBUG_MODE else logging.INFO)
 
 # === Load Challenges ===
+challenges_path = os.path.join(BASE_DIR, "web_version", "challenges.json")
 try:
-    print("Loading challenges from challenges.json...")
-    challenges = ChallengeList()
+    print(f"Loading challenges from {challenges_path}...")
+    challenges = ChallengeList(challenges_file=challenges_path)
     print(f"Loaded {challenges.numOfChallenges} challenges successfully.")
 except FileNotFoundError:
-    print("❌ ERROR: Could not find 'challenges.json' in the current directory!")
+    print(f"❌ ERROR: Could not find '{challenges_path}'!")
     exit(1)
 except json.JSONDecodeError:
-    print("❌ ERROR: 'challenges.json' contains invalid JSON!")
+    print(f"❌ ERROR: '{challenges_path}' contains invalid JSON!")
     exit(1)
 
 # === Helper: XOR Decode ===
 def xor_decode(encoded_base64, key):
     decoded_bytes = base64.b64decode(encoded_base64)
     return ''.join(
-        chr(b ^ ord(key[i % len(key)]))
-        for i, b in enumerate(decoded_bytes)
+        chr(b ^ ord(key[i % len(key)])) for i, b in enumerate(decoded_bytes)
     )
 
 # === Routes ===
@@ -53,6 +68,10 @@ def challenge_view(challenge_id):
         return "Challenge not found", 404
 
     folder = selectedChallenge.getFolder()
+    if not os.path.exists(folder):
+        # ⚠️ If challenge folder missing, return simple 404
+        return f"⚠️ Challenge folder not found: {folder}", 404
+
     readme_html = ""
     readme_path = os.path.join(folder, 'README.txt')
     if os.path.exists(readme_path):
@@ -79,7 +98,8 @@ def get_challenge_file(challenge_id, filename):
         return "Challenge not found", 404
 
     folder = selectedChallenge.getFolder()
-    if not os.path.isfile(os.path.join(folder, filename)):
+    filepath = os.path.join(folder, filename)
+    if not os.path.exists(filepath):
         return "File not found", 404
 
     return send_from_directory(folder, filename)
@@ -112,6 +132,9 @@ def open_folder(challenge_id):
         return jsonify({"status": "error", "message": "Challenge not found"}), 404
 
     folder = selectedChallenge.getFolder()
+    if not os.path.exists(folder):
+        return jsonify({"status": "error", "message": "Challenge folder not found."}), 404
+
     try:
         subprocess.Popen(['xdg-open', folder], shell=False)
         return jsonify({"status": "success"})
@@ -126,11 +149,10 @@ def run_script(challenge_id):
 
     script_path = os.path.join(selectedChallenge.getFolder(), selectedChallenge.getScript())
 
-    if not os.path.isfile(script_path):
+    if not os.path.exists(script_path):
         return jsonify({"status": "error", "message": f"Script '{selectedChallenge.getScript()}' not found."}), 404
 
     try:
-        # === Detect if running on Parrot OS and prefer parrot-terminal ===
         if os.path.exists("/etc/parrot"):  # Parrot-specific marker file
             print("🐦 Detected Parrot OS. Forcing parrot-terminal.")
             subprocess.Popen([
@@ -140,7 +162,6 @@ def run_script(challenge_id):
             ], shell=False)
             return jsonify({"status": "success"})
 
-        # === Fallback for non-Parrot distros ===
         fallback_terminals = ["gnome-terminal", "konsole", "xfce4-terminal", "lxterminal"]
         for term in fallback_terminals:
             if subprocess.call(["which", term], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0:
