@@ -1,161 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>{{ challenge.name }} - CCRI CTF Hub</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        body {
-            font-family: sans-serif;
-            margin: 20px;
-            background: #f9f9f9;
-        }
-        h1 {
-            color: #333;
-        }
-        .actions {
-            margin: 15px 0;
-        }
-        .actions button {
-            margin-right: 10px;
-        }
-        .readme {
-            background: #f1f1f1;
-            padding: 15px;
-            border-radius: 6px;
-            white-space: normal;
-            word-wrap: break-word;
-        }
-        .readme h1, .readme h2, .readme h3 {
-            margin-top: 15px;
-            color: #222;
-        }
-        .readme p {
-            margin: 10px 0;
-        }
-        .readme code {
-            background: #eaeaea;
-            padding: 2px 4px;
-            border-radius: 3px;
-            font-family: monospace;
-        }
-        .readme pre {
-            background: #eaeaea;
-            padding: 10px;
-            border-radius: 5px;
-            overflow-x: auto;
-        }
-        .readme ul {
-            margin: 10px 0;
-            padding-left: 20px;
-        }
-        .readme strong {
-            font-weight: bold;
-        }
-        #flagInput {
-            width: 300px;
-            padding: 5px;
-            margin-top: 5px;
-        }
-        #flagStatus {
-            margin-top: 10px;
-            font-weight: bold;
-        }
-    </style>
-</head>
-<body>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
     <h1>{{ challenge.name }}</h1>
 
     <div class="actions">
-        <button onclick="runScript()">🖥 Run Helper Script</button>
-        <button onclick="openFolder()">📂 Open Folder</button>
-        <button onclick="location.href='/'">⬅ Back to Challenges</button>
+      <button type="button" onclick="window.location.href='{{ url_for('index') }}';">
+        ⬅ Back to Challenges
+      </button>
+      <button type="button" onclick="fetch('/open_folder/{{ challenge.id }}', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => { if(data.status !== 'success'){ console.error('Failed to open folder:', data.message); } });">
+        📂 Open Folder
+      </button>
+      <button type="button" onclick="fetch('/run_script/{{ challenge.id }}', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => { if(data.status !== 'success'){ console.error('Failed to run script:', data.message); } });">
+        🖥 Run Helper Script
+      </button>
     </div>
 
-    <hr>
+    <hr />
+    <div id="challenge-wrapper">
+      <div class="challenge-wrapper-section">
+        <h2 style="width: 100%; text-align: center">📖 Challenge Details</h2>
+        {% if readme %}
+        <div class="readme">{{ readme|safe }}</div>
+        {% else %}
+        <p><em>No README.txt found in this folder.</em></p>
+        {% endif %}
+      </div>
 
-    <h2>📖 Challenge Details</h2>
-    {% if readme %}
-    <div class="readme">
-        {{ readme|safe }}
-    </div>
-    {% else %}
-    <p><em>No README.txt found in this folder.</em></p>
-    {% endif %}
+      <div class="challenge-wrapper-section">
+        <h2>📂 Attached Files</h2>
+        {% if files %}
+        <ul>
+          {% for file in files %}
+          <li>
+            <a
+              href="{{ url_for('get_challenge_file', challenge_id=challenge.id, filename=file) }}"
+              target="_blank"
+            >{{ file }}</a>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p><em>No additional files in this folder.</em></p>
+        {% endif %}
+      </div>
 
-    <h2>📂 Attached Files</h2>
-    {% if files %}
-    <ul>
-        {% for file in files %}
-        <li>
-            <a href="{{ url_for('get_challenge_file', challenge_id=challenge_id, filename=file) }}" target="_blank">{{ file }}</a>
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p><em>No additional files in this folder.</em></p>
-    {% endif %}
-
-    <h2>🏁 Submit Flag</h2>
-    <input type="text" id="flagInput" placeholder="Enter flag (CCRI-XXXX-1234)">
-    <button onclick="submitFlag()">✅ Submit</button>
-    <p id="flagStatus"></p>
-
-    <script>
-        function runScript() {
-            fetch(`/run_script/{{ challenge_id }}`, { method: 'POST' })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status !== "success") {
-                        console.error("Failed to launch script:", data.message);
-                    }
-                });
-        }
-
-        function openFolder() {
-            fetch(`/open_folder/{{ challenge_id }}`, { method: 'POST' })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status !== "success") {
-                        console.error("Failed to open folder:", data.message);
-                    }
-                });
-        }
-
-        function submitFlag() {
-            const flag = document.getElementById('flagInput').value.trim().toUpperCase();
-            fetch(`/submit_flag/{{ challenge_id }}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ flag: flag })
+      <div class="challenge-wrapper-footer">
+        <div>
+          <h2>🏁 Submit Flag</h2>
+        </div>
+        <div class="input-wrapper">
+          <svg
+            fill="none"
+            viewBox="0 0 24 24"
+            height="24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+            class="icon"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-width="1.5"
+              stroke="#141B34"
+              d="M18 11.0041C17.4166 9.91704 16.273 9.15775 14.9519 9.0993C13.477 9.03404 11.9788 9 10.329 9C8.67911 9 7.18091 9.03404 5.70604 9.0993C3.95328 9.17685 2.51295 10.4881 2.27882 12.1618C2.12602 13.2541 2 14.3734 2 15.5134C2 16.6534 2.12602 17.7727 2.27882 18.865C2.51295 20.5387 3.95328 21.8499 5.70604 21.9275C6.42013 21.9591 7.26041 21.9834 8 22"
+            ></path>
+            <path
+              stroke-linejoin="round"
+              stroke-linecap="round"
+              stroke-width="1.5"
+              stroke="#141B34"
+              d="M6 9V6.5C6 4.01472 8.01472 2 10.5 2C12.9853 2 15 4.01472 15 6.5V9"
+            ></path>
+          </svg>
+          <input
+            type="text"
+            id="flagInput"
+            name="flagInput"
+            class="input"
+            placeholder="Enter flag (CCRI-XXXX-1234)"
+          />
+          <button type="button" class="Subscribe-btn" onclick="
+            const flag = document.getElementById('flagInput').value.trim()
+            fetch('/submit_flag/{{ challenge.id }}', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ flag: flag })
             })
             .then(res => res.json())
             .then(data => {
-                const status = document.getElementById('flagStatus');
-                if (data.status === "correct") {
-                    status.textContent = "🎉 Correct flag!";
-                    status.style.color = "green";
-                    localStorage.setItem("{{ challenge_id }}", flag);
-                } else if (data.status === "incorrect") {
-                    status.textContent = "❌ Incorrect flag.";
-                    status.style.color = "red";
-                } else {
-                    status.textContent = "⚠️ Error: " + data.message;
-                    status.style.color = "orange";
-                }
+              const status = document.getElementById('flagStatus');
+              if (data.status === 'correct') {
+                status.textContent = '🎉 Correct flag!';
+                status.style.color = 'green';
+                localStorage.setItem('{{ challenge.id }}', flag);
+              } else if (data.status === 'incorrect') {
+                status.textContent = '❌ Incorrect flag.';
+                status.style.color = 'red';
+              } else {
+                status.textContent = '⚠️ Error: ' + data.message;
+                status.style.color = 'orange';
+              }
             });
-        }
+          ">
+            Submit
+          </button>
+          <p id="flagStatus"></p>
+        </div>
+      </div>
+    </div>
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const savedFlag = localStorage.getItem("{{ challenge_id }}");
-            if (savedFlag) {
-                const flagInput = document.getElementById('flagInput');
-                flagInput.value = savedFlag;
-                const status = document.getElementById('flagStatus');
-                status.textContent = "🎉 Correct flag!";
-                status.style.color = "green";
-            }
-        });
+    <script>
+      // Pre-fill saved flag
+      const savedFlag = localStorage.getItem("{{ challenge.id }}");
+      if (savedFlag) {
+        const flagInput = document.getElementById("flagInput");
+        flagInput.value = savedFlag;
+        const status = document.getElementById("flagStatus");
+        status.textContent = "🎉 Correct flag!";
+        status.style.color = "green";
+      }
     </script>
-</body>
+  </body>
 </html>

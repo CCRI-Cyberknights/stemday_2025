@@ -3,126 +3,108 @@
     "name": "Stego Decode",
     "folder": "../challenges/01_Stego",
     "script": "extract_flag.sh",
-    "flag": "CCRI-STEG-1842",
-    "key": "CTF4EVER"
+    "flag": "CCRI-STEG-1842"
   },
   "02_Base64": {
     "name": "Base64 Decoder",
     "folder": "../challenges/02_Base64",
     "script": "solve.sh",
-    "flag": "CCRI-BQEX-2102",
-    "key": "CTF4EVER"
+    "flag": "CCRI-BQEX-2102"
   },
   "03_ROT13": {
     "name": "ROT13 Explorer",
     "folder": "../challenges/03_ROT13",
     "script": "decode_rot13.sh",
-    "flag": "CCRI-ROTN-3303",
-    "key": "CTF4EVER"
+    "flag": "CCRI-ROTN-3303"
   },
   "04_Vigenere": {
     "name": "Vigenère Cipher",
     "folder": "../challenges/04_Vigenère",
     "script": "break_vigenere.sh",
-    "flag": "CCRI-VIGY-4925",
-    "key": "CTF4EVER"
+    "flag": "CCRI-VIGY-4925"
   },
   "05_ArchivePassword": {
     "name": "Archive Password Cracker",
     "folder": "../challenges/05_Archive_Password",
     "script": "crack_zip.sh",
-    "flag": "CCRI-ARCH-5401",
-    "key": "CTF4EVER"
+    "flag": "CCRI-ARCH-5401"
   },
   "06_Hashcat": {
     "name": "Hashcat Challenge",
     "folder": "../challenges/06_Hashcat",
     "script": "run_chain_crack.sh",
-    "flag": "CCRI-ZIPP-5401",
-    "key": "CTF4EVER"
+    "flag": "CCRI-ZIPP-5401"
   },
   "07_ExtractBinary": {
     "name": "Extract from Binary",
-    "folder": "../challenges/07_Extract _from_Binary",
+    "folder": "../challenges/07_Extract_from_Binary",
     "script": "analyze_binary.sh",
-    "flag": "CCRI-BINA-7091",
-    "key": "CTF4EVER"
+    "flag": "CCRI-BINA-7091"
   },
   "08_FakeAuthLog": {
     "name": "Fake Auth Log",
     "folder": "../challenges/08_Fake_Auth_Log",
     "script": "investigate_authlog.sh",
-    "flag": "CCRI-LOGS-9310",
-    "key": "CTF4EVER"
+    "flag": "CCRI-LOGS-9310"
   },
   "09_FixScript": {
     "name": "Fix the Script",
     "folder": "../challenges/09_Fix_the_Script",
     "script": "script_runner.sh",
-    "flag": "CCRI-SCRP-1098",
-    "key": "CTF4EVER"
+    "flag": "CCRI-SCRP-1098"
   },
   "10_Metadata": {
     "name": "Metadata Explorer",
     "folder": "../challenges/10_Metadata",
     "script": "inspect_metadata.sh",
-    "flag": "CCRI-META-3481",
-    "key": "CTF4EVER"
+    "flag": "CCRI-META-3481"
   },
   "11_HiddenFlag": {
     "name": "Hidden Flag Hunt",
     "folder": "../challenges/11_Hidden_Flag",
     "script": "search_for_flag.sh",
-    "flag": "CCRI-HIDE-5742",
-    "key": "CTF4EVER"
+    "flag": "CCRI-HIDE-5742"
   },
   "12_QRCodes": {
     "name": "QR Codes Puzzle",
     "folder": "../challenges/12_QR_Codes",
     "script": "qr_code_explorer.sh",
-    "flag": "CCRI-QRCX-4821",
-    "key": "CTF4EVER"
+    "flag": "CCRI-QRCX-4821"
   },
   "13_HTTPHeaders": {
     "name": "HTTP Headers Analysis",
     "folder": "../challenges/13_HTTP_Headers",
     "script": "investigate_headers.sh",
-    "flag": "CCRI-HEAD-7362",
-    "key": "CTF4EVER"
+    "flag": "CCRI-HEAD-7362"
   },
   "14_SubdomainSweep": {
     "name": "Subdomain Sweep",
-    "folder": "../challenges/14_Subdomain _Sweep",
+    "folder": "../challenges/14_Subdomain_Sweep",
     "script": "explore_subdomains.sh",
-    "flag": "CCRI-SUBD-4927",
-    "key": "CTF4EVER"
+    "flag": "CCRI-SUBD-4927"
   },
   "15_ProcessInspection": {
     "name": "Process Inspection",
     "folder": "../challenges/15_Process_Inspection",
     "script": "explore_processes.sh",
-    "flag": "CCRI-PROC-2954",
-    "key": "CTF4EVER"
+    "flag": "CCRI-PROC-2954"
   },
   "16_Hex_Hunting": {
     "name": "Hex Hunting",
     "folder": "../challenges/16_Hex_Hunting",
     "script": "inspect_binary.sh",
-    "flag": "CCRI-HEXG-2718",
-    "key": "CTF4EVER"
+    "flag": "CCRI-HEXG-2718"
   },
   "17_Nmap_Scanning": {
     "name": "Nmap Scanning",
     "folder": "../challenges/17_Nmap_Scanning",
     "script": "helper_scan.sh",
-    "flag": "CCRI-SCAN-8472",
-    "key": "CTF4EVER"
+    "flag": "CCRI-SCAN-8472"
   },
   "18_Pcap_Search": {
     "name": "Pcap Search",
     "folder": "../challenges/18_Pcap_Search",
     "script": "analyze_pcap.sh",
-    "flag": "CCRI-NETW-7315",
-    "key": "CTF4EVER"
+    "flag": "CCRI-NETW-7315"
   }
 }
