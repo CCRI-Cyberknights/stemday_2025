@@ -53,6 +53,19 @@ def make_scripts_executable(challenges_data):
         else:
             print(f"⚠️ Skipping missing script: {script_path}")
 
+def sanitize_templates(template_dir):
+    print("📝 Sanitizing templates for student version...")
+    for root, dirs, files in os.walk(template_dir):
+        for file in files:
+            if file.endswith(".html"):
+                path = os.path.join(root, file)
+                with open(path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                content = content.replace("CCRI CTF Admin Hub", "{{ 'CCRI CTF Admin Hub' if mode == 'admin' else 'CCRI CTF Student Hub' }}")
+                with open(path, "w", encoding="utf-8") as f:
+                    f.write(content)
+                print(f"✅ Sanitized {path}")
+
 def prepare_web_version():
     # === Validate admin folder contents ===
     if not os.path.isfile(ADMIN_JSON):
@@ -99,6 +112,9 @@ def prepare_web_version():
     print("📂 Copying templates and static files...")
     shutil.copytree(TEMPLATES_FOLDER, os.path.join(STUDENT_DIR, "templates"), dirs_exist_ok=True)
     shutil.copytree(STATIC_FOLDER, os.path.join(STUDENT_DIR, "static"), dirs_exist_ok=True)
+
+    # === Sanitize templates ===
+    sanitize_templates(os.path.join(STUDENT_DIR, "templates"))
 
     # === Compile backend .py files ===
     print("⚙️ Compiling backend Python files to .pyc...")
