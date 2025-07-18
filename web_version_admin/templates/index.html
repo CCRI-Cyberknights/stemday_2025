@@ -2,14 +2,16 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>🚀 CCRI CTF Hub</title>
+    <title>
+      🚀 CCRI CTF {{ "Admin" if mode == "admin" else "Student" }} Hub
+    </title>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}"
     />
   </head>
   <body>
-    <h1>🚀 CCRI CTF Student Hub</h1>
+    <h1>🚀 CCRI CTF {{ "Admin" if mode == "admin" else "Student" }} Hub</h1>
     <p>Welcome to the web hub for solving CTF challenges.</p>
     <p><strong>Flag Format:</strong> CCRI-AAAA-1111</p>
 
