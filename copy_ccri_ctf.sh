@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # === CCRI_CTF Selective Copy Script ===
-# Copies CCRI_CTF folder to a student account Desktop
+# Copies CCRI_CTF folder to the ccri_stem account Desktop
 # Finds project root automatically and preserves ownership/permissions
 
 # === Resolve project root ===
@@ -21,15 +21,7 @@ find_project_root() {
 
 PROJECT_ROOT="$(find_project_root)"
 SRC="$PROJECT_ROOT"
-
-# === Prompt for student username ===
-read -p "👤 Enter the student account username (e.g., 'ccri_stem'): " STUDENT_USER
-if [ -z "$STUDENT_USER" ]; then
-    echo "❌ No username entered. Aborting."
-    read -p "Press ENTER to exit..." junk
-    exit 1
-fi
-
+STUDENT_USER="ccri_stem"
 DEST="/home/$STUDENT_USER/Desktop/CCRI_CTF"
 
 # === Dry run flag ===
@@ -82,7 +74,10 @@ else
     echo "➡️  To:"
     echo "   $DEST"
     echo
+
+    # Use rsync without preserving source ownership
     sudo rsync -avh --progress \
+        --no-o --no-g \
         --include ".ccri_ctf_root" \
         --include "challenges/***" \
         --include "web_version/***" \
@@ -90,9 +85,9 @@ else
         --exclude "*" \
         "$SRC/" "$DEST/"
 
-    # Set ownership
+    # Set ownership for all copied files to student
     echo "🔑 Setting ownership to $STUDENT_USER..."
-    sudo chown -R "$STUDENT_USER":"$STUDENT_USER" "$DEST"
+    sudo chown -R "$STUDENT_USER:$STUDENT_USER" "$DEST"
 
     # Set permissions
     echo "🔒 Adjusting permissions..."
