@@ -21,8 +21,7 @@ sudo apt install -y \
 # --- Upgrade pip and install Python packages ---
 echo
 echo "🐍 Installing Python packages..."
-python3 -m pip install --upgrade pip
-python3 -m pip install flask
+sudo apt install -y python3-flask
 
 # --- Configure Git (if not already configured) ---
 if ! git config user.name >/dev/null 2>&1; then
