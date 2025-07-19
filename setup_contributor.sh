@@ -35,4 +35,31 @@ else
     echo "   Email: $(git config user.email)"
 fi
 echo
-echo "🎉 Setup complete! You are now ready to clone the repo!"
+
+# --- Ask if they want to clone the repo automatically ---
+read -rp "📥 Do you want me to clone the STEMDay_2025 repo for you? (y/n): " clone_choice
+
+if [[ "$clone_choice" =~ ^[Yy]$ ]]; then
+    CTF_REPO="https://github.com/CCRI-Cyberknights/stemday_2025.git"
+    TARGET_DIR="$HOME/stemday_2025"
+
+    echo
+    echo "📥 Cloning the contributor repo to: $TARGET_DIR"
+    rm -rf "$TARGET_DIR"  # Remove any existing folder to avoid conflicts
+    git clone "$CTF_REPO" "$TARGET_DIR"
+
+    echo
+    echo "✅ Repository cloned successfully!"
+    echo "➡️ To get started: cd $TARGET_DIR"
+else
+    echo
+    echo "💡 Since you chose not to clone the repo automatically:"
+    echo "   - Make sure you manually clone the repo using:"
+    echo "     git clone https://github.com/CCRI-Cyberknights/stemday_2025.git"
+    echo "   - Then cd into the folder to begin working."
+    echo
+fi
+
+echo
+echo "🎉 Setup complete! You’re ready to contribute to STEMDay_2025."
+echo
