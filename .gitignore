@@ -1,43 +1,48 @@
-# === Ignore build artifacts and random files ===
-*.pyc
-__pycache__/
-*.bak
-*.swp
-*.log
-*binary_flag.c
+# Ignore everything
+*
 
-# Ignore compiled binaries and temp C files
-*.o
-*.out
-*.class
-
-# Ignore images and test files in root
-*.jpg
-*.png
-
-# Ignore Linux desktop launchers
-*.desktop
-
-# === Ignore web_version student build ===
-web_version/
-
-# === Keep admin files and challenges ===
-!web_version_admin/
-!challenges/
-
-# === Ignore custom scripts in root ===
-generate_*
-hex_script.sh
-make_pcap_traffic.py
-main_web_portal_idea.txt
-plan_overview.txt
-index_grid_obfuscated.html
-
-# === Keep docs and licensing ===
+# Un-ignore these files and folders
+!.gitignore
 !README.md
-!LICENSE
+!CHANGELOG.md
 !CONTRIBUTING.md
-!Launch CCRI CTF Hub.desktop
-!copy_ccri_ctf.sh
+!LICENSE
+!pyproject.toml
+!requirements.txt
+!.ccri_ctf_root
+
+# Setup scripts
+!1_setup_dev_env.sh
 !start_web_hub.sh
 !stop_web_hub.sh
+!setup_contributor.sh
+
+# Docker files
+!Dockerfile
+!docker-compose.yml
+!docker-start.sh
+!docker-start.bat
+!start-ctf.ps1
+
+# Admin tools
+!generate_all_flags.py
+!generate_takehome_flags.py
+
+# Desktop shortcuts
+!Launch CCRI CTF Hub.desktop
+!Launch CCRI CTF Hub (Mint).desktop
+
+# Un-ignore folders AND their contents
+!flag_generators/
+!flag_generators/**
+
+# Ignore Python cache only in flag_generators
+flag_generators/__pycache__/
+flag_generators/**/__pycache__/
+
+# Un-ignore challenges and web_version_admin
+!challenges/
+!challenges/**
+
+!web_version_admin/
+!web_version_admin/**
