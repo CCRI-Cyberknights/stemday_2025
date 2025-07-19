@@ -301,7 +301,7 @@ def start_fake_service(port):
     except OSError as e:
         print(f"❌ Could not bind port {port}: {e}")
 
-for port in range(8000, 8101):
+for port in ALL_PORTS.keys():
     start_fake_service(port)
 
 if __name__ == '__main__':
