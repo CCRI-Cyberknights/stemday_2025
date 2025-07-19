@@ -34,5 +34,5 @@ else
     echo "   Name : $(git config user.name)"
     echo "   Email: $(git config user.email)"
 fi
-
+echo
 echo "🎉 Setup complete! You are now ready to clone the repo!"
