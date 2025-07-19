@@ -41,3 +41,4 @@ index_grid_obfuscated.html
 !copy_ccri_ctf.sh
 !start_web_hub.sh
 !stop_web_hub.sh
+!setup_student.sh
