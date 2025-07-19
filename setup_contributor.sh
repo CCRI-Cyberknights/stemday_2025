@@ -13,15 +13,10 @@ sudo apt update
 
 sudo apt install -y \
   git \
-  python3 python3-pip python3-venv \
-  python3-markdown python3-scapy \
+  python3 python3-venv \
+  python3-markdown python3-scapy python3-flask \
   exiftool zbar-tools steghide hashcat unzip nmap tshark qrencode \
   xdg-utils lsof vim-common util-linux
-
-# --- Upgrade pip and install Python packages ---
-echo
-echo "🐍 Installing Python packages..."
-sudo apt install -y python3-flask
 
 # --- Configure Git (if not already configured) ---
 if ! git config user.name >/dev/null 2>&1; then
