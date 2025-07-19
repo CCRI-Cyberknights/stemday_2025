@@ -19,39 +19,54 @@ This version is built for **students**, with all admin/developer-only tools remo
 
 ---
 
-## 📦 Install Dependencies (Required)
+## 📥 Setting Up the CTF
 
-If you downloaded this CTF directly from GitHub (instead of using the USB stick or prebuilt ISO we provided), you’ll need to install some tools first.
+If you downloaded this CTF directly from GitHub (or are looking at it online), follow these steps to set it up:
 
-Run this command in your VM’s terminal:
+### ✅ 1. Install Required Tools
+
+Run this command in your VM’s terminal to install everything you’ll need for the challenges:
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/CCRI-Cyberknights/stemday2025_home/main/setup_student.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/CCRI-Cyberknights/stemday2025_takehome/main/setup_student.sh)
 ```
 
 This will:
 ✅ Install all the tools needed for the challenges (like `hashcat`, `nmap`, and `steghide`).
-✅ Place the CTF folder and desktop shortcut in the right location.
 
 ---
 
-## 🗂️ Project Structure
+### ✅ 2. Download the CTF Folder
 
-Here’s what you’ll find on your VM’s Desktop after setup:
+After installing the tools, download this CTF repository.
 
+**Option A: Download ZIP**
+
+1. Click the green **“Code”** button above → **“Download ZIP”**.
+2. Extract the ZIP file to your **Downloads folder**.
+
+**Option B: Clone with Git**
+If you’re comfortable with Git, run:
+
+```bash
+git clone https://github.com/CCRI-Cyberknights/stemday2025_takehome.git
 ```
-Desktop/
-├── CCRI_CTF_Home/                  # Main CTF folder
-│   ├── challenges/                 # All the hands-on CTF challenges
-│   ├── web_version/                # The interactive hub website
-│   ├── Launch CCRI CTF Hub.desktop # Shortcut to open the hub in a browser
-└── (no admin scripts or hidden flags)
-```
 
-📝 **Note:**
+---
 
-* The `web_version/` folder contains the interactive CTF hub.
-* Challenge flags are hidden in their respective folders — you can’t peek at them directly! 😄
+### ✅ 3. Move the CTF Folder to Your Desktop
+
+1. Move the extracted folder (`stemday2025_takehome/`) to your **Desktop**.
+
+2. Inside that folder, you’ll find:
+
+   * **challenges/** – The hands-on CTF challenges.
+   * **web\_version/** – The interactive CTF hub.
+   * **Launch CCRI CTF Hub.desktop** – Shortcut to open the hub in a browser.
+
+3. Drag the **“Launch CCRI CTF Hub.desktop”** file to your Desktop.
+
+4. Right-click the shortcut → **Properties → Permissions** → ✅ Check *“Allow this file to run as a program.”*
 
 ---
 
@@ -70,27 +85,7 @@ Each challenge includes:
 
 ## 🌐 Updating Your CTF (Optional)
 
-If you’d like to pull the latest version of this CTF (if updates are released), run this in your VM’s terminal:
-
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/CCRI-Cyberknights/stemday2025_home/main/setup_student.sh)
-```
-
-This will:
-✅ Download the newest version of the student bundle into your **Downloads folder**.
-✅ Replace old challenge files and hub content.
-
----
-
-### 📄 **Move the Desktop Shortcut Back**
-
-After running the update script:
-
-1. Go to your **Downloads folder** and open the `CCRI_CTF_Home` folder.
-2. Drag the **“Launch CCRI CTF Hub.desktop”** file back onto your Desktop.
-3. Right-click the shortcut → **Properties → Permissions** → ✅ Check *“Allow this file to run as a program.”*
-
-Now you’re ready to jump back in!
+If updates are released, you can re-download the latest version of this repository and repeat **steps 2–3** above.
 
 ---
 
