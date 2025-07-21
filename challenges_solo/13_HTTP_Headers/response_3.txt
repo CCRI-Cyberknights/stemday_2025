@@ -1,0 +1,18 @@
+HTTP/1.1 200 OK
+Date: Sun, 30 Jun 2025 15:45:07 GMT
+Server: Liber8-Server/2.3.1
+Content-Type: application/json
+Cache-Control: no-cache
+X-Powered-By: Node.js/18.16.0
+X-Flag: CTFX-8421-SRVR
+X-Frame-Options: SAMEORIGIN
+X-Content-Type-Options: nosniff
+
+{
+  "status": "ok",
+  "message": "API version 1.2.4 is running.",
+  "notes": "No maintenance scheduled."
+}
+
+<!-- Debug: API response size 512 bytes -->
+

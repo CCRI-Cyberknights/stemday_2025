@@ -5,23 +5,20 @@
     <title>{{ challenge.name }} - CCRI CTF Hub</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
   </head>
-  <body>
+  <body
+    data-challenge-id="{{ challenge.id }}"
+    data-url-index="{{ url_for('index') }}"
+    data-url-open-folder="/open_folder/{{ challenge.id }}"
+    data-url-run-script="/run_script/{{ challenge.id }}"
+    data-url-submit-flag="/submit_flag/{{ challenge.id }}"
+  >
     <h1>{{ challenge.name }}</h1>
 
+    <!-- Top Buttons -->
     <div class="actions">
-      <button type="button" onclick="window.location.href='{{ url_for('index') }}';">
-        ⬅ Back to Challenges
-      </button>
-      <button type="button" onclick="fetch('/open_folder/{{ challenge.id }}', { method: 'POST' })
-        .then(res => res.json())
-        .then(data => { if(data.status !== 'success'){ console.error('Failed to open folder:', data.message); } });">
-        📂 Open Folder
-      </button>
-      <button type="button" onclick="fetch('/run_script/{{ challenge.id }}', { method: 'POST' })
-        .then(res => res.json())
-        .then(data => { if(data.status !== 'success'){ console.error('Failed to run script:', data.message); } });">
-        🖥 Run Helper Script
-      </button>
+      <button type="button" onclick="goBackToIndex();">⬅ Back to Challenges</button>
+      <button type="button" onclick="runHelper('open');">📂 Open Folder</button>
+      <button type="button" onclick="runHelper('run');">🖥 Run Helper Script</button>
     </div>
 
     <hr />
@@ -87,39 +84,70 @@
             class="input"
             placeholder="Enter flag (CCRI-XXXX-1234)"
           />
-          <button type="button" class="Subscribe-btn" onclick="
-            const flag = document.getElementById('flagInput').value.trim()
-            fetch('/submit_flag/{{ challenge.id }}', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ flag: flag })
-            })
-            .then(res => res.json())
-            .then(data => {
-              const status = document.getElementById('flagStatus');
-              if (data.status === 'correct') {
-                status.textContent = '🎉 Correct flag!';
-                status.style.color = 'green';
-                localStorage.setItem('{{ challenge.id }}', flag);
-              } else if (data.status === 'incorrect') {
-                status.textContent = '❌ Incorrect flag.';
-                status.style.color = 'red';
-              } else {
-                status.textContent = '⚠️ Error: ' + data.message;
-                status.style.color = 'orange';
-              }
-            });
-          ">
+          <button type="button" class="Subscribe-btn" onclick="submitFlag();">
             Submit
           </button>
           <p id="flagStatus"></p>
         </div>
       </div>
+
+      <!-- Bottom Buttons -->
+      <hr />
+      <div class="actions bottom-buttons">
+        <button type="button" onclick="goBackToIndex();">⬅ Back to Challenges</button>
+        <button type="button" onclick="runHelper('open');">📂 Open Folder</button>
+        <button type="button" onclick="runHelper('run');">🖥 Run Helper Script</button>
+      </div>
     </div>
 
     <script>
+      const challengeId = document.body.dataset.challengeId;
+      const urlIndex = document.body.dataset.urlIndex;
+      const urlOpenFolder = document.body.dataset.urlOpenFolder;
+      const urlRunScript = document.body.dataset.urlRunScript;
+      const urlSubmitFlag = document.body.dataset.urlSubmitFlag;
+
+      function goBackToIndex() {
+        window.location.href = urlIndex;
+      }
+
+      function runHelper(action) {
+        const url = action === 'open' ? urlOpenFolder : urlRunScript;
+        fetch(url, { method: 'POST' })
+          .then(res => res.json())
+          .then(data => {
+            if (data.status !== 'success') {
+              console.error('Failed:', data.message);
+            }
+          });
+      }
+
+      function submitFlag() {
+        const flag = document.getElementById('flagInput').value.trim();
+        fetch(urlSubmitFlag, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ flag: flag })
+        })
+        .then(res => res.json())
+        .then(data => {
+          const status = document.getElementById('flagStatus');
+          if (data.status === 'correct') {
+            status.textContent = '🎉 Correct flag!';
+            status.style.color = 'green';
+            localStorage.setItem(challengeId, flag);
+          } else if (data.status === 'incorrect') {
+            status.textContent = '❌ Incorrect flag.';
+            status.style.color = 'red';
+          } else {
+            status.textContent = '⚠️ Error: ' + data.message;
+            status.style.color = 'orange';
+          }
+        });
+      }
+
       // Pre-fill saved flag
-      const savedFlag = localStorage.getItem("{{ challenge.id }}");
+      const savedFlag = localStorage.getItem(challengeId);
       if (savedFlag) {
         const flagInput = document.getElementById("flagInput");
         flagInput.value = savedFlag;

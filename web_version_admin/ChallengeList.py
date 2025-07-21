@@ -75,3 +75,28 @@ class ChallengeList:
     def get_list_of_ids(self):
         """Return a list of all challenge IDs."""
         return [c.getId() for c in self.challenges]
+
+    def save_challenges(self):
+        """
+        Saves the current challenges (including updated flags) back to the JSON file.
+        Ensures script paths are saved relative to their folder.
+        """
+        try:
+            data = {}
+            for c in self.challenges:
+                folder_name = os.path.basename(c.getFolder())  # Just the folder name
+                script_name = os.path.basename(c.getScript())  # Just the script filename
+                data[c.getId()] = {
+                    "name": c.getName(),
+                    "folder": folder_name,
+                    "script": script_name,
+                    "flag": c.getFlag()
+                }
+
+            with open(self.challenges_path, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+
+            print(f"✅ Saved updated challenges to {self.challenges_path}")
+        except Exception as e:
+            print(f"❌ ERROR: Failed to save challenges: {e}")
+            raise

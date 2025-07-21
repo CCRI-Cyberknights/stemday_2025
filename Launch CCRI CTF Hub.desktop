@@ -3,8 +3,8 @@
 Version=1.0
 Type=Application
 Terminal=false
-Name[en_US]=Launch CCRI CTF Hub
-Exec=bash -lc "~/Desktop/stemday2025_takehome/web_version/start_web_hub.sh"
+Name=Launch CCRI CTF Hub
+Exec=bash -lc "~/Desktop/stemday_2025/start_web_hub.sh"
 Icon=firefox-esr
 Icon[en_US]=firefox-esr
-Name=Launch CCRI CTF Hub
+Name[en_US]=Launch CCRI CTF Hub

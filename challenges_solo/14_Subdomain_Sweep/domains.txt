@@ -1,0 +1,6 @@
+alpha.liber8.local
+beta.liber8.local
+gamma.liber8.local
+delta.liber8.local
+omega.liber8.local
+

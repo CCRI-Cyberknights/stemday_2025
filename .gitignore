@@ -1,44 +1,49 @@
-# === Ignore build artifacts and random files ===
-*.pyc
-__pycache__/
-*.bak
-*.swp
-*.log
-*binary_flag.c
+# Ignore everything
+*
 
-# Ignore compiled binaries and temp C files
-*.o
-*.out
-*.class
-
-# Ignore images and test files in root
-*.jpg
-*.png
-
-# Ignore Linux desktop launchers
-*.desktop
-
-# === Ignore web_version student build ===
-web_version/
-
-# === Keep admin files and challenges ===
-!web_version_admin/
-!challenges/
-
-# === Ignore custom scripts in root ===
-generate_*
-hex_script.sh
-make_pcap_traffic.py
-main_web_portal_idea.txt
-plan_overview.txt
-index_grid_obfuscated.html
-
-# === Keep docs and licensing ===
+# Un-ignore these files and folders
+!.gitignore
 !README.md
-!LICENSE
 !CONTRIBUTING.md
+!LICENSE
+!.ccri_ctf_root
+
+# Setup scripts
+!setup_contributor.py
+!start_web_hub.py
+!stop_web_hub.py
+
+# Admin tools
+!generate_all_flags.py
+!validate_all_flags.py
+
+# Desktop shortcuts
 !Launch CCRI CTF Hub.desktop
-!copy_ccri_ctf.sh
-!start_web_hub.sh
-!stop_web_hub.sh
-!setup_student.sh
+
+# Un-ignore folders AND their contents
+!flag_generators/
+!flag_generators/**
+
+# Ignore Python cache only in flag_generators
+flag_generators/__pycache__/
+flag_generators/**/__pycache__/
+
+# Ignore dry run output
+dryrun_output
+dryrun_output/**
+
+# Ignore generated web_version
+web_version
+web_version/**
+
+# Un-ignore challenges and web_version_admin
+!challenges/
+!challenges/**
+
+!challenges_solo
+!challenges_solo/**
+
+!web_version_admin/
+!web_version_admin/**
+web_version_admin/server.bak
+web_version_admin/challenges.json.bak

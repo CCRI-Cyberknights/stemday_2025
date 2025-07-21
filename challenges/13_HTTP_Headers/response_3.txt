@@ -1,12 +1,13 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:45:07 GMT
+Date: Sun, 30 Jun 2025 15:50:14 GMT
 Server: Liber8-Server/2.3.1
 Content-Type: application/json
-Cache-Control: no-cache
-X-Powered-By: Node.js/18.16.0
-X-Flag: CTFX-8421-SRVR
+Cache-Control: no-store
+X-Powered-By: Ruby on Rails/7.1.0
+X-Flag: FTWI-0948-GVEJ
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
+Set-Cookie: sessionid=sl5dfkz9mguj; HttpOnly; Secure
 
 {
   "status": "ok",
@@ -15,4 +16,3 @@ X-Content-Type-Options: nosniff
 }
 
 <!-- Debug: API response size 512 bytes -->
-

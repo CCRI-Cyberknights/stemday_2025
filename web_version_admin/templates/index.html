@@ -9,8 +9,25 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}"
     />
+    <!-- Prevent back/forward cache issues -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <script>
+      // Force reload when navigating with browser back/forward buttons
+      window.addEventListener("pageshow", function (event) {
+        if (event.persisted) {
+          console.log("⏪ Back/Forward cache detected: Reloading index...");
+          window.location.reload();
+        }
+      });
+    </script>
   </head>
-  <body>
+  <body 
+    data-total-challenges="{{ challenges.challenges | length }}"
+    data-challenge-ids='{{ challenges.get_list_of_ids() | tojson }}'
+    data-challenge-base-url="{{ url_for('index') }}"
+  >
     <h1>🚀 CCRI CTF {{ "Admin" if mode == "admin" else "Student" }} Hub</h1>
     <p>Welcome to the web hub for solving CTF challenges.</p>
     <p><strong>Flag Format:</strong> CCRI-AAAA-1111</p>
@@ -21,7 +38,7 @@
 
     <div class="grid">
       {% for challenge in challenges.challenges %}
-      <div class="challenge-card" id="{{ challenge.id }}">
+      <div class="challenge-card{% if challenge.complete %} completed{% endif %}" id="{{ challenge.id }}">
         <h3>{{ challenge.ch_number }}. {{ challenge.name }}</h3>
         {% if challenge.complete %}
         <p class="completed">✅ Completed</p>
@@ -29,7 +46,8 @@
         <button
           class="view-btn"
           type="button"
-          onclick="window.location.href='/challenge/{{ challenge.id }}';"
+          data-challenge-url="/challenge/{{ challenge.id }}"
+          onclick="startChallenge(this);"
         >
           🚀 Start Challenge
         </button>
@@ -39,21 +57,26 @@
     </div>
 
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const total = {{ challenges.challenges | length }};
-        let completed = 0;
+      function startChallenge(button) {
+        const url = button.dataset.challengeUrl;
+        window.location.href = url;
+      }
 
-        // Update completed challenges from localStorage
-        {% for challenge in challenges.challenges %}
-        const challengeId = "{{ challenge.id }}";
-        const savedFlag = localStorage.getItem(challengeId);
-        if (savedFlag) {
-          document
-            .getElementById(challengeId)
-            .classList.add("completed");
-          completed++;
-        }
-        {% endfor %}
+      document.addEventListener("DOMContentLoaded", () => {
+        const body = document.body;
+        const total = parseInt(body.dataset.totalChallenges);
+        const challengeIDs = JSON.parse(body.dataset.challengeIds);
+
+        let completed = 0;
+        challengeIDs.forEach((challengeId) => {
+          const savedFlag = localStorage.getItem(challengeId);
+          if (savedFlag) {
+            document
+              .getElementById(challengeId)
+              .classList.add("completed");
+            completed++;
+          }
+        });
 
         // Update progress counter
         document.getElementById("progress-counter").textContent =

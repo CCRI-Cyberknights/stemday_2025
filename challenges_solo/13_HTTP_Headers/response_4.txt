@@ -1,0 +1,22 @@
+HTTP/1.1 200 OK
+Date: Sun, 30 Jun 2025 15:45:03 GMT
+Server: Liber8-Server/2.3.1
+Content-Type: text/html; charset=UTF-8
+Cache-Control: private, no-cache
+X-Powered-By: ASP.NET Core/7.0
+Set-Cookie: auth_token=abc123xyz; HttpOnly; Secure
+X-Flag: CCRI-HEAD-7362
+X-Frame-Options: DENY
+X-Content-Type-Options: nosniff
+
+<html>
+  <head><title>Internal Dashboard</title></head>
+  <body>
+    <h1>Liber8 Ops Dashboard</h1>
+    <p>Authentication successful. Redirecting...</p>
+  </body>
+</html>
+
+<!-- Debug: Flag integrity verified -->
+<!-- To-do: Update security headers on staging -->
+

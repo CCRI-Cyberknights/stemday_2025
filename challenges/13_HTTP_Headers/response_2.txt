@@ -1,14 +1,20 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:45:12 GMT
+Date: Sun, 30 Jun 2025 15:49:32 GMT
 Server: Liber8-Server/2.3.1
 Content-Type: text/plain; charset=UTF-8
 Cache-Control: public, max-age=86400
-X-Powered-By: Python/3.11.4
-X-Flag: RESP-1290-CTFX
-X-Frame-Options: DENY
+X-Powered-By: Ruby on Rails/7.1.0
+X-Flag: CCRI-AIFU-6327
+X-Frame-Options: SAMEORIGIN
+X-Content-Type-Options: nosniff
+Set-Cookie: sessionid=du5496ex9ctk; HttpOnly; Secure
 
-Welcome to the Liber8 data endpoint.
-This endpoint returns plain text responses.
+<html>
+  <head><title>Liber8 Portal</title></head>
+  <body>
+    <h1>Welcome to Liber8</h1>
+    <p>System maintenance is underway. Some services may be unavailable.</p>
+  </body>
+</html>
 
-<!-- Developer Debug: X-Flag header injected for testing -->
-
+<!-- Debug: Temporary caching enabled -->

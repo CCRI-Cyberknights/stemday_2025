@@ -1,4 +1,7 @@
-todo:
-- make backup of backup
-- never delete .flag files
-
+Remember to check permissions after restore.
+Remember to check permissions after restore.
+Research notes for backup procedures.
+TODO: Document encryption key rotation.
+Remember to check permissions after restore.
+# [No sensitive data found here]
+TODO: Document encryption key rotation.

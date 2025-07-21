@@ -198,37 +198,49 @@ def run_script(challenge_id):
         return jsonify({"status": "error", "message": f"Script '{selectedChallenge.getScript()}' not found."}), 404
 
     try:
+        # Determine command based on file extension
+        if script_path.endswith(".sh"):
+            run_command = f"bash \"{script_path}\""
+        elif script_path.endswith(".py"):
+            run_command = f"python3 \"{script_path}\""
+        else:
+            return jsonify({"status": "error", "message": "Unsupported script type."}), 400
+
+        # Preferred terminal: parrot-terminal
         if os.path.exists("/etc/parrot"):
-            print("🐦 Detected Parrot OS. Forcing parrot-terminal.")
+            print("🐦 Detected Parrot OS. Using parrot-terminal.")
             subprocess.Popen([
                 "parrot-terminal",
                 "--working-directory", selectedChallenge.getFolder(),
-                "-e", f"bash \"{script_path}\""
+                "-e", run_command
             ], shell=False)
             return jsonify({"status": "success"})
 
+        # Fallback terminals
         fallback_terminals = ["gnome-terminal", "konsole", "xfce4-terminal", "lxterminal"]
         for term in fallback_terminals:
             if subprocess.call(["which", term], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0:
                 subprocess.Popen([
                     term,
                     "--working-directory", selectedChallenge.getFolder(),
-                    "-e", f"bash \"{script_path}\""
+                    "-e", run_command
                 ], shell=False)
                 return jsonify({"status": "success"})
 
+        # If no terminal emulator is found
         return jsonify({"status": "error", "message": "No supported terminal emulator found."}), 500
 
     except Exception as e:
+        print(f"❌ Failed to launch helper script: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
 # === Simulated Open Ports (Realistic Nmap Network) ===
 FAKE_FLAGS = {
-    8004: "NMAP-PORT-4312",
-    8023: "SCAN-4312-PORT",
-    8047: "CCRI-SCAN-8472",  # ✅ REAL FLAG
-    8072: "OPEN-SERVICE-9281",
-    8095: "HTTP-7721-SERVER"
+    8005: "CCRI-HVDF-4036",       # ✅ REAL FLAG
+    8024: "CTAU-3189-ZWJC",       # fake
+    8072: "HKJP-OWWV-3721",       # fake
+    8056: "ZLND-WYOY-4908",       # fake
+    8041: "AOFB-9291-NAFM",       # fake
 }
 
 JUNK_RESPONSES = {
@@ -273,7 +285,22 @@ SERVICE_NAMES = {
 }
 
 SERVICE_NAMES.update({
-    # Example: generator will overwrite these dynamically
+    8005: "kappa-node",
+    8024: "lambda-api",
+    8072: "gamma-relay",
+    8056: "beta-hub",
+    8041: "metricsd",
+    8025: "delta-sync",
+    8051: "epsilon-sync",
+    8088: "auth-service",
+    8064: "theta-daemon",
+    8033: "zeta-cache",
+    8035: "configd",
+    8076: "delta-proxy",
+    8069: "sysmon-api",
+    8006: "update-agent",
+    8019: "omega-stream",
+    8046: "alpha-core"
 })
 
 ALL_PORTS = {**JUNK_RESPONSES, **FAKE_FLAGS}
