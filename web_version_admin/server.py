@@ -1,9 +1,9 @@
 try:
     # Flask 2.x: Markup is part of flask
-    from flask import Flask, render_template, request, jsonify, Markup, send_from_directory
+    from flask import Flask, render_template, request, jsonify, Markup, send_from_directory, redirect, url_for, session
 except ImportError:
     # Flask 3.x: Markup moved to markupsafe
-    from flask import Flask, render_template, request, jsonify, send_from_directory
+    from flask import Flask, render_template, request, jsonify, send_from_directory, redirect, url_for, session
     from markupsafe import Markup
 
 import subprocess
@@ -15,6 +15,7 @@ import logging
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import markdown
 import sys
+
 sys.dont_write_bytecode = True  # 🛡 prevent .pyc files in admin
 
 # === Base Directory ===
@@ -27,62 +28,169 @@ if BASE_DIR not in sys.path:
 # === Import backend logic ===
 from ChallengeList import ChallengeList
 
-# === Detect mode and select challenges.json path ===
+# === Flask App Initialization ===
 server_dir = os.path.dirname(os.path.abspath(__file__))
-if os.path.basename(server_dir) == "web_version_admin":
-    mode = "admin"
-    challenges_path = os.path.join(server_dir, "challenges.json")
-    template_folder = os.path.join(server_dir, "templates")
-    static_folder = os.path.join(server_dir, "static")
-else:
-    mode = "student"
-    challenges_path = os.path.join(server_dir, "challenges.json")
-    template_folder = os.path.join(server_dir, "templates")
-    static_folder = os.path.join(server_dir, "static")
 
-print(f"📖 Using challenges file at: {challenges_path}")
-print(f"📖 Using template folder at: {template_folder}")
+template_folder = os.path.join(server_dir, "templates")
+static_folder = os.path.join(server_dir, "static")
 
-# === App Initialization ===
 app = Flask(
     __name__,
     template_folder=template_folder,
     static_folder=static_folder
 )
 
+app.secret_key = "super_secret_key"  # required for session tracking
 DEBUG_MODE = os.environ.get("CCRI_DEBUG", "0") == "1"
 logging.basicConfig(level=logging.DEBUG if DEBUG_MODE else logging.INFO)
-print(f"DEBUG: server_dir = {server_dir}")
-print(f"DEBUG: mode = {mode}")
-print(f"DEBUG: Rendering with mode={mode}")
 
-# === Load Challenges ===
-try:
-    print(f"Loading challenges from {challenges_path}...")
-    challenges = ChallengeList(challenges_file=challenges_path)
-    print(f"Loaded {challenges.numOfChallenges} challenges successfully.")
-except FileNotFoundError:
-    print(f"❌ ERROR: Could not find '{challenges_path}'!")
-    exit(1)
-except json.JSONDecodeError:
-    print(f"❌ ERROR: '{challenges_path}' contains invalid JSON!")
-    exit(1)
+# === Detect Admin or Student ===
+if os.path.basename(server_dir) == "web_version_admin":
+    base_mode = "admin"
+else:
+    base_mode = "student"
 
-# === Helper: XOR Decode ===
-def xor_decode(encoded_base64, key):
-    decoded_bytes = base64.b64decode(encoded_base64)
-    return ''.join(
-        chr(b ^ ord(key[i % len(key)])) for i, b in enumerate(decoded_bytes)
-    )
+print(f"📖 Using template folder at: {template_folder}")
+print(f"DEBUG: Base mode = {base_mode}")
+
+# === Simulated Open Ports ===
+# Guided Mode: 8000–8100
+GUIDED_FAKE_FLAGS = {
+    8005: "CCRI-HVDF-4036",       # ✅ REAL FLAG
+    8024: "CTAU-3189-ZWJC",       # fake
+    8072: "HKJP-OWWV-3721",       # fake
+    8056: "ZLND-WYOY-4908",       # fake
+    8041: "AOFB-9291-NAFM",       # fake
+}
+GUIDED_JUNK_RESPONSES = {
+    8001: "Welcome to Dev HTTP Server v1.3\nPlease login to continue.",
+    8009: "🔒 Unauthorized: API key required.",
+    8015: "503 Service Unavailable\nTry again later.",
+    8020: "<html><body><h1>It works!</h1><p>Apache2 default page.</p></body></html>",
+}
+GUIDED_SERVICE_NAMES = {
+    8001: "dev-http",
+    8005: "kappa-node",
+    8024: "lambda-api",
+    8072: "gamma-relay",
+    8056: "beta-hub",
+    8041: "metricsd",
+}
+
+# Solo Mode: 9000–9100
+SOLO_FAKE_FLAGS = {
+    9005: "CCRI-QWER-7890",       # ✅ REAL FLAG
+    9024: "ASDF-1234-HJKL",       # fake
+    9072: "ZXCV-5678-UIOP",       # fake
+    9056: "BNMM-0987-LKJH",       # fake
+    9041: "YTRE-4567-WQAS",       # fake
+}
+SOLO_JUNK_RESPONSES = {
+    9001: "Welcome to Solo Dev Server v2.0\nAuthentication required.",
+    9009: "🔒 Solo API key missing.",
+    9015: "503 Solo Service Unavailable\nTry again later.",
+    9020: "<html><body><h1>Solo It works!</h1><p>Default page.</p></body></html>",
+}
+SOLO_SERVICE_NAMES = {
+    9001: "solo-http",
+    9005: "sigma-node",
+    9024: "tau-api",
+    9072: "delta-relay",
+    9056: "omega-hub",
+    9041: "solo-metricsd",
+}
+
+GUIDED_ALL_PORTS = {**GUIDED_JUNK_RESPONSES, **GUIDED_FAKE_FLAGS}
+SOLO_ALL_PORTS = {**SOLO_JUNK_RESPONSES, **SOLO_FAKE_FLAGS}
+
+
+# === Dynamic HTTP Handler Factory ===
+def PortHandlerFactory(response_map, service_map):
+    class CustomPortHandler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            response = response_map.get(self.server.server_port, "Connection refused")
+            service_name = service_map.get(self.server.server_port, "http")
+            banner = f"👋 Welcome to {service_name} Service\n\n"
+            self.send_response(200)
+            self.send_header("Content-type", "text/plain; charset=utf-8")
+            self.send_header("Server", service_name)
+            self.send_header("X-Service-Name", service_name)
+            self.end_headers()
+            self.wfile.write((banner + response).encode("utf-8"))
+
+        def log_message(self, format, *args):
+            return
+    return CustomPortHandler
+
+
+# === Start Simulated Services ===
+def start_fake_service(port, response_map, service_map):
+    try:
+        server = HTTPServer(('0.0.0.0', port), PortHandlerFactory(response_map, service_map))
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        print(f"🛰️  Simulated service running on port {port} ({service_map.get(port, 'http')})")
+    except OSError as e:
+        print(f"❌ Could not bind port {port}: {e}")
+
+# Start Guided Mode Services (8000–8100)
+for port in GUIDED_ALL_PORTS.keys():
+    start_fake_service(port, GUIDED_ALL_PORTS, GUIDED_SERVICE_NAMES)
+
+# Start Solo Mode Services (9000–9100)
+for port in SOLO_ALL_PORTS.keys():
+    start_fake_service(port, SOLO_ALL_PORTS, SOLO_SERVICE_NAMES)
+
+
+# === Helper: Load Challenges ===
+def load_challenges(mode="regular"):
+    """
+    Load challenges from the correct JSON file based on mode.
+    """
+    if mode == "solo":
+        challenges_path = os.path.join(server_dir, "challenges_solo.json")
+        challenges_folder = "challenges_solo"
+    else:
+        challenges_path = os.path.join(server_dir, "challenges.json")
+        challenges_folder = "challenges"
+
+    print(f"📖 Loading {mode.upper()} challenges from {challenges_path}")
+
+    try:
+        challenge_list = ChallengeList(challenges_file=challenges_path)
+        print(f"✅ Loaded {challenge_list.numOfChallenges} challenges for {mode.upper()} mode.")
+        return challenge_list, challenges_folder
+    except FileNotFoundError:
+        print(f"❌ ERROR: Could not find '{challenges_path}'!")
+        exit(1)
+    except json.JSONDecodeError:
+        print(f"❌ ERROR: '{challenges_path}' contains invalid JSON!")
+        exit(1)
 
 # === Flask Routes ===
 @app.route('/')
+def landing_page():
+    return render_template('landing.html', base_mode=base_mode)
+
+@app.route('/set_mode/<mode>')
+def set_mode(mode):
+    if mode not in ["regular", "solo"]:
+        return "Invalid mode", 400
+    session["mode"] = mode
+    print(f"🌐 Mode set to: {mode.upper()}")
+    return redirect(url_for('index'))
+
+@app.route('/challenges')
 def index():
-    return render_template('index.html', challenges=challenges, mode=mode)
+    mode = session.get("mode", "regular")
+    challenge_list, challenges_folder = load_challenges(mode)
+    return render_template('index.html', challenges=challenge_list, base_mode=base_mode, mode=mode)
 
 @app.route('/challenge/<challenge_id>')
 def challenge_view(challenge_id):
-    selectedChallenge = challenges.get_challenge_by_id(challenge_id)
+    mode = session.get("mode", "regular")
+    challenge_list, challenges_folder = load_challenges(mode)
+
+    selectedChallenge = challenge_list.get_challenge_by_id(challenge_id)
     if selectedChallenge is None:
         return "Challenge not found", 404
 
@@ -107,230 +215,11 @@ def challenge_view(challenge_id):
         and not f.startswith(".")
     ]
 
-    return render_template('challenge.html', challenge=selectedChallenge, readme=readme_html, files=file_list)
+    template = "challenge_solo.html" if mode == "solo" else "challenge.html"
+    return render_template(template, challenge=selectedChallenge, readme=readme_html, files=file_list, base_mode=base_mode, mode=mode)
 
-@app.route('/challenge/<challenge_id>/file/<path:filename>')
-def get_challenge_file(challenge_id, filename):
-    selectedChallenge = challenges.get_challenge_by_id(challenge_id)
-    if selectedChallenge is None:
-        return "Challenge not found", 404
 
-    folder = selectedChallenge.getFolder()
-    filepath = os.path.join(folder, filename)
-    if not os.path.exists(filepath):
-        return "File not found", 404
-
-    return send_from_directory(folder, filename)
-
-@app.route('/submit_flag/<challenge_id>', methods=['POST'])
-def submit_flag(challenge_id):
-    data = request.get_json()
-    submitted_flag = data.get('flag', '').strip()
-    selectedChallenge = challenges.get_challenge_by_id(challenge_id)
-
-    if selectedChallenge is None:
-        print(f"❌ Challenge ID '{challenge_id}' not found.")
-        return jsonify({"status": "error", "message": "Challenge not found"}), 404
-
-    print(f"🌐 Running in {mode.upper()} mode")
-    correct_flag = selectedChallenge.getFlag().strip()
-
-    print("====== FLAG DEBUG ======")
-    print(f"🗂 Mode: {mode.upper()}")
-    print(f"📥 Submitted flag: '{submitted_flag}'")
-    print(f"🎯 Correct flag:   '{correct_flag}'")
-    print("========================")
-
-    if mode == "admin":
-        if submitted_flag == correct_flag:
-            print(f"✅ MATCH (Admin): Submitted flag matches correct flag.")
-            selectedChallenge.setComplete()
-            if selectedChallenge.getId() not in challenges.completed_challenges:
-                challenges.completed_challenges.append(selectedChallenge.getId())
-            return jsonify({"status": "correct"})
-        else:
-            print(f"❌ MISMATCH (Admin): Submitted flag does not match correct flag.")
-            return jsonify({"status": "incorrect"}), 400
-
-    else:
-        try:
-            decoded_flag = xor_decode(correct_flag, "CTF4EVER").strip()
-            print(f"🎯 Decoded correct flag (Student): '{decoded_flag}'")
-        except Exception as e:
-            print(f"⚠️ Decode failed in student mode: {e}")
-            return jsonify({"status": "error", "message": "Internal decoding error."}), 500
-
-        if submitted_flag == decoded_flag:
-            print(f"✅ MATCH (Student): Submitted flag matches decoded flag.")
-            selectedChallenge.setComplete()
-            if selectedChallenge.getId() not in challenges.completed_challenges:
-                challenges.completed_challenges.append(selectedChallenge.getId())
-            return jsonify({"status": "correct"})
-        else:
-            print(f"❌ MISMATCH (Student): Submitted flag does not match decoded flag.")
-            return jsonify({"status": "incorrect"}), 400
-
-@app.route('/open_folder/<challenge_id>', methods=['POST'])
-def open_folder(challenge_id):
-    selectedChallenge = challenges.get_challenge_by_id(challenge_id)
-    if selectedChallenge is None:
-        return jsonify({"status": "error", "message": "Challenge not found"}), 404
-
-    folder = selectedChallenge.getFolder()
-    if not os.path.exists(folder):
-        return jsonify({"status": "error", "message": "Challenge folder not found."}), 404
-
-    try:
-        subprocess.Popen(['xdg-open', folder], shell=False)
-        return jsonify({"status": "success"})
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
-
-@app.route('/run_script/<challenge_id>', methods=['POST'])
-def run_script(challenge_id):
-    selectedChallenge = challenges.get_challenge_by_id(challenge_id)
-    if selectedChallenge is None:
-        return jsonify({"status": "error", "message": "Challenge not found"}), 404
-
-    script_path = os.path.join(selectedChallenge.getFolder(), selectedChallenge.getScript())
-
-    if not os.path.exists(script_path):
-        return jsonify({"status": "error", "message": f"Script '{selectedChallenge.getScript()}' not found."}), 404
-
-    try:
-        # Determine command based on file extension
-        if script_path.endswith(".sh"):
-            run_command = f"bash \"{script_path}\""
-        elif script_path.endswith(".py"):
-            run_command = f"python3 \"{script_path}\""
-        else:
-            return jsonify({"status": "error", "message": "Unsupported script type."}), 400
-
-        # Preferred terminal: parrot-terminal
-        if os.path.exists("/etc/parrot"):
-            print("🐦 Detected Parrot OS. Using parrot-terminal.")
-            subprocess.Popen([
-                "parrot-terminal",
-                "--working-directory", selectedChallenge.getFolder(),
-                "-e", run_command
-            ], shell=False)
-            return jsonify({"status": "success"})
-
-        # Fallback terminals
-        fallback_terminals = ["gnome-terminal", "konsole", "xfce4-terminal", "lxterminal"]
-        for term in fallback_terminals:
-            if subprocess.call(["which", term], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0:
-                subprocess.Popen([
-                    term,
-                    "--working-directory", selectedChallenge.getFolder(),
-                    "-e", run_command
-                ], shell=False)
-                return jsonify({"status": "success"})
-
-        # If no terminal emulator is found
-        return jsonify({"status": "error", "message": "No supported terminal emulator found."}), 500
-
-    except Exception as e:
-        print(f"❌ Failed to launch helper script: {e}")
-        return jsonify({"status": "error", "message": str(e)}), 500
-
-# === Simulated Open Ports (Realistic Nmap Network) ===
-FAKE_FLAGS = {
-    8005: "CCRI-HVDF-4036",       # ✅ REAL FLAG
-    8024: "CTAU-3189-ZWJC",       # fake
-    8072: "HKJP-OWWV-3721",       # fake
-    8056: "ZLND-WYOY-4908",       # fake
-    8041: "AOFB-9291-NAFM",       # fake
-}
-
-JUNK_RESPONSES = {
-    8001: "Welcome to Dev HTTP Server v1.3\nPlease login to continue.",
-    8009: "🔒 Unauthorized: API key required.",
-    8015: "503 Service Unavailable\nTry again later.",
-    8020: "<html><body><h1>It works!</h1><p>Apache2 default page.</p></body></html>",
-    8028: "DEBUG: Connection established successfully.",
-    8033: "💡 Tip: Scan only the ports you really need.",
-    8039: "ERROR 400: Bad request syntax.",
-    8045: "System maintenance in progress. Expected downtime: 13 minutes.",
-    8051: "Welcome to Experimental IoT Server (beta build).",
-    8058: "Python HTTP Server: directory listing not allowed.",
-    8064: "💻 Dev API v0.1 — POST requests only.",
-    8077: "403 Forbidden: You don’t have permission to access this resource.",
-    8083: "Error 418: I’m a teapot.",
-    8089: "Hello World!\nTest endpoint active.",
-    8098: "Server under maintenance.\nPlease retry in 5 minutes."
-}
-
-SERVICE_NAMES = {
-    8001: "dev-http",
-    8004: "flag-api",
-    8009: "secure-api",
-    8015: "maintenance",
-    8020: "apache",
-    8023: "flag-api",
-    8028: "debug-service",
-    8033: "help-service",
-    8039: "http",
-    8045: "maintenance",
-    8047: "flag-api",
-    8051: "iot-server",
-    8058: "http",
-    8064: "dev-api",
-    8072: "flag-api",
-    8077: "secure-api",
-    8083: "http",
-    8089: "test-service",
-    8095: "flag-api",
-    8098: "maintenance"
-}
-
-SERVICE_NAMES.update({
-    8005: "kappa-node",
-    8024: "lambda-api",
-    8072: "gamma-relay",
-    8056: "beta-hub",
-    8041: "metricsd",
-    8025: "delta-sync",
-    8051: "epsilon-sync",
-    8088: "auth-service",
-    8064: "theta-daemon",
-    8033: "zeta-cache",
-    8035: "configd",
-    8076: "delta-proxy",
-    8069: "sysmon-api",
-    8006: "update-agent",
-    8019: "omega-stream",
-    8046: "alpha-core"
-})
-
-ALL_PORTS = {**JUNK_RESPONSES, **FAKE_FLAGS}
-
-class PortHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        response = ALL_PORTS.get(self.server.server_port, "Connection refused")
-        service_name = SERVICE_NAMES.get(self.server.server_port, "http")
-        banner = f"👋 Welcome to {service_name} Service\n\n"
-        self.send_response(200)
-        self.send_header("Content-type", "text/plain; charset=utf-8")
-        self.send_header("Server", service_name)
-        self.send_header("X-Service-Name", service_name)
-        self.end_headers()
-        self.wfile.write((banner + response).encode("utf-8"))
-
-    def log_message(self, format, *args):
-        return
-
-def start_fake_service(port):
-    try:
-        server = HTTPServer(('0.0.0.0', port), PortHandler)
-        threading.Thread(target=server.serve_forever, daemon=True).start()
-        print(f"🛰️  Simulated service running on port {port} ({SERVICE_NAMES.get(port, 'http')})")
-    except OSError as e:
-        print(f"❌ Could not bind port {port}: {e}")
-
-for port in ALL_PORTS.keys():
-    start_fake_service(port)
-
+# === Start Server ===
 if __name__ == '__main__':
-    print(f"🌐 {mode.capitalize()} hub running on http://127.0.0.1:5000")
+    print(f"🌐 {base_mode.capitalize()} hub running on http://127.0.0.1:5000")
     app.run(host='127.0.0.1', port=5000, debug=False, threaded=True)

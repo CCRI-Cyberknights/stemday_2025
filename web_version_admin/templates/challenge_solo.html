@@ -2,25 +2,21 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>{{ challenge.name }} - CCRI CTF Admin Guided</title>
+    <title>{{ challenge.name }} - CCRI CTF Admin Solo</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
   </head>
   <body
     data-challenge-id="{{ challenge.id }}"
     data-url-index="{{ url_for('index') }}"
-    data-url-open-folder="/open_folder/{{ challenge.id }}"
-    data-url-run-script="/run_script/{{ challenge.id }}"
     data-url-submit-flag="/submit_flag/{{ challenge.id }}"
     data-base-mode="{{ base_mode }}"
     data-mode="{{ mode }}"
   >
-    <h1>{{ challenge.name }} - 🛠 Guided Mode</h1>
+    <h1>{{ challenge.name }} - 🔥 Solo Mode</h1>
 
     <!-- Top Buttons -->
     <div class="actions">
       <button type="button" onclick="goBackToIndex();">⬅ Back to Challenges</button>
-      <button type="button" onclick="runHelper('open');">📂 Open Folder</button>
-      <button type="button" onclick="runHelper('run');">🖥 Run Helper Script</button>
     </div>
 
     <hr />
@@ -75,8 +71,6 @@
       <hr />
       <div class="actions bottom-buttons">
         <button type="button" onclick="goBackToIndex();">⬅ Back to Challenges</button>
-        <button type="button" onclick="runHelper('open');">📂 Open Folder</button>
-        <button type="button" onclick="runHelper('run');">🖥 Run Helper Script</button>
       </div>
     </div>
 
@@ -86,23 +80,10 @@
       const mode = document.body.dataset.mode;
       const storageKey = `${baseMode}-${mode}-${challengeId}`;
       const urlIndex = document.body.dataset.urlIndex;
-      const urlOpenFolder = document.body.dataset.urlOpenFolder;
-      const urlRunScript = document.body.dataset.urlRunScript;
       const urlSubmitFlag = document.body.dataset.urlSubmitFlag;
 
       function goBackToIndex() {
         window.location.href = urlIndex;
-      }
-
-      function runHelper(action) {
-        const url = action === 'open' ? urlOpenFolder : urlRunScript;
-        fetch(url, { method: 'POST' })
-          .then(res => res.json())
-          .then(data => {
-            if (data.status !== 'success') {
-              console.error('Failed:', data.message);
-            }
-          });
       }
 
       function submitFlag() {

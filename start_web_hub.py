@@ -41,7 +41,6 @@ def open_browser():
     firefox = shutil.which("firefox")
     if firefox:
         try:
-            # Launch Firefox in a new window, fully detached
             subprocess.Popen(
                 [firefox, "--new-window", "http://localhost:5000"],
                 stdout=subprocess.DEVNULL,
@@ -68,22 +67,12 @@ def main():
     print("🚀 Starting the CCRI CTF Hub...\n")
     project_root = find_project_root()
 
-    # Detect mode
+    # Detect Admin vs Student environment
     if os.path.isdir(os.path.join(project_root, "web_version_admin")):
         print("🛠️ Admin/Dev environment detected (web_version_admin found).\n")
-        print("Which mode would you like to run?")
-        print("1) 🛠️ Admin Mode (full tools, editable flags)")
-        print("2) 🎓 Student Mode (restricted, obfuscated flags)\n")
-        mode_choice = input("Enter choice [1-2]: ").strip()
-        if mode_choice == "1":
-            server_dir = os.path.join(project_root, "web_version_admin")
-            server_file = "server.py"
-        elif mode_choice == "2":
-            server_dir = os.path.join(project_root, "web_version")
-            server_file = "server.pyc"
-        else:
-            print("❌ Invalid choice. Exiting.")
-            sys.exit(1)
+        server_dir = os.path.join(project_root, "web_version_admin")
+        server_file = "server.py"
+        print("🌐 NOTE: Guided/Solo selection will happen on the landing page.")
     else:
         print("🎓 Student environment detected (web_version_admin not found).")
         server_dir = os.path.join(project_root, "web_version")

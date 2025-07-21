@@ -25,9 +25,17 @@ class ChallengeList:
         base_dir = os.path.dirname(os.path.abspath(__file__))
         self.challenges_path = os.path.join(base_dir, challenges_file)
 
+        # === Determine if we are in Solo mode ===
+        if os.path.basename(self.challenges_path) == "challenges_solo.json":
+            self.solo_mode = True
+            challenges_folder_name = "challenges_solo"
+        else:
+            self.solo_mode = False
+            challenges_folder_name = "challenges"
+
         # === Set parent challenges folder ===
         self.challenges_root = os.path.normpath(
-            os.path.join(base_dir, "..", "challenges")
+            os.path.join(base_dir, "..", challenges_folder_name)
         )
 
         print(f"📖 Checking for challenges file at: {self.challenges_path}")
@@ -53,9 +61,10 @@ class ChallengeList:
                 id=key,
                 ch_number=order,
                 name=entry['name'],
-                folder=os.path.join(self.challenges_root, entry['folder']),
-                script=entry['script'],
-                flag=entry['flag']
+                folder=entry['folder'],
+                flag=entry['flag'],
+                script=entry.get('script'),  # May not exist in Solo JSON
+                solo_mode=self.solo_mode
             )
             print(f"➡️  Challenge #{order}: {challenge.getName()} (ID={key})")
             self.challenges.append(challenge)
@@ -85,13 +94,17 @@ class ChallengeList:
             data = {}
             for c in self.challenges:
                 folder_name = os.path.basename(c.getFolder())  # Just the folder name
-                script_name = os.path.basename(c.getScript())  # Just the script filename
-                data[c.getId()] = {
+                entry = {
                     "name": c.getName(),
                     "folder": folder_name,
-                    "script": script_name,
                     "flag": c.getFlag()
                 }
+                if not self.solo_mode and c.getScript():
+                    # Only include script in Guided mode
+                    script_name = os.path.basename(c.getScript())
+                    entry["script"] = script_name
+
+                data[c.getId()] = entry
 
             with open(self.challenges_path, 'w', encoding='utf-8') as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)

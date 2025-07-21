@@ -73,30 +73,18 @@ def main():
     print("🛑 Stopping CCRI CTF Hub...\n")
     project_root = find_project_root()
 
-    # Prompt user to select mode
-    print("Which server do you want to stop?")
-    print("1) 🛠️ Admin Server")
-    print("2) 🎓 Student Server\n")
-    mode_choice = input("Enter choice [1-2]: ").strip()
-    if mode_choice == "1":
-        server_file = os.path.join(project_root, "web_version_admin", "server.py")
-    elif mode_choice == "2":
-        server_file = os.path.join(project_root, "web_version", "server.pyc")
-    else:
-        print("❌ Invalid choice. Exiting.")
-        sys.exit(1)
-
-    # Stop Flask server
+    # Stop Flask server processes (Admin or Student)
     print("🔍 Searching for running Flask server processes...")
-    kill_processes_by_pattern(f"python3.*{server_file}")
+    kill_processes_by_pattern("python3.*server.py")  # Matches Admin server
+    kill_processes_by_pattern("python3.*server.pyc") # Matches Student server
 
     # Stop Flask on port 5000 (backup)
     print("🔍 Checking for processes on port 5000...")
     clear_port(5000)
 
-    # Stop simulated services (8000–8100)
+    # Stop simulated services (Guided: 8000–8100)
     print("🔍 Checking for simulated services on ports 8000–8100...")
-    ports_cleared = 0
+    guided_ports_cleared = 0
     for port in range(8000, 8101):
         try:
             result = subprocess.run(
@@ -107,14 +95,36 @@ def main():
             )
             if result.stdout.strip():
                 clear_port(port)
-                ports_cleared += 1
+                guided_ports_cleared += 1
         except Exception:
-            break  # lsof already checked above
+            break
 
-    if ports_cleared > 0:
-        print(f"✅ Cleared {ports_cleared} simulated service(s) on ports 8000–8100.")
+    if guided_ports_cleared > 0:
+        print(f"✅ Cleared {guided_ports_cleared} simulated service(s) on ports 8000–8100.")
     else:
         print("⚠️ No simulated services running on ports 8000–8100.")
+
+    # Stop simulated services (Solo: 9000–9100)
+    print("🔍 Checking for simulated services on ports 9000–9100...")
+    solo_ports_cleared = 0
+    for port in range(9000, 9101):
+        try:
+            result = subprocess.run(
+                ["lsof", "-iTCP:%d" % port, "-sTCP:LISTEN"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                text=True
+            )
+            if result.stdout.strip():
+                clear_port(port)
+                solo_ports_cleared += 1
+        except Exception:
+            break
+
+    if solo_ports_cleared > 0:
+        print(f"✅ Cleared {solo_ports_cleared} simulated service(s) on ports 9000–9100.")
+    else:
+        print("⚠️ No simulated services running on ports 9000–9100.")
 
     print("\n🎯 All cleanup complete.")
 

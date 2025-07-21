@@ -3,7 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <title>
-      🚀 CCRI CTF {{ "Admin" if mode == "admin" else "Student" }} Hub
+      🚀 CCRI CTF 
+      {% if base_mode == "admin" %}
+        Admin {{ "Guided" if mode == "regular" else "Solo" }} Hub
+      {% else %}
+        Student Hub
+      {% endif %}
     </title>
     <link
       rel="stylesheet"
@@ -27,8 +32,17 @@
     data-total-challenges="{{ challenges.challenges | length }}"
     data-challenge-ids='{{ challenges.get_list_of_ids() | tojson }}'
     data-challenge-base-url="{{ url_for('index') }}"
+    data-mode="{{ mode }}"
+    data-base-mode="{{ base_mode }}"
   >
-    <h1>🚀 CCRI CTF {{ "Admin" if mode == "admin" else "Student" }} Hub</h1>
+    <h1>
+      🚀 CCRI CTF 
+      {% if base_mode == "admin" %}
+        Admin {{ "Guided" if mode == "regular" else "Solo" }} Hub
+      {% else %}
+        Student Hub
+      {% endif %}
+    </h1>
     <p>Welcome to the web hub for solving CTF challenges.</p>
     <p><strong>Flag Format:</strong> CCRI-AAAA-1111</p>
 
@@ -67,9 +81,12 @@
         const total = parseInt(body.dataset.totalChallenges);
         const challengeIDs = JSON.parse(body.dataset.challengeIds);
 
+        // Use a mode-specific key for progress tracking
+        const storagePrefix = `${body.dataset.baseMode}-${body.dataset.mode}`;
         let completed = 0;
+
         challengeIDs.forEach((challengeId) => {
-          const savedFlag = localStorage.getItem(challengeId);
+          const savedFlag = localStorage.getItem(`${storagePrefix}-${challengeId}`);
           if (savedFlag) {
             document
               .getElementById(challengeId)
