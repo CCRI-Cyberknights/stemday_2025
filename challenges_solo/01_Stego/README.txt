@@ -47,7 +47,7 @@ Hint: The password to unlock the secret is the most common one in the world.
 
 Note: Some tools (like steghide) will automatically save the hidden content to a file (e.g., flag.txt). Other tools may simply print the hidden data on the screen. If you uncover the flag this way, save it yourself:
 
-echo "CCRI-XXXX-1234" > flag.txt
+echo "CCRI-AAAA-1111" > flag.txt
 
 ---
 
@@ -55,9 +55,9 @@ echo "CCRI-XXXX-1234" > flag.txt
 
 When you find the flag, it will look like this:
 
-CCRI-XXXX-1234
+CCRI-AAAA-1111
 
-Replace the XXXX and numbers with the real code you uncover.
+Replace the AAAA and numbers with the real code you uncover.
 
 ---
 

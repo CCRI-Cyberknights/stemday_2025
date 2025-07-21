@@ -60,7 +60,7 @@ def copy_root_marker():
         log_verbose("No .ccri_ctf_root marker found at project root.")
 
 def load_validation_unlocks(mode):
-    """Load validation_unlocks JSON for guided or solo mode."""
+    """Load validation_unlocks JSON for guided or solo mode, normalize keys/passwords to lowercase."""
     unlocks_file = UNLOCKS_SOLO if mode == "solo" else UNLOCKS_GUIDED
     log_verbose(f"Loading validation unlocks from: {unlocks_file}")
     if not unlocks_file.exists():
@@ -69,6 +69,15 @@ def load_validation_unlocks(mode):
     with open(unlocks_file, "r", encoding="utf-8") as f:
         data = json.load(f)
         log_verbose(f"Loaded {len(data)} unlock entries.")
+
+        # 🔥 Normalize key/password fields to lowercase
+        for entry in data.values():
+            for field in ("vigenere_key", "last_password", "zip_password"):
+                if field in entry and isinstance(entry[field], str):
+                    original_value = entry[field]
+                    entry[field] = original_value.lower()
+                    log_verbose(f"Normalized {field}: '{original_value}' -> '{entry[field]}'")
+
         return data
 
 def validate_challenge(challenge_id, entry, timeouts):

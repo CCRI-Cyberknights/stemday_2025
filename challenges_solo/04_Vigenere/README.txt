@@ -34,7 +34,7 @@ This challenge assumes you’ll explore and choose the right approach for decodi
 1. Open cipher.txt and inspect the encrypted message.  
 2. Try to decode it using the suspected keyword.  
 
-Hint: What’s the opposite of logout? That word might help unlock the message.
+Hint: What is our state capital? That word might help unlock the message.
 
 3. Look carefully at each decoded result. Only one will contain a flag in the correct format.
 

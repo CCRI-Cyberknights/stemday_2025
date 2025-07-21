@@ -14,15 +14,16 @@ class VigenereFlagGenerator:
     Stores unlock metadata for validation workflow.
     """
 
-    DEFAULT_KEY = "login"  # Default key for guided mode
+    DEFAULT_KEY = "login"        # Guided mode key (case-insensitive)
+    SOLO_KEY = "Providence"      # Solo mode key (case-insensitive)
 
     def __init__(self, project_root: Path = None, mode="guided"):
         self.project_root = project_root or self.find_project_root()
         self.mode = mode  # guided or solo
 
-        # Choose the appropriate Vigenère key per mode
+        # Choose and normalize the Vigenère key for the selected mode
         self.vigenere_key = (
-            self.DEFAULT_KEY if self.mode == "guided" else "securekey"  # Example solo key
+            self.DEFAULT_KEY.lower() if self.mode == "guided" else self.SOLO_KEY.lower()
         )
 
         # Unlock metadata file based on mode
@@ -46,7 +47,7 @@ class VigenereFlagGenerator:
 
     def vigenere_encrypt(self, plaintext: str, key: str = None) -> str:
         """Encrypt plaintext using Vigenère cipher with the given key."""
-        key = (key or self.vigenere_key).lower()
+        key = (key or self.vigenere_key).lower()  # Normalize key to lowercase
         result = []
         key_len = len(key)
         key_indices = [ord(k) - ord('a') for k in key]
