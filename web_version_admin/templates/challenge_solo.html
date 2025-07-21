@@ -8,6 +8,7 @@
   <body
     data-challenge-id="{{ challenge.id }}"
     data-url-index="{{ url_for('index') }}"
+    data-url-open-folder="/open_folder/{{ challenge.id }}"
     data-url-submit-flag="/submit_flag/{{ challenge.id }}"
     data-base-mode="{{ base_mode }}"
     data-mode="{{ mode }}"
@@ -17,6 +18,7 @@
     <!-- Top Buttons -->
     <div class="actions">
       <button type="button" onclick="goBackToIndex();">⬅ Back to Challenges</button>
+      <button type="button" onclick="openFolder();">📂 Open Folder</button>
     </div>
 
     <hr />
@@ -71,6 +73,7 @@
       <hr />
       <div class="actions bottom-buttons">
         <button type="button" onclick="goBackToIndex();">⬅ Back to Challenges</button>
+        <button type="button" onclick="openFolder();">📂 Open Folder</button>
       </div>
     </div>
 
@@ -80,10 +83,21 @@
       const mode = document.body.dataset.mode;
       const storageKey = `${baseMode}-${mode}-${challengeId}`;
       const urlIndex = document.body.dataset.urlIndex;
+      const urlOpenFolder = document.body.dataset.urlOpenFolder;
       const urlSubmitFlag = document.body.dataset.urlSubmitFlag;
 
       function goBackToIndex() {
         window.location.href = urlIndex;
+      }
+
+      function openFolder() {
+        fetch(urlOpenFolder, { method: 'POST' })
+          .then(res => res.json())
+          .then(data => {
+            if (data.status !== 'success') {
+              console.error('Failed to open folder:', data.message);
+            }
+          });
       }
 
       function submitFlag() {

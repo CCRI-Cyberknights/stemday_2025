@@ -329,3 +329,26 @@ a:visited {
 .Subscribe-btn:active {
   transform: scale(0.9);
 }
+/* 🆕 Top Right Button for "Back to Hub" (matches view-btn) */
+.top-right {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.home-btn {
+  margin: 8px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #1e1e1e;
+  color: #fff;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.home-btn:hover {
+  background: linear-gradient(135deg, #6a009b, #48006a);
+}
+

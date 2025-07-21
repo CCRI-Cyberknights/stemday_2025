@@ -157,7 +157,9 @@ def load_challenges(mode="regular"):
 
     try:
         challenge_list = ChallengeList(challenges_file=challenges_path)
-        print(f"✅ Loaded {challenge_list.numOfChallenges} challenges for {mode.upper()} mode.")
+        list_type = "Guided" if mode == "regular" else "Solo"
+        user_type = "Admin" if base_mode == "admin" else "Student"
+        print(f"✅ {user_type} {list_type} Challenge List loaded ({challenge_list.numOfChallenges} challenges).")
         return challenge_list, challenges_folder
     except FileNotFoundError:
         print(f"❌ ERROR: Could not find '{challenges_path}'!")
@@ -169,6 +171,7 @@ def load_challenges(mode="regular"):
 # === Flask Routes ===
 @app.route('/')
 def landing_page():
+    print(f"🌐 {base_mode.capitalize()} Hub loaded at http://127.0.0.1:5000")
     return render_template('landing.html', base_mode=base_mode)
 
 @app.route('/set_mode/<mode>')
@@ -183,7 +186,19 @@ def set_mode(mode):
 def index():
     mode = session.get("mode", "regular")
     challenge_list, challenges_folder = load_challenges(mode)
-    return render_template('index.html', challenges=challenge_list, base_mode=base_mode, mode=mode)
+
+    # Dynamic title for Challenge List
+    if base_mode == "admin":
+        list_title = f"Admin {'Guided' if mode == 'regular' else 'Solo'} Challenge List"
+    else:
+        list_title = f"Student {'Guided' if mode == 'regular' else 'Solo'} Challenge List"
+
+    print(f"📄 Opening {list_title}...")
+    return render_template('index.html', 
+                           challenges=challenge_list, 
+                           base_mode=base_mode, 
+                           mode=mode, 
+                           list_title=list_title)
 
 @app.route('/challenge/<challenge_id>')
 def challenge_view(challenge_id):
@@ -216,10 +231,93 @@ def challenge_view(challenge_id):
     ]
 
     template = "challenge_solo.html" if mode == "solo" else "challenge.html"
-    return render_template(template, challenge=selectedChallenge, readme=readme_html, files=file_list, base_mode=base_mode, mode=mode)
+    print(f"➡️ Opening {selectedChallenge.getName()} in {mode.upper()} mode.")
+    return render_template(template, 
+                           challenge=selectedChallenge, 
+                           readme=readme_html, 
+                           files=file_list, 
+                           base_mode=base_mode, 
+                           mode=mode)
+
+
+# === Route: Open Folder ===
+@app.route('/open_folder/<challenge_id>', methods=['POST'])
+def open_folder(challenge_id):
+    """
+    Open the challenge folder in the system file explorer (works in all modes).
+    """
+    challenge_list, _ = load_challenges(session.get("mode", "regular"))
+    selectedChallenge = challenge_list.get_challenge_by_id(challenge_id)
+    if selectedChallenge is None:
+        return jsonify({"status": "error", "message": "Challenge not found"}), 404
+
+    folder_path = selectedChallenge.getFolder()
+    print(f"📂 Opening folder: {folder_path}")
+    try:
+        if sys.platform.startswith('linux'):
+            subprocess.Popen(['xdg-open', folder_path])
+        elif sys.platform.startswith('darwin'):
+            subprocess.Popen(['open', folder_path])
+        elif sys.platform.startswith('win'):
+            subprocess.Popen(['explorer', folder_path])
+        else:
+            return jsonify({"status": "error", "message": "Unsupported OS"}), 500
+        return jsonify({"status": "success", "message": "Folder opened"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"Failed to open folder: {e}"}), 500
+
+
+# === Route: Run Helper Script ===
+@app.route('/run_script/<challenge_id>', methods=['POST'])
+def run_script(challenge_id):
+    """
+    Run the guided helper script for the challenge (disabled in Solo mode).
+    """
+    mode = session.get("mode", "regular")
+    if mode == "solo":
+        return jsonify({"status": "error", "message": "Helper scripts are disabled in Solo Mode."}), 403
+
+    challenge_list, _ = load_challenges(mode)
+    selectedChallenge = challenge_list.get_challenge_by_id(challenge_id)
+    if selectedChallenge is None:
+        return jsonify({"status": "error", "message": "Challenge not found"}), 404
+
+    script_path = selectedChallenge.getScript()
+    print(f"🚀 Running helper script: {script_path}")
+
+    try:
+        subprocess.Popen(['gnome-terminal', '--', 'python3', script_path])
+        return jsonify({"status": "success", "message": "Helper script started"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"Failed to run script: {e}"}), 500
+
+
+# === Route: Serve Challenge Files ===
+@app.route('/challenge/<challenge_id>/file/<path:filename>')
+def get_challenge_file(challenge_id, filename):
+    """
+    Serve individual challenge files.
+    Active in Admin and Guided (regular) modes.
+    """
+    mode = session.get("mode", "regular")
+    if base_mode == "student" and mode == "solo":
+        return "File downloads are disabled in Solo Mode.", 403
+
+    challenge_list, _ = load_challenges(mode)
+    selectedChallenge = challenge_list.get_challenge_by_id(challenge_id)
+    if selectedChallenge is None:
+        return "Challenge not found", 404
+
+    folder = selectedChallenge.getFolder()
+    filepath = os.path.join(folder, filename)
+    if not os.path.exists(filepath):
+        return "File not found", 404
+
+    print(f"📂 Serving file '{filename}' for challenge {challenge_id}.")
+    return send_from_directory(folder, filename)
 
 
 # === Start Server ===
 if __name__ == '__main__':
-    print(f"🌐 {base_mode.capitalize()} hub running on http://127.0.0.1:5000")
+    print(f"🚀 {base_mode.capitalize()} Hub running on http://127.0.0.1:5000")
     app.run(host='127.0.0.1', port=5000, debug=False, threaded=True)

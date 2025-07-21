@@ -2,14 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>
-      🚀 CCRI CTF 
-      {% if base_mode == "admin" %}
-        Admin {{ "Guided" if mode == "regular" else "Solo" }} Hub
-      {% else %}
-        Student Hub
-      {% endif %}
-    </title>
+    <title>{{ list_title }}</title>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}"
@@ -35,14 +28,12 @@
     data-mode="{{ mode }}"
     data-base-mode="{{ base_mode }}"
   >
-    <h1>
-      🚀 CCRI CTF 
-      {% if base_mode == "admin" %}
-        Admin {{ "Guided" if mode == "regular" else "Solo" }} Hub
-      {% else %}
-        Student Hub
-      {% endif %}
-    </h1>
+    <!-- 🆕 Top-right Back to Hub Button -->
+    <div class="top-right">
+      <button onclick="goToLanding();" class="home-btn">🏠 Back to Hub</button>
+    </div>
+
+    <h1>🚀 {{ list_title }}</h1>
     <p>Welcome to the web hub for solving CTF challenges.</p>
     <p><strong>Flag Format:</strong> CCRI-AAAA-1111</p>
 
@@ -71,6 +62,10 @@
     </div>
 
     <script>
+      function goToLanding() {
+        window.location.href = "/";
+      }
+
       function startChallenge(button) {
         const url = button.dataset.challengeUrl;
         window.location.href = url;

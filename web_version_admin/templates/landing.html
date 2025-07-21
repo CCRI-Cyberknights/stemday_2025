@@ -2,32 +2,73 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>🚀 CCRI CTF Mode Selection</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}"
-    />
+    <title>🚀 CCRI CTF {{ base_mode|capitalize }} Hub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <style>
+      /* Center content and add spacing */
+      .landing-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        margin-top: 30px;
+      }
+
+      .grid {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+
+      .challenge-card {
+        width: 300px;
+        background: transparent;
+        border: 2px solid #ccc;
+        color: #f3e600;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+
+      .landing-logo {
+        margin-top: 40px;
+        max-width: 400px;
+        width: 80%;
+        height: auto;
+      }
+    </style>
   </head>
   <body>
-    <h1>🚀 CCRI CTF {{ base_mode|capitalize }} Hub</h1>
-    <p>Select which version of the challenges you want to start:</p>
+    <div class="landing-container">
+      <h1>🚀 CCRI CTF {{ base_mode|capitalize }} Hub</h1>
+      <p>Select which version of the challenges you want to start:</p>
 
-    <div class="grid">
-      <div class="challenge-card">
-        <h3>🛠 Guided Mode</h3>
-        <p>Includes helper scripts and walkthroughs for each challenge.</p>
-        <a href="{{ url_for('set_mode', mode='regular') }}">
-          <button class="view-btn">Start Guided Mode</button>
-        </a>
+      <div class="grid">
+        <div class="challenge-card">
+          <h3>🛠 Guided Mode</h3>
+          <p>Includes helper scripts and walkthroughs for each challenge.</p>
+          <a href="{{ url_for('set_mode', mode='regular') }}">
+            <button class="view-btn">🚀 Start Guided Challenge List</button>
+          </a>
+        </div>
+
+        <div class="challenge-card">
+          <h3>🔥 Solo Mode</h3>
+          <p>No helpers. Solve challenges manually for the full experience.</p>
+          <a href="{{ url_for('set_mode', mode='solo') }}">
+            <button class="view-btn">🚀 Start Solo Challenge List</button>
+          </a>
+        </div>
       </div>
 
-      <div class="challenge-card">
-        <h3>🔥 Solo Mode</h3>
-        <p>No helpers. Solve challenges manually for the full experience.</p>
-        <a href="{{ url_for('set_mode', mode='solo') }}">
-          <button class="view-btn">Start Solo Mode</button>
-        </a>
-      </div>
+      <!-- CyberKnights logo -->
+      <img
+        src="{{ url_for('static', filename='assets/CyberKnights_2.png') }}"
+        alt="CyberKnights Logo"
+        class="landing-logo"
+      />
     </div>
   </body>
 </html>
