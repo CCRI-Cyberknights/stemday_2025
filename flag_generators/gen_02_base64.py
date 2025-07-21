@@ -13,11 +13,21 @@ class Base64FlagGenerator:
     Generator for the Base64 intercepted message challenge.
     Encodes an intercepted transmission (including flags) into encoded.txt
     and stores unlock metadata for validation workflow.
+    Supports Guided and Solo modes.
     """
-    def __init__(self, project_root: Path = None):
+    def __init__(self, project_root: Path = None, mode: str = "guided"):
         self.project_root = project_root or self.find_project_root()
+        self.mode = mode.lower()
+        if self.mode not in ["guided", "solo"]:
+            print(f"❌ ERROR: Invalid mode '{self.mode}'. Expected 'guided' or 'solo'.", file=sys.stderr)
+            sys.exit(1)
+
         self.metadata = {}  # For unlock info
-        self.unlock_file = self.project_root / "web_version_admin" / "validation_unlocks.json"
+        # Decide unlock file based on mode
+        unlock_filename = (
+            "validation_unlocks.json" if self.mode == "guided" else "validation_unlocks_solo.json"
+        )
+        self.unlock_file = self.project_root / "web_version_admin" / unlock_filename
 
     @staticmethod
     def find_project_root() -> Path:
@@ -60,7 +70,7 @@ class Base64FlagGenerator:
                 json.dump(unlocks, f, indent=2)
             print(f"💾 Metadata saved: {self.unlock_file.relative_to(self.project_root)}")
         except Exception as e:
-            print(f"❌ Failed to update validation_unlocks.json: {e}", file=sys.stderr)
+            print(f"❌ Failed to update {self.unlock_file.name}: {e}", file=sys.stderr)
             sys.exit(1)
 
     def embed_flags(self, challenge_folder: Path, real_flag: str, fake_flags: list):
@@ -112,7 +122,7 @@ class Base64FlagGenerator:
                 "hint": "Decode encoded.txt using base64 -d or an online tool."
             }
 
-            # Save metadata to validation_unlocks.json
+            # Save metadata to validation unlocks file
             self.update_validation_unlocks()
 
         except PermissionError:
@@ -136,5 +146,5 @@ class Base64FlagGenerator:
 
         self.embed_flags(challenge_folder, real_flag, fake_flags)
         print('   🎭 Fake flags:', ', '.join(fake_flags))
-        print(f"✅ Admin flag: {real_flag}")
+        print(f"✅ {self.mode.capitalize()} flag: {real_flag}")
         return real_flag

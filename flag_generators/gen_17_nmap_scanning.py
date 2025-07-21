@@ -3,6 +3,7 @@
 import random
 import re
 import sys
+import json
 from pathlib import Path
 from flag_generators.flag_helpers import FlagUtils
 
@@ -15,16 +16,28 @@ class NmapScanFlagGenerator:
     Stores unlock metadata for validation workflow.
     """
 
-    def __init__(self, project_root: Path = None, server_file: Path = None):
+    def __init__(self, project_root: Path = None, server_file: Path = None, mode="guided"):
         self.project_root = project_root or self.find_project_root()
         self.server_file = server_file or self.project_root / "web_version_admin" / "server.py"
-        self.metadata = {}  # For unlock info
+        self.mode = mode  # guided or solo
+
+        # Choose port range based on mode
+        self.port_range = (
+            list(range(8000, 8100)) if self.mode == "guided" else list(range(9000, 9100))
+        )
+
+        # Select unlock metadata file for this mode
+        unlock_file_name = (
+            "validation_unlocks_solo.json"
+            if self.mode == "solo" else
+            "validation_unlocks.json"
+        )
+        self.unlock_file = self.project_root / "web_version_admin" / unlock_file_name
+        self.metadata = {}
 
     @staticmethod
     def find_project_root() -> Path:
-        """
-        Walk up directories until .ccri_ctf_root is found.
-        """
+        """Walk up directories until .ccri_ctf_root is found."""
         dir_path = Path.cwd()
         for parent in [dir_path] + list(dir_path.parents):
             if (parent / ".ccri_ctf_root").exists():
@@ -38,10 +51,7 @@ class NmapScanFlagGenerator:
         return random.sample(sorted(available), count)
 
     def patch_server_file(self, real_flag: str, fake_flags: dict, real_port: int, junk_ports: dict):
-        """
-        Update FAKE_FLAGS and SERVICE_NAMES in server.py with randomized ports,
-        flags, and service names.
-        """
+        """Update FAKE_FLAGS and SERVICE_NAMES in server.py with randomized ports, flags, and service names."""
         server_file = self.server_file.resolve()
 
         if not server_file.exists():
@@ -122,22 +132,40 @@ class NmapScanFlagGenerator:
                 "real_flag": real_flag,
                 "real_port": real_port,
                 "server_file": str(server_file.relative_to(self.project_root)),
-                "unlock_method": f"Scan ports and query HTTP endpoints to locate the real flag (port {real_port})",
-                "hint": "Use nmap -p8000-8100 localhost to discover ports and curl to check flags."
+                "unlock_method": f"Scan ports {self.port_range[0]}-{self.port_range[-1]} and query HTTP endpoints to locate the real flag (port {real_port})",
+                "hint": f"Use nmap -p{self.port_range[0]}-{self.port_range[-1]} localhost to discover ports and curl to check flags."
             }
+
+            # Save metadata
+            self.update_validation_unlocks()
 
         except Exception as e:
             print(f"❌ ERROR during server.py patching: {e}", file=sys.stderr)
             sys.exit(1)
 
-    def generate_flag(self, challenge_folder: Path) -> str:
-        """
-        Generate a real flag, update server.py with fake/real flags and randomized service names, and return real flag.
-        """
-        port_range = list(range(8000, 8100))
+    def update_validation_unlocks(self):
+        """Save metadata into validation_unlocks JSON for this mode."""
+        try:
+            if self.unlock_file.exists():
+                with open(self.unlock_file, "r", encoding="utf-8") as f:
+                    unlocks = json.load(f)
+            else:
+                unlocks = {}
 
+            unlocks["17_Nmap_Scanning"] = self.metadata
+
+            with open(self.unlock_file, "w", encoding="utf-8") as f:
+                json.dump(unlocks, f, indent=2)
+            print(f"💾 Metadata saved to: {self.unlock_file.relative_to(self.project_root)}")
+
+        except Exception as e:
+            print(f"❌ Failed to update {self.unlock_file.name}: {e}", file=sys.stderr)
+            sys.exit(1)
+
+    def generate_flag(self, challenge_folder: Path) -> str:
+        """Generate real and fake flags, patch server.py, and return real flag."""
         # === Select random ports for flags ===
-        selected_flag_ports = self.random_ports(port_range, [], 5)
+        selected_flag_ports = self.random_ports(self.port_range, [], 5)
         real_port = selected_flag_ports[0]
         real_flag = FlagUtils.generate_real_flag()
         fake_flags = {port: FlagUtils.generate_fake_flag() for port in selected_flag_ports[1:]}
@@ -161,7 +189,7 @@ class NmapScanFlagGenerator:
             "Server under maintenance.\nPlease retry later."
         }
         num_junk_ports = random.randint(8, 12)  # Pick 8–12 junk ports
-        selected_junk_ports = self.random_ports(port_range, selected_flag_ports, num_junk_ports)
+        selected_junk_ports = self.random_ports(self.port_range, selected_flag_ports, num_junk_ports)
         junk_responses = {
             port: random.choice(list(junk_response_pool))
             for port in selected_junk_ports

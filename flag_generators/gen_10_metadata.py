@@ -5,21 +5,31 @@ import random
 import subprocess
 import sys
 import shutil
+import json
 from flag_generators.flag_helpers import FlagUtils
 
 
 class MetadataFlagGenerator:
     """
     Generator for the Metadata challenge.
-    Embeds real and fake flags into the EXIF metadata of capybara.jpg.
-    Stores unlock metadata for validation workflow.
+    Embeds real and fake flags into EXIF metadata of capybara.jpg.
+    Handles guided and solo modes separately.
     """
 
-    def __init__(self, project_root: Path = None):
+    def __init__(self, project_root: Path = None, mode="guided"):
         self.project_root = project_root or self.find_project_root()
+        self.mode = mode  # guided or solo
         self.generator_dir = Path(__file__).parent.resolve()
         self.source_image = self.generator_dir / "capybara.jpg"
         self.metadata = {}  # For unlock info
+
+        # Select unlock file based on mode
+        unlock_file_name = (
+            "validation_unlocks_solo.json"
+            if self.mode == "solo" else
+            "validation_unlocks.json"
+        )
+        self.unlock_file = self.project_root / "web_version_admin" / unlock_file_name
 
     @staticmethod
     def find_project_root() -> Path:
@@ -35,7 +45,7 @@ class MetadataFlagGenerator:
 
     def safe_cleanup(self, challenge_folder: Path):
         """
-        Remove only previously generated capybara.jpg and exiftool backup if present.
+        Remove previously generated capybara.jpg and exiftool backup if present.
         """
         dest_image = challenge_folder / "capybara.jpg"
         backup_file = dest_image.with_suffix(dest_image.suffix + "_original")
@@ -56,7 +66,7 @@ class MetadataFlagGenerator:
 
         # === Check if exiftool is installed ===
         if shutil.which("exiftool") is None:
-            print("❌ exiftool is not installed. Please install it first (e.g., sudo apt install libimage-exiftool-perl).", file=sys.stderr)
+            print("❌ exiftool is not installed. Please install it (e.g., sudo apt install libimage-exiftool-perl).", file=sys.stderr)
             sys.exit(1)
 
         # === Ensure challenge folder exists and clean old files ===
@@ -113,12 +123,27 @@ class MetadataFlagGenerator:
         print(f"✅ Embedded real flag in UserComment: {real_flag}")
 
         # === Record unlock metadata ===
-        self.metadata = {
-            "real_flag": real_flag,
-            "challenge_file": str(dest_image.relative_to(self.project_root)),
-            "unlock_method": "Inspect EXIF metadata of capybara.jpg to find the flag",
-            "hint": "Use exiftool or exifread to view metadata tags."
-        }
+        try:
+            if self.unlock_file.exists():
+                with open(self.unlock_file, "r", encoding="utf-8") as f:
+                    unlocks = json.load(f)
+            else:
+                unlocks = {}
+
+            unlocks["10_Metadata"] = {
+                "real_flag": real_flag,
+                "challenge_file": str(dest_image.relative_to(self.project_root)),
+                "unlock_method": "Inspect EXIF metadata of capybara.jpg to find the flag",
+                "hint": "Use exiftool or exifread to view metadata tags."
+            }
+
+            with open(self.unlock_file, "w", encoding="utf-8") as f:
+                json.dump(unlocks, f, indent=2)
+            print(f"💾 Metadata saved to: {self.unlock_file.relative_to(self.project_root)}")
+
+        except Exception as e:
+            print(f"❌ Failed to update {self.unlock_file.name}: {e}", file=sys.stderr)
+            sys.exit(1)
 
     def generate_flag(self, challenge_folder: Path) -> str:
         """
@@ -140,4 +165,5 @@ class MetadataFlagGenerator:
         fake_flags = list(fake_flags)
 
         self.embed_flags(challenge_folder, real_flag, fake_flags)
+        print(f"✅ {self.mode.capitalize()} flag: {real_flag}")
         return real_flag

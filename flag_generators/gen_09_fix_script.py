@@ -3,6 +3,7 @@
 from pathlib import Path
 import random
 import sys
+import json
 from flag_generators.flag_helpers import FlagUtils
 
 
@@ -10,20 +11,27 @@ class FixScriptFlagGenerator:
     """
     Generator for the Fix the Script challenge.
     Embeds the real flag into a Python script with a broken operator.
-    Stores unlock metadata for validation workflow.
+    Handles guided and solo modes separately but uses the full operator set for both.
     """
 
     ALL_OPERATORS = ["+", "-", "*", "/"]
 
-    def __init__(self, project_root: Path = None):
+    def __init__(self, project_root: Path = None, mode="guided"):
         self.project_root = project_root or self.find_project_root()
-        self.metadata = {}  # For unlock info
+        self.mode = mode  # guided or solo
+
+        # Unlock metadata file based on mode
+        unlock_file_name = (
+            "validation_unlocks_solo.json"
+            if self.mode == "solo" else
+            "validation_unlocks.json"
+        )
+        self.unlock_file = self.project_root / "web_version_admin" / unlock_file_name
+        self.metadata = {}
 
     @staticmethod
     def find_project_root() -> Path:
-        """
-        Walk up directories until .ccri_ctf_root is found.
-        """
+        """Walk up directories until .ccri_ctf_root is found."""
         dir_path = Path.cwd()
         for parent in [dir_path] + list(dir_path.parents):
             if (parent / ".ccri_ctf_root").exists():
@@ -32,9 +40,7 @@ class FixScriptFlagGenerator:
         sys.exit(1)
 
     def safe_cleanup(self, challenge_folder: Path):
-        """
-        Remove only the previously generated broken_flag.py file.
-        """
+        """Remove only the previously generated broken_flag.py file."""
         script_file = challenge_folder / "broken_flag.py"
         if script_file.exists():
             try:
@@ -46,7 +52,7 @@ class FixScriptFlagGenerator:
     def find_safe_parts_and_operator(self):
         """
         Keep trying until only 1 operator gives a 4-digit result.
-        All others must give results outside 1000–9999.
+        Uses ALL_OPERATORS for both guided and solo modes.
         """
         attempt = 0
         while True:
@@ -62,13 +68,13 @@ class FixScriptFlagGenerator:
                     part1 = random.randint(target_value + 100, target_value + 1000)
                     part2 = part1 - target_value
                 elif correct_op == "*":
-                    factors = [i for i in range(2, 100) if target_value % i == 0]
+                    factors = [i for i in range(2, 50) if target_value % i == 0]
                     if not factors:
-                        continue  # Retry if no factors
+                        continue
                     part2 = random.choice(factors)
                     part1 = target_value // part2
                 elif correct_op == "/":
-                    part2 = random.randint(2, 50)
+                    part2 = random.randint(2, 25)
                     part1 = target_value * part2
                 else:
                     continue
@@ -94,11 +100,34 @@ class FixScriptFlagGenerator:
                     print(f"⚠️ Attempt {attempt} error: {e}", file=sys.stderr)
                 continue
 
+    def update_validation_unlocks(self, real_flag: str, script_file: Path, correct_op: str):
+        """Save metadata into the appropriate validation_unlocks JSON."""
+        try:
+            if self.unlock_file.exists():
+                with open(self.unlock_file, "r", encoding="utf-8") as f:
+                    unlocks = json.load(f)
+            else:
+                unlocks = {}
+
+            unlocks["09_FixScript"] = {
+                "real_flag": real_flag,
+                "correct_operator": correct_op,
+                "challenge_file": str(script_file.relative_to(self.project_root)),
+                "unlock_method": "Fix the Python script’s math operator to calculate the flag",
+                "hint": f"Find the broken operator in broken_flag.py and replace it with '{correct_op}'."
+            }
+
+            with open(self.unlock_file, "w", encoding="utf-8") as f:
+                json.dump(unlocks, f, indent=2)
+            print(f"💾 Metadata saved to: {self.unlock_file.relative_to(self.project_root)}")
+
+        except Exception as e:
+            print(f"❌ Failed to update {self.unlock_file.name}: {e}", file=sys.stderr)
+            sys.exit(1)
+
     def embed_flag(self, challenge_folder: Path, suffix_value: int, correct_op: str, part1: int, part2: int):
-        """
-        Create broken_flag.py with randomized incorrect operator.
-        """
-        script_path = challenge_folder / "broken_flag.py"
+        """Create broken_flag.py with randomized incorrect operator."""
+        script_file = challenge_folder / "broken_flag.py"
 
         try:
             self.safe_cleanup(challenge_folder)
@@ -119,33 +148,27 @@ part2 = {part2}
 # MATH ERROR!
 code = part1 {wrong_op} part2  # <- wrong math
 
-print(f\"Your flag is: CCRI-SCRP-{{int(code)}}\")
+print(f"Your flag is: CCRI-SCRP-{{int(code)}}")
 """
 
-            script_path.write_text(broken_script)
-            script_path.chmod(0o755)
+            script_file.write_text(broken_script)
+            script_file.chmod(0o755)
 
-            print(f"📝 broken_flag.py created: {script_path.relative_to(self.project_root)}")
+            print(f"📝 broken_flag.py created: {script_file.relative_to(self.project_root)}")
             print(f"✅ Correct op = {correct_op}, Broken op = {wrong_op}, Flag = CCRI-SCRP-{suffix_value}")
 
-            # Record unlock metadata with correct operator
-            self.metadata = {
-                "real_flag": f"CCRI-SCRP-{suffix_value}",
-                "challenge_file": str(script_path.relative_to(self.project_root)),
-                "correct_operator": correct_op,
-                "unlock_method": "Fix the Python script’s math operator to calculate the flag",
-                "hint": "Look for the broken operator in broken_flag.py and correct it."
-            }
+            # Save metadata
+            real_flag = f"CCRI-SCRP-{suffix_value}"
+            self.update_validation_unlocks(real_flag, script_file, correct_op)
 
         except Exception as e:
             print(f"💥 Failed to write script: {e}", file=sys.stderr)
             sys.exit(1)
 
     def generate_flag(self, challenge_folder: Path) -> str:
-        """
-        Generate a real flag and embed it into broken_flag.py.
-        """
+        """Generate a real flag and embed it into broken_flag.py."""
         correct_op, part1, part2, suffix_value = self.find_safe_parts_and_operator()
         self.embed_flag(challenge_folder, suffix_value, correct_op, part1, part2)
         real_flag = f"CCRI-SCRP-{suffix_value}"
+        print(f"✅ {self.mode.capitalize()} flag: {real_flag}")
         return real_flag

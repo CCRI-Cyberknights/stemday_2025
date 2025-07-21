@@ -3,13 +3,15 @@
 from pathlib import Path
 import random
 import sys
+import json
 from flag_generators.flag_helpers import FlagUtils
 
 
 class HTTPHeaderFlagGenerator:
     """
     Generator for the HTTP Headers challenge.
-    Produces 5 response_*.txt files in the challenge folder with 1 real flag and 4 decoys.
+    Produces 5 response_*.txt files in the challenge folder
+    with 1 real flag and 4 decoys. Supports guided and solo modes.
     """
 
     SERVERS = [
@@ -79,9 +81,18 @@ This endpoint returns plain text responses."""
         "<!-- To-do: Update security headers on staging -->"
     ]
 
-    def __init__(self, project_root: Path = None):
+    def __init__(self, project_root: Path = None, mode="guided"):
         self.project_root = project_root or self.find_project_root()
-        self.metadata = {}  # For unlock info
+        self.mode = mode  # guided or solo
+
+        # Choose unlocks file based on mode
+        unlock_file_name = (
+            "validation_unlocks_solo.json"
+            if self.mode == "solo" else
+            "validation_unlocks.json"
+        )
+        self.unlock_file = self.project_root / "web_version_admin" / unlock_file_name
+        self.metadata = {}
 
     @staticmethod
     def find_project_root() -> Path:
@@ -137,6 +148,32 @@ This endpoint returns plain text responses."""
             print(f"📁 Creating challenge folder: {challenge_folder.relative_to(self.project_root)}")
             challenge_folder.mkdir(parents=True, exist_ok=True)
 
+    def update_validation_unlocks(self, real_flag: str, real_response_file: Path):
+        """Save metadata into the correct validation_unlocks JSON."""
+        try:
+            # Load existing unlocks
+            if self.unlock_file.exists():
+                with open(self.unlock_file, "r", encoding="utf-8") as f:
+                    unlocks = json.load(f)
+            else:
+                unlocks = {}
+
+            unlocks["13_HTTPHeaders"] = {
+                "real_flag": real_flag,
+                "challenge_file": str(real_response_file.relative_to(self.project_root)),
+                "unlock_method": "Inspect HTTP headers in response_*.txt to locate the X-Flag header with the real flag",
+                "hint": "Look for custom HTTP headers like X-Flag in the responses"
+            }
+
+            # Save updated metadata
+            with open(self.unlock_file, "w", encoding="utf-8") as f:
+                json.dump(unlocks, f, indent=2)
+            print(f"💾 Metadata saved to: {self.unlock_file.relative_to(self.project_root)}")
+
+        except Exception as e:
+            print(f"❌ Failed to update {self.unlock_file.name}: {e}", file=sys.stderr)
+            sys.exit(1)
+
     def embed_http_responses(self, challenge_folder: Path, real_flag: str, fake_flags: list):
         """
         Generate 5 response files with headers, one containing the real flag.
@@ -161,13 +198,8 @@ This endpoint returns plain text responses."""
                 else:
                     print(f"➖ {file_path.name} (decoy)")
 
-            # Record unlock metadata
-            self.metadata = {
-                "real_flag": real_flag,
-                "challenge_file": str(real_response_file.relative_to(self.project_root)),
-                "unlock_method": "Inspect HTTP headers in response_*.txt to locate the X-Flag header with the real flag",
-                "hint": "Look for custom HTTP headers like X-Flag in the responses"
-            }
+            # Save unlock metadata
+            self.update_validation_unlocks(real_flag, real_response_file)
 
         except Exception as e:
             print(f"❌ Failed during HTTP response embedding: {e}", file=sys.stderr)
@@ -185,4 +217,5 @@ This endpoint returns plain text responses."""
             real_flag = FlagUtils.generate_real_flag()
 
         self.embed_http_responses(challenge_folder, real_flag, fake_flags)
+        print(f"✅ {self.mode.capitalize()} flag: {real_flag}")
         return real_flag

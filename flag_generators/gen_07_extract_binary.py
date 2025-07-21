@@ -4,6 +4,7 @@ from pathlib import Path
 import random
 import subprocess
 import sys
+import json
 from flag_generators.flag_helpers import FlagUtils
 
 
@@ -11,18 +12,25 @@ class ExtractBinaryFlagGenerator:
     """
     Generator for the Extract Binary challenge.
     Embeds real and fake flags into a compiled C binary.
-    Stores unlock metadata for validation workflow.
+    Handles separate unlock metadata for guided and solo modes.
     """
 
-    def __init__(self, project_root: Path = None):
+    def __init__(self, project_root: Path = None, mode="guided"):
         self.project_root = project_root or self.find_project_root()
-        self.metadata = {}  # For unlock info
+        self.mode = mode  # guided or solo
+
+        # Unlock metadata file based on mode
+        unlock_file_name = (
+            "validation_unlocks_solo.json"
+            if self.mode == "solo" else
+            "validation_unlocks.json"
+        )
+        self.unlock_file = self.project_root / "web_version_admin" / unlock_file_name
+        self.metadata = {}
 
     @staticmethod
     def find_project_root() -> Path:
-        """
-        Walk up directories until .ccri_ctf_root is found.
-        """
+        """Walk up directories until .ccri_ctf_root is found."""
         dir_path = Path.cwd()
         for parent in [dir_path] + list(dir_path.parents):
             if (parent / ".ccri_ctf_root").exists():
@@ -31,9 +39,7 @@ class ExtractBinaryFlagGenerator:
         sys.exit(1)
 
     def safe_cleanup(self, challenge_folder: Path):
-        """
-        Remove only previously generated files for this challenge.
-        """
+        """Remove only previously generated files for this challenge."""
         targets = [
             challenge_folder / "hidden_flag",     # compiled binary
             challenge_folder / "hidden_flag.c"    # C source file
@@ -49,13 +55,20 @@ class ExtractBinaryFlagGenerator:
     def generate_c_source(self, real_flag: str, fake_flags: list) -> str:
         """
         Generate C source code with embedded real + fake flags.
+        Adjusts junk strings slightly in solo mode for more challenge.
         """
+        # Different junk strings for guided vs solo
         junk_strings = [
             "ABCD1234XYZ!@#%$^&*()_+=?><~",
             "longgarbage....data...not...readable....random",
             "G@rb@g3StuffDataThatLooksBinaryButIsn't....",
             "%%%%%%%//////??????^^^^^*****&&&&&"
         ]
+
+        if self.mode == "solo":
+            # Add extra noise to confuse naive strings searches
+            junk_strings = [s[::-1] + "_solo" for s in junk_strings]
+
         binary_junk = ", ".join(str(random.randint(0, 255)) for _ in range(600))
 
         return f"""
@@ -91,10 +104,32 @@ int main() {{
 }}
 """
 
+    def update_validation_unlocks(self, real_flag, binary_file: Path):
+        """Save metadata into the correct validation_unlocks JSON."""
+        try:
+            if self.unlock_file.exists():
+                with open(self.unlock_file, "r", encoding="utf-8") as f:
+                    unlocks = json.load(f)
+            else:
+                unlocks = {}
+
+            unlocks["07_ExtractBinary"] = {
+                "real_flag": real_flag,
+                "challenge_file": str(binary_file.relative_to(self.project_root)),
+                "unlock_method": "Analyze binary with strings or disassembler to find flags",
+                "hint": "Try using 'strings hidden_flag' or load it in radare2."
+            }
+
+            with open(self.unlock_file, "w", encoding="utf-8") as f:
+                json.dump(unlocks, f, indent=2)
+            print(f"💾 Metadata saved to: {self.unlock_file.relative_to(self.project_root)}")
+
+        except Exception as e:
+            print(f"❌ Failed to update {self.unlock_file.name}: {e}", file=sys.stderr)
+            sys.exit(1)
+
     def embed_flags(self, challenge_folder: Path, real_flag: str, fake_flags: list):
-        """
-        Generate C source, compile it, and place binary in challenge folder.
-        """
+        """Generate C source, compile it, and place binary in challenge folder."""
         self.safe_cleanup(challenge_folder)
 
         try:
@@ -124,23 +159,15 @@ int main() {{
             except Exception as cleanup_err:
                 print(f"⚠️ Warning: Could not remove {c_file.relative_to(self.project_root)}: {cleanup_err}")
 
-            # Record unlock metadata
-            self.metadata = {
-                "real_flag": real_flag,
-                "challenge_file": str(binary_file.relative_to(self.project_root)),
-                "unlock_method": "Analyze binary with strings or a disassembler to find flags",
-                "hint": "Try using 'strings hidden_flag' or load it in radare2."
-            }
+            # Save unlock metadata
+            self.update_validation_unlocks(real_flag, binary_file)
 
         except Exception as e:
             print(f"💥 ERROR: {e}", file=sys.stderr)
             sys.exit(1)
 
     def generate_flag(self, challenge_folder: Path) -> str:
-        """
-        Generate real/fake flags and embed them into binary.
-        Returns plaintext real flag.
-        """
+        """Generate real/fake flags and embed them into binary. Returns plaintext real flag."""
         real_flag = FlagUtils.generate_real_flag()
         fake_flags = [FlagUtils.generate_fake_flag() for _ in range(4)]
 
@@ -149,5 +176,5 @@ int main() {{
 
         self.embed_flags(challenge_folder, real_flag, fake_flags)
         print('   🎭 Fake flags:', ', '.join(fake_flags))
-        print(f"✅ Admin flag: {real_flag}")
+        print(f"✅ {self.mode.capitalize()} flag: {real_flag}")
         return real_flag

@@ -11,11 +11,18 @@ class StegoFlagGenerator:
     """
     Generator for the Stego challenge flags.
     Embeds real and fake flags into a squirrel.jpg image using steghide.
+    Behavior adapts based on 'guided' or 'solo' mode.
     """
-    def __init__(self, project_root: Path = None):
+    def __init__(self, project_root: Path = None, mode: str = "guided"):
         self.project_root = project_root or self.find_project_root()
         self.generator_dir = self.project_root / "flag_generators"
         self.source_image = self.generator_dir / "squirrel.jpg"
+
+        # Track the mode (guided/solo)
+        self.mode = mode.lower()
+        if self.mode not in ["guided", "solo"]:
+            print(f"❌ ERROR: Invalid mode '{self.mode}'. Expected 'guided' or 'solo'.", file=sys.stderr)
+            sys.exit(1)
 
         # === Exported unlock data for validation ===
         self.last_password = None
@@ -46,7 +53,7 @@ class StegoFlagGenerator:
                 except Exception as e:
                     print(f"⚠️ Could not delete {filename}: {e}", file=sys.stderr)
 
-    def embed_flags(self, challenge_folder: Path, real_flag: str, fake_flags: list, passphrase="password"):
+    def embed_flags(self, challenge_folder: Path, real_flag: str, fake_flags: list, passphrase: str):
         """
         Copy pristine squirrel.jpg into the challenge folder and embed real + fake flags.
         """
@@ -107,10 +114,15 @@ class StegoFlagGenerator:
         real_flag = FlagUtils.generate_real_flag()
         fake_flags = [FlagUtils.generate_fake_flag() for _ in range(4)]
         self.last_fake_flags = fake_flags  # Store for validation
-        self.last_password = "password"   # Store password used
+
+        # Use fixed passphrases per mode
+        if self.mode == "guided":
+            self.last_password = "password"  # Guided default
+        else:
+            self.last_password = "liber8"    # Solo default (change later)
 
         self.embed_flags(challenge_folder, real_flag, fake_flags, passphrase=self.last_password)
         print('   🎭 Fake flags:', ', '.join(fake_flags))
 
-        print(f"✅ Admin flag: {real_flag}")
+        print(f"✅ {self.mode.capitalize()} flag: {real_flag} (passphrase: {self.last_password})")
         return real_flag

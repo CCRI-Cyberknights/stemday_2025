@@ -53,15 +53,25 @@ GENERATOR_CLASSES = {
     "18_Pcap_Search": PcapSearchFlagGenerator,
 }
 
+
 # === Master Flag Generation Class ===
 class FlagGenerationManager:
-    def __init__(self, dry_run=False):
+    def __init__(self, dry_run=False, mode="guided"):
         self.project_root = self.find_project_root()
         self.web_admin_dir = self.project_root / "web_version_admin"
-        self.challenges_dir = self.project_root / "challenges"
         self.dryrun_dir = self.project_root / "dryrun_output"
-        self.challenge_list = ChallengeList()
         self.dry_run = dry_run
+        self.mode = mode  # guided or solo
+
+        # Set challenge directory and validation unlocks file based on mode
+        if self.mode == "solo":
+            self.challenges_dir = self.project_root / "challenges_solo"
+            self.unlocks_file = self.web_admin_dir / "validation_unlocks_solo.json"
+            self.challenge_list = ChallengeList(challenges_file=self.web_admin_dir / "challenges_solo.json")
+        else:
+            self.challenges_dir = self.project_root / "challenges"
+            self.unlocks_file = self.web_admin_dir / "validation_unlocks.json"
+            self.challenge_list = ChallengeList(challenges_file=self.web_admin_dir / "challenges.json")
 
         # Prepare unlock data structure
         self.validation_unlocks = {}
@@ -77,17 +87,16 @@ class FlagGenerationManager:
         sys.exit(1)
 
     def prepare_backup(self):
-        """Create a backup of challenges.json."""
-        backup_file = self.web_admin_dir / "challenges.json.bak"
-        shutil.copy2(self.web_admin_dir / "challenges.json", backup_file)
+        """Create a backup of the challenges.json."""
+        backup_file = self.web_admin_dir / f"challenges_{self.mode}.json.bak"
+        shutil.copy2(self.web_admin_dir / f"challenges_{self.mode}.json", backup_file)
         print(f"📦 Backup created: {backup_file.relative_to(self.project_root)}")
 
     def save_unlocks(self):
         """Save validation unlocks JSON."""
-        unlocks_path = self.web_admin_dir / "validation_unlocks.json"
-        with open(unlocks_path, "w", encoding="utf-8") as f:
+        with open(self.unlocks_file, "w", encoding="utf-8") as f:
             json.dump(self.validation_unlocks, f, indent=2)
-        print(f"🔑 Unlock data saved: {unlocks_path.relative_to(self.project_root)}")
+        print(f"🔑 Unlock data saved: {self.unlocks_file.relative_to(self.project_root)}")
 
     def print_flag_report(self, real_flag, fake_flags):
         """Print real and fake flags for sanity checking."""
@@ -98,6 +107,8 @@ class FlagGenerationManager:
 
     def generate_flags(self):
         """Iterate through challenges and generate flags."""
+        print(f"\n🌐 Generating flags for {self.mode.upper()} mode...")
+
         if self.dry_run:
             print("📝 Dry-run mode enabled: outputs will be written to 'dryrun_output/'\n")
             self.dryrun_dir.mkdir(parents=True, exist_ok=True)
@@ -111,9 +122,9 @@ class FlagGenerationManager:
             try:
                 folder_name = Path(challenge.getFolder()).name
                 target_folder = (
-                    self.dryrun_dir / folder_name
+                    self.dryrun_dir / self.mode / folder_name
                     if self.dry_run
-                    else Path(challenge.getFolder())
+                    else self.challenges_dir / folder_name
                 )
 
                 # Create challenge folder if it doesn't exist (non-destructive)
@@ -123,7 +134,7 @@ class FlagGenerationManager:
 
                 generator_cls = GENERATOR_CLASSES.get(challenge.getId())
                 if generator_cls:
-                    generator = generator_cls()
+                    generator = generator_cls(mode=self.mode)  # Pass mode to generator
 
                     # Run flag generation
                     real_flag = generator.generate_flag(target_folder)
@@ -158,27 +169,41 @@ class FlagGenerationManager:
 
         if not self.dry_run:
             self.challenge_list.save_challenges()
-            print("🎉 All flags generated and challenges.json updated.")
+            print(f"🎉 All flags generated and challenges_{self.mode}.json updated.")
             self.save_unlocks()
 
-        print(f"\n📊 Summary: {success_count} successful | {fail_count} failed")
+        print(f"\n📊 Summary ({self.mode.upper()}): {success_count} successful | {fail_count} failed")
+
 
 # === Entry Point ===
 if __name__ == "__main__":
     try:
-        # Prompt for dry-run unless CLI flag specified
         parser = argparse.ArgumentParser()
-        parser.add_argument("--dry-run", action="store_true", help="Generate flags without modifying challenges.json")
+        parser.add_argument("--dry-run", action="store_true", help="Generate flags without modifying JSON files")
         args = parser.parse_args()
 
-        # If no CLI flag, prompt user interactively
+        print("🌐 Which mode do you want to generate?")
+        print("1️⃣ Guided mode only")
+        print("2️⃣ Solo mode only")
+        print("3️⃣ Both (Guided + Solo)")
+        mode_choice = input("Enter 1, 2, or 3: ").strip()
+
         if not args.dry_run:
-            choice = input("⚠️ Do you want to run in dry-run mode? (y/N): ").strip().lower()
-            if choice == "y":
+            confirm = input("⚠️ Do you want to run in dry-run mode? (y/N): ").strip().lower()
+            if confirm == "y":
                 args.dry_run = True
 
-        manager = FlagGenerationManager(dry_run=args.dry_run)
-        manager.generate_flags()
+        if mode_choice == "1":
+            FlagGenerationManager(dry_run=args.dry_run, mode="guided").generate_flags()
+        elif mode_choice == "2":
+            FlagGenerationManager(dry_run=args.dry_run, mode="solo").generate_flags()
+        elif mode_choice == "3":
+            for m in ["guided", "solo"]:
+                FlagGenerationManager(dry_run=args.dry_run, mode=m).generate_flags()
+        else:
+            print("❌ Invalid choice. Exiting.")
+            sys.exit(1)
+
     except Exception as e:
         print(f"\n❌ ERROR: {e}")
         input("🔴 Press Enter to close...")

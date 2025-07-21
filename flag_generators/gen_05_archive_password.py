@@ -4,6 +4,7 @@ from pathlib import Path
 import random
 import subprocess
 import base64
+import json
 import sys
 from flag_generators.flag_helpers import FlagUtils
 
@@ -15,10 +16,17 @@ class ArchivePasswordFlagGenerator:
     Stores unlock metadata for validation workflow.
     """
 
-    def __init__(self, project_root: Path = None):
+    def __init__(self, project_root: Path = None, mode="guided"):
         self.project_root = project_root or self.find_project_root()
+        self.mode = mode  # guided or solo
         self.wordlist_template = self.project_root / "flag_generators" / "wordlist.txt"
-        self.metadata = {}  # For unlock info
+
+        # Select validation file based on mode
+        unlocks_file = (
+            "validation_unlocks_solo.json" if self.mode == "solo" else "validation_unlocks.json"
+        )
+        self.unlock_file = self.project_root / "web_version_admin" / unlocks_file
+        self.metadata = {}
 
     @staticmethod
     def find_project_root() -> Path:
@@ -45,6 +53,48 @@ class ArchivePasswordFlagGenerator:
                 except Exception as e:
                     print(f"⚠️ Could not delete {target_file.name}: {e}", file=sys.stderr)
 
+    def choose_password(self, all_passwords):
+        """
+        Select a password for the ZIP file depending on mode.
+        """
+        if self.mode == "guided":
+            # Pick a random password from the lower half of the wordlist
+            return random.choice(all_passwords[:len(all_passwords)//2])
+        else:
+            # Pick a random password from the upper half of the wordlist
+            return random.choice(all_passwords[len(all_passwords)//2:])
+
+    def update_validation_unlocks(self, real_flag: str, zip_file: Path, wordlist_file: Path, password: str):
+        """
+        Save metadata into the correct validation unlocks JSON file.
+        """
+        try:
+            # Load existing unlocks file
+            if self.unlock_file.exists():
+                with open(self.unlock_file, "r", encoding="utf-8") as f:
+                    unlocks = json.load(f)
+            else:
+                unlocks = {}
+
+            # Add metadata for this challenge
+            unlocks["05_ArchivePassword"] = {
+                "real_flag": real_flag,
+                "zip_password": password,
+                "challenge_file": str(zip_file.relative_to(self.project_root)),
+                "wordlist_file": str(wordlist_file.relative_to(self.project_root)),
+                "unlock_method": "Brute-force ZIP password using provided wordlist",
+                "hint": "Use wordlist.txt with zip2john + hashcat or fcrackzip."
+            }
+
+            # Save back to file
+            with open(self.unlock_file, "w", encoding="utf-8") as f:
+                json.dump(unlocks, f, indent=2)
+            print(f"💾 Metadata saved: {self.unlock_file.relative_to(self.project_root)}")
+
+        except Exception as e:
+            print(f"❌ Failed to update {self.unlock_file.name}: {e}", file=sys.stderr)
+            sys.exit(1)
+
     def embed_flags(self, challenge_folder: Path, real_flag: str, fake_flags: list):
         """
         Create wordlist.txt and password-protected secret.zip containing message_encoded.txt.
@@ -67,8 +117,8 @@ class ArchivePasswordFlagGenerator:
             if not all_passwords:
                 raise ValueError("❌ Wordlist template is empty!")
 
-            # Randomly pick a password
-            correct_password = random.choice(all_passwords)
+            # Select password based on mode
+            correct_password = self.choose_password(all_passwords)
 
             # Copy wordlist.txt into challenge folder
             wordlist_file = challenge_folder / "wordlist.txt"
@@ -105,16 +155,8 @@ class ArchivePasswordFlagGenerator:
             encoded_file.unlink()
             print(f"🗝️ {wordlist_file.relative_to(self.project_root)} and 🔒 {zip_file.relative_to(self.project_root)} created with correct password: {correct_password}")
 
-            # Record unlock metadata
-            self.metadata = {
-                "real_flag": real_flag,
-                "last_zip_password": correct_password,
-                "challenge_file": str(zip_file.relative_to(self.project_root)),
-                "wordlist_file": str(wordlist_file.relative_to(self.project_root)),
-                "zip_password": correct_password,
-                "unlock_method": "Brute-force ZIP password using provided wordlist",
-                "hint": "Use wordlist.txt with zip2john + hashcat or fcrackzip."
-            }
+            # Save unlock metadata
+            self.update_validation_unlocks(real_flag, zip_file, wordlist_file, correct_password)
 
         except Exception as e:
             print(f"❌ Unexpected error: {e}")
@@ -133,5 +175,5 @@ class ArchivePasswordFlagGenerator:
 
         self.embed_flags(challenge_folder, real_flag, fake_flags)
         print('   🎭 Fake flags:', ', '.join(fake_flags))
-        print(f"✅ Admin flag: {real_flag}")
+        print(f"✅ {self.mode.capitalize()} flag: {real_flag}")
         return real_flag

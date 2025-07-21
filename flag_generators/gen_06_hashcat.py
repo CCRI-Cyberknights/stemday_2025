@@ -14,18 +14,25 @@ class HashcatFlagGenerator:
     """
     Generator for the Hashcat challenge.
     Splits flags into parts, encodes them, and creates password-protected zips.
-    Stores unlock metadata for validation workflow.
+    Handles separate passwords and unlock metadata for guided/solo modes.
     """
 
-    def __init__(self, project_root: Path = None):
+    def __init__(self, project_root: Path = None, mode="guided"):
         self.project_root = project_root or self.find_project_root()
+        self.mode = mode  # guided or solo
+
+        # Choose unlock file based on mode
+        unlock_file_name = (
+            "validation_unlocks_solo.json"
+            if self.mode == "solo" else
+            "validation_unlocks.json"
+        )
+        self.unlock_file = self.project_root / "web_version_admin" / unlock_file_name
         self.metadata = {}  # For unlock info
 
     @staticmethod
     def find_project_root() -> Path:
-        """
-        Walk up directories until .ccri_ctf_root is found.
-        """
+        """Walk up directories until .ccri_ctf_root is found."""
         dir_path = Path.cwd()
         for parent in [dir_path] + list(dir_path.parents):
             if (parent / ".ccri_ctf_root").exists():
@@ -44,9 +51,7 @@ class HashcatFlagGenerator:
         return base64.b64encode(text.encode("utf-8")).decode("utf-8")
 
     def safe_cleanup(self, challenge_folder: Path):
-        """
-        Remove previously generated assets (ZIPs, hashes.txt, wordlist.txt, encoded segments).
-        """
+        """Remove previously generated assets (ZIPs, hashes.txt, wordlist.txt, encoded segments)."""
         targets = [
             challenge_folder / "hashes.txt",
             challenge_folder / "wordlist.txt",
@@ -64,10 +69,30 @@ class HashcatFlagGenerator:
                 except Exception as e:
                     print(f"⚠️ Could not delete {target.name}: {e}", file=sys.stderr)
 
+    def update_validation_unlocks(self, real_flag):
+        """Save metadata into the correct validation_unlocks JSON."""
+        try:
+            # Load existing data
+            if self.unlock_file.exists():
+                with open(self.unlock_file, "r", encoding="utf-8") as f:
+                    unlocks = json.load(f)
+            else:
+                unlocks = {}
+
+            # Update metadata for this challenge
+            unlocks["06_Hashcat"] = self.metadata
+
+            # Save back to file
+            with open(self.unlock_file, "w", encoding="utf-8") as f:
+                json.dump(unlocks, f, indent=2)
+            print(f"💾 Metadata saved to: {self.unlock_file.relative_to(self.project_root)}")
+
+        except Exception as e:
+            print(f"❌ Failed to update {self.unlock_file.name}: {e}", file=sys.stderr)
+            sys.exit(1)
+
     def embed_flags(self, challenge_folder: Path, real_flag: str, fake_flags: list):
-        """
-        Create hashes.txt, wordlist.txt, and password-protected ZIPs with encoded segments.
-        """
+        """Create hashes.txt, wordlist.txt, and password-protected ZIPs with encoded segments."""
         self.safe_cleanup(challenge_folder)
 
         try:
@@ -99,7 +124,7 @@ class HashcatFlagGenerator:
                 file_path.write_text(encoded_b64)
                 encoded_files.append(file_path)
 
-            # Pick random passwords
+            # Pick random passwords (separate for guided/solo)
             wordlist_template = self.project_root / "flag_generators" / "wordlist.txt"
             all_passwords = wordlist_template.read_text().splitlines()
             chosen_passwords = random.sample(all_passwords, 3)
@@ -153,15 +178,15 @@ class HashcatFlagGenerator:
                 "hint": "Use hashes.txt + wordlist.txt with Hashcat to crack passwords and extract ZIPs."
             }
 
+            # Save metadata
+            self.update_validation_unlocks(real_flag)
+
         except Exception as e:
             print(f"❌ Unexpected error during Hashcat setup: {e}", file=sys.stderr)
             sys.exit(1)
 
     def generate_flag(self, challenge_folder: Path) -> str:
-        """
-        Generate real/fake flags and embed them into Hashcat challenge assets.
-        Returns the real flag in plaintext.
-        """
+        """Generate real/fake flags and embed them into Hashcat challenge assets."""
         real_flag = FlagUtils.generate_real_flag()
         fake_flags = [FlagUtils.generate_fake_flag() for _ in range(4)]
 
@@ -170,5 +195,5 @@ class HashcatFlagGenerator:
 
         self.embed_flags(challenge_folder, real_flag, fake_flags)
         print('   🎭 Fake flags:', ', '.join(fake_flags))
-        print(f"✅ Admin flag: {real_flag}")
+        print(f"✅ {self.mode.capitalize()} flag: {real_flag}")
         return real_flag

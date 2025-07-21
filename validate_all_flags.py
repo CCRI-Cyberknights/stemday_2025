@@ -3,13 +3,15 @@ import subprocess
 import shutil
 import sys
 import os
-from pathlib import Path
 import json
+from pathlib import Path
 
 # === CCRI STEMDay Master Validator ===
 VALIDATION_ROOT = Path.cwd() / "validation_results"
 CHALLENGES_ROOT = Path.cwd() / "challenges"
 CHALLENGES_JSON = Path.cwd() / "web_version_admin" / "challenges.json"
+UNLOCKS_GUIDED = Path.cwd() / "web_version_admin" / "validation_unlocks.json"
+UNLOCKS_SOLO = Path.cwd() / "web_version_admin" / "validation_unlocks_solo.json"
 
 # Timeout in seconds for each helper script
 HELPER_TIMEOUT = 30
@@ -57,6 +59,17 @@ def copy_root_marker():
     else:
         log_verbose("No .ccri_ctf_root marker found at project root.")
 
+def load_validation_unlocks(mode):
+    """Load validation_unlocks JSON for guided or solo mode."""
+    unlocks_file = UNLOCKS_SOLO if mode == "solo" else UNLOCKS_GUIDED
+    log_verbose(f"Loading validation unlocks from: {unlocks_file}")
+    if not unlocks_file.exists():
+        print(f"❌ ERROR: {unlocks_file} not found.", file=sys.stderr)
+        sys.exit(1)
+    with open(unlocks_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
+        log_verbose(f"Loaded {len(data)} unlock entries.")
+        return data
 
 def validate_challenge(challenge_id, entry, timeouts):
     """Validate a single challenge in an isolated sandbox."""
@@ -129,11 +142,36 @@ def validate_challenge(challenge_id, entry, timeouts):
         timeouts.append(challenge_id)
         return False
 
+def choose_mode():
+    """Prompt user for guided or solo mode if not specified."""
+    print("\n🎛️ Which validation mode?")
+    print("[1] Guided (default)")
+    print("[2] Solo")
+    choice = input("Enter choice [1/2]: ").strip()
+    if choice == "2":
+        return "solo"
+    return "guided"
+
 def main():
     print("\n🚦 CCRI STEMDay Master Validator\n" + "="*40)
+
+    # Determine mode: guided or solo
+    if len(sys.argv) > 1:
+        mode_arg = sys.argv[1].lower()
+        if mode_arg in ("guided", "solo"):
+            mode = mode_arg
+        else:
+            print("❌ Invalid mode. Usage: validate_all_flags.py [guided|solo]")
+            sys.exit(1)
+    else:
+        mode = choose_mode()
+
+    print(f"🛠️ Mode: {mode.upper()}")
+
     clean_validation_folder()
     copy_root_marker()
     challenges = load_challenges_json()
+    unlocks = load_validation_unlocks(mode)
     success_count = 0
     fail_count = 0
     timeouts = []
@@ -153,7 +191,7 @@ def main():
         print("⚠️ Check validation_results/*/validation.log for details.")
 
     if fail_count == 0 and not timeouts:
-        print("\n🎉 All challenges validated successfully! The student workflow is working perfectly.\n")
+        print("\n🎉 All challenges validated successfully!\n")
     else:
         print("\n🚨 Validation completed with errors or timeouts. Review the logs above.\n")
 

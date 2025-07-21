@@ -8,6 +8,7 @@ except ImportError:
 
 import random
 import sys
+import json
 from pathlib import Path
 from flag_generators.flag_helpers import FlagUtils
 
@@ -19,15 +20,22 @@ class PcapSearchFlagGenerator:
     Stores unlock metadata for validation workflow.
     """
 
-    def __init__(self, project_root: Path = None):
+    def __init__(self, project_root: Path = None, mode="guided"):
         self.project_root = project_root or self.find_project_root()
-        self.metadata = {}  # For unlock info
+        self.mode = mode  # guided or solo
+
+        # Choose unlock metadata file for guided/solo
+        unlock_file_name = (
+            "validation_unlocks_solo.json"
+            if self.mode == "solo" else
+            "validation_unlocks.json"
+        )
+        self.unlock_file = self.project_root / "web_version_admin" / unlock_file_name
+        self.metadata = {}
 
     @staticmethod
     def find_project_root() -> Path:
-        """
-        Walk up directories until .ccri_ctf_root is found.
-        """
+        """Walk up directories until .ccri_ctf_root is found."""
         dir_path = Path.cwd()
         for parent in [dir_path] + list(dir_path.parents):
             if (parent / ".ccri_ctf_root").exists():
@@ -36,18 +44,14 @@ class PcapSearchFlagGenerator:
         sys.exit(1)
 
     def http_packet(self, src, dst, sport, dport, payload):
-        """
-        Craft a TCP packet with HTTP payload.
-        """
+        """Craft a TCP packet with HTTP payload."""
         ip = IP(src=src, dst=dst)
         tcp = TCP(sport=sport, dport=dport, flags="PA", seq=random.randint(1000, 5000))
         raw = Raw(load=payload)
         return ip / tcp / raw
 
     def http_conversation(self, src, dst, flag=None, noise=False, real_flag=False):
-        """
-        Build a realistic HTTP conversation.
-        """
+        """Build a realistic HTTP conversation."""
         sport = random.randint(1024, 65535)
         dport = 80
         packets = []
@@ -114,8 +118,13 @@ class PcapSearchFlagGenerator:
             packets.extend(self.http_conversation(src, dst, flag=fake))
 
         # Embed the real flag (header only, no hint in body)
-        src = "192.168.50.10"
-        dst = "192.168.50.20"
+        if self.mode == "guided":
+            src = "192.168.50.10"
+            dst = "192.168.50.20"
+        else:  # solo mode
+            src = "10.250.0.5"
+            dst = "10.250.0.10"
+
         packets.extend(self.http_conversation(src, dst, flag=real_flag, real_flag=True))
 
         # Shuffle packets for realism
@@ -133,9 +142,30 @@ class PcapSearchFlagGenerator:
         self.metadata = {
             "real_flag": real_flag,
             "challenge_file": str(output_file.relative_to(self.project_root)),
-            "unlock_method": "Analyze traffic.pcap for flags in HTTP headers using Wireshark or tshark",
+            "unlock_method": f"Analyze traffic.pcap for flags in HTTP headers using Wireshark or tshark",
             "hint": "Filter for HTTP headers in Wireshark (e.g., http.header) or grep for 'X-Flag:'"
         }
+
+        self.update_validation_unlocks()
+
+    def update_validation_unlocks(self):
+        """Save metadata into validation_unlocks JSON for this mode."""
+        try:
+            if self.unlock_file.exists():
+                with open(self.unlock_file, "r", encoding="utf-8") as f:
+                    unlocks = json.load(f)
+            else:
+                unlocks = {}
+
+            unlocks["18_Pcap_Search"] = self.metadata
+
+            with open(self.unlock_file, "w", encoding="utf-8") as f:
+                json.dump(unlocks, f, indent=2)
+            print(f"💾 Metadata saved to: {self.unlock_file.relative_to(self.project_root)}")
+
+        except Exception as e:
+            print(f"❌ Failed to update {self.unlock_file.name}: {e}", file=sys.stderr)
+            sys.exit(1)
 
     def generate_flag(self, challenge_folder: Path) -> str:
         """
