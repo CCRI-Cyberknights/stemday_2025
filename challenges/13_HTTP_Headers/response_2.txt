@@ -1,20 +1,18 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:49:32 GMT
-Server: Liber8-Server/2.3.1
-Content-Type: text/plain; charset=UTF-8
-Cache-Control: public, max-age=86400
-X-Powered-By: Ruby on Rails/7.1.0
-X-Flag: CCRI-AIFU-6327
+Date: Sun, 30 Jun 2025 15:59:05 GMT
+Server: Go HTTP Server/1.19
+Content-Type: application/json
+Cache-Control: no-store
+X-Powered-By: PHP/8.1.12
+X-Flag: CCRI-WGOA-1000
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=du5496ex9ctk; HttpOnly; Secure
+Set-Cookie: sessionid=zmxc0q9n8ema; HttpOnly; Secure
 
-<html>
-  <head><title>Liber8 Portal</title></head>
-  <body>
-    <h1>Welcome to Liber8</h1>
-    <p>System maintenance is underway. Some services may be unavailable.</p>
-  </body>
-</html>
+{
+  "status": "ok",
+  "message": "API version 1.2.4 is running.",
+  "notes": "No maintenance scheduled."
+}
 
-<!-- Debug: Temporary caching enabled -->
+<!-- To-do: Update security headers on staging -->

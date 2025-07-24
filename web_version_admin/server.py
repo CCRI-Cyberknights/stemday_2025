@@ -16,7 +16,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import markdown
 import sys
 
-sys.dont_write_bytecode = True  # 🛡 prevent .pyc files in admin
+sys.dont_write_bytecode = True  # 🔡 prevent .pyc files in admin
 
 # === Base Directory ===
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -53,56 +53,82 @@ else:
 print(f"📖 Using template folder at: {template_folder}")
 print(f"DEBUG: Base mode = {base_mode}")
 
-# === Simulated Open Ports ===
-# Guided Mode: 8000–8100
+# === Simulated Open Ports (dictionaries will be overwritten by generator) ===
 GUIDED_FAKE_FLAGS = {
-    8005: "CCRI-HVDF-4036",       # ✅ REAL FLAG
-    8024: "CTAU-3189-ZWJC",       # fake
-    8072: "HKJP-OWWV-3721",       # fake
-    8056: "ZLND-WYOY-4908",       # fake
-    8041: "AOFB-9291-NAFM",       # fake
+    8037: "CCRI-MXTX-7315",       # ✅ REAL FLAG
+    8098: "RUKH-RDAO-9437",       # fake
+    8095: "VMLU-7199-UORY",       # fake
+    8074: "QNGA-2314-AQHB",       # fake
+    8070: "PKVM-FZNV-5079",       # fake
 }
 GUIDED_JUNK_RESPONSES = {
-    8001: "Welcome to Dev HTTP Server v1.3\nPlease login to continue.",
-    8009: "🔒 Unauthorized: API key required.",
-    8015: "503 Service Unavailable\nTry again later.",
-    8020: "<html><body><h1>It works!</h1><p>Apache2 default page.</p></body></html>",
+    8009: "💡 Tip: Scan only the ports you really need.",
+    8035: "<html><body><h1>It works!</h1><p>Apache2 default page.</p></body></html>",
+    8057: "DEBUG: Connection established successfully.",
+    8068: "503 Service Unavailable\nTry again later.",
+    8073: "💡 Tip: Scan only the ports you really need.",
+    8080: "💡 Tip: Scan only the ports you really need.",
+    8088: "💻 Dev API v0.1 — POST requests only.",
+    8091: "System maintenance in progress."
 }
 GUIDED_SERVICE_NAMES = {
-    8001: "dev-http",
-    8005: "kappa-node",
-    8024: "lambda-api",
-    8072: "gamma-relay",
-    8056: "beta-hub",
-    8041: "metricsd",
+    8009: "epsilon-sync",
+    8035: "metricsd",
+    8037: "update-agent",
+    8057: "auth-service",
+    8068: "alpha-core",
+    8070: "delta-proxy",
+    8073: "omega-stream",
+    8074: "delta-sync",
+    8080: "sysmon-api",
+    8088: "zeta-cache",
+    8091: "beta-hub",
+    8095: "configd",
+    8098: "kappa-node"
 }
-
-# Solo Mode: 9000–9100
 SOLO_FAKE_FLAGS = {
-    9005: "CCRI-QWER-7890",       # ✅ REAL FLAG
-    9024: "ASDF-1234-HJKL",       # fake
-    9072: "ZXCV-5678-UIOP",       # fake
-    9056: "BNMM-0987-LKJH",       # fake
-    9041: "YTRE-4567-WQAS",       # fake
+    9039: "CCRI-TAIO-1561",       # ✅ REAL FLAG
+    9009: "IADX-5281-HEFS",       # fake
+    9058: "JCVT-3190-LCSM",       # fake
+    9012: "SOIJ-7344-VWAO",       # fake
+    9040: "UYVZ-2008-OHGD",       # fake
 }
 SOLO_JUNK_RESPONSES = {
-    9001: "Welcome to Solo Dev Server v2.0\nAuthentication required.",
-    9009: "🔒 Solo API key missing.",
-    9015: "503 Solo Service Unavailable\nTry again later.",
-    9020: "<html><body><h1>Solo It works!</h1><p>Default page.</p></body></html>",
+    9005: "403 Forbidden: You don’t have permission to access this resource.",
+    9015: "<html><body><h1>It works!</h1><p>Apache2 default page.</p></body></html>",
+    9018: "💻 Dev API v0.1 — POST requests only.",
+    9021: "DEBUG: Connection established successfully.",
+    9026: "Python HTTP Server: directory listing not allowed.",
+    9027: "Python HTTP Server: directory listing not allowed.",
+    9036: "403 Forbidden: You don’t have permission to access this resource.",
+    9062: "403 Forbidden: You don’t have permission to access this resource.",
+    9065: "<html><body><h1>It works!</h1><p>Apache2 default page.</p></body></html>",
+    9073: "💻 Dev API v0.1 — POST requests only.",
+    9086: "Welcome to Experimental IoT Server (beta build).",
+    9092: "System maintenance in progress."
 }
 SOLO_SERVICE_NAMES = {
-    9001: "solo-http",
-    9005: "sigma-node",
-    9024: "tau-api",
-    9072: "delta-relay",
-    9056: "omega-hub",
-    9041: "solo-metricsd",
+    9005: "metricsd",
+    9009: "gamma-relay",
+    9012: "update-agent",
+    9015: "omega-stream",
+    9018: "epsilon-sync",
+    9021: "delta-proxy",
+    9026: "beta-hub",
+    9027: "kappa-node",
+    9036: "zeta-cache",
+    9039: "kappa-node",
+    9040: "sysmon-api",
+    9058: "configd",
+    9062: "auth-service",
+    9065: "theta-daemon",
+    9073: "lambda-api",
+    9086: "alpha-core",
+    9092: "delta-sync"
 }
 
 GUIDED_ALL_PORTS = {**GUIDED_JUNK_RESPONSES, **GUIDED_FAKE_FLAGS}
 SOLO_ALL_PORTS = {**SOLO_JUNK_RESPONSES, **SOLO_FAKE_FLAGS}
-
 
 # === Dynamic HTTP Handler Factory ===
 def PortHandlerFactory(response_map, service_map):
@@ -122,13 +148,12 @@ def PortHandlerFactory(response_map, service_map):
             return
     return CustomPortHandler
 
-
 # === Start Simulated Services ===
 def start_fake_service(port, response_map, service_map):
     try:
         server = HTTPServer(('0.0.0.0', port), PortHandlerFactory(response_map, service_map))
         threading.Thread(target=server.serve_forever, daemon=True).start()
-        print(f"🛰️  Simulated service running on port {port} ({service_map.get(port, 'http')})")
+        print(f"🚁️  Simulated service running on port {port} ({service_map.get(port, 'http')})")
     except OSError as e:
         print(f"❌ Could not bind port {port}: {e}")
 
@@ -140,12 +165,8 @@ for port in GUIDED_ALL_PORTS.keys():
 for port in SOLO_ALL_PORTS.keys():
     start_fake_service(port, SOLO_ALL_PORTS, SOLO_SERVICE_NAMES)
 
-
 # === Helper: Load Challenges ===
 def load_challenges(mode="regular"):
-    """
-    Load challenges from the correct JSON file based on mode.
-    """
     if mode == "solo":
         challenges_path = os.path.join(server_dir, "challenges_solo.json")
         challenges_folder = "challenges_solo"
@@ -187,7 +208,6 @@ def index():
     mode = session.get("mode", "regular")
     challenge_list, challenges_folder = load_challenges(mode)
 
-    # Dynamic title for Challenge List
     if base_mode == "admin":
         list_title = f"Admin {'Guided' if mode == 'regular' else 'Solo'} Challenge List"
     else:
@@ -239,13 +259,8 @@ def challenge_view(challenge_id):
                            base_mode=base_mode, 
                            mode=mode)
 
-
-# === Route: Open Folder ===
 @app.route('/open_folder/<challenge_id>', methods=['POST'])
 def open_folder(challenge_id):
-    """
-    Open the challenge folder in the system file explorer (works in all modes).
-    """
     challenge_list, _ = load_challenges(session.get("mode", "regular"))
     selectedChallenge = challenge_list.get_challenge_by_id(challenge_id)
     if selectedChallenge is None:
@@ -266,13 +281,8 @@ def open_folder(challenge_id):
     except Exception as e:
         return jsonify({"status": "error", "message": f"Failed to open folder: {e}"}), 500
 
-
-# === Route: Run Helper Script ===
 @app.route('/run_script/<challenge_id>', methods=['POST'])
 def run_script(challenge_id):
-    """
-    Run the guided helper script for the challenge (disabled in Solo mode).
-    """
     mode = session.get("mode", "regular")
     if mode == "solo":
         return jsonify({"status": "error", "message": "Helper scripts are disabled in Solo Mode."}), 403
@@ -291,14 +301,8 @@ def run_script(challenge_id):
     except Exception as e:
         return jsonify({"status": "error", "message": f"Failed to run script: {e}"}), 500
 
-
-# === Route: Serve Challenge Files ===
 @app.route('/challenge/<challenge_id>/file/<path:filename>')
 def get_challenge_file(challenge_id, filename):
-    """
-    Serve individual challenge files.
-    Active in Admin and Guided (regular) modes.
-    """
     mode = session.get("mode", "regular")
     if base_mode == "student" and mode == "solo":
         return "File downloads are disabled in Solo Mode.", 403
@@ -315,7 +319,6 @@ def get_challenge_file(challenge_id, filename):
 
     print(f"📂 Serving file '{filename}' for challenge {challenge_id}.")
     return send_from_directory(folder, filename)
-
 
 # === Start Server ===
 if __name__ == '__main__':

@@ -1,4 +1,7 @@
-[INFO] Started backup...
-[WARN] Low disk space on /mnt/volume1
-[INFO] Sync complete
-
+[2025-06-19 14:35:22] WARN Disk usage at 92%.
+[2025-06-19 14:33:01] INFO User login attempt.
+[2025-06-19 14:33:01] INFO User login attempt.
+[2025-06-19 14:35:22] WARN Disk usage at 92%.
+CCRI-VRWG-3538
+[2025-06-19 14:35:22] WARN Disk usage at 92%.
+[2025-06-19 14:33:01] INFO User login attempt.

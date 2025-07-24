@@ -53,7 +53,6 @@ GENERATOR_CLASSES = {
     "18_Pcap_Search": PcapSearchFlagGenerator,
 }
 
-
 # === Master Flag Generation Class ===
 class FlagGenerationManager:
     def __init__(self, dry_run=False, mode="guided"):
@@ -63,22 +62,20 @@ class FlagGenerationManager:
         self.dry_run = dry_run
         self.mode = mode  # guided or solo
 
-        # Set challenge directory and validation unlocks file based on mode
-        if self.mode == "solo":
-            self.challenges_dir = self.project_root / "challenges_solo"
-            self.unlocks_file = self.web_admin_dir / "validation_unlocks_solo.json"
-            self.challenge_list = ChallengeList(challenges_file=self.web_admin_dir / "challenges_solo.json")
-        else:
-            self.challenges_dir = self.project_root / "challenges"
-            self.unlocks_file = self.web_admin_dir / "validation_unlocks.json"
-            self.challenge_list = ChallengeList(challenges_file=self.web_admin_dir / "challenges.json")
+        # Explicit filename mapping
+        filename_map = {
+            "guided": "challenges.json",
+            "solo": "challenges_solo.json"
+        }
+        self.challenges_file = self.web_admin_dir / filename_map[self.mode]
+        self.challenges_dir = self.project_root / ("challenges" if self.mode == "guided" else "challenges_solo")
+        self.unlocks_file = self.web_admin_dir / f"validation_unlocks{'_solo' if self.mode == 'solo' else ''}.json"
+        self.challenge_list = ChallengeList(challenges_file=self.challenges_file)
 
-        # Prepare unlock data structure
-        self.validation_unlocks = {}
+        self.validation_unlocks = self.load_existing_unlocks()
 
     @staticmethod
     def find_project_root():
-        """Walk up from current directory until .ccri_ctf_root is found."""
         dir_path = Path.cwd()
         for parent in [dir_path] + list(dir_path.parents):
             if (parent / ".ccri_ctf_root").exists():
@@ -86,27 +83,31 @@ class FlagGenerationManager:
         print("❌ ERROR: Could not find .ccri_ctf_root marker. Are you inside the CTF folder?", file=sys.stderr)
         sys.exit(1)
 
+    def load_existing_unlocks(self):
+        if self.unlocks_file.exists():
+            try:
+                with open(self.unlocks_file, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except json.JSONDecodeError:
+                print(f"⚠️ Warning: {self.unlocks_file.name} is not valid JSON. Starting fresh.")
+        return {}
+
     def prepare_backup(self):
-        """Create a backup of the challenges.json."""
-        backup_file = self.web_admin_dir / f"challenges_{self.mode}.json.bak"
-        shutil.copy2(self.web_admin_dir / f"challenges_{self.mode}.json", backup_file)
+        backup_file = self.challenges_file.with_suffix(".json.bak")
+        shutil.copy2(self.challenges_file, backup_file)
         print(f"📦 Backup created: {backup_file.relative_to(self.project_root)}")
 
     def save_unlocks(self):
-        """Save validation unlocks JSON."""
         with open(self.unlocks_file, "w", encoding="utf-8") as f:
             json.dump(self.validation_unlocks, f, indent=2)
         print(f"🔑 Unlock data saved: {self.unlocks_file.relative_to(self.project_root)}")
 
     def print_flag_report(self, real_flag, fake_flags):
-        """Print real and fake flags for sanity checking."""
         print(f"   🏁 Real flag: {real_flag}")
-        if fake_flags:
-            for fake in fake_flags:
-                print(f"   🎭 Fake flag: {fake}")
+        for fake in fake_flags:
+            print(f"   🎭 Fake flag: {fake}")
 
     def generate_flags(self):
-        """Iterate through challenges and generate flags."""
         print(f"\n🌐 Generating flags for {self.mode.upper()} mode...")
 
         if self.dry_run:
@@ -123,57 +124,48 @@ class FlagGenerationManager:
                 folder_name = Path(challenge.getFolder()).name
                 target_folder = (
                     self.dryrun_dir / self.mode / folder_name
-                    if self.dry_run
-                    else self.challenges_dir / folder_name
+                    if self.dry_run else self.challenges_dir / folder_name
                 )
-
-                # Create challenge folder if it doesn't exist (non-destructive)
                 target_folder.mkdir(parents=True, exist_ok=True)
 
                 print(f"🚀 Generating flag for {challenge.getId()}...")
 
                 generator_cls = GENERATOR_CLASSES.get(challenge.getId())
-                if generator_cls:
-                    generator = generator_cls(mode=self.mode)  # Pass mode to generator
-
-                    # Run flag generation
-                    real_flag = generator.generate_flag(target_folder)
-                    fake_flags = getattr(generator, "last_fake_flags", [])
-
-                    # Gather unlock hints from the generator
-                    unlock_data = getattr(generator, "metadata", {})
-
-                    for attr in ["last_password", "last_zip_password", "last_subdomains", "last_ports"]:
-                        value = getattr(generator, attr, None)
-                        if value:
-                            unlock_data[attr] = value
-
-                    self.validation_unlocks[challenge.getId()] = unlock_data
-
-                    # Print flag report
-                    self.print_flag_report(real_flag, fake_flags)
-
-                    if self.dry_run:
-                        print(f"✅ [Dry-Run] {challenge.getId()}: Real flag = {real_flag}")
-                        print(f"📂 Would write files to: {target_folder.relative_to(self.project_root)}\n")
-                    else:
-                        challenge.flag = real_flag
-                        print(f"✅ {challenge.getId()}: Real flag = {real_flag}\n")
-
-                    success_count += 1
-                else:
+                if not generator_cls:
                     print(f"⚠️ No generator found for {challenge.getId()}. Skipping.\n")
+                    continue
+
+                generator = generator_cls(mode=self.mode)
+                real_flag = generator.generate_flag(target_folder)
+                fake_flags = getattr(generator, "last_fake_flags", [])
+                unlock_data = getattr(generator, "metadata", {})
+
+                for attr in ["last_password", "last_zip_password", "last_subdomains", "last_ports"]:
+                    value = getattr(generator, attr, None)
+                    if value:
+                        unlock_data[attr] = value
+
+                if not self.dry_run:
+                    self.validation_unlocks[challenge.getId()] = unlock_data
+                    challenge.flag = real_flag
+                    print(f"✅ {challenge.getId()}: Real flag = {real_flag}\n")
+                else:
+                    print(f"✅ [Dry-Run] {challenge.getId()}: Real flag = {real_flag}")
+                    print(f"📂 Would write files to: {target_folder.relative_to(self.project_root)}\n")
+
+                self.print_flag_report(real_flag, fake_flags)
+                success_count += 1
+
             except Exception as e:
                 print(f"❌ ERROR in {challenge.getId()}: {e}\n")
                 fail_count += 1
 
         if not self.dry_run:
             self.challenge_list.save_challenges()
-            print(f"🎉 All flags generated and challenges_{self.mode}.json updated.")
             self.save_unlocks()
+            print(f"🎉 All flags generated and {self.challenges_file.name} updated.")
 
         print(f"\n📊 Summary ({self.mode.upper()}): {success_count} successful | {fail_count} failed")
-
 
 # === Entry Point ===
 if __name__ == "__main__":

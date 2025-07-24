@@ -1,4 +1,4 @@
-sysdump version: 0.8
-recovered 4 files
-integrity: unknown
-
+SWFI-XHMA-4791
+### System Memory Dump ###
+Heap analysis: no anomalies detected.
+Saved core dump for developer inspection.

@@ -1,10 +1,7 @@
-# legacy backup configuration
-
-kernel=5.3.0-xx
-logrotate=monthly
-last_good_boot=2022-11-10
-
-FLAG: HIDE-9991-CODE
-
-[END CONFIG]
-
+user=guest
+enable_logging=true
+EAOR-5900-IFRZ
+user=guest
+last_modified=2019-08-12
+enable_logging=true
+enable_logging=true

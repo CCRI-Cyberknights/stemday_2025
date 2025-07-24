@@ -1,19 +1,20 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:45:18 GMT
-Server: Liber8-Server/2.3.1
+Date: Sun, 30 Jun 2025 15:48:45 GMT
+Server: Apache/2.4.54 (Ubuntu)
 Content-Type: text/html; charset=UTF-8
 Cache-Control: no-store
-X-Powered-By: Go HTTP Server/1.19
-X-Flag: HACK-6633-PROT
+X-Powered-By: Node.js/18.16.0
+X-Flag: BSTQ-DKWK-0367
 X-Frame-Options: SAMEORIGIN
+X-Content-Type-Options: nosniff
+Set-Cookie: sessionid=e7ddtp63ajwe; HttpOnly; Secure
 
 <html>
-  <head><title>Data Service</title></head>
+  <head><title>Internal Dashboard</title></head>
   <body>
-    <h1>Data Service Ready</h1>
-    <p>Connect your client application to begin.</p>
+    <h1>Liber8 Ops Dashboard</h1>
+    <p>Authentication successful. Redirecting...</p>
   </body>
 </html>
 
-<!-- Debug: Session created for client 10.6.112.3 -->
-
+<!-- To-do: Update security headers on staging -->

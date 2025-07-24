@@ -4,7 +4,6 @@ from pathlib import Path
 import random
 import shutil
 import sys
-import json
 from flag_generators.flag_helpers import FlagUtils
 
 
@@ -12,7 +11,7 @@ class HiddenFlagGenerator:
     """
     Generator for the Hidden Flag challenge.
     Builds a fake folder structure and hides real + fake flags in random files.
-    Supports guided and solo modes with separate unlock metadata.
+    Supports guided and solo modes with metadata returned to master script.
     """
 
     FOLDERS_AND_FILES = {
@@ -80,33 +79,19 @@ class HiddenFlagGenerator:
 
     def __init__(self, project_root: Path = None, mode="guided"):
         self.project_root = project_root or self.find_project_root()
-        self.mode = mode  # guided or solo
-
-        # Choose unlocks file based on mode
-        unlock_file_name = (
-            "validation_unlocks_solo.json"
-            if self.mode == "solo" else
-            "validation_unlocks.json"
-        )
-        self.unlock_file = self.project_root / "web_version_admin" / unlock_file_name
-        self.metadata = {}  # For unlock info
+        self.mode = mode
+        self.metadata = {}
 
     @staticmethod
     def find_project_root() -> Path:
-        """
-        Walk up directories until .ccri_ctf_root is found.
-        """
         dir_path = Path.cwd()
         for parent in [dir_path] + list(dir_path.parents):
             if (parent / ".ccri_ctf_root").exists():
                 return parent.resolve()
-        print("❌ ERROR: Could not find .ccri_ctf_root marker. Are you inside the CTF folder?", file=sys.stderr)
+        print("❌ ERROR: Could not find .ccri_ctf_root marker.", file=sys.stderr)
         sys.exit(1)
 
     def safe_cleanup(self, base_dir: Path):
-        """
-        Clean up only the 'junk/' subfolder if it exists.
-        """
         if base_dir.exists():
             print(f"🗑️ Removing old folder: {base_dir.relative_to(self.project_root)}")
             try:
@@ -115,10 +100,6 @@ class HiddenFlagGenerator:
                 print(f"⚠️ Could not delete {base_dir.name}: {e}", file=sys.stderr)
 
     def generate_junk_for_file(self, file_name: str, flag: str = None) -> str:
-        """
-        Generate 3–7 lines of junk text for the specific file name,
-        optionally embedding a flag.
-        """
         snippets = self.FILE_BASED_JUNK.get(file_name, ["# Generic placeholder content"])
         lines = random.choices(snippets, k=random.randint(3, 7))
         insert_pos = random.randint(0, len(lines))
@@ -126,9 +107,6 @@ class HiddenFlagGenerator:
         return "\n".join(lines)
 
     def create_folder_structure(self, base_dir: Path, real_flag: str, fake_flags: list):
-        """
-        Build the fixed folder structure and embed flags randomly in files.
-        """
         self.safe_cleanup(base_dir)
 
         try:
@@ -145,7 +123,6 @@ class HiddenFlagGenerator:
                 file_path = folder_path / file_name
                 all_files.append(file_path)
 
-        # Randomly select 5 files for flags
         flag_files = random.sample(all_files, 5)
         real_flag_file = flag_files[0]
         fake_flag_files = flag_files[1:]
@@ -168,34 +145,14 @@ class HiddenFlagGenerator:
         print(f"✅ Real flag hidden in: {real_flag_file.relative_to(base_dir)}")
         print("📁 Folder structure created with embedded flags.")
 
-        # Record unlock metadata
-        try:
-            if self.unlock_file.exists():
-                with open(self.unlock_file, "r", encoding="utf-8") as f:
-                    unlocks = json.load(f)
-            else:
-                unlocks = {}
-
-            unlocks["11_HiddenFlag"] = {
-                "real_flag": real_flag,
-                "challenge_folder": str(base_dir.relative_to(self.project_root)),
-                "unlock_method": "Search recursively for the flag in hidden files",
-                "hint": "Use grep -R or find/strings to locate the flag in junk/"
-            }
-
-            with open(self.unlock_file, "w", encoding="utf-8") as f:
-                json.dump(unlocks, f, indent=2)
-            print(f"💾 Metadata saved to: {self.unlock_file.relative_to(self.project_root)}")
-
-        except Exception as e:
-            print(f"❌ Failed to update {self.unlock_file.name}: {e}", file=sys.stderr)
-            sys.exit(1)
+        self.metadata = {
+            "real_flag": real_flag,
+            "challenge_folder": str(base_dir.relative_to(self.project_root)),
+            "unlock_method": "Search recursively for the flag in hidden files",
+            "hint": "Use grep -R or find/strings to locate the flag in junk/"
+        }
 
     def generate_flag(self, challenge_folder: Path) -> str:
-        """
-        Generate the fixed folder structure with 1 real + 4 fake flags,
-        and return the real flag.
-        """
         real_flag = FlagUtils.generate_real_flag()
         fake_flags = [FlagUtils.generate_fake_flag() for _ in range(4)]
 

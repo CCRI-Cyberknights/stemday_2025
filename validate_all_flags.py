@@ -17,7 +17,7 @@ UNLOCKS_SOLO = Path.cwd() / "web_version_admin" / "validation_unlocks_solo.json"
 HELPER_TIMEOUT = 30
 
 # Verbose logging flag
-VERBOSE = True
+VERBOSE = False
 
 def log_verbose(message):
     """Print detailed debug info if verbose mode is enabled."""

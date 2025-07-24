@@ -1,5 +1,5 @@
-Review each file carefully.
-Review each file carefully.
-Welcome to the reference directory.
-CNLT-6442-TXLK
+This folder contains assorted documentation.
+This folder contains assorted documentation.
+This folder contains assorted documentation.
+LKNJ-8636-YWJI
 Welcome to the reference directory.
