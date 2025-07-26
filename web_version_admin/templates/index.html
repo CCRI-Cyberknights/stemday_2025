@@ -46,7 +46,7 @@
       <div class="challenge-card{% if challenge.complete %} completed{% endif %}" id="{{ challenge.id }}">
         <h3>{{ challenge.ch_number }}. {{ challenge.name }}</h3>
         {% if challenge.complete %}
-        <p class="completed">✅ Completed</p>
+        <p class="challenge-status">✅ Completed</p>
         {% else %}
         <button
           class="view-btn"
@@ -83,10 +83,21 @@
         challengeIDs.forEach((challengeId) => {
           const savedFlag = localStorage.getItem(`${storagePrefix}-${challengeId}`);
           if (savedFlag) {
-            document
-              .getElementById(challengeId)
-              .classList.add("completed");
+            const card = document.getElementById(challengeId);
+            card.classList.add("completed");
             completed++;
+
+            // Remove the button if it exists
+            const button = card.querySelector("button.view-btn");
+            if (button) {
+              button.remove();
+
+              // Add ✅ Completed label in its place
+              const status = document.createElement("p");
+              status.className = "challenge-status";
+              status.textContent = "✅ Completed";
+              card.appendChild(status);
+            }
           }
         });
 

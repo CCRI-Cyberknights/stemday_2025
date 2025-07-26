@@ -259,6 +259,28 @@ def challenge_view(challenge_id):
                            base_mode=base_mode, 
                            mode=mode)
 
+@app.route('/submit_flag/<challenge_id>', methods=['POST'])
+def submit_flag(challenge_id):
+    mode = session.get("mode", "regular")
+    challenge_list, _ = load_challenges(mode)
+    selected_challenge = challenge_list.get_challenge_by_id(challenge_id)
+
+    if selected_challenge is None:
+        return jsonify({"status": "error", "message": "Challenge not found"}), 404
+
+    data = request.get_json()
+    submitted_flag = data.get("flag", "").strip()
+
+    real_flag = selected_challenge.getFlag().strip()
+
+    if submitted_flag == real_flag:
+        print(f"✅ Correct flag submitted for {challenge_id}")
+        return jsonify({"status": "correct"})
+    else:
+        print(f"❌ Incorrect flag submitted for {challenge_id}")
+        return jsonify({"status": "incorrect"})
+
+
 @app.route('/open_folder/<challenge_id>', methods=['POST'])
 def open_folder(challenge_id):
     challenge_list, _ = load_challenges(session.get("mode", "regular"))

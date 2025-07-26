@@ -120,17 +120,28 @@ a:visited {
 	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 .challenge-card.completed {
-	background-color: #d4edda; /* light green */
-	border: 2px solid #28a745;
-	position: relative;
+	background-color: transparent;
+	border: 2px solid #4CAF50;
+	/* subtle green border */
+	backdrop-filter: blur(3px);
+	box-shadow: none;
 }
+
+/* Remove green background and giant emoji */
 .challenge-card.completed::after {
-	content: '✅'; /* Bigger checkmark */
-	position: absolute;
-	top: 8px;
-	right: 8px;
-	font-size: 2em;
-	color: #28a745;
+	content: none;
+}
+
+/* Final styling for the completed label */
+.challenge-status {
+	font-weight: bold;
+	color: #4CAF50;
+	font-size: 1em;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 0.4em;
+	margin-top: 10px;
 }
 .progress {
 	font-weight: bold;
