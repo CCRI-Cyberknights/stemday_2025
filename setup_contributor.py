@@ -25,8 +25,8 @@ def apt_install(packages):
 def pip_install(packages):
     """Install Python packages via pip."""
     print("🐍 Installing Python packages...")
-    run("python3 -m pip install --upgrade pip")
-    run(f"python3 -m pip install {' '.join(packages)}")
+    run("python3 -m pip install --upgrade pip --break-system-packages")
+    run(f"python3 -m pip install --break-system-packages {' '.join(packages)}")
 
 def install_steghide_deb():
     """Download and install patched Steghide 0.6.0 from custom .deb."""
