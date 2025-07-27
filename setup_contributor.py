@@ -26,13 +26,15 @@ def apt_install(packages):
     run("sudo apt update")
     run(f"sudo apt install -y {' '.join(packages)}")
 
-def pip_install(packages):
-    """Install Python packages using pipx."""
-    print("🐍 Installing Python packages via pipx...")
+def pip_install():
+    """Install Python CLI tools via pipx and Python libs via pip."""
+    print("🐍 Installing Python CLI tools via pipx...")
     run(["sudo", "apt", "install", "-y", "pipx"])
     run(["pipx", "ensurepath"])
-    for package in packages:
-        run(["pipx", "install", package])
+    run(["pipx", "install", "flask"])
+
+    print("📚 Installing Flask and MarkupSafe via pip (for Python imports)...")
+    run(["python3", "-m", "pip", "install", "--break-system-packages", "flask", "markupsafe"])
 
 def install_steghide_deb():
     """Download and install patched Steghide 0.6.0 from custom .deb."""
@@ -97,9 +99,8 @@ def main():
     # === Install patched Steghide ===
     install_steghide_deb()
 
-    # === Install Python libraries via pipx ===
-    pip_packages = ["flask", "markupsafe"]
-    pip_install(pip_packages)
+    # === Install Python libraries and CLI tools ===
+    pip_install()
 
     # === Configure Git ===
     configure_git()
