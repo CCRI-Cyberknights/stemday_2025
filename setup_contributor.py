@@ -27,10 +27,12 @@ def apt_install(packages):
     run(f"sudo apt install -y {' '.join(packages)}")
 
 def pip_install(packages):
-    """Install Python packages via pip with override."""
-    print("🐍 Installing Python packages...")
-    run(["python3", "-m", "pip", "install", "--upgrade", "pip", "--break-system-packages"])
-    run(["python3", "-m", "pip", "install", "--break-system-packages"] + packages)
+    """Install Python packages using pipx."""
+    print("🐍 Installing Python packages via pipx...")
+    run(["sudo", "apt", "install", "-y", "pipx"])
+    run(["pipx", "ensurepath"])
+    for package in packages:
+        run(["pipx", "install", package])
 
 def install_steghide_deb():
     """Download and install patched Steghide 0.6.0 from custom .deb."""
@@ -95,7 +97,7 @@ def main():
     # === Install patched Steghide ===
     install_steghide_deb()
 
-    # === Install Python libraries ===
+    # === Install Python libraries via pipx ===
     pip_packages = ["flask", "markupsafe"]
     pip_install(pip_packages)
 
