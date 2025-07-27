@@ -9,9 +9,13 @@ import platform
 STEGO_DEB_URL = "https://raw.githubusercontent.com/CCRI-Cyberknights/stemday_2025/main/debs/steghide_0.6.0-1_amd64.deb"
 
 def run(cmd, check=True):
-    """Run a system command and print output."""
-    print(f"💻 Running: {cmd}")
-    result = subprocess.run(cmd, shell=True)
+    """Run a command (str or list) and print it."""
+    if isinstance(cmd, str):
+        print(f"💻 Running: {cmd}")
+        result = subprocess.run(cmd, shell=True)
+    else:
+        print(f"💻 Running: {' '.join(cmd)}")
+        result = subprocess.run(cmd)
     if check and result.returncode != 0:
         print(f"❌ ERROR: Command failed -> {cmd}", file=sys.stderr)
         sys.exit(1)
@@ -23,10 +27,10 @@ def apt_install(packages):
     run(f"sudo apt install -y {' '.join(packages)}")
 
 def pip_install(packages):
-    """Install Python packages via pip."""
+    """Install Python packages via pip with override."""
     print("🐍 Installing Python packages...")
-    run("python3 -m pip install --upgrade pip --break-system-packages")
-    run(f"python3 -m pip install --break-system-packages {' '.join(packages)}")
+    run(["python3", "-m", "pip", "install", "--upgrade", "pip", "--break-system-packages"])
+    run(["python3", "-m", "pip", "install", "--break-system-packages"] + packages)
 
 def install_steghide_deb():
     """Download and install patched Steghide 0.6.0 from custom .deb."""
@@ -40,7 +44,7 @@ def install_steghide_deb():
         print("ℹ️ Steghide not found or outdated. Installing patched version...")
 
     print("⬇️ Downloading Steghide 0.6.0 .deb package...")
-    run(f"wget -q {STEGO_DEB_URL} -O /tmp/steghide.deb")
+    run(["wget", "-q", STEGO_DEB_URL, "-O", "/tmp/steghide.deb"])
 
     print("📦 Installing patched Steghide...")
     run("sudo dpkg -i /tmp/steghide.deb || sudo apt --fix-broken install -y")
@@ -54,7 +58,7 @@ Pin-Priority: 1001
 """
     with open("/tmp/steghide-pin", "w") as f:
         f.write(pin_contents)
-    run(f"sudo mv /tmp/steghide-pin {pin_file}")
+    run(["sudo", "mv", "/tmp/steghide-pin", pin_file])
 
 def configure_git():
     """Prompt user to configure Git if not already configured."""
@@ -67,9 +71,9 @@ def configure_git():
         print("⚠️  Git is not configured. Let's set it up:")
         git_name = input("Enter your Git name: ").strip()
         git_email = input("Enter your Git email: ").strip()
-        run(f'git config --global user.name "{git_name}"')
-        run(f'git config --global user.email "{git_email}"')
-        run('git config --global credential.helper store')
+        run(["git", "config", "--global", "user.name", git_name])
+        run(["git", "config", "--global", "user.email", git_email])
+        run(["git", "config", "--global", "credential.helper", "store"])
         print("✅ Git configuration saved.")
 
 def main():
