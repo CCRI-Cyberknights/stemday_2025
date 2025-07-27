@@ -2,118 +2,109 @@
   "01_Stego": {
     "name": "Stego Decode",
     "folder": "01_Stego",
-    "flag": "CCRI-ZFQB-3492",
+    "flag": "CCRI-ATIA-2069",
     "script": "extract_flag.py"
   },
   "02_Base64": {
     "name": "Base64 Decoder",
     "folder": "02_Base64",
-    "flag": "CCRI-GYJQ-7028",
+    "flag": "CCRI-HFKK-7402",
     "script": "solve.py"
   },
   "03_ROT13": {
     "name": "ROT13 Explorer",
     "folder": "03_ROT13",
-    "flag": "CCRI-NVRG-8735",
+    "flag": "CCRI-PXBZ-8040",
     "script": "decode_rot13.py"
   },
   "04_Vigenere": {
     "name": "Vigenère Cipher",
     "folder": "04_Vigenere",
-    "flag": "CCRI-LBJM-4289",
+    "flag": "CCRI-AVDI-8676",
     "script": "break_vigenere.py"
   },
   "05_ArchivePassword": {
     "name": "Archive Password Cracker",
     "folder": "05_Archive_Password",
-    "flag": "CCRI-ITKZ-5910",
+    "flag": "CCRI-LYRX-4070",
     "script": "crack_zip.py"
   },
   "06_Hashcat": {
     "name": "Hashcat Challenge",
     "folder": "06_Hashcat",
-    "flag": "CCRI-MPMF-0710",
+    "flag": "CCRI-FTGG-7645",
     "script": "run_chain_crack.py"
   },
   "07_ExtractBinary": {
     "name": "Extract from Binary",
     "folder": "07_Extract_from_Binary",
-    "flag": "CCRI-DGJH-9632",
+    "flag": "CCRI-FKXH-4474",
     "script": "analyze_binary.py"
   },
   "08_FakeAuthLog": {
     "name": "Fake Auth Log",
     "folder": "08_Fake_Auth_Log",
-    "flag": "CCRI-FIBC-6128",
+    "flag": "CCRI-FWMG-0784",
     "script": "investigate_authlog.py"
   },
   "09_FixScript": {
     "name": "Fix the Script",
     "folder": "09_Fix_the_Script",
-    "flag": "CCRI-SCRP-5022",
+    "flag": "CCRI-SCRP-4429",
     "script": "script_runner.py"
   },
   "10_Metadata": {
     "name": "Metadata Explorer",
     "folder": "10_Metadata",
-    "flag": "CCRI-META-RMKS-1428",
+    "flag": "CCRI-META-KLSP-0156",
     "script": "inspect_metadata.py"
   },
   "11_HiddenFlag": {
     "name": "Hidden Flag Hunt",
     "folder": "11_Hidden_Flag",
-    "flag": "CCRI-AESW-8128",
+    "flag": "CCRI-RLNG-5449",
     "script": "search_for_flag.py"
   },
   "12_QRCodes": {
     "name": "QR Codes Puzzle",
     "folder": "12_QR_Codes",
-    "flag": "CCRI-BAHC-4034",
+    "flag": "CCRI-DVLX-3456",
     "script": "qr_code_explorer.py"
   },
   "13_HTTPHeaders": {
     "name": "HTTP Headers Analysis",
     "folder": "13_HTTP_Headers",
-    "flag": "CCRI-WGOA-1000",
+    "flag": "CCRI-AGHN-8838",
     "script": "investigate_headers.py"
   },
   "14_SubdomainSweep": {
     "name": "Subdomain Sweep",
     "folder": "14_Subdomain_Sweep",
-    "flag": "CCRI-QCUQ-0690",
+    "flag": "CCRI-SLMW-4364",
     "script": "explore_subdomains.py"
   },
   "15_ProcessInspection": {
     "name": "Process Inspection",
     "folder": "15_Process_Inspection",
-    "flag": "CCRI-GPSX-8816",
+    "flag": "CCRI-TFQF-2245",
     "script": "explore_processes.py"
   },
   "16_Hex_Hunting": {
     "name": "Hex Hunting",
     "folder": "16_Hex_Hunting",
-    "flag": "CCRI-DSHL-8434",
+    "flag": "CCRI-SQXG-0993",
     "script": "inspect_binary.py"
   },
   "17_Nmap_Scanning": {
     "name": "Nmap Scanning",
     "folder": "17_Nmap_Scanning",
-    "flag": [
-      "CCRI-MXTX-7315",
-      {
-        "real_flag": "CCRI-MXTX-7315",
-        "real_port": 8037,
-        "server_file": "web_version_admin/server.py",
-        "unlock_method": "Scan ports 8000–8099 and query HTTP endpoints to locate the real flag (port 8037)",
-        "hint": "Use nmap -p8000-8099 localhost to discover ports and curl to check flags."
-      }
-    ],
+    "flag": "CCRI-XIOU-9477",
     "script": "helper_scan.py"
   },
   "18_Pcap_Search": {
     "name": "Pcap Search",
     "folder": "18_Pcap_Search",
-    "flag": "CCRI-PNOD-2235",
+    "flag": "CCRI-IJKU-1771",
     "script": "analyze_pcap.py"
   }
 }

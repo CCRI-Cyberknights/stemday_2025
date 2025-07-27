@@ -1,18 +1,20 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:59:05 GMT
-Server: Go HTTP Server/1.19
-Content-Type: application/json
+Date: Sun, 30 Jun 2025 15:49:16 GMT
+Server: nginx/1.24.0
+Content-Type: text/plain; charset=UTF-8
 Cache-Control: no-store
 X-Powered-By: PHP/8.1.12
-X-Flag: CCRI-WGOA-1000
+X-Flag: RATR-8637-DZSJ
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=zmxc0q9n8ema; HttpOnly; Secure
+Set-Cookie: sessionid=i9eo17bet8x2; HttpOnly; Secure
 
-{
-  "status": "ok",
-  "message": "API version 1.2.4 is running.",
-  "notes": "No maintenance scheduled."
-}
+<html>
+  <head><title>Liber8 Portal</title></head>
+  <body>
+    <h1>Welcome to Liber8</h1>
+    <p>System maintenance is underway. Some services may be unavailable.</p>
+  </body>
+</html>
 
-<!-- To-do: Update security headers on staging -->
+<!-- Debug: API response size 512 bytes -->

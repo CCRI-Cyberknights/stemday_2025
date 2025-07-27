@@ -1,15 +1,15 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:49:40 GMT
-Server: Apache/2.4.54 (Ubuntu)
-Content-Type: text/plain; charset=UTF-8
+Date: Sun, 30 Jun 2025 15:53:17 GMT
+Server: Go HTTP Server/1.19
+Content-Type: application/json
 Cache-Control: no-store
-X-Powered-By: Node.js/18.16.0
-X-Flag: MDRR-5775-LKCY
+X-Powered-By: Python/3.11.4
+X-Flag: CCRI-FDDG-1103
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=fqd67bubzg3e; HttpOnly; Secure
+Set-Cookie: sessionid=y9leerklmh47; HttpOnly; Secure
 
 Welcome to the Liber8 data endpoint.
 This endpoint returns plain text responses.
 
-<!-- Developer note: Remove X-Test headers before release -->
+<!-- Debug: API response size 512 bytes -->

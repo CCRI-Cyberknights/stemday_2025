@@ -1,13 +1,13 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:47:03 GMT
-Server: nginx/1.24.0
+Date: Sun, 30 Jun 2025 15:57:18 GMT
+Server: Apache/2.4.54 (Ubuntu)
 Content-Type: application/json
-Cache-Control: no-store
-X-Powered-By: PHP/8.1.12
-X-Flag: MLLR-2808-QASC
+Cache-Control: public, max-age=86400
+X-Powered-By: Ruby on Rails/7.1.0
+X-Flag: GWZK-4242-UQLN
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=pz4mzzrz11zf; HttpOnly; Secure
+Set-Cookie: sessionid=cugnhk3nlhxq; HttpOnly; Secure
 
 Welcome to the Liber8 data endpoint.
 This endpoint returns plain text responses.

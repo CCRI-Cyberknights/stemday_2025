@@ -63,16 +63,16 @@ def fetch_port_response(port):
         print("❌ ERROR: curl is not installed.")
         sys.exit(1)
 
-def validate_flag_in_services(expected_flag):
-    scan_output = run_nmap_scan()
-    open_ports = extract_open_ports(scan_output)
-    for port in open_ports:
-        response = fetch_port_response(port)
-        if expected_flag in response:
-            print(f"✅ Validation success: found flag in port {port}")
-            return True
-    print(f"❌ Validation failed: flag {expected_flag} not found in any port", file=sys.stderr)
-    return False
+def validate_flag_in_services(expected_flag, expected_port):
+    print(f"🔎 Validating port {expected_port} for expected flag: {expected_flag}")
+    response = fetch_port_response(expected_port)
+    if expected_flag in response:
+        print(f"✅ Validation success: found flag at port {expected_port}")
+        return True
+    else:
+        print(f"❌ Validation failed: expected flag not found at port {expected_port}")
+        print(f"   Got response: {response}")
+        return False
 
 def main():
     project_root = find_project_root()
@@ -80,17 +80,19 @@ def main():
     os.chdir(script_dir)
 
     if validation_mode:
-        # Load expected flag from validation unlocks
+        # Load expected flag and port from validation unlocks
         unlock_file = os.path.join(project_root, "web_version_admin", "validation_unlocks.json")
         try:
             with open(unlock_file, "r", encoding="utf-8") as f:
                 unlocks = json.load(f)
-            expected_flag = unlocks["17_Nmap_Scanning"]["real_flag"]
+            challenge_meta = unlocks["17_Nmap_Scanning"]
+            expected_flag = challenge_meta["real_flag"]
+            expected_port = int(challenge_meta["real_port"])
         except Exception as e:
             print(f"❌ ERROR: Could not load validation unlocks: {e}", file=sys.stderr)
             sys.exit(1)
 
-        if validate_flag_in_services(expected_flag):
+        if validate_flag_in_services(expected_flag, expected_port):
             sys.exit(0)
         else:
             sys.exit(1)

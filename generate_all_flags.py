@@ -136,7 +136,8 @@ class FlagGenerationManager:
                     continue
 
                 generator = generator_cls(mode=self.mode)
-                real_flag = generator.generate_flag(target_folder)
+                result = generator.generate_flag(target_folder)
+                real_flag = result[0] if isinstance(result, tuple) else result
                 fake_flags = getattr(generator, "last_fake_flags", [])
                 unlock_data = getattr(generator, "metadata", {})
 

@@ -1,15 +1,15 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:49:28 GMT
+Date: Sun, 30 Jun 2025 15:56:12 GMT
 Server: Apache/2.4.54 (Ubuntu)
 Content-Type: text/html; charset=UTF-8
 Cache-Control: private, no-cache
-X-Powered-By: Python/3.11.4
-X-Flag: RYSD-8339-YQZT
+X-Powered-By: PHP/8.1.12
+X-Flag: HVLB-KPBS-3497
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=sed3md3ab45e; HttpOnly; Secure
+Set-Cookie: sessionid=6k0qn62ug4hn; HttpOnly; Secure
 
 Welcome to the Liber8 data endpoint.
 This endpoint returns plain text responses.
 
-<!-- To-do: Update security headers on staging -->
+<!-- Developer note: Remove X-Test headers before release -->

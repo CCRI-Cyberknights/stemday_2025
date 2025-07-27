@@ -1,5 +1,6 @@
 This folder contains assorted documentation.
 This folder contains assorted documentation.
 This folder contains assorted documentation.
-LKNJ-8636-YWJI
-Welcome to the reference directory.
+# [No sensitive data found here]
+Review each file carefully.
+This folder contains assorted documentation.

@@ -16,9 +16,10 @@
 # Admin tools
 !generate_all_flags.py
 !validate_all_flags.py
+!copy_ccri_ctf.py
 
 # Desktop shortcuts
-!Launch CCRI CTF Hub.desktop
+!Launch_CCRI_CTF_Hub.desktop
 
 # Un-ignore folders AND their contents
 !flag_generators/

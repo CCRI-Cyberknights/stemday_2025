@@ -55,76 +55,76 @@ print(f"DEBUG: Base mode = {base_mode}")
 
 # === Simulated Open Ports (dictionaries will be overwritten by generator) ===
 GUIDED_FAKE_FLAGS = {
-    8037: "CCRI-MXTX-7315",       # ✅ REAL FLAG
-    8098: "RUKH-RDAO-9437",       # fake
-    8095: "VMLU-7199-UORY",       # fake
-    8074: "QNGA-2314-AQHB",       # fake
-    8070: "PKVM-FZNV-5079",       # fake
+    8051: "CCRI-XIOU-9477",       # ✅ REAL FLAG
+    8076: "PJFD-BYXU-9731",       # fake
+    8016: "BFRJ-IIKR-1772",       # fake
+    8097: "ACBU-6463-XRTN",       # fake
+    8045: "WPNG-POKA-4121",       # fake
 }
 GUIDED_JUNK_RESPONSES = {
-    8009: "💡 Tip: Scan only the ports you really need.",
-    8035: "<html><body><h1>It works!</h1><p>Apache2 default page.</p></body></html>",
-    8057: "DEBUG: Connection established successfully.",
-    8068: "503 Service Unavailable\nTry again later.",
-    8073: "💡 Tip: Scan only the ports you really need.",
-    8080: "💡 Tip: Scan only the ports you really need.",
-    8088: "💻 Dev API v0.1 — POST requests only.",
-    8091: "System maintenance in progress."
+    8004: "Welcome to Experimental IoT Server (beta build).",
+    8008: "🔒 Unauthorized: API key required.",
+    8013: "503 Service Unavailable\nTry again later.",
+    8024: "Python HTTP Server: directory listing not allowed.",
+    8055: "Hello World!\nTest endpoint active.",
+    8064: "System maintenance in progress.",
+    8079: "ERROR 400: Bad request syntax.",
+    8082: "Error 418: I’m a teapot."
 }
 GUIDED_SERVICE_NAMES = {
-    8009: "epsilon-sync",
-    8035: "metricsd",
-    8037: "update-agent",
-    8057: "auth-service",
-    8068: "alpha-core",
-    8070: "delta-proxy",
-    8073: "omega-stream",
-    8074: "delta-sync",
-    8080: "sysmon-api",
-    8088: "zeta-cache",
-    8091: "beta-hub",
-    8095: "configd",
-    8098: "kappa-node"
+    8004: "omega-stream",
+    8008: "beta-hub",
+    8013: "metricsd",
+    8016: "theta-daemon",
+    8024: "sysmon-api",
+    8045: "gamma-relay",
+    8051: "epsilon-sync",
+    8055: "delta-proxy",
+    8064: "zeta-cache",
+    8076: "configd",
+    8079: "kappa-node",
+    8082: "delta-sync",
+    8097: "auth-service"
 }
 SOLO_FAKE_FLAGS = {
-    9039: "CCRI-TAIO-1561",       # ✅ REAL FLAG
-    9009: "IADX-5281-HEFS",       # fake
-    9058: "JCVT-3190-LCSM",       # fake
-    9012: "SOIJ-7344-VWAO",       # fake
-    9040: "UYVZ-2008-OHGD",       # fake
+    9042: "CCRI-MZGP-0820",       # ✅ REAL FLAG
+    9051: "UFWC-6488-VRPV",       # fake
+    9075: "VIXY-7206-RZNH",       # fake
+    9072: "KDOI-7081-HTFP",       # fake
+    9024: "YYOV-7146-WHZJ",       # fake
 }
 SOLO_JUNK_RESPONSES = {
-    9005: "403 Forbidden: You don’t have permission to access this resource.",
-    9015: "<html><body><h1>It works!</h1><p>Apache2 default page.</p></body></html>",
-    9018: "💻 Dev API v0.1 — POST requests only.",
-    9021: "DEBUG: Connection established successfully.",
-    9026: "Python HTTP Server: directory listing not allowed.",
-    9027: "Python HTTP Server: directory listing not allowed.",
-    9036: "403 Forbidden: You don’t have permission to access this resource.",
-    9062: "403 Forbidden: You don’t have permission to access this resource.",
-    9065: "<html><body><h1>It works!</h1><p>Apache2 default page.</p></body></html>",
-    9073: "💻 Dev API v0.1 — POST requests only.",
-    9086: "Welcome to Experimental IoT Server (beta build).",
-    9092: "System maintenance in progress."
+    9001: "Welcome to Experimental IoT Server (beta build).",
+    9004: "ERROR 400: Bad request syntax.",
+    9007: "🔒 Unauthorized: API key required.",
+    9011: "💡 Tip: Scan only the ports you really need.",
+    9015: "Server under maintenance.\nPlease retry later.",
+    9016: "Hello World!\nTest endpoint active.",
+    9020: "403 Forbidden: You don’t have permission to access this resource.",
+    9028: "System maintenance in progress.",
+    9049: "503 Service Unavailable\nTry again later.",
+    9070: "Python HTTP Server: directory listing not allowed.",
+    9078: "💻 Dev API v0.1 — POST requests only.",
+    9081: "503 Service Unavailable\nTry again later."
 }
 SOLO_SERVICE_NAMES = {
-    9005: "metricsd",
-    9009: "gamma-relay",
-    9012: "update-agent",
-    9015: "omega-stream",
-    9018: "epsilon-sync",
-    9021: "delta-proxy",
-    9026: "beta-hub",
-    9027: "kappa-node",
-    9036: "zeta-cache",
-    9039: "kappa-node",
-    9040: "sysmon-api",
-    9058: "configd",
-    9062: "auth-service",
-    9065: "theta-daemon",
-    9073: "lambda-api",
-    9086: "alpha-core",
-    9092: "delta-sync"
+    9001: "beta-hub",
+    9004: "omega-stream",
+    9007: "theta-daemon",
+    9011: "configd",
+    9015: "sysmon-api",
+    9016: "metricsd",
+    9020: "epsilon-sync",
+    9024: "auth-service",
+    9028: "kappa-node",
+    9042: "delta-sync",
+    9049: "delta-sync",
+    9051: "update-agent",
+    9070: "gamma-relay",
+    9072: "delta-proxy",
+    9075: "alpha-core",
+    9078: "lambda-api",
+    9081: "zeta-cache"
 }
 
 GUIDED_ALL_PORTS = {**GUIDED_JUNK_RESPONSES, **GUIDED_FAKE_FLAGS}

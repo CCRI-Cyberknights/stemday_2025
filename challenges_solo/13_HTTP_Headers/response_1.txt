@@ -1,17 +1,19 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:54:20 GMT
-Server: Go HTTP Server/1.19
-Content-Type: application/json
-Cache-Control: no-store
-X-Powered-By: Node.js/18.16.0
-X-Flag: CCRI-GSJS-8963
+Date: Sun, 30 Jun 2025 15:56:19 GMT
+Server: nginx/1.24.0
+Content-Type: text/html; charset=UTF-8
+Cache-Control: public, max-age=86400
+X-Powered-By: ASP.NET Core/7.0
+X-Flag: PTVI-0737-LDXI
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
 
-{
-  "status": "ok",
-  "message": "API version 1.2.4 is running.",
-  "notes": "No maintenance scheduled."
-}
+<html>
+  <head><title>Liber8 Portal</title></head>
+  <body>
+    <h1>Welcome to Liber8</h1>
+    <p>System maintenance is underway. Some services may be unavailable.</p>
+  </body>
+</html>
 
-<!-- Debug: Temporary caching enabled -->
+<!-- Debug: API response size 512 bytes -->
