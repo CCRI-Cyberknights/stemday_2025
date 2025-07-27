@@ -18,6 +18,8 @@
 !generate_all_flags.py
 !validate_all_flags.py
 !copy_ccri_ctf.py
+!debs/
+!debs/**
 
 # Desktop shortcuts
 !Launch_CCRI_CTF_HUB.desktop
