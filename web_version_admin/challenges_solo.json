@@ -2,91 +2,91 @@
   "01_Stego": {
     "name": "Stego Decode",
     "folder": "01_Stego",
-    "flag": "CCRI-LEIK-4675"
+    "flag": "CCRI-IZWV-7499"
   },
   "02_Base64": {
     "name": "Base64 Decoder",
     "folder": "02_Base64",
-    "flag": "CCRI-GIPA-3744"
+    "flag": "CCRI-YLHO-3207"
   },
   "03_ROT13": {
     "name": "ROT13 Explorer",
     "folder": "03_ROT13",
-    "flag": "CCRI-ULDY-0559"
+    "flag": "CCRI-WJML-7715"
   },
   "04_Vigenere": {
     "name": "Vigenère Cipher",
     "folder": "04_Vigenere",
-    "flag": "CCRI-LUVC-1636"
+    "flag": "CCRI-SODC-7978"
   },
   "05_ArchivePassword": {
     "name": "Archive Password Cracker",
     "folder": "05_Archive_Password",
-    "flag": "CCRI-BDGO-1352"
+    "flag": "CCRI-OGNC-7390"
   },
   "06_Hashcat": {
     "name": "Hashcat Challenge",
     "folder": "06_Hashcat",
-    "flag": "CCRI-VCUV-2422"
+    "flag": "CCRI-JPWU-2992"
   },
   "07_ExtractBinary": {
     "name": "Extract from Binary",
     "folder": "07_Extract_from_Binary",
-    "flag": "CCRI-OWCB-1133"
+    "flag": "CCRI-EWFX-3275"
   },
   "08_FakeAuthLog": {
     "name": "Fake Auth Log",
     "folder": "08_Fake_Auth_Log",
-    "flag": "CCRI-MXNT-6508"
+    "flag": "CCRI-MRBB-5897"
   },
   "09_FixScript": {
     "name": "Fix the Script",
     "folder": "09_Fix_the_Script",
-    "flag": "CCRI-SCRP-5929"
+    "flag": "CCRI-SCRP-9801"
   },
   "10_Metadata": {
     "name": "Metadata Explorer",
     "folder": "10_Metadata",
-    "flag": "CCRI-META-NHMX-4827"
+    "flag": "CCRI-META-DRHH-6023"
   },
   "11_HiddenFlag": {
     "name": "Hidden Flag Hunt",
     "folder": "11_Hidden_Flag",
-    "flag": "CCRI-QSZU-9012"
+    "flag": "CCRI-GHJC-2142"
   },
   "12_QRCodes": {
     "name": "QR Codes Puzzle",
     "folder": "12_QR_Codes",
-    "flag": "CCRI-KINE-1537"
+    "flag": "CCRI-SWOS-4102"
   },
   "13_HTTPHeaders": {
     "name": "HTTP Headers Analysis",
     "folder": "13_HTTP_Headers",
-    "flag": "CCRI-FDDG-1103"
+    "flag": "CCRI-RCBB-6935"
   },
   "14_SubdomainSweep": {
     "name": "Subdomain Sweep",
     "folder": "14_Subdomain_Sweep",
-    "flag": "CCRI-ZHNL-1077"
+    "flag": "CCRI-NWQW-8476"
   },
   "15_ProcessInspection": {
     "name": "Process Inspection",
     "folder": "15_Process_Inspection",
-    "flag": "CCRI-RRRY-4509"
+    "flag": "CCRI-SPMO-5762"
   },
   "16_Hex_Hunting": {
     "name": "Hex Hunting",
     "folder": "16_Hex_Hunting",
-    "flag": "CCRI-RDYE-5437"
+    "flag": "CCRI-ZWHV-7860"
   },
   "17_Nmap_Scanning": {
     "name": "Nmap Scanning",
     "folder": "17_Nmap_Scanning",
-    "flag": "CCRI-MZGP-0820"
+    "flag": "CCRI-CKCN-7164"
   },
   "18_Pcap_Search": {
     "name": "Pcap Search",
     "folder": "18_Pcap_Search",
-    "flag": "CCRI-HNSL-0576"
+    "flag": "CCRI-PWRX-4503"
   }
 }

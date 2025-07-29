@@ -1,18 +1,18 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:57:49 GMT
+Date: Sun, 30 Jun 2025 15:47:47 GMT
 Server: Apache/2.4.54 (Ubuntu)
-Content-Type: application/json
+Content-Type: text/plain; charset=UTF-8
 Cache-Control: no-store
-X-Powered-By: Node.js/18.16.0
-X-Flag: OGDX-5617-AYRI
+X-Powered-By: Ruby on Rails/7.1.0
+X-Flag: WZLY-3761-XKBE
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
 
 <html>
-  <head><title>Internal Dashboard</title></head>
+  <head><title>Data Service</title></head>
   <body>
-    <h1>Liber8 Ops Dashboard</h1>
-    <p>Authentication successful. Redirecting...</p>
+    <h1>Data Service Ready</h1>
+    <p>Connect your client application to begin.</p>
   </body>
 </html>
 

@@ -1,15 +1,19 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:57:18 GMT
-Server: Apache/2.4.54 (Ubuntu)
+Date: Sun, 30 Jun 2025 15:52:07 GMT
+Server: Liber8-Server/3.0.0-beta
 Content-Type: application/json
-Cache-Control: public, max-age=86400
-X-Powered-By: Ruby on Rails/7.1.0
-X-Flag: GWZK-4242-UQLN
+Cache-Control: private, no-cache
+X-Powered-By: ASP.NET Core/7.0
+X-Flag: SFKU-WROK-9113
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=cugnhk3nlhxq; HttpOnly; Secure
 
-Welcome to the Liber8 data endpoint.
-This endpoint returns plain text responses.
+<html>
+  <head><title>Liber8 Portal</title></head>
+  <body>
+    <h1>Welcome to Liber8</h1>
+    <p>System maintenance is underway. Some services may be unavailable.</p>
+  </body>
+</html>
 
-<!-- Debug: Temporary caching enabled -->
+<!-- Developer note: Remove X-Test headers before release -->

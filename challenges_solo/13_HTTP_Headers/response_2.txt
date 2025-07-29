@@ -1,15 +1,20 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:53:17 GMT
-Server: Go HTTP Server/1.19
-Content-Type: application/json
-Cache-Control: no-store
-X-Powered-By: Python/3.11.4
-X-Flag: CCRI-FDDG-1103
+Date: Sun, 30 Jun 2025 15:54:42 GMT
+Server: nginx/1.24.0
+Content-Type: text/plain; charset=UTF-8
+Cache-Control: public, max-age=86400
+X-Powered-By: Node.js/18.16.0
+X-Flag: EMIF-PXWF-3738
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=y9leerklmh47; HttpOnly; Secure
+Set-Cookie: sessionid=agmgsdm1u2l8; HttpOnly; Secure
 
-Welcome to the Liber8 data endpoint.
-This endpoint returns plain text responses.
+<html>
+  <head><title>Internal Dashboard</title></head>
+  <body>
+    <h1>Liber8 Ops Dashboard</h1>
+    <p>Authentication successful. Redirecting...</p>
+  </body>
+</html>
 
-<!-- Debug: API response size 512 bytes -->
+<!-- To-do: Update security headers on staging -->

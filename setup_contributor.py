@@ -91,7 +91,7 @@ def main():
         # Python libraries (system side)
         "python3-markdown", "python3-scapy",
         # Challenge tools
-        "exiftool", "zbar-tools", "hashcat", "unzip",
+        "exiftool", "zbar-tools", "hashcat", "unzip", "libmcrypt4",
         "nmap", "tshark", "qrencode", "xdg-utils", "lsof", "vim-common", "util-linux"
     ]
     apt_install(apt_packages)
