@@ -87,7 +87,7 @@ def main():
     # === Install system dependencies ===
     apt_packages = [
         # Essential tools
-        "git", "python3", "python3-pip", "python3-venv", "gcc", "build-essential",
+        "git", "python3", "python3-pip", "python3-venv", "gcc", "build-essential", "fonts-noto-color-emoji"
         # Python libraries (system side)
         "python3-markdown", "python3-scapy",
         # Challenge tools
