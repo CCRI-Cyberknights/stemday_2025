@@ -32,6 +32,11 @@ class ChallengeList:
         else:
             self.solo_mode = False
             challenges_folder_name = "challenges"
+        
+        # === Determine environment mode (student/admin) ===
+        self.mode = os.environ.get("CCRI_CTF_MODE", "student").lower()
+        print(f"🔍 Environment mode detected: {self.mode}")
+
 
         # === Set parent challenges folder ===
         self.challenges_root = os.path.normpath(

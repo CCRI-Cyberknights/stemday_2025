@@ -16,15 +16,14 @@ def find_project_root():
 
 def launch_flask_server(server_path, log_file):
     print(f"🌐 Launching Flask web server from: {server_path}")
-    # Start the Flask server as a detached process
     with open(log_file, "w") as log:
         subprocess.Popen(
             [sys.executable, server_path],
             stdout=log,
             stderr=subprocess.STDOUT,
-            preexec_fn=os.setpgrp  # Detach from parent process group
+            preexec_fn=os.setpgrp
         )
-    time.sleep(2)  # Give Flask time to start
+    time.sleep(2)
     try:
         subprocess.check_call(
             ["curl", "-s", "http://localhost:5000"],
@@ -51,45 +50,48 @@ def open_browser():
             return
         except Exception as e:
             print(f"⚠️ Could not launch Firefox: {e}")
+    elif shutil.which("xdg-open"):
+        subprocess.Popen(
+            ["xdg-open", "http://localhost:5000"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+        print("✅ Browser launched using xdg-open.")
     else:
-        print("⚠️ Firefox not found. Trying xdg-open...")
-        if shutil.which("xdg-open"):
-            subprocess.Popen(
-                ["xdg-open", "http://localhost:5000"],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
-            )
-            print("✅ Browser launched using xdg-open.")
-        else:
-            print("❌ No browser launcher found. Please open manually: http://localhost:5000")
+        print("❌ No browser launcher found. Please open manually: http://localhost:5000")
 
 def main():
     print("🚀 Starting the CCRI CTF Hub...\n")
     project_root = find_project_root()
 
-    # Detect Admin vs Student environment
-    if os.path.isdir(os.path.join(project_root, "web_version_admin")):
-        print("🛠️ Admin/Dev environment detected (web_version_admin found).\n")
-        server_dir = os.path.join(project_root, "web_version_admin")
-        server_file = "server.py"
-        print("🌐 NOTE: Guided/Solo selection will happen on the landing page.")
-    else:
-        print("🎓 Student environment detected (web_version_admin not found).")
-        server_dir = os.path.join(project_root, "web_version")
-        server_file = "server.pyc"
+    has_admin = os.path.isdir(os.path.join(project_root, "web_version_admin"))
+    has_student = os.path.isdir(os.path.join(project_root, "web_version"))
 
+    if has_admin and has_student:
+        print("🧭 Both Admin and Student environments detected.")
+        choice = input("🔄 Launch which mode? [1] Admin [2] Student (default): ").strip()
+        base_mode = "admin" if choice == "1" else "student"
+    elif has_admin:
+        print("🛠️ Only Admin environment detected.")
+        base_mode = "admin"
+    elif has_student:
+        print("🎓 Only Student environment detected.")
+        base_mode = "student"
+    else:
+        print("❌ ERROR: No valid web_version or web_version_admin folder found.")
+        sys.exit(1)
+
+    os.environ["CCRI_CTF_MODE"] = base_mode
+    server_dir = os.path.join(project_root, "web_version_admin" if base_mode == "admin" else "web_version")
+    server_file = "server.py" if base_mode == "admin" else "server.pyc"
     server_path = os.path.join(server_dir, server_file)
+
     if not os.path.isfile(server_path):
         print(f"❌ ERROR: Cannot find {server_file} in {server_dir}")
         sys.exit(1)
 
-    # Check if Flask server already running
     try:
-        subprocess.check_call(
-            ["lsof", "-i:5000"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
-        )
+        subprocess.check_call(["lsof", "-i:5000"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         print("🌐 Flask web server is already running. Skipping launch.")
     except subprocess.CalledProcessError:
         log_file = os.path.join(project_root, "web_server.log")

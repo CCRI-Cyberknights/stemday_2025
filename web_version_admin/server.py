@@ -44,11 +44,14 @@ app.secret_key = "super_secret_key"  # required for session tracking
 DEBUG_MODE = os.environ.get("CCRI_DEBUG", "0") == "1"
 logging.basicConfig(level=logging.DEBUG if DEBUG_MODE else logging.INFO)
 
-# === Detect Admin or Student ===
-if os.path.basename(server_dir) == "web_version_admin":
-    base_mode = "admin"
-else:
-    base_mode = "student"
+# === Detect Admin or Student Mode (ENV-first, then folder name) ===
+base_mode = os.environ.get("CCRI_CTF_MODE", "").strip().lower()
+
+if not base_mode:
+    if os.path.basename(server_dir) == "web_version_admin":
+        base_mode = "admin"
+    else:
+        base_mode = "student"
 
 print(f"📖 Using template folder at: {template_folder}")
 print(f"DEBUG: Base mode = {base_mode}")
@@ -272,7 +275,6 @@ def submit_flag(challenge_id):
 
     data = request.get_json()
     submitted_flag = data.get("flag", "").strip()
-
     real_flag = selected_challenge.getFlag().strip()
 
     if submitted_flag == real_flag:
@@ -281,6 +283,7 @@ def submit_flag(challenge_id):
     else:
         print(f"❌ Incorrect flag submitted for {challenge_id}")
         return jsonify({"status": "incorrect"})
+
 
 
 @app.route('/open_folder/<challenge_id>', methods=['POST'])
