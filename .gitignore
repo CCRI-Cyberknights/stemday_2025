@@ -18,6 +18,7 @@
 !generate_all_flags.py
 !validate_all_flags.py
 !copy_ccri_ctf.py
+!copy_takehome_ccri_ctf.py
 !debs/
 !debs/**
 
