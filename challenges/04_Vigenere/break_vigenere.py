@@ -4,8 +4,15 @@ import sys
 import json
 import re
 
-# === Vigenère Cipher Breaker ===
+# === Constants ===
+GUIDED_JSON = "validation_unlocks.json"
+SOLO_JSON = "validation_unlocks_solo.json"
+CHALLENGE_ID = "04_Vigenere"
 
+# === Detect Validation Mode
+validation_mode = os.getenv("CCRI_VALIDATE") == "1"
+
+# === Utilities
 def find_project_root():
     dir_path = os.path.abspath(os.path.dirname(__file__))
     while dir_path != "/":
@@ -15,6 +22,24 @@ def find_project_root():
     print("❌ ERROR: Could not find project root marker (.ccri_ctf_root).", file=sys.stderr)
     sys.exit(1)
 
+def get_ctf_mode():
+    mode = os.environ.get("CCRI_MODE")
+    if mode in ("guided", "solo"):
+        return mode
+    return "solo" if "challenges_solo" in os.path.abspath(__file__) else "guided"
+
+def load_expected_flag():
+    project_root = find_project_root()
+    json_file = SOLO_JSON if get_ctf_mode() == "solo" else GUIDED_JSON
+    json_path = os.path.join(project_root, "web_version_admin", json_file)
+    try:
+        with open(json_path, "r", encoding="utf-8") as f:
+            unlocks = json.load(f)
+        return unlocks[CHALLENGE_ID]["real_flag"]
+    except Exception as e:
+        print(f"❌ ERROR: Could not load validation unlocks: {e}", file=sys.stderr)
+        sys.exit(1)
+
 def clear_screen():
     if not validation_mode:
         os.system('clear' if os.name == 'posix' else 'cls')
@@ -23,8 +48,8 @@ def pause(prompt="Press ENTER to continue..."):
     if not validation_mode:
         input(prompt)
 
+# === Vigenère Logic
 def vigenere_decrypt(ciphertext, key):
-    """Standard Vigenère decryption."""
     result = []
     key = key.lower()
     key_len = len(key)
@@ -44,49 +69,39 @@ def vigenere_decrypt(ciphertext, key):
     return ''.join(result)
 
 def find_ccri_flag(text):
-    """Find a CCRI flag in the given text."""
     match = re.search(r"CCRI-[A-Z0-9]{4}-\d{4}", text)
     return match.group(0) if match else None
 
+# === Main Logic
 def main():
     project_root = find_project_root()
+    cwd = os.getcwd()
+    script_dir = os.path.abspath(os.path.dirname(__file__))
 
-    # Detect sandboxed validation folder
+    # File paths
     if validation_mode:
-        cwd = os.getcwd()
         cipher_file = os.path.join(cwd, "cipher.txt")
         output_file = os.path.join(cwd, "decoded_output.txt")
     else:
-        challenge_folder = os.path.join(project_root, "challenges", "04_Vigenere")
-        cipher_file = os.path.join(challenge_folder, "cipher.txt")
-        output_file = os.path.join(challenge_folder, "decoded_output.txt")
+        cipher_file = os.path.join(script_dir, "cipher.txt")
+        output_file = os.path.join(script_dir, "decoded_output.txt")
 
-    # === Validation Mode: Silent flag check ===
+    if not os.path.isfile(cipher_file):
+        print(f"❌ ERROR: cipher.txt not found at {cipher_file}")
+        sys.exit(1)
+
+    # === Validation Path ===
     if validation_mode:
-        unlock_file = os.path.join(project_root, "web_version_admin", "validation_unlocks.json")
-        try:
-            with open(unlock_file, "r", encoding="utf-8") as f:
-                unlocks = json.load(f)
-            expected_flag = unlocks["04_Vigenere"]["real_flag"]
-        except Exception as e:
-            print(f"❌ ERROR: Could not load validation unlocks: {e}", file=sys.stderr)
-            sys.exit(1)
+        expected_flag = load_expected_flag()
+        keyword = "login"  # fixed for validation
 
-        if not os.path.isfile(cipher_file):
-            print(f"❌ ERROR: cipher.txt not found at {cipher_file}", file=sys.stderr)
-            sys.exit(1)
-
-        # Decrypt with fixed keyword 'login'
-        keyword = "login"
         with open(cipher_file, "r", encoding="utf-8") as f:
             ciphertext = f.read()
         plaintext = vigenere_decrypt(ciphertext, keyword)
 
-        # Save the plaintext in the sandbox folder
         with open(output_file, "w", encoding="utf-8") as f_out:
             f_out.write(plaintext + "\n")
 
-        # Look for a CCRI flag in the decrypted text
         found_flag = find_ccri_flag(plaintext)
 
         if found_flag:
@@ -101,18 +116,13 @@ def main():
             print(f"🔎 Debug: Decrypted text was:\n{plaintext}\n")
             sys.exit(1)
 
-    # === Student Interactive Mode ===
+    # === Student Mode ===
     clear_screen()
     print("🔐 Vigenère Cipher Breaker")
     print("===============================\n")
     print(f"📄 Encrypted message: {cipher_file}")
     print("🎯 Goal: Decrypt it and find the CCRI flag.\n")
     pause()
-
-    if not os.path.isfile(cipher_file):
-        print(f"❌ ERROR: cipher.txt not found at {cipher_file}")
-        pause("Press ENTER to close this terminal...")
-        sys.exit(1)
 
     with open(cipher_file, "r", encoding="utf-8") as f:
         ciphertext = f.read()
@@ -151,5 +161,4 @@ def main():
     pause("Press ENTER to close this terminal...")
 
 if __name__ == "__main__":
-    validation_mode = os.getenv("CCRI_VALIDATE") == "1"
     main()

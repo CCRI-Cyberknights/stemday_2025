@@ -5,7 +5,11 @@ import subprocess
 import json
 import time
 
-# === Process Inspection Helper ===
+# === Constants ===
+CHALLENGE_ID = "15_ProcessInspection"
+GUIDED_JSON = "validation_unlocks.json"
+SOLO_JSON = "validation_unlocks_solo.json"
+validation_mode = os.getenv("CCRI_VALIDATE") == "1"
 
 def find_project_root():
     dir_path = os.path.abspath(os.path.dirname(__file__))
@@ -15,6 +19,23 @@ def find_project_root():
         dir_path = os.path.dirname(dir_path)
     print("❌ ERROR: Could not find project root marker (.ccri_ctf_root).", file=sys.stderr)
     sys.exit(1)
+
+def get_ctf_mode():
+    mode = os.environ.get("CCRI_MODE")
+    if mode in ("guided", "solo"):
+        return mode
+    return "solo" if "challenges_solo" in os.path.abspath(__file__) else "guided"
+
+def load_expected_flag(project_root):
+    mode = get_ctf_mode()
+    unlock_file = os.path.join(project_root, "web_version_admin", SOLO_JSON if mode == "solo" else GUIDED_JSON)
+    try:
+        with open(unlock_file, "r", encoding="utf-8") as f:
+            unlocks = json.load(f)
+        return unlocks[CHALLENGE_ID]["real_flag"]
+    except Exception as e:
+        print(f"❌ ERROR: Could not load validation unlocks: {e}", file=sys.stderr)
+        sys.exit(1)
 
 def clear_screen():
     if not validation_mode:
@@ -65,21 +86,8 @@ def main():
     ps_dump = os.path.join(script_dir, "ps_dump.txt")
 
     if validation_mode:
-        # Load expected flag from validation unlocks
-        unlock_file = os.path.join(project_root, "web_version_admin", "validation_unlocks.json")
-        try:
-            with open(unlock_file, "r", encoding="utf-8") as f:
-                unlocks = json.load(f)
-            expected_flag = unlocks["15_ProcessInspection"]["real_flag"]
-        except Exception as e:
-            print(f"❌ ERROR: Could not load validation unlocks: {e}", file=sys.stderr)
-            sys.exit(1)
-
-        # Validate
-        if validate_flag_in_ps_dump(ps_dump, expected_flag):
-            sys.exit(0)
-        else:
-            sys.exit(1)
+        expected_flag = load_expected_flag(project_root)
+        sys.exit(0 if validate_flag_in_ps_dump(ps_dump, expected_flag) else 1)
 
     # === Student Interactive Mode ===
     relaunch_in_bigger_terminal(__file__)
@@ -171,5 +179,4 @@ def main():
             clear_screen()
 
 if __name__ == "__main__":
-    validation_mode = os.getenv("CCRI_VALIDATE") == "1"
     main()

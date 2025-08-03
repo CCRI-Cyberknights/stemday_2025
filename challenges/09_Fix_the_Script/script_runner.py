@@ -5,8 +5,15 @@ import subprocess
 import time
 import json
 
-# === Fix the Flag! (Python Edition) ===
+# === Constants ===
+GUIDED_JSON = "validation_unlocks.json"
+SOLO_JSON = "validation_unlocks_solo.json"
+CHALLENGE_ID = "09_FixScript"
 
+# === Detect Validation Mode
+validation_mode = os.getenv("CCRI_VALIDATE") == "1"
+
+# === Utilities
 def find_project_root():
     dir_path = os.path.abspath(os.path.dirname(__file__))
     while dir_path != "/":
@@ -15,6 +22,23 @@ def find_project_root():
         dir_path = os.path.dirname(dir_path)
     print("❌ ERROR: Could not find project root marker (.ccri_ctf_root).", file=sys.stderr)
     sys.exit(1)
+
+def get_ctf_mode():
+    env = os.environ.get("CCRI_MODE")
+    if env in ("guided", "solo"):
+        return env
+    return "solo" if "challenges_solo" in os.path.abspath(__file__) else "guided"
+
+def load_unlock_data(project_root):
+    json_path = os.path.join(project_root, "web_version_admin", SOLO_JSON if get_ctf_mode() == "solo" else GUIDED_JSON)
+    try:
+        with open(json_path, "r", encoding="utf-8") as f:
+            unlocks = json.load(f)
+        entry = unlocks[CHALLENGE_ID]
+        return entry["real_flag"], entry.get("correct_operator", "+")
+    except Exception as e:
+        print(f"❌ ERROR: Could not load unlock data: {e}", file=sys.stderr)
+        sys.exit(1)
 
 def clear_screen():
     if not validation_mode:
@@ -25,10 +49,6 @@ def pause(prompt="Press ENTER to continue..."):
         input(prompt)
 
 def flatten_broken_script_dir(script_dir, script_name):
-    """
-    Move broken_flag.py to script_dir if it’s inside a nested directory
-    and remove empty folders.
-    """
     for root, dirs, files in os.walk(script_dir):
         for f in files:
             if f == script_name and root != script_dir:
@@ -36,13 +56,11 @@ def flatten_broken_script_dir(script_dir, script_name):
                 dst = os.path.join(script_dir, f)
                 if not os.path.exists(dst):
                     os.rename(src, dst)
-        # Remove empty dirs
         for d in dirs:
-            dir_to_remove = os.path.join(root, d)
             try:
-                os.rmdir(dir_to_remove)
+                os.rmdir(os.path.join(root, d))
             except OSError:
-                pass  # Ignore if not empty
+                pass
 
 def run_python_script(script_path):
     try:
@@ -58,7 +76,6 @@ def run_python_script(script_path):
         sys.exit(1)
 
 def replace_operator(script_path, new_operator):
-    """Replace the math operator in broken_flag.py"""
     try:
         with open(script_path, "r") as f:
             lines = f.readlines()
@@ -72,28 +89,18 @@ def replace_operator(script_path, new_operator):
         print(f"❌ ERROR updating script: {e}")
         sys.exit(1)
 
+# === Main Logic
 def main():
     project_root = find_project_root()
     script_dir = os.path.abspath(os.path.dirname(__file__))
     broken_script = os.path.join(script_dir, "broken_flag.py")
     flag_output_file = os.path.join(script_dir, "flag.txt")
 
-    # Flatten directory in case broken_flag.py is nested
     flatten_broken_script_dir(script_dir, "broken_flag.py")
 
-    # === Validation Mode: silent flag check ===
+    # === Validation Mode ===
     if validation_mode:
-        unlock_file = os.path.join(project_root, "web_version_admin", "validation_unlocks.json")
-        try:
-            with open(unlock_file, "r", encoding="utf-8") as f:
-                unlocks = json.load(f)
-            expected_flag = unlocks["09_FixScript"]["real_flag"]
-            correct_op = unlocks["09_FixScript"].get("correct_operator", "+")
-        except Exception as e:
-            print(f"❌ ERROR: Could not load validation unlocks: {e}", file=sys.stderr)
-            sys.exit(1)
-
-        # Patch script with the correct operator from metadata
+        expected_flag, correct_op = load_unlock_data(project_root)
         replace_operator(broken_script, correct_op)
         fixed_output = run_python_script(broken_script)
 
@@ -104,7 +111,7 @@ def main():
             print(f"❌ Validation failed: flag {expected_flag} not found.", file=sys.stderr)
             sys.exit(1)
 
-    # === Student Interactive Mode ===
+    # === Student Mode ===
     clear_screen()
     print("🧪 Challenge #09 – Fix the Flag! (Python Edition)")
     print("===============================================\n")
@@ -146,5 +153,4 @@ def main():
         pause("Press ENTER to close this terminal...")
 
 if __name__ == "__main__":
-    validation_mode = os.getenv("CCRI_VALIDATE") == "1"
     main()

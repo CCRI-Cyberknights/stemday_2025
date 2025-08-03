@@ -5,7 +5,13 @@ import json
 import subprocess
 import time
 
-# === QR Code Explorer ===
+# === Constants ===
+GUIDED_JSON = "validation_unlocks.json"
+SOLO_JSON = "validation_unlocks_solo.json"
+CHALLENGE_ID = "12_QRCodes"
+
+# === Detect validation mode
+validation_mode = os.getenv("CCRI_VALIDATE") == "1"
 
 def find_project_root():
     dir_path = os.path.abspath(os.path.dirname(__file__))
@@ -15,6 +21,23 @@ def find_project_root():
         dir_path = os.path.dirname(dir_path)
     print("❌ ERROR: Could not find project root marker (.ccri_ctf_root).", file=sys.stderr)
     sys.exit(1)
+
+def get_ctf_mode():
+    env = os.environ.get("CCRI_MODE")
+    if env in ("guided", "solo"):
+        return env
+    return "solo" if "challenges_solo" in os.path.abspath(__file__) else "guided"
+
+def load_expected_flag(project_root):
+    mode = get_ctf_mode()
+    unlock_path = os.path.join(project_root, "web_version_admin", SOLO_JSON if mode == "solo" else GUIDED_JSON)
+    try:
+        with open(unlock_path, "r", encoding="utf-8") as f:
+            unlocks = json.load(f)
+        return unlocks[CHALLENGE_ID]["real_flag"]
+    except Exception as e:
+        print(f"❌ ERROR: Could not load validation unlocks: {e}", file=sys.stderr)
+        sys.exit(1)
 
 def clear_screen():
     if not validation_mode:
@@ -51,9 +74,6 @@ def decode_qr(file_path):
         sys.exit(1)
 
 def validate_all_qrs(qr_codes, expected_flag):
-    """
-    For validation mode: scan all QR codes for the expected flag.
-    """
     print("🔍 Validation: scanning all QR codes for the expected flag...")
     for qr in qr_codes:
         decoded = decode_qr(qr)
@@ -69,21 +89,8 @@ def main():
     qr_codes = [os.path.join(script_dir, f"qr_0{i}.png") for i in range(1, 6)]
 
     if validation_mode:
-        # Load expected flag from validation unlocks
-        unlock_file = os.path.join(project_root, "web_version_admin", "validation_unlocks.json")
-        try:
-            with open(unlock_file, "r", encoding="utf-8") as f:
-                unlocks = json.load(f)
-            expected_flag = unlocks["12_QRCodes"]["real_flag"]
-        except Exception as e:
-            print(f"❌ ERROR: Could not load validation unlocks: {e}", file=sys.stderr)
-            sys.exit(1)
-
-        # Run validation
-        if validate_all_qrs(qr_codes, expected_flag):
-            sys.exit(0)
-        else:
-            sys.exit(1)
+        expected_flag = load_expected_flag(project_root)
+        sys.exit(0 if validate_all_qrs(qr_codes, expected_flag) else 1)
 
     # === Student Interactive Mode ===
     clear_screen()
@@ -157,5 +164,4 @@ def main():
             clear_screen()
 
 if __name__ == "__main__":
-    validation_mode = os.getenv("CCRI_VALIDATE") == "1"
     main()

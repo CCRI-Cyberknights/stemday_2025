@@ -2,9 +2,17 @@
 import os
 import subprocess
 import sys
+import json
 
-# === Base64 Decoder Helper ===
+# === Constants ===
+GUIDED_JSON = "validation_unlocks.json"
+SOLO_JSON = "validation_unlocks_solo.json"
+CHALLENGE_ID = "02_Base64"
 
+# === Detect Validation Mode
+validation_mode = os.environ.get("CCRI_VALIDATE") == "1"
+
+# === Project Root Detection
 def find_project_root():
     dir_path = os.path.abspath(os.path.dirname(__file__))
     while dir_path != "/":
@@ -14,16 +22,28 @@ def find_project_root():
     print("❌ ERROR: Could not find project root marker (.ccri_ctf_root).", file=sys.stderr)
     sys.exit(1)
 
-def clear_screen():
-    if not validation_mode:
-        os.system('clear' if os.name == 'posix' else 'cls')
+# === Detect Mode
+def get_ctf_mode():
+    env = os.environ.get("CCRI_MODE")
+    if env in ("guided", "solo"):
+        return env
+    return "solo" if "challenges_solo" in os.path.abspath(__file__) else "guided"
 
-def pause(prompt="Press ENTER to continue..."):
-    if not validation_mode:
-        input(prompt)
+# === Load Flag
+def load_expected_flag():
+    project_root = find_project_root()
+    mode = get_ctf_mode()
+    json_path = os.path.join(project_root, "web_version_admin", SOLO_JSON if mode == "solo" else GUIDED_JSON)
+    try:
+        with open(json_path, "r", encoding="utf-8") as f:
+            unlocks = json.load(f)
+        return unlocks[CHALLENGE_ID]["real_flag"]
+    except Exception as e:
+        print(f"❌ ERROR: Could not load validation flag: {e}", file=sys.stderr)
+        sys.exit(1)
 
+# === Base64 Decode Logic
 def decode_base64(input_file, output_file):
-    """Decode the Base64 file and return the decoded string."""
     try:
         result = subprocess.run(
             ["base64", "--decode", input_file],
@@ -39,24 +59,23 @@ def decode_base64(input_file, output_file):
     except subprocess.CalledProcessError:
         return None
 
+# === Utility
+def clear_screen():
+    if not validation_mode:
+        os.system('clear' if os.name == 'posix' else 'cls')
+
+def pause(prompt="Press ENTER to continue..."):
+    if not validation_mode:
+        input(prompt)
+
+# === Main Logic
 def main():
-    project_root = find_project_root()
     script_dir = os.path.abspath(os.path.dirname(__file__))
     input_file = os.path.join(script_dir, "encoded.txt")
     output_file = os.path.join(script_dir, "decoded_output.txt")
 
     if validation_mode:
-        # 🛠 Validation mode: check decoded content matches expected flag
-        unlock_file = os.path.join(project_root, "web_version_admin", "validation_unlocks.json")
-        try:
-            import json
-            with open(unlock_file, "r", encoding="utf-8") as f:
-                unlocks = json.load(f)
-            expected_flag = unlocks["02_Base64"]["real_flag"]
-        except Exception as e:
-            print(f"❌ ERROR: Could not load validation unlocks: {e}", file=sys.stderr)
-            sys.exit(1)
-
+        expected_flag = load_expected_flag()
         decoded = decode_base64(input_file, output_file)
         if decoded and expected_flag in decoded:
             print(f"✅ Validation success: found flag {expected_flag}")
@@ -65,7 +84,7 @@ def main():
             print(f"❌ Validation failed: flag {expected_flag} not found in decoded content", file=sys.stderr)
             sys.exit(1)
 
-    # === Student Interactive Mode ===
+    # === Student Mode ===
     clear_screen()
     print("📡 Intercepted Transmission Decoder")
     print("=====================================\n")
@@ -88,7 +107,6 @@ def main():
     print("   encoded.txt    → Input file to decode\n")
     pause()
 
-    # Simulate analysis
     print("\n🔍 Scanning file for Base64 structure...")
     pause("Press ENTER to continue decoding...")
     print("✅ Base64 structure confirmed!\n")
@@ -102,7 +120,6 @@ def main():
         pause("Press ENTER to close this terminal...")
         sys.exit(1)
 
-    # Display and save decoded output
     print("\n📡 Decoded Transmission:")
     print("-----------------------------")
     print(decoded)
@@ -113,5 +130,4 @@ def main():
     pause("Press ENTER to close this terminal...")
 
 if __name__ == "__main__":
-    validation_mode = os.getenv("CCRI_VALIDATE") == "1"
     main()

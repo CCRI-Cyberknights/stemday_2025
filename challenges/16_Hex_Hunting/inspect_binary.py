@@ -9,9 +9,13 @@ from pathlib import Path
 
 # === Hex Flag Hunter Helper ===
 
+CHALLENGE_ID = "16_Hex_Hunting"
 FLAG_PATTERN = r"CCRI-[A-Z]{4}-[0-9]{4}"
 BINARY_FILE = "hex_flag.bin"
 NOTES_FILE = "notes.txt"
+GUIDED_JSON = "validation_unlocks.json"
+SOLO_JSON = "validation_unlocks_solo.json"
+validation_mode = os.getenv("CCRI_VALIDATE") == "1"
 
 def find_project_root():
     dir_path = os.path.abspath(os.path.dirname(__file__))
@@ -22,25 +26,22 @@ def find_project_root():
     print("❌ ERROR: Could not find project root marker (.ccri_ctf_root).", file=sys.stderr)
     sys.exit(1)
 
+def get_ctf_mode():
+    mode = os.environ.get("CCRI_MODE")
+    if mode in ("guided", "solo"):
+        return mode
+    return "solo" if "challenges_solo" in str(Path(__file__).resolve()) else "guided"
+
 def load_expected_flag():
-    """
-    Load expected flag from correct validation unlocks JSON depending on current challenge folder path.
-    """
-    root = find_project_root()
-
-    # Detect challenge mode from current working directory
-    cwd = Path.cwd()
-    if "challenges_solo" in str(cwd):
-        unlocks_file = os.path.join(root, "web_version_admin", "validation_unlocks_solo.json")
-    else:
-        unlocks_file = os.path.join(root, "web_version_admin", "validation_unlocks.json")
-
+    project_root = find_project_root()
+    mode = get_ctf_mode()
+    unlock_path = os.path.join(project_root, "web_version_admin", SOLO_JSON if mode == "solo" else GUIDED_JSON)
     try:
-        with open(unlocks_file, "r", encoding="utf-8") as f:
+        with open(unlock_path, "r", encoding="utf-8") as f:
             unlocks = json.load(f)
-        return unlocks["16_Hex_Hunting"]["real_flag"]
+        return unlocks[CHALLENGE_ID]["real_flag"]
     except Exception as e:
-        print(f"❌ ERROR: Could not load {os.path.basename(unlocks_file)}: {e}", file=sys.stderr)
+        print(f"❌ ERROR: Could not load {os.path.basename(unlock_path)}: {e}", file=sys.stderr)
         sys.exit(1)
 
 def clear_screen():
@@ -69,11 +70,7 @@ def search_flags(binary_file, pattern=FLAG_PATTERN):
         )
         if strings_output.returncode != 0:
             return []
-        flags = []
-        for line in strings_output.stdout.strip().splitlines():
-            if re.match(pattern, line.strip()):
-                flags.append(line.strip())
-        return flags
+        return [line.strip() for line in strings_output.stdout.splitlines() if re.match(pattern, line.strip())]
     except Exception as e:
         print(f"❌ Error while scanning binary: {e}")
         sys.exit(1)
@@ -95,7 +92,7 @@ def show_hex_context(binary_file, offset, context=64):
     start = max(0, offset - 16)
     try:
         dd = subprocess.Popen(
-            ["dd", f"if={binary_file}", f"bs=1", f"skip={start}", f"count={context}"],
+            ["dd", f"if={binary_file}", "bs=1", f"skip={start}", f"count={context}"],
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL
         )
@@ -111,11 +108,9 @@ def validate_flag_in_binary(binary_file, expected_flag):
     if expected_flag in flags:
         print(f"✅ Validation success: found flag {expected_flag}")
         return True
-
     try:
         with open(binary_file, "rb") as f:
-            data = f.read()
-            if expected_flag.encode("utf-8") in data:
+            if expected_flag.encode("utf-8") in f.read():
                 print(f"✅ Validation fallback: found flag {expected_flag} in raw bytes")
                 return True
     except Exception as e:
@@ -138,10 +133,7 @@ def main():
 
     if validation_mode:
         expected_flag = load_expected_flag()
-        if validate_flag_in_binary(BINARY_FILE, expected_flag):
-            sys.exit(0)
-        else:
-            sys.exit(1)
+        sys.exit(0 if validate_flag_in_binary(BINARY_FILE, expected_flag) else 1)
 
     pause("Press ENTER to begin scanning...")
     scanning_animation()
@@ -195,5 +187,4 @@ def main():
     pause()
 
 if __name__ == "__main__":
-    validation_mode = os.getenv("CCRI_VALIDATE") == "1"
     main()

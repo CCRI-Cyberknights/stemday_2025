@@ -4,8 +4,14 @@ import sys
 import subprocess
 import json
 import time
+from pathlib import Path
 
 # === Nmap Scan Puzzle Helper ===
+
+CHALLENGE_ID = "17_Nmap_Scanning"
+GUIDED_JSON = "validation_unlocks.json"
+SOLO_JSON = "validation_unlocks_solo.json"
+validation_mode = os.getenv("CCRI_VALIDATE") == "1"
 
 def find_project_root():
     dir_path = os.path.abspath(os.path.dirname(__file__))
@@ -15,6 +21,12 @@ def find_project_root():
         dir_path = os.path.dirname(dir_path)
     print("❌ ERROR: Could not find project root marker (.ccri_ctf_root).", file=sys.stderr)
     sys.exit(1)
+
+def get_ctf_mode():
+    mode = os.environ.get("CCRI_MODE")
+    if mode in ("guided", "solo"):
+        return mode
+    return "solo" if "challenges_solo" in str(Path(__file__).resolve()) else "guided"
 
 def clear_screen():
     if not validation_mode:
@@ -80,22 +92,19 @@ def main():
     os.chdir(script_dir)
 
     if validation_mode:
-        # Load expected flag and port from validation unlocks
-        unlock_file = os.path.join(project_root, "web_version_admin", "validation_unlocks.json")
+        mode = get_ctf_mode()
+        unlock_file = os.path.join(project_root, "web_version_admin", SOLO_JSON if mode == "solo" else GUIDED_JSON)
         try:
             with open(unlock_file, "r", encoding="utf-8") as f:
                 unlocks = json.load(f)
-            challenge_meta = unlocks["17_Nmap_Scanning"]
+            challenge_meta = unlocks[CHALLENGE_ID]
             expected_flag = challenge_meta["real_flag"]
             expected_port = int(challenge_meta["real_port"])
         except Exception as e:
             print(f"❌ ERROR: Could not load validation unlocks: {e}", file=sys.stderr)
             sys.exit(1)
 
-        if validate_flag_in_services(expected_flag, expected_port):
-            sys.exit(0)
-        else:
-            sys.exit(1)
+        sys.exit(0 if validate_flag_in_services(expected_flag, expected_port) else 1)
 
     # === Student Interactive Mode ===
     clear_screen()
@@ -125,7 +134,6 @@ def main():
         pause("Press ENTER to exit...")
         sys.exit(1)
 
-    # Interactive exploration
     while True:
         clear_screen()
         print("--------------------------------------")
@@ -146,12 +154,7 @@ def main():
             print(f"\n🌐 Connecting to http://localhost:{port} ...")
             print("--------------------------------------")
             response = fetch_port_response(port)
-
-            if not response:
-                print(f"⚠️ No response received from port {port}.")
-            else:
-                print(response)
-
+            print(response if response else f"⚠️ No response received from port {port}.")
             print("--------------------------------------\n")
 
             while True:
@@ -182,5 +185,4 @@ def main():
             time.sleep(1)
 
 if __name__ == "__main__":
-    validation_mode = os.getenv("CCRI_VALIDATE") == "1"
     main()

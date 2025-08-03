@@ -5,8 +5,15 @@ import subprocess
 import json
 import time
 
-# === Metadata Inspection Tool ===
+# === Constants ===
+GUIDED_JSON = "validation_unlocks.json"
+SOLO_JSON = "validation_unlocks_solo.json"
+CHALLENGE_ID = "10_Metadata"
 
+# === Validation Mode Detection
+validation_mode = os.getenv("CCRI_VALIDATE") == "1"
+
+# === Utilities
 def find_project_root():
     dir_path = os.path.abspath(os.path.dirname(__file__))
     while dir_path != "/":
@@ -16,6 +23,26 @@ def find_project_root():
     print("❌ ERROR: Could not find project root marker (.ccri_ctf_root).", file=sys.stderr)
     sys.exit(1)
 
+def get_ctf_mode():
+    env = os.environ.get("CCRI_MODE")
+    if env in ("guided", "solo"):
+        return env
+    return "solo" if "challenges_solo" in os.path.abspath(__file__) else "guided"
+
+def load_expected_flag(project_root):
+    unlock_path = os.path.join(
+        project_root,
+        "web_version_admin",
+        SOLO_JSON if get_ctf_mode() == "solo" else GUIDED_JSON
+    )
+    try:
+        with open(unlock_path, "r", encoding="utf-8") as f:
+            unlocks = json.load(f)
+        return unlocks[CHALLENGE_ID]["real_flag"]
+    except Exception as e:
+        print(f"❌ ERROR: Could not load validation unlocks: {e}", file=sys.stderr)
+        sys.exit(1)
+
 def clear_screen():
     if not validation_mode:
         os.system('clear' if os.name == 'posix' else 'cls')
@@ -24,24 +51,16 @@ def pause(prompt="Press ENTER to continue..."):
     if not validation_mode:
         input(prompt)
 
+# === Main Logic
 def main():
     project_root = find_project_root()
     script_dir = os.path.abspath(os.path.dirname(__file__))
     target_image = os.path.join(script_dir, "capybara.jpg")
     output_file = os.path.join(script_dir, "metadata_dump.txt")
 
-    # === Validation Mode ===
     if validation_mode:
-        unlock_file = os.path.join(project_root, "web_version_admin", "validation_unlocks.json")
-        try:
-            with open(unlock_file, "r", encoding="utf-8") as f:
-                unlocks = json.load(f)
-            expected_flag = unlocks["10_Metadata"]["real_flag"]
-        except Exception as e:
-            print(f"❌ ERROR: Could not load validation unlocks: {e}", file=sys.stderr)
-            sys.exit(1)
+        expected_flag = load_expected_flag(project_root)
 
-        # Run exiftool and search for the flag
         try:
             result = subprocess.run(
                 ["exiftool", target_image],
@@ -95,7 +114,6 @@ def main():
 
     print(f"✅ All metadata saved to: {os.path.basename(output_file)}\n")
 
-    # Preview fields
     print("👀 Let’s preview a few key fields:")
     print("----------------------------------------")
     try:
@@ -107,7 +125,6 @@ def main():
         print("⚠️ No common fields found.")
     print("----------------------------------------\n")
 
-    # Optional search
     keyword = input("🔎 Enter a keyword to search in the metadata (or press ENTER to skip): ").strip()
     if keyword:
         print(f"\n🔎 Searching for '{keyword}' in {os.path.basename(output_file)}...")
@@ -122,5 +139,4 @@ def main():
     pause("Press ENTER to close this terminal...")
 
 if __name__ == "__main__":
-    validation_mode = os.getenv("CCRI_VALIDATE") == "1"
     main()

@@ -5,7 +5,13 @@ import json
 import re
 import time
 
-# === Interactive Hidden File Explorer ===
+# === Constants ===
+GUIDED_JSON = "validation_unlocks.json"
+SOLO_JSON = "validation_unlocks_solo.json"
+CHALLENGE_ID = "11_HiddenFlag"
+
+# === Validation Mode Detection
+validation_mode = os.getenv("CCRI_VALIDATE") == "1"
 
 def find_project_root():
     dir_path = os.path.abspath(os.path.dirname(__file__))
@@ -15,6 +21,26 @@ def find_project_root():
         dir_path = os.path.dirname(dir_path)
     print("❌ ERROR: Could not find project root marker (.ccri_ctf_root).", file=sys.stderr)
     sys.exit(1)
+
+def get_ctf_mode():
+    env = os.environ.get("CCRI_MODE")
+    if env in ("guided", "solo"):
+        return env
+    return "solo" if "challenges_solo" in os.path.abspath(__file__) else "guided"
+
+def load_expected_flag(project_root):
+    unlock_path = os.path.join(
+        project_root,
+        "web_version_admin",
+        SOLO_JSON if get_ctf_mode() == "solo" else GUIDED_JSON
+    )
+    try:
+        with open(unlock_path, "r", encoding="utf-8") as f:
+            unlocks = json.load(f)
+        return unlocks[CHALLENGE_ID]["real_flag"]
+    except Exception as e:
+        print(f"❌ ERROR: Could not load validation unlocks: {e}", file=sys.stderr)
+        sys.exit(1)
 
 def clear_screen():
     if not validation_mode:
@@ -31,16 +57,12 @@ def list_directory(path):
         return []
 
 def validate_hidden_flag(root_dir, expected_flag):
-    """
-    For validation mode: search recursively for the expected flag.
-    """
     for dirpath, dirnames, filenames in os.walk(root_dir):
         for filename in filenames:
             file_path = os.path.join(dirpath, filename)
             try:
                 with open(file_path, "r") as f:
-                    content = f.read()
-                    if expected_flag in content:
+                    if expected_flag in f.read():
                         print(f"✅ Validation success: found flag {expected_flag} in {file_path}")
                         return True
             except Exception:
@@ -56,21 +78,8 @@ def main():
     current_dir = root_dir
 
     if validation_mode:
-        # Load expected flag from validation unlocks
-        unlock_file = os.path.join(project_root, "web_version_admin", "validation_unlocks.json")
-        try:
-            with open(unlock_file, "r", encoding="utf-8") as f:
-                unlocks = json.load(f)
-            expected_flag = unlocks["11_HiddenFlag"]["real_flag"]
-        except Exception as e:
-            print(f"❌ ERROR: Could not load validation unlocks: {e}", file=sys.stderr)
-            sys.exit(1)
-
-        # Run validation search
-        if validate_hidden_flag(root_dir, expected_flag):
-            sys.exit(0)
-        else:
-            sys.exit(1)
+        expected_flag = load_expected_flag(project_root)
+        sys.exit(0 if validate_hidden_flag(root_dir, expected_flag) else 1)
 
     # === Student Interactive Mode ===
     clear_screen()
@@ -92,7 +101,7 @@ def main():
         pause("Press ENTER to close this terminal...")
         sys.exit(1)
 
-    # Start exploring
+    # === Explorer Loop ===
     while True:
         clear_screen()
         print("🗂️  Hidden File Explorer")
@@ -113,74 +122,71 @@ def main():
             print(f"📂 Running: ls -a \"{relative_dir}\"")
             print("--------------------------------------")
             items = list_directory(current_dir)
-            if items:
-                for item in sorted(items):
-                    print(item)
-            else:
-                print("⚠️  No files or directories found.")
+            print("\n".join(sorted(items)) if items else "⚠️  No files or directories found.")
             print("--------------------------------------")
             pause()
+
         elif choice == "2":
             subdirs = [d for d in os.listdir(current_dir) if os.path.isdir(os.path.join(current_dir, d))]
             if not subdirs:
                 print("\n⚠️  No subdirectories found here.")
                 pause()
-            else:
-                clear_screen()
-                print(f"📂 Subdirectories in '{relative_dir}':")
-                print("--------------------------------------")
-                for idx, subdir in enumerate(sorted(subdirs), 1):
-                    print(f"{idx:2d}) {subdir}")
-                try:
-                    index = int(input("\nEnter the number of the directory to enter: ").strip())
-                    if 1 <= index <= len(subdirs):
-                        current_dir = os.path.join(current_dir, subdirs[index - 1])
-                        print(f"📂 Changed directory to: {os.path.relpath(current_dir, script_dir)}")
-                        time.sleep(0.5)
-                    else:
-                        print("❌ Invalid selection.")
-                        pause()
-                except ValueError:
-                    print("❌ Invalid input. Please enter a number.")
+                continue
+            clear_screen()
+            print(f"📂 Subdirectories in '{relative_dir}':")
+            print("--------------------------------------")
+            for idx, subdir in enumerate(sorted(subdirs), 1):
+                print(f"{idx:2d}) {subdir}")
+            try:
+                index = int(input("\nEnter the number of the directory to enter: ").strip())
+                if 1 <= index <= len(subdirs):
+                    current_dir = os.path.join(current_dir, subdirs[index - 1])
+                else:
+                    print("❌ Invalid selection.")
                     pause()
+            except ValueError:
+                print("❌ Invalid input. Please enter a number.")
+                pause()
+
         elif choice == "3":
             files = [f for f in os.listdir(current_dir) if os.path.isfile(os.path.join(current_dir, f))]
             if not files:
                 print("\n⚠️  No files found here.")
                 pause()
-            else:
-                clear_screen()
-                print(f"📄 Files in '{relative_dir}':")
-                print("--------------------------------------")
-                for idx, file in enumerate(sorted(files), 1):
-                    print(f"{idx:2d}) {file}")
-                try:
-                    index = int(input("\nEnter the number of the file to view: ").strip())
-                    if 1 <= index <= len(files):
-                        filepath = os.path.join(current_dir, files[index - 1])
-                        clear_screen()
-                        print(f"📄 Running: cat \"{os.path.relpath(filepath, script_dir)}\"")
-                        print("--------------------------------------")
-                        try:
-                            with open(filepath, "r") as f:
-                                print(f.read())
-                        except Exception as e:
-                            print(f"❌ Could not read file: {e}")
-                        print("--------------------------------------\n")
-                        save_choice = input(f"Would you like to save this output to {os.path.basename(results_file)}? (y/n): ").strip().lower()
-                        if save_choice == "y":
-                            with open(results_file, "a") as rf:
-                                rf.write(f"\n----- {os.path.relpath(filepath, script_dir)} -----\n")
-                                with open(filepath, "r") as f:
-                                    rf.write(f.read())
-                            print(f"✅ Saved to {os.path.basename(results_file)}")
-                            pause()
-                    else:
-                        print("❌ Invalid selection.")
-                        pause()
-                except ValueError:
-                    print("❌ Invalid input. Please enter a number.")
+                continue
+            clear_screen()
+            print(f"📄 Files in '{relative_dir}':")
+            print("--------------------------------------")
+            for idx, file in enumerate(sorted(files), 1):
+                print(f"{idx:2d}) {file}")
+            try:
+                index = int(input("\nEnter the number of the file to view: ").strip())
+                if 1 <= index <= len(files):
+                    filepath = os.path.join(current_dir, files[index - 1])
+                    clear_screen()
+                    print(f"📄 Running: cat \"{os.path.relpath(filepath, script_dir)}\"")
+                    print("--------------------------------------")
+                    try:
+                        with open(filepath, "r") as f:
+                            content = f.read()
+                            print(content)
+                    except Exception as e:
+                        print(f"❌ Could not read file: {e}")
+                    print("--------------------------------------\n")
+                    save_choice = input(f"Would you like to save this output to {os.path.basename(results_file)}? (y/n): ").strip().lower()
+                    if save_choice == "y":
+                        with open(results_file, "a") as rf:
+                            rf.write(f"\n----- {os.path.relpath(filepath, script_dir)} -----\n")
+                            rf.write(content)
+                        print(f"✅ Saved to {os.path.basename(results_file)}")
                     pause()
+                else:
+                    print("❌ Invalid selection.")
+                    pause()
+            except ValueError:
+                print("❌ Invalid input. Please enter a number.")
+                pause()
+
         elif choice == "4":
             if os.path.abspath(current_dir) != os.path.abspath(root_dir):
                 current_dir = os.path.dirname(current_dir)
@@ -189,6 +195,7 @@ def main():
             else:
                 print("⚠️ Already at the top-level directory.")
                 pause()
+
         elif choice == "5":
             print("👋 Exiting explorer. Good luck finding the *real* flag!")
             break
@@ -197,5 +204,4 @@ def main():
             pause()
 
 if __name__ == "__main__":
-    validation_mode = os.getenv("CCRI_VALIDATE") == "1"
     main()
