@@ -1,5 +1,6 @@
+# [No sensitive data found here]
+enable_logging=true
+user=guest
 # Legacy configuration file
 last_modified=2019-08-12
-last_modified=2019-08-12
-NSNL-3892-OJMK
-last_modified=2019-08-12
+enable_logging=true

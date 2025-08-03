@@ -1,63 +1,77 @@
 # 🧩 Vigenère Cipher Challenge
 
-You’ve recovered a scrambled message from an intercepted communication. Analysts suspect it was encoded using the Vigenère cipher — a classic encryption method that scrambles letters based on a repeating keyword.
+A scrambled message was extracted from a Liber8 field communication. It’s encrypted using a centuries-old cipher — one that relies on a keyword to twist each letter unpredictably.
+
+Can you recover the original message and extract the correct CCRI flag?
 
 ---
 
 ## 🧠 What is the Vigenère Cipher?
 
-The Vigenère cipher is a method of encrypting text by using a series of Caesar ciphers based on the letters of a repeating keyword. Each letter in the plaintext is shifted by an amount determined by the corresponding letter in the keyword.
+The Vigenère cipher encrypts letters by shifting them based on a repeating keyword. Each letter of the message is moved forward in the alphabet based on the position of the corresponding letter in the keyword.
 
 For example:  
-- Plaintext: ATTACK  
-- Keyword:   KEYKEY  
-- Ciphertext: KXRIGU  
+- Plaintext: **ATTACK**  
+- Keyword:   **KEYKEY**  
+- Ciphertext: **KXRIGU**
 
-This was considered strong in the 16th century, but modern tools can break it.
-
----
-
-## 🛠 Tools You Might Use
-
-Linux and open-source software provide ways to decode a Vigenère cipher:  
-
-- gpg or cryptool (if available) – some cipher-breaking tools include Vigenère support.  
-- python – you can write a small script to try a keyword.  
-- online Vigenère decoders – useful but take care with uploading data.  
-
-This challenge assumes you’ll explore and choose the right approach for decoding.
+The same message with a different keyword will produce a completely different result — making the key essential to successful decryption.
 
 ---
 
-## 📝 Challenge Instructions
+## 🛠 Tools & Techniques
 
-1. Open cipher.txt and inspect the encrypted message.  
-2. Try to decode it using the suspected keyword.  
+Here are tools and methods that can help you decode a Vigenère cipher:
 
-Hint: What is our state capital? That word might help unlock the message.
+| Tool        | Use Case                               | Example Command / Link                                               |
+|-------------|----------------------------------------|-----------------------------------------------------------------------|
+| `python3`   | Write a simple decoder using logic     | `codecs` or manual shift logic in a Python script                    |
+| Online tools| Test different keys quickly            | Search "Vigenère cipher decoder" — some support keyword input         |
+| `gpg`, `cryptool`, or `cyberchef` | Advanced GUI or CLI options       | May support Vigenère (GUI required in some cases)                     |
 
-3. Look carefully at each decoded result. Only one will contain a flag in the correct format.
+> Tip: You’ll need the **correct keyword** to make sense of the message. The wrong key will produce garbage — but the right one reveals structure and meaning.
 
-Note: Some tools might print the decoded result on screen without saving it. If you see the flag, save it yourself:  
+---
 
+## 🧩 Investigator’s Journal
+
+🗒️ *“The agent used a familiar word to encrypt the file — something close to home. We’ve seen them lean on regional references before. If you know where we are, you know the key.”*
+
+---
+
+## 📝 Your Objective
+
+Inspect the file:
+
+📁 **cipher.txt**
+
+Then:
+1. Try to decode the text using a keyword.
+2. Look for **structured sentences** and flag-like patterns in the result.
+3. One of the candidates will match the CCRI flag format — and only one will be real.
+
+> If your decoding tool doesn’t save output to a file, you can save the correct result manually:
+
+```bash
 echo "CCRI-AAAA-1111" > decoded_output.txt
+````
 
 ---
 
-## 📂 Files in this folder
+## 📂 Files in This Folder
 
-- cipher.txt – The encrypted message.
+* `cipher.txt` — The encrypted message using the Vigenère cipher.
 
 ---
 
 ## 🏁 Flag Format
 
-When you find the flag, it will look like this:
+The correct flag will appear as:
 
-CCRI-AAAA-1111
+**CCRI-AAAA-1111**
 
-Replace the AAAA and numbers with the real code you uncover.
+Replace `AAAA` and `1111` with the flag you uncover.
 
 ---
 
-Take your time and experiment. This challenge is about understanding how classical ciphers work and how they can be broken.
+💡 This cipher was once considered unbreakable — now it's your turn to reverse it. Think historically. Think locally.

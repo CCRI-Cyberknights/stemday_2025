@@ -36,7 +36,6 @@ class NmapScanFlagGenerator:
         return random.sample(sorted(available), count)
 
     def escape_python_string_literal(self, s: str) -> str:
-        """Escape a safe, double-quoted Python string literal."""
         return '"' + s.replace('\\', '\\\\').replace('\n', '\\n').replace('"', '\\"') + '"'
 
     def patch_server_file(self, real_flag: str, fake_flags: dict, real_port: int, junk_ports: dict):
@@ -47,7 +46,6 @@ class NmapScanFlagGenerator:
             sys.exit(1)
 
         try:
-            # Choose correct variable names
             flag_var = "GUIDED_FAKE_FLAGS" if self.mode == "guided" else "SOLO_FAKE_FLAGS"
             junk_var = "GUIDED_JUNK_RESPONSES" if self.mode == "guided" else "SOLO_JUNK_RESPONSES"
             service_var = "GUIDED_SERVICE_NAMES" if self.mode == "guided" else "SOLO_SERVICE_NAMES"
@@ -64,20 +62,17 @@ class NmapScanFlagGenerator:
                 for i, port in enumerate(all_ports)
             }
 
-            # Build fake flag block
             new_fake_flags = [f"    {real_port}: \"{real_flag}\",       # ✅ REAL FLAG"]
             for port, flag in fake_flags.items():
                 new_fake_flags.append(f"    {port}: \"{flag}\",       # fake")
             new_fake_flags_block = f"{flag_var} = {{\n" + "\n".join(new_fake_flags) + "\n}"
 
-            # Build junk response block (with safe escaping)
             new_junk_responses = []
             for port in sorted(junk_ports):
                 safe_response = self.escape_python_string_literal(junk_ports[port])
                 new_junk_responses.append(f"    {port}: {safe_response}")
             new_junk_block = f"{junk_var} = {{\n" + ",\n".join(new_junk_responses) + "\n}"
 
-            # Build service name dict and update blocks
             service_name_updates = [
                 f"    {port}: \"{combined_service_names[port]}\"" for port in sorted(combined_service_names)
             ]
@@ -87,7 +82,6 @@ class NmapScanFlagGenerator:
             print(f"📂 Reading {server_file}...")
             content = server_file.read_text(encoding="utf-8")
 
-            # Replace FAKE FLAGS block
             new_content, count_flags = re.subn(
                 rf"{flag_var}\s*=\s*\{{[^}}]*\}}",
                 new_fake_flags_block,
@@ -97,7 +91,6 @@ class NmapScanFlagGenerator:
             if count_flags == 0:
                 raise RuntimeError(f"No {flag_var} block found to replace!")
 
-            # Replace JUNK RESPONSES block
             new_content, count_junk = re.subn(
                 rf"{junk_var}\s*=\s*\{{[^}}]*\}}",
                 new_junk_block,
@@ -107,7 +100,6 @@ class NmapScanFlagGenerator:
             if count_junk == 0:
                 raise RuntimeError(f"No {junk_var} block found to replace!")
 
-            # Replace SERVICE_NAMES base assignment (if it exists)
             new_content, count_base_services = re.subn(
                 rf"{service_var}\s*=\s*\{{[^}}]*\}}",
                 base_service_block,
@@ -117,7 +109,6 @@ class NmapScanFlagGenerator:
             if count_base_services == 0:
                 print(f"⚠️ WARNING: No base assignment for {service_var} found — skipping.")
 
-            # Replace SERVICE_NAMES update block (if it exists)
             new_content, count_update_block = re.subn(
                 rf"{service_var}\.update\(\s*\{{[^}}]*\}}\s*\)",
                 new_service_names_block,
@@ -130,7 +121,6 @@ class NmapScanFlagGenerator:
                     "# Combine real flags and junk responses\n" + new_service_names_block
                 )
 
-            # Backup and write
             backup_file = server_file.with_suffix(".bak")
             if not backup_file.exists():
                 server_file.replace(backup_file)
@@ -184,4 +174,19 @@ class NmapScanFlagGenerator:
         print(f"🏁 Real flag: {real_flag} on port {real_port}")
         for port, flag in fake_flags.items():
             print(f"🎭 Fake flag: {flag} on port {port}")
+
+        # Save unlock metadata just like other generators
+        unlocks_file = self.project_root / "web_version_admin" / (
+            "validation_unlocks.json" if self.mode == "guided" else "validation_unlocks_solo.json"
+        )
+        challenge_id = "17_Nmap_Scanning"
+        existing = {}
+        if unlocks_file.exists():
+            with open(unlocks_file, "r", encoding="utf-8") as f:
+                existing = json.load(f)
+        existing[challenge_id] = self.metadata
+        with open(unlocks_file, "w", encoding="utf-8") as f:
+            json.dump(existing, f, indent=2)
+        print(f"📦 Saved unlock data to {unlocks_file.name}")
+
         return real_flag, self.metadata

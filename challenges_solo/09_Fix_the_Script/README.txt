@@ -1,50 +1,59 @@
-# 🧠 Challenge 09: Fix the Flag! (Bash Edition)
+# 🧠 Challenge 09: Fix the Flag!
 
-You’ve discovered a broken Bash script that’s supposed to print the agency’s flag — but something’s gone wrong.
+You’ve found a Python script that’s supposed to reveal the agency’s flag — but it’s broken!
 
-Right now it only prints a two-digit number at the end instead of a full flag. Your mission is to analyze the buggy code and fix it so the correct flag appears.
+Instead of showing the correct flag, it prints the wrong number at the end. Your task is to debug and repair the code so the full flag is revealed.
 
 ---
 
 ## 🧠 What’s Going On?
 
-This challenge tests your ability to read and debug Bash scripts. Small mistakes in logic or syntax can break programs in subtle ways. Fixing them requires understanding how the code flows.
+Even small mistakes in code can have big consequences. This script has a bug that causes it to calculate the wrong value. You'll need to identify the issue and fix it like a proper developer would.
 
 ---
 
-## 🛠 Tools You Might Use
+## 🛠 Tools & Techniques
 
-- nano/vim – Edit and correct the Bash script.  
-- bash – Run the script to test your fixes.  
-- echo/set -x – Add debug statements to see what’s happening inside the script.  
+Here are some common tools you can use while debugging Python scripts:
+
+| Tool/Command     | Purpose                                             |
+|------------------|-----------------------------------------------------|
+| `nano` / `vim`   | Edit the Python script in the terminal              |
+| `python`         | Run the script and see what it prints               |
+| `print()`        | Add extra output to help debug variable values      |
+| `int()` / `f""`  | Convert values and format output cleanly            |
+
+> 💡 Pay special attention to how the code performs calculations.
 
 ---
 
 ## 📝 Challenge Instructions
 
-1. Open broken_flag.sh and read through the code carefully.  
-2. Look for any logic errors, typos, or incorrect calculations.  
-3. Fix the script so it correctly prints the flag in the terminal.  
-4. When you see the flag on screen, save it:
+1. Open `broken_flag.py` and carefully review the code.  
+2. Look for logic or math errors in how the final number is calculated.  
+3. Correct the mistake and re-run the script.  
+4. When the correct flag appears in your terminal, save it like this:
 
+```bash
 echo "CCRI-AAAA-1111" > flag.txt
+````
 
 ---
 
-## 📂 Files in this folder
+## 📂 Files in This Folder
 
-- broken_flag.sh – The buggy Bash script.
+* `broken_flag.py` – The buggy Python script that needs fixing.
 
 ---
 
 ## 🏁 Flag Format
 
-When you fix the script and recover the flag, it will look like this:
+The flag will appear like this when correct:
 
-CCRI-AAAA-1111
+**CCRI-AAAA-1111**
 
-Replace the AAAA and numbers with the real code you uncover.
+Replace `AAAA` and the numbers with the real flag you discover.
 
 ---
 
-This challenge is about thinking like a developer and using Bash to debug and repair broken logic.
+Think like a coder. Follow the flow of logic. One wrong operator is all that stands between you and the flag!

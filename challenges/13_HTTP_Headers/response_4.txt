@@ -1,15 +1,20 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:47:36 GMT
-Server: Liber8-Server/2.3.1
-Content-Type: text/html; charset=UTF-8
+Date: Sun, 30 Jun 2025 15:54:28 GMT
+Server: Go HTTP Server/1.19
+Content-Type: text/plain; charset=UTF-8
 Cache-Control: no-store
-X-Powered-By: ASP.NET Core/7.0
-X-Flag: ISBL-5381-WMMS
+X-Powered-By: Ruby on Rails/7.1.0
+X-Flag: RSDO-YIRD-6336
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=wt7lgq86zrua; HttpOnly; Secure
+Set-Cookie: sessionid=meps2q7h3p0i; HttpOnly; Secure
 
-Welcome to the Liber8 data endpoint.
-This endpoint returns plain text responses.
+<html>
+  <head><title>Liber8 Portal</title></head>
+  <body>
+    <h1>Welcome to Liber8</h1>
+    <p>System maintenance is underway. Some services may be unavailable.</p>
+  </body>
+</html>
 
 <!-- Debug: Session created for client 10.6.112.3 -->

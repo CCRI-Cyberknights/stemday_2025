@@ -1,19 +1,20 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:59:21 GMT
+Date: Sun, 30 Jun 2025 15:53:15 GMT
 Server: Go HTTP Server/1.19
-Content-Type: application/json
-Cache-Control: public, max-age=86400
-X-Powered-By: Ruby on Rails/7.1.0
-X-Flag: CCRI-RCBB-6935
+Content-Type: text/html; charset=UTF-8
+Cache-Control: private, no-cache
+X-Powered-By: ASP.NET Core/7.0
+X-Flag: CCRI-XBWS-0795
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
+Set-Cookie: sessionid=p4tp21rhgv1h; HttpOnly; Secure
 
 <html>
-  <head><title>Liber8 Portal</title></head>
+  <head><title>Data Service</title></head>
   <body>
-    <h1>Welcome to Liber8</h1>
-    <p>System maintenance is underway. Some services may be unavailable.</p>
+    <h1>Data Service Ready</h1>
+    <p>Connect your client application to begin.</p>
   </body>
 </html>
 
-<!-- Debug: Session created for client 10.6.112.3 -->
+<!-- Debug: Temporary caching enabled -->

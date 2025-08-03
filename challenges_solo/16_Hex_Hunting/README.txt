@@ -1,59 +1,73 @@
 # 🧠 Challenge 16: Hex Flag Hunter
 
-Liber8 hackers left behind a suspicious binary file: hex_flag.bin.  
-It’s too small to be a real program, but something about it feels… hidden.
+Liber8 hackers left behind a mysterious binary: `hex_flag.bin`.
+
+It’s too small to be a legitimate executable — which means it was likely crafted for something more… covert.
 
 ---
 
 ## 🎯 Your Mission
 
-Analyze the binary and uncover the real agency flag embedded in its data.
+Use binary inspection techniques to uncover a hidden flag embedded within the file.
+
+But beware: there are five possible candidates hidden inside.  
+Only ONE of them is the true agency flag.
 
 ---
 
-## 📖 Hints
+## 🧰 Recommended Tools & Commands
 
-- The flag is hidden as ASCII text within the binary.  
-- It follows this format: CCRI-AAAA-1111  
-- There are five candidate flags in the file — but only ONE is correct.  
-- Look for patterns carefully: some decoys are designed to mislead you.  
+| Tool / Command                          | Purpose                                                |
+|-----------------------------------------|--------------------------------------------------------|
+| `strings hex_flag.bin`                  | Extract readable text from the binary                 |
+| `grep "CCRI-"` or regex search patterns | Narrow down flag candidates                           |
+| `xxd hex_flag.bin | less`               | View hex and ASCII side-by-side                       |
+| `hexedit hex_flag.bin`                 | Interactively browse and search inside the file       |
+| `grep -abo CCRI-` hex_flag.bin         | Show byte offsets of embedded flags (binary-aware)    |
+| `dd` + `xxd`                            | Show hex context for any specific byte offset         |
 
----
+💡 The correct flag will follow this format:
 
-## 🛠 Tools You Might Use
+**CCRI-AAAA-1111**
 
-- strings – Quickly extract readable text from binaries.  
-- xxd – View hex and ASCII side-by-side for deeper inspection.  
-- hexedit – Open the binary in an interactive hex editor for scrolling and searching.  
-
----
-
-## 📝 Challenge Instructions
-
-1. Start by running strings on hex_flag.bin to get a quick look at embedded text.  
-2. Use xxd or hexedit to explore the file more carefully.  
-3. Examine each candidate flag you find and determine which one matches the agency’s official format.  
-
-Note: If you find the correct flag, save it manually:
-
-echo "CCRI-AAAA-1111" > flag.txt
+Others may look convincing, but only one is real.
 
 ---
 
-## 📂 Files in this folder
+## 📝 Challenge Strategy
 
-- hex_flag.bin – Suspicious binary to investigate.
+1. Start with `strings` to see what readable content is inside.
+2. Search for candidate flags using `grep`, regular expressions, or visual scanning.
+3. Validate which flags feel legitimate by reviewing their context (surrounding hex bytes help).
+4. Consider saving promising candidates to a notes file for later review.
+
+---
+
+## 📂 Files in This Folder
+
+- `hex_flag.bin` – Suspicious binary to inspect.
 
 ---
 
 ## 🏁 Flag Format
 
-When you find the flag, it will look like this:
+The valid flag will match this structure:
 
-CCRI-AAAA-1111
+**CCRI-AAAA-1111**
 
-Replace the AAAA and numbers with the real code you uncover.
+Once you’ve found it, submit it by running:
+
+```bash
+echo "CCRI-AAAA-1111" > flag.txt
+````
+
+(Replace `AAAA-1111` with the real flag string.)
 
 ---
 
-This challenge is about using forensics tools to pull hidden clues from binary data and separating the real target from decoys.
+## 🧠 Final Advice
+
+Not all flags are created equal. Some might have been inserted to throw you off.
+Check the context. Think like a forensic analyst. Trust your instincts.
+
+Your tools are sharp. Time to dissect the binary.

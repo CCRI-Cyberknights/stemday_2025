@@ -1,0 +1,19 @@
+Transmission Start
+------------------------
+To: LIBER8 Command Node
+From: Recon Unit 5
+
+Flag candidates from intercepted communications. Message scrambled with a simple cipher for transit security.
+
+Candidates:
+- CCRI-FKTX-2881
+- ULHS-5725-HKDV
+- EHPA-UTHS-0417
+- GSVX-ZQIO-3250
+- DGBP-RQEZ-3847
+
+Validate and extract the correct CCRI flag.
+
+Transmission End
+------------------------
+

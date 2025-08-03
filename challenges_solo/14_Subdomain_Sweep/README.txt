@@ -1,56 +1,76 @@
 # 🌐 Challenge 14: Subdomain Sweep
 
-The Liber8 network relies on multiple subdomains for internal operations.  
-You’ve intercepted DNS data revealing five subdomains, each hosting a web page that displays a “flag.” But only ONE of these flags is authentic — the others are clever decoys.
+Liber8’s internal infrastructure spans multiple subdomains, each hosting seemingly mundane content.  
+But one of them is hiding an authentic agency flag — buried somewhere in the HTML source.
 
 ---
 
 ## 🎯 Your Mission
 
-1. Investigate each subdomain’s page.  
-2. Examine the flag text displayed on the page.  
-3. Identify which flag is real using the agency’s format.
+Your task is to sweep through the HTML files from five known subdomains and identify which one conceals the real flag.
+
+You're looking for:
+
+**CCRI-AAAA-1111**
+
+Only one subdomain will display a valid flag in this exact format.  
+All others contain clever imitations — wrong prefixes, reversed formats, or fake agency codes.
 
 ---
 
-## 🛠 Tools You Might Use
+## 🛠 Tools & Techniques
 
-- less – View the raw HTML content of each page.  
-- grep – Search for flag-like patterns in multiple files (e.g., `grep "CCRI-" *.html`).  
-- a web browser – Open each page visually to inspect how the flag is displayed.  
+| Tool/Method                              | What it helps you do                                  |
+|------------------------------------------|--------------------------------------------------------|
+| `less *.html`                            | Scroll through raw HTML responses                      |
+| `grep "CCRI-" *.html`                    | Search for possible flags by prefix                    |
+| `grep -E '[A-Z]{4}-[0-9]{4}' *.html`     | Broader pattern match (might reveal fake flags)        |
+| `xdg-open alpha.liber8.local.html`       | Open HTML visually in browser for formatting clues     |
+| `Ctrl+U` in browser                      | View page source — some flags might not be visible     |
+| `Ctrl+F` then search `CCRI`              | Find embedded data quickly in large source files       |
+
+💡 Real security analysts know: just because you see something on the page doesn’t mean that’s how it’s structured in the source.
 
 ---
 
-## 📝 Challenge Instructions
+## 📝 How to Investigate
 
-1. Open and review each subdomain HTML file one by one.  
-2. Look for text strings that resemble a flag.  
-3. Remember: only one flag follows the official agency format. Fake flags will use the wrong prefixes or structures.  
+1. Inspect each `.html` file with your preferred tools.
+2. Look for any text string that resembles a flag — in paragraph tags, `<pre>` blocks, or debug-style output.
+3. Ignore decoys that are malformed, use other prefixes, or break the flag structure.
+4. Once you confirm the correct flag, save it to a file using:
 
-Note: If you find the correct flag, save it manually:
-
+```bash
 echo "CCRI-AAAA-1111" > flag.txt
+````
 
 ---
 
-## 🗂️ Files in this folder
+## 🗂️ Files in This Folder
 
-- alpha.liber8.local.html – Subdomain page #1  
-- beta.liber8.local.html – Subdomain page #2  
-- gamma.liber8.local.html – Subdomain page #3  
-- delta.liber8.local.html – Subdomain page #4  
-- omega.liber8.local.html – Subdomain page #5  
+* alpha.liber8.local.html
+* beta.liber8.local.html
+* gamma.liber8.local.html
+* delta.liber8.local.html
+* omega.liber8.local.html
 
----
-
-## 🏁 Flag Format
-
-When you find the flag, it will look like this:
-
-CCRI-AAAA-1111
-
-Replace the AAAA and numbers with the real code you uncover.
+Each file represents a web page hosted on its respective internal subdomain.
 
 ---
 
-This challenge is about exploring web content and distinguishing real data from convincing fakes.
+## 🏁 Flag Format Reminder
+
+The only valid flag will match:
+
+**CCRI-AAAA-1111**
+
+The rest are misleading red herrings.
+
+---
+
+## 🔎 Field Tip
+
+Flags may not always be out in the open.
+Scan the source code carefully — sometimes the real payload is tucked inside `<pre>` blocks or hidden behind developer comments or debug logs.
+
+Stay sharp, agent. You're on the right track.

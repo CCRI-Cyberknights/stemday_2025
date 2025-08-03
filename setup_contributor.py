@@ -2,7 +2,6 @@
 import os
 import sys
 import subprocess
-import platform
 
 # === 🌟 CCRI CyberKnights Full Environment Setup ===
 
@@ -35,6 +34,12 @@ def pip_install():
 
     print("📚 Installing Flask and MarkupSafe via pip (for Python imports)...")
     run(["python3", "-m", "pip", "install", "--break-system-packages", "flask", "markupsafe"])
+
+def install_zsteg():
+    """Install zsteg via Ruby gem."""
+    print("💎 Installing Ruby and zsteg...")
+    run(["sudo", "apt", "install", "-y", "ruby", "ruby-dev", "libmagic-dev"])
+    run(["sudo", "gem", "install", "zsteg"])
 
 def install_steghide_deb():
     """Download and install patched Steghide 0.6.0 from custom .deb."""
@@ -84,25 +89,21 @@ def main():
     print("\n🚀 Setting up your CCRI_CTF contributor environment...")
     print("=" * 60 + "\n")
 
-    # === Install system dependencies ===
     apt_packages = [
         # Essential tools
-        "git", "python3", "python3-pip", "python3-venv", "gcc", "build-essential", "fonts-noto-color-emoji"
+        "git", "python3", "python3-pip", "python3-venv", "gcc", "build-essential", "fonts-noto-color-emoji",
         # Python libraries (system side)
         "python3-markdown", "python3-scapy",
         # Challenge tools
         "exiftool", "zbar-tools", "hashcat", "unzip", "libmcrypt4",
-        "nmap", "tshark", "qrencode", "xdg-utils", "lsof", "vim-common", "util-linux"
+        "nmap", "tshark", "qrencode", "xdg-utils", "lsof", "vim-common", "util-linux",
+        "binwalk", "fcrackzip", "john", "radare2", "imagemagick", "hexedit", "feh"
     ]
+
     apt_install(apt_packages)
-
-    # === Install patched Steghide ===
     install_steghide_deb()
-
-    # === Install Python libraries and CLI tools ===
     pip_install()
-
-    # === Configure Git ===
+    install_zsteg()
     configure_git()
 
     print("\n🎉 Setup complete! You are now ready to contribute to the CCRI CTF project.")

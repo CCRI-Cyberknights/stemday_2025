@@ -1,12 +1,13 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:49:43 GMT
-Server: Go HTTP Server/1.19
-Content-Type: application/json
-Cache-Control: no-store
-X-Powered-By: Node.js/18.16.0
-X-Flag: CEID-6219-NCUM
+Date: Sun, 30 Jun 2025 15:50:03 GMT
+Server: nginx/1.24.0
+Content-Type: text/html; charset=UTF-8
+Cache-Control: private, no-cache
+X-Powered-By: ASP.NET Core/7.0
+X-Flag: UTHW-FYXE-1235
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
+Set-Cookie: sessionid=h3b10skl1hos; HttpOnly; Secure
 
 <html>
   <head><title>Internal Dashboard</title></head>

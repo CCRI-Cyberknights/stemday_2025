@@ -1,20 +1,19 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:54:42 GMT
-Server: nginx/1.24.0
-Content-Type: text/plain; charset=UTF-8
-Cache-Control: public, max-age=86400
-X-Powered-By: Node.js/18.16.0
-X-Flag: EMIF-PXWF-3738
+Date: Sun, 30 Jun 2025 15:52:24 GMT
+Server: Liber8-Server/3.0.0-beta
+Content-Type: text/html; charset=UTF-8
+Cache-Control: private, no-cache
+X-Powered-By: ASP.NET Core/7.0
+X-Flag: UAJR-1388-IBHK
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=agmgsdm1u2l8; HttpOnly; Secure
 
 <html>
-  <head><title>Internal Dashboard</title></head>
+  <head><title>Data Service</title></head>
   <body>
-    <h1>Liber8 Ops Dashboard</h1>
-    <p>Authentication successful. Redirecting...</p>
+    <h1>Data Service Ready</h1>
+    <p>Connect your client application to begin.</p>
   </body>
 </html>
 
-<!-- To-do: Update security headers on staging -->
+<!-- Debug: Temporary caching enabled -->

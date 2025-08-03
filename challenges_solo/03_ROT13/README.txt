@@ -1,62 +1,75 @@
 # 🔐 ROT13 Decode Challenge
 
-An intercepted note was found in the logs of a compromised account. It’s readable… sort of. But every letter seems slightly off — like the alphabet has been twisted.
+A scrambled message was intercepted from a compromised Liber8 communications relay. It appears to be human-readable… but twisted.
 
-This challenge introduces ROT13, a simple substitution cipher that shifts each letter 13 places through the alphabet.
-
-- It’s symmetrical: applying ROT13 twice restores the original message.  
-- While not secure by today’s standards, it’s still used to obscure text from casual readers.
+Your mission is to unscramble it and identify the real CCRI flag buried inside.
 
 ---
 
 ## 🧠 What is ROT13?
 
-ROT13 (“rotate by 13 places”) is a classic Caesar cipher where each letter is replaced with the letter 13 positions later in the alphabet. For example:  
+ROT13 is a basic substitution cipher that rotates each letter of the alphabet 13 positions forward. After 'Z', it wraps around back to 'A'.
 
-A → N  
-N → A  
-HELLO → URYYB  
+It’s symmetrical:
+- A becomes N  
+- N becomes A  
+- Apply it twice to return to the original message
 
-Apply ROT13 twice and you’ll get back the original message.
-
----
-
-## 🛠 Tools You Might Use
-
-Linux provides multiple ways to decode ROT13 text:  
-
-- tr – translate characters in the terminal (e.g., `tr 'A-Za-z' 'N-ZA-Mn-za-m'`)  
-- python – using `codecs.decode(message, 'rot_13')`.  
-- online ROT13 decoders – easy but requires caution with sensitive data.  
+This method isn't secure — but it *is* good enough to confuse casual readers.
 
 ---
 
-## 📝 Challenge Instructions
+## 🛠 Tools & Techniques
 
-1. Open cipher.txt and inspect the scrambled message.  
-2. Use one of the tools above to decode it back into readable text.  
-3. Search the decoded text for the hidden flag.
+Here are some tools that can help you decode ROT13 manually or automatically:
 
-Note: Some tools will print the decoded message on screen without saving it. If you spot the flag, save it manually:
+| Tool         | Use Case                                 | Example Command                                      |
+|--------------|------------------------------------------|------------------------------------------------------|
+| `tr`         | Translate character sets in shell        | `tr 'A-Za-z' 'N-ZA-Mn-za-m' < cipher.txt`           |
+| `python3`    | Use a one-liner with `codecs`            | `python3 -c "import codecs; print(codecs.decode(open('cipher.txt').read(), 'rot_13'))"` |
+| `vim`/`emacs`| ROT13 decoding built into editors         | `:%!tr A-Za-z N-ZA-Mn-za-m` (inside Vim normal mode) |
+| Online tools | ROT13 converters (use cautiously)         | Paste into ROT13 decoder sites (for non-sensitive data) |
 
+> Tip: ROT13 only affects letters A–Z. Numbers, punctuation, and formatting remain unchanged.
+
+---
+
+## 🧩 Investigator’s Journal
+
+🗒️ *“They used that childish cipher again. At this point, it’s just a matter of habit. Run it through the rotator and see what shakes loose.”*
+
+---
+
+## 📝 Your Objective
+
+Inspect this file:
+
+📁 **cipher.txt**
+
+Use one of the tools above to decode the message and search for a string matching the CCRI flag format. The transmission may contain **multiple candidates** — only one is real.
+
+If your decoding method displays output to the screen, save the result manually:
+
+```bash
 echo "CCRI-AAAA-1111" > decoded_output.txt
+````
 
 ---
 
-## 📂 Files in this folder
+## 📂 Files in This Folder
 
-- cipher.txt – The scrambled message.
+* `cipher.txt` — The scrambled transmission using ROT13.
 
 ---
 
 ## 🏁 Flag Format
 
-When you find the flag, it will look like this:
+Look for a flag in this format:
 
-CCRI-AAAA-1111
+**CCRI-AAAA-1111**
 
-Replace the AAAA and numbers with the real code you uncover.
+Replace `AAAA` and `1111` with the real code found in the message.
 
 ---
 
-Take your time and experiment. This challenge is about learning how to reverse basic ciphers.
+💡 ROT13 is one of the simplest ciphers — but don't let that fool you. The message might be clear once decoded, but only one flag is authentic.

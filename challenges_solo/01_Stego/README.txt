@@ -1,64 +1,76 @@
 # 🕵️ Stego Decode Challenge
 
-Your mission: extract a secret flag hidden inside an image file.
+A suspicious image has surfaced during a Liber8 investigation. Intelligence analysts believe it contains hidden data that may expose an insider’s identity.
 
-The picture may look completely normal, but it has been altered using steganography — a technique for hiding data inside files. Cybersecurity professionals use tools to reveal these hidden secrets. Now it’s your turn.
+Your job: extract the secret message embedded within this image.
 
 ---
 
 ## 🧠 What is Steganography?
 
-Steganography comes from the Greek for "covered writing." It’s the practice of hiding information in plain sight, such as embedding a secret message in an image, audio file, or even text. Unlike encryption, steganography tries to avoid detection entirely.
+Steganography is the art of hiding messages in plain sight — like embedding a text file inside an image or song. Unlike encryption, its goal is to be invisible rather than unreadable.
 
 ---
 
-## 🛠 Tools You Might Use
+## 🛠 Tools & Techniques
 
-In Linux, there are several tools for uncovering hidden data in files. Some examples:
+Try out some of these Linux tools — each reveals different kinds of secrets:
 
-- steghide – extracts or embeds data in image/audio files.
-- binwalk – scans files for embedded content.
-- strings – searches for readable text in binary files.
-- exiftool – examines metadata in media files.
+| Tool         | Use Case                                               | Example Command                            |
+|--------------|--------------------------------------------------------|--------------------------------------------|
+| `strings`    | View readable text inside binary files                 | `strings squirrel.jpg \| less`             |
+| `exiftool`   | Inspect metadata (camera info, author, hidden tags)    | `exiftool squirrel.jpg`                    |
+| `binwalk`    | Detect and extract embedded files                      | `binwalk -e squirrel.jpg`                  |
+| `zsteg`      | Analyze LSB steganography in PNGs (JPG support limited)| `zsteg squirrel.jpg` *(may not work here)* |
+| `steghide`   | Embed/extract files using a passphrase                 | `steghide extract -sf squirrel.jpg`        |
+| `file`       | Check file type and structure                          | `file squirrel.jpg`                        |
+| `xxd`        | View raw hex data                                      | `xxd squirrel.jpg \| less`                 |
 
-This challenge assumes you’ll explore and choose the right tool for the job.
+> Tip: Use `man` or `--help` with any command to learn more.
 
----
-
-## 📝 Challenge Instructions
-
-1. Start by inspecting the suspicious image:
-   squirrel.jpg
-
-2. Think about how data might be hidden:
-   - Could there be hidden text?
-   - A file embedded within the image?
-   - Metadata carrying clues?
-
-3. Experiment with the tools above to look deeper.
-
-Hint: The password to unlock the secret is the most common one in the world.
+Not all of these tools will reveal useful information — some may lead to dead ends. The challenge lies in experimenting and connecting the dots.
 
 ---
 
-## 📂 Files in this folder
+## 🧩 Investigator's Journal
 
-- squirrel.jpg – The suspicious image.
+🗒️ *“Liber8 operatives often hide things in plain sight... and they tend to reuse the same password across tools. Predictable, rebellious, and catchy — that’s their style.”*
 
-Note: Some tools (like steghide) will automatically save the hidden content to a file (e.g., flag.txt). Other tools may simply print the hidden data on the screen. If you uncover the flag this way, save it yourself:
+---
 
+## 📝 Your Objective
+
+Analyze the image:
+
+📁 **squirrel.jpg**
+
+Ask yourself:
+- Does the image contain metadata or embedded content?
+- Are there readable strings or hidden files inside?
+- Might a password be needed to reveal the payload?
+
+If you discover the flag in output or extract a file, be sure to save it manually:
+
+```bash
 echo "CCRI-AAAA-1111" > flag.txt
+````
+
+---
+
+## 📂 Files in This Folder
+
+* `squirrel.jpg` — The image to investigate.
 
 ---
 
 ## 🏁 Flag Format
 
-When you find the flag, it will look like this:
+All flags follow the same format:
 
-CCRI-AAAA-1111
+**CCRI-AAAA-1111**
 
-Replace the AAAA and numbers with the real code you uncover.
+Replace `AAAA` and the numbers with the code you uncover.
 
 ---
 
-Take your time and experiment. This challenge is about understanding the tools and thinking like a cyber detective.
+💡 This challenge rewards persistence and creative use of tools. Think like a cyber detective — sometimes the best secrets are the ones hiding in plain sight.

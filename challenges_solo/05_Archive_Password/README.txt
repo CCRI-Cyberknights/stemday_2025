@@ -1,64 +1,77 @@
 # 🔐 ZIP File Crack & Decode
 
-You’ve recovered a mysterious ZIP archive: secret.zip.
+An encrypted ZIP archive was intercepted during a Liber8 exfiltration attempt. It’s locked with a password, but you’ve also recovered a list of possible passwords nearby — probably used by the same operative.
 
-It’s password-protected — and the password isn’t obvious. Luckily, a wordlist of possible passwords (wordlist.txt) was also found. Only one of them works.
-
-Inside the archive lies a Base64-encoded message. It contains several flag-like strings, but only one matches the official agency format.
+Inside the archive? A scrambled message, encoded in Base64. Your mission is to crack the ZIP, decode the message, and uncover the real flag.
 
 ---
 
 ## 🧠 What’s Going On?
 
-Password-protected ZIP archives are a common way to secure files. However, if the password is weak or if you have a list of potential passwords, it’s possible to “brute-force” your way in.
+Password-protected ZIP files can be brute-forced if you know (or guess) the possible passwords. If weak passwords are used — or if you have a list of likely candidates — cracking is just a matter of time and technique.
 
-After cracking the archive, you’ll also need to decode the extracted Base64 message to uncover the flag.
-
----
-
-## 🛠 Tools You Might Use
-
-To attempt cracking the ZIP file:  
-
-- fcrackzip – a tool to brute-force ZIP passwords using a wordlist.  
-- unzip – if you already know the password.  
-- python – you can write a script to try each word in the list.  
-
-To decode Base64 content:  
-
-- base64 – standard Linux utility.  
-- python – `base64.b64decode()`  
+But unlocking the archive is only part one. The extracted file contains Base64-encoded content — you'll need to decode it before the flag becomes readable.
 
 ---
 
-## 📝 Challenge Instructions
+## 🛠 Tools & Techniques
 
-1. Start by examining secret.zip and wordlist.txt.  
-2. Use one of the tools above to try each password in the wordlist.  
-3. Once you unlock the archive, extract its contents.  
-4. Decode the extracted message and carefully review for the correct flag.
+Try using a combination of these tools for different phases of this challenge:
 
-Note: Some tools will print the decoded result on screen instead of saving it. If you see the flag, save it yourself:  
+| Phase           | Tool         | Use Case / Command Example                                   |
+|------------------|--------------|---------------------------------------------------------------|
+| ZIP Cracking     | `fcrackzip`  | `fcrackzip -u -D -p wordlist.txt secret.zip`                 |
+|                  | `unzip`      | Test passwords one by one: `unzip -P guess -t secret.zip`    |
+|                  | `python`     | Write a script to loop through wordlist                      |
+| Base64 Decoding  | `base64`     | `base64 --decode message_encoded.txt`                        |
+|                  | `python3`    | `base64.b64decode()`                                         |
+| Optional Tools   | `zip2john` + `hashcat` | For hash-based cracking (advanced)              |
 
+> Note: Be cautious with automation. Rate limits or malformed attempts might corrupt the ZIP file during testing. Validate each attempt cleanly.
+
+---
+
+## 🧩 Investigator’s Journal
+
+🗒️ *“They always used the same weak password list — lazy opsec. If you find that list, you’ve already got the key. Just try them until something opens.”*
+
+---
+
+## 📝 Your Objective
+
+1. Analyze the following files:
+   - `secret.zip`: the encrypted archive
+   - `wordlist.txt`: the list of possible passwords
+
+2. Brute-force the ZIP file with the wordlist until it opens.
+
+3. Once extracted, decode the contents of `message_encoded.txt` (Base64).
+
+4. From the decoded message, locate the **one valid CCRI flag**.
+
+> If your decoder prints the flag on screen, you can save it like this:
+
+```bash
 echo "CCRI-AAAA-1111" > decoded_output.txt
+````
 
 ---
 
-## 📂 Files in this folder
+## 📂 Files in This Folder
 
-- secret.zip – The password-protected archive.  
-- wordlist.txt – Potential passwords.  
+* `secret.zip` — The password-protected archive
+* `wordlist.txt` — The password list for cracking
 
 ---
 
 ## 🏁 Flag Format
 
-When you find the flag, it will look like this:
+When you find the flag, it will follow this format:
 
-CCRI-AAAA-1111
+**CCRI-AAAA-1111**
 
-Replace the AAAA and numbers with the real code you uncover.
+Replace `AAAA` and `1111` with the real code you uncover in the decoded message.
 
 ---
 
-This challenge is about learning how weak passwords can be exploited and how data can be hidden inside archives.
+💡 This challenge is about exploiting weak password practices and layered obfuscation. Think like an analyst — work the outer shell before you reach the core.

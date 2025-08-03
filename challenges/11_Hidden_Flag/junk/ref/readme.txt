@@ -1,4 +1,7 @@
+This folder contains assorted documentation.
+This folder contains assorted documentation.
+PNAK-8250-NYAP
 Welcome to the reference directory.
 Review each file carefully.
-Review each file carefully.
-# [No sensitive data found here]
+Welcome to the reference directory.
+This folder contains assorted documentation.

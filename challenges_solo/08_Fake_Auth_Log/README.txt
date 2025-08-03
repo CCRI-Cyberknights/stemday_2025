@@ -1,57 +1,73 @@
 # 🕵️ Challenge 08: Fake Auth Log Investigation
 
-You’ve recovered a suspicious system log: auth.log.
+You’ve intercepted a suspicious system log: `auth.log`.
 
-It’s packed with fake SSH login records — but buried in the noise is one hidden flag.
+It looks like a normal SSH activity log... except something’s off. Among the login entries is a hidden flag, disguised in plain sight.
 
 ---
 
 ## 🧠 What’s Going On?
 
-System logs like auth.log record login attempts and system authentication events. Attackers sometimes hide data in logs, hoping it will blend in with normal activity. 
+System logs like `auth.log` record login attempts, user authentication, and session activity. But logs can be noisy — especially on compromised systems where attackers might try to blend false entries in with real ones.
 
-In this case, some entries have odd-looking process IDs (PIDs) that don’t follow normal number patterns. Only one of these anomalies contains the valid flag.
-
----
-
-## 🛠 Tools You Might Use
-
-- grep – Scan for keywords or patterns in large log files.  
-- less – View and scroll through logs efficiently.  
-- awk – Extract specific fields from log entries.  
-- head/tail – Quickly view the beginning or end of a file.  
+Sometimes the trick isn’t *what’s* in the log, but *where*.
 
 ---
 
-## 📝 Challenge Instructions
+## 🛠 Tools & Techniques
 
-1. Open auth.log and scan through the login entries.  
-2. Look for PIDs that seem unusual or don’t match typical numeric patterns.  
-3. Use grep and other tools to isolate suspicious entries.  
-4. Search for any flag-like strings in the output.  
+Here are some tools commonly used to slice and search through log files:
 
-Hint: Not every strange PID hides a flag. Only one matches the official agency format.
+| Tool       | Use Case                                           | Example Command                                |
+|------------|----------------------------------------------------|------------------------------------------------|
+| `grep`     | Search for text patterns in log entries            | `grep sshd auth.log`                           |
+| `awk`      | Extract structured fields like usernames or PIDs   | `awk '{print $5}' auth.log`                    |
+| `less`     | Scroll and inspect large log files interactively   | `less auth.log`                                |
+| `head`     | Preview the beginning of a file                    | `head auth.log`                                |
+| `grep -E`  | Use regular expressions for smarter filtering      | `grep -E 'CCRI-[A-Z0-9]{4}-[0-9]{4}' auth.log` |
 
-Note: If you spot the correct flag on screen, save it yourself:
+> 💡 Tip: SSH logs often follow this format:
+> `sshd[PID]: Accepted/Failed ... from IP ...`
 
+Can you spot something unusual about the PIDs?
+
+---
+
+## 🧩 Investigator’s Journal
+
+🗒️ *“The log was filled with noise, but I noticed the patterns didn’t make sense. Some process IDs looked... off. Not numeric. That’s where I started digging.”*
+
+---
+
+## 📝 Your Objective
+
+1. Explore the `auth.log` file.
+2. Look for login entries with strange or non-numeric process IDs.
+3. Use tools like `grep` or `awk` to narrow your search.
+4. One line contains a hidden flag that fits the agency format.
+
+To capture your finding:
+
+```bash
 echo "CCRI-AAAA-1111" > flag.txt
+````
 
 ---
 
-## 📂 Files in this folder
+## 📂 Files in This Folder
 
-- auth.log – Fake system log to investigate.
+* `auth.log` – Simulated log file for forensic analysis.
 
 ---
 
 ## 🏁 Flag Format
 
-When you find the flag, it will look like this:
+The correct flag will match this format:
 
-CCRI-AAAA-1111
+**CCRI-AAAA-1111**
 
-Replace the AAAA and numbers with the real code you uncover.
+Replace `AAAA` and `1111` with the correct values you uncover.
 
 ---
 
-This challenge is about analyzing log files like a system administrator to detect hidden anomalies.
+🔎 Trust your instincts and follow the clues in the logs — sometimes the system tells more than it means to.

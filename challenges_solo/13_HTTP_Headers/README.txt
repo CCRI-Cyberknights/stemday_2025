@@ -1,59 +1,77 @@
 # 📡 Challenge 13: HTTP Headers Mystery
 
-Liber8 operatives have been exchanging secret messages through HTTP servers.  
-You’ve intercepted five HTTP response files, but only ONE contains the real agency flag. The others are decoys designed to mislead intruders.
+Liber8 agents have been quietly passing secret messages through web servers.  
+You've intercepted five of their raw HTTP responses — but only one contains the **real** agency flag.
 
 ---
 
 ## 🎯 Your Mission
 
-1. Investigate each HTTP response carefully.  
-2. Look for a hidden X-Flag: header in the response.  
-3. Identify the correct flag in this format:  
-   CCRI-AAAA-1111  
+Explore the HTTP response files and uncover the secret hidden in the headers.
+
+✅ You're looking for a header that starts with:
+
+```
+
+X-Flag: CCRI-....
+
+````
+
+Only one of the five responses has the **true** agency flag in this format:
+
+**CCRI-AAAA-1111**
+
+❌ Decoy flags may use similar headers, but will be disguised with:
+- Invalid prefixes (e.g., `X-Code:` or `X-Flag: SCAN-1234-FAKE`)
+- Incorrect formats (e.g., `CCRI-1111-AAAA`)
 
 ---
 
-## 🛠 Tools You Might Use
+## 🛠 Useful Tools & Techniques
 
-- less – View and scroll through each HTTP response file.  
-- grep – Search for specific headers (e.g., `grep "X-Flag:" response_1.txt`).  
-- cat – Quickly display a file’s contents.  
+| Tool/Command                         | What it does                                           |
+|--------------------------------------|--------------------------------------------------------|
+| `less response_1.txt`                | Scroll and read a response interactively               |
+| `/CCRI` inside `less`                | Search for flag-like patterns in the file              |
+| `grep "X-Flag:" response_*.txt`      | Quickly scan files for any `X-Flag:` headers           |
+| `grep "CCRI-" response_*.txt`        | Scan for valid flags by known prefix                   |
+| `cat`, `head`, `tail`                | Peek into text files quickly                           |
+
+> 💡 Headers are near the **top** of each HTTP response. The rest is just body content or noise.
 
 ---
 
-## 📝 Challenge Instructions
+## 📝 Instructions
 
-1. Open each response file one by one and review the headers.  
-2. Search for the X-Flag: header that contains a flag-like string.  
-3. Verify that the flag matches the agency’s official format. Fake flags will use different prefixes.  
+1. Review each `response_*.txt` file using tools of your choice.  
+2. Identify lines that start with `X-Flag:`.  
+3. Validate whether the value follows the official flag format.  
+4. When you’re sure you've found the correct flag, save it like this:
 
-Hint: Only one flag starts with CCRI-. All others are impostors.
-
-Note: If you find the correct flag, save it manually:
-
+```bash
 echo "CCRI-AAAA-1111" > flag.txt
+````
 
 ---
 
-## 🗂️ Files in this folder
+## 📂 Files in This Folder
 
-- response_1.txt – Captured HTTP response #1  
-- response_2.txt – Captured HTTP response #2  
-- response_3.txt – Captured HTTP response #3  
-- response_4.txt – Captured HTTP response #4  
-- response_5.txt – Captured HTTP response #5  
+* response\_1.txt
+* response\_2.txt
+* response\_3.txt
+* response\_4.txt
+* response\_5.txt
 
 ---
 
 ## 🏁 Flag Format
 
-When you find the flag, it will look like this:
+The real flag matches this structure exactly:
 
-CCRI-AAAA-1111
+**CCRI-AAAA-1111**
 
-Replace the AAAA and numbers with the real code you uncover.
+Any other variant is a deliberate fake.
 
 ---
 
-This challenge teaches you how to analyze HTTP headers like a security analyst scanning for hidden messages.
+This challenge sharpens your ability to extract intel from network traffic — a critical skill for threat analysts and penetration testers.

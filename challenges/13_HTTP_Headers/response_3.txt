@@ -1,20 +1,19 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:47:32 GMT
-Server: Go HTTP Server/1.19
-Content-Type: application/json
-Cache-Control: public, max-age=86400
-X-Powered-By: Node.js/18.16.0
-X-Flag: YSLT-VKQL-3060
+Date: Sun, 30 Jun 2025 15:53:26 GMT
+Server: Liber8-Server/3.0.0-beta
+Content-Type: text/html; charset=UTF-8
+Cache-Control: no-store
+X-Powered-By: ASP.NET Core/7.0
+X-Flag: CCRI-QFGV-8721
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=q4hlmiculfbl; HttpOnly; Secure
 
 <html>
-  <head><title>Internal Dashboard</title></head>
+  <head><title>Liber8 Portal</title></head>
   <body>
-    <h1>Liber8 Ops Dashboard</h1>
-    <p>Authentication successful. Redirecting...</p>
+    <h1>Welcome to Liber8</h1>
+    <p>System maintenance is underway. Some services may be unavailable.</p>
   </body>
 </html>
 
-<!-- Debug: API response size 512 bytes -->
+<!-- Developer note: Remove X-Test headers before release -->

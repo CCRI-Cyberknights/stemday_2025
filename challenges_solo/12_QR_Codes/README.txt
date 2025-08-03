@@ -1,60 +1,73 @@
 # 🧠 Challenge 12: QR Code Decode
 
-This folder contains five mysterious QR code images.  
-Only ONE of them hides the real agency flag.
+Agents intercepted a packet of digital images passed between suspected operatives.  
+Each one is a QR code — a potential clue or a distraction.
+
+Only **one** hides a valid agency flag. The rest? Misdirection.
 
 ---
 
 ## 🎯 Your Mission
 
-1. View and scan each QR code using your preferred tools.  
-2. Examine the decoded results carefully.  
-3. Identify the one valid flag in this format:  
-   CCRI-AAAA-1111  
-4. Save the flag once you find it.
+Search through five suspicious QR codes and uncover which one hides a real agency flag.
+
+✅ Real flags follow this exact format:  
+**CCRI-AAAA-1111**
+
+❌ Fake flags may look convincing but use the wrong prefix, wrong order, or incorrect structure:  
+- QR-HINT-1234  
+- CCRI-1111-FAKE  
+- SCAN-CODE-####  
+Don’t fall for imitations.
 
 ---
 
-## 🛠 Tools You Might Use
+## 🛠 Suggested Tools
 
-- zbarimg – Decodes QR codes directly from image files in Linux.  
-- feh/eog – Open and view QR images in the VM.  
-- A smartphone QR scanner – You can scan the images off your VM screen.  
+Choose your approach — command-line or visual inspection.
+
+| Tool/Command              | Purpose                                         |
+|---------------------------|--------------------------------------------------|
+| `zbarimg qr_*.png`        | Scan QR images from the command line (fastest)   |
+| `feh` or `eog`            | Open and visually inspect the QR code images     |
+| Smartphone camera         | Scan QR codes directly off the VM screen         |
+| `cat *.txt`               | If your tools save decoded text to file, view it |
+
+> 💡 Hint: Each QR code is a PNG image. You’ll need to decode the contents to reveal any embedded text.
 
 ---
 
-## 📝 Challenge Instructions
+## 📝 Instructions
 
-1. Open and inspect each QR code image in this folder.  
-2. Use zbarimg or another QR decoding tool to extract the hidden text.  
-3. Look carefully at the decoded strings. Only one result follows the official format.  
+1. Examine all five QR codes in the folder using one of the tools above.  
+2. Decode the embedded text from each image.  
+3. Look carefully — some results are fake. Only one flag has the **correct format**.  
+4. When you find the real flag, save it manually like this:
 
-Hint: Fake flags may look convincing but often have the wrong prefix or structure.  
-
-Note: If you see the correct flag, save it manually:
-
+```bash
 echo "CCRI-AAAA-1111" > flag.txt
+````
 
 ---
 
-## 📂 Files in this folder
+## 📂 Files to Explore
 
-- qr_01.png – QR code image.  
-- qr_02.png – QR code image.  
-- qr_03.png – QR code image.  
-- qr_04.png – QR code image.  
-- qr_05.png – QR code image.  
+* `qr_01.png`
+* `qr_02.png`
+* `qr_03.png`
+* `qr_04.png`
+* `qr_05.png`
+
+Each file is a QR code image containing either a real flag or a convincing fake.
 
 ---
 
 ## 🏁 Flag Format
 
-When you find the flag, it will look like this:
+Real flag = `CCRI-AAAA-1111`
 
-CCRI-AAAA-1111
-
-Replace the AAAA and numbers with the real code you uncover.
+All other formats are designed to trick you.
 
 ---
 
-This challenge is about exploring digital forensics techniques to decode hidden data in everyday objects.
+Your forensic instincts and tool selection will determine how quickly you uncover the truth.

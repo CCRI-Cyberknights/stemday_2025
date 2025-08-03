@@ -34,19 +34,10 @@ def print_progress_bar(length=30, delay=0.02):
         time.sleep(delay)
     print()
 
-def run_hashcat(hashes_file, wordlist_file, potfile):
-    """Run hashcat to crack hashes."""
-    subprocess.run(
-        ["hashcat", "-m", "0", "-a", "0", hashes_file, wordlist_file,
-         "--potfile-path", potfile, "--force"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
-    )
-
 def decode_base64_file(input_path, output_path):
     """Decode a base64 file and save output."""
     decoded_dir = os.path.dirname(output_path)
-    os.makedirs(decoded_dir, exist_ok=True)  # Ensure output dir exists
+    os.makedirs(decoded_dir, exist_ok=True)
     try:
         result = subprocess.run(
             ["base64", "--decode", input_path],
@@ -62,10 +53,6 @@ def decode_base64_file(input_path, output_path):
         return None
 
 def flatten_extracted_dir(extracted_dir):
-    """
-    Move files from subdirectories up to extracted_dir,
-    then remove empty subdirectories.
-    """
     for root, dirs, files in os.walk(extracted_dir):
         for f in files:
             src = os.path.join(root, f)
@@ -85,15 +72,14 @@ def flatten_extracted_dir(extracted_dir):
                     pass
 
 def reassemble_flags(decoded_dir, assembled_file):
-    """Reassemble decoded segments into candidate flags."""
     decoded_files = sorted(
         [f for f in os.listdir(decoded_dir) if f.endswith(".txt")],
-        key=lambda x: int("".join(filter(str.isdigit, x)))  # Extract digits from filename
+        key=lambda x: int("".join(filter(str.isdigit, x)))
     )
     assembled_lines = []
     try:
         with open(assembled_file, "w") as out_f:
-            for i in range(5):  # Assume 5 candidate flags
+            for i in range(5):
                 parts = []
                 for decoded_file in decoded_files:
                     path = os.path.join(decoded_dir, decoded_file)
@@ -101,7 +87,7 @@ def reassemble_flags(decoded_dir, assembled_file):
                     if i < len(lines):
                         parts.append(lines[i].strip())
                     else:
-                        parts.append("MISSING")  # Graceful fallback
+                        parts.append("MISSING")
                 flag = "-".join(parts)
                 assembled_lines.append(flag)
                 out_f.write(flag + "\n")
@@ -110,29 +96,11 @@ def reassemble_flags(decoded_dir, assembled_file):
         print(f"❌ ERROR during flag reassembly: {e}", file=sys.stderr)
         return []
 
-def extract_zip_files(hashes_file, potfile, segments_dir, extracted_dir, decoded_dir):
-    """Pair hashes and passwords, then extract ZIP files."""
-    os.makedirs(decoded_dir, exist_ok=True)  # Ensure decoded_dir exists
+def extract_zip_files_with_passwords(passwords, segments_dir, extracted_dir, decoded_dir):
+    os.makedirs(decoded_dir, exist_ok=True)
 
-    # Load hashes.txt (original order)
-    with open(hashes_file, "r") as f:
-        hash_list = [line.strip() for line in f if line.strip()]
-
-    # Load cracked hashes
-    cracked = {}
-    with open(potfile, "r") as pf:
-        for line in pf:
-            if ':' in line:
-                hash_val, password = line.strip().split(':', 1)
-                cracked[hash_val] = password
-
-    # Map ZIP files to cracked passwords
-    for idx, hash_val in enumerate(hash_list, start=1):
-        password = cracked.get(hash_val)
+    for idx, password in enumerate(passwords, start=1):
         zipfile = os.path.join(segments_dir, f"part{idx}.zip")
-        if password is None:
-            print(f"❌ No cracked password found for hash {hash_val}", file=sys.stderr)
-            continue
 
         print(f"\n🔑 Unlocking {zipfile} with password: {password}")
         result = subprocess.run(
@@ -157,35 +125,26 @@ def extract_zip_files(hashes_file, potfile, segments_dir, extracted_dir, decoded
 
 def validate_challenge(script_dir, project_root):
     """Run validation using expected flag and hash-password-ZIP mapping."""
-    hashes_file = os.path.join(script_dir, "hashes.txt")
-    wordlist_file = os.path.join(script_dir, "wordlist.txt")
-    potfile = os.path.join(script_dir, "hashcat.potfile")
     segments_dir = os.path.join(script_dir, "segments")
     extracted_dir = os.path.join(script_dir, "extracted")
     decoded_dir = os.path.join(script_dir, "decoded_segments")
     assembled_file = os.path.join(script_dir, "assembled_flag.txt")
     unlock_file = os.path.join(project_root, "web_version_admin", "validation_unlocks.json")
 
-    # Load expected flag
+    # Load expected flag and password mapping
     try:
         with open(unlock_file, "r", encoding="utf-8") as f:
             unlocks = json.load(f)
-        expected_flag = unlocks["06_Hashcat"]["real_flag"]
+        entry = unlocks.get("06_Hashcat")
+        expected_flag = entry["real_flag"]
+        password_map = entry["hash_password_zip_map"]
+        passwords = [v["password"] for v in password_map.values()]
     except Exception as e:
         print(f"❌ ERROR: Could not load validation unlocks: {e}", file=sys.stderr)
         sys.exit(1)
 
-    print("\n🛠️ [Validation] Running Hashcat...")
-    run_hashcat(hashes_file, wordlist_file, potfile)
-
-    print("\n[✅] Cracked hashes:")
-    with open(potfile, "r") as pf:
-        for line in pf:
-            if ':' in line:
-                hash_val, password = line.strip().split(':', 1)
-                print(f"🔓 {hash_val} : {password}")
-
-    extract_zip_files(hashes_file, potfile, segments_dir, extracted_dir, decoded_dir)
+    print("\n🛠️ [Validation] Using known passwords to unzip files...")
+    extract_zip_files_with_passwords(passwords, segments_dir, extracted_dir, decoded_dir)
 
     print("\n🧩 Assembling candidate flags...")
     candidate_flags = reassemble_flags(decoded_dir, assembled_file)
@@ -197,8 +156,15 @@ def validate_challenge(script_dir, project_root):
         print(f"❌ Validation failed: flag {expected_flag} not found.", file=sys.stderr)
         sys.exit(1)
 
+def run_hashcat(hashes_file, wordlist_file, potfile):
+    subprocess.run(
+        ["hashcat", "-m", "0", "-a", "0", hashes_file, wordlist_file,
+         "--potfile-path", potfile, "--force"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
+
 def student_interactive(script_dir):
-    """Run interactive student challenge."""
     hashes_file = os.path.join(script_dir, "hashes.txt")
     wordlist_file = os.path.join(script_dir, "wordlist.txt")
     potfile = os.path.join(script_dir, "hashcat.potfile")
@@ -249,7 +215,12 @@ def student_interactive(script_dir):
                     print(f"🔓 {hash_val} : {password}")
 
         pause("\nPress ENTER to extract ZIPs and decode segments...")
-        extract_zip_files(hashes_file, potfile, segments_dir, extracted_dir, decoded_dir)
+        extract_zip_files_with_passwords(
+            [line.strip().split(':', 1)[1] for line in open(potfile) if ':' in line],
+            segments_dir,
+            extracted_dir,
+            decoded_dir
+        )
 
         print("\n🧩 Assembling candidate flags...")
         print_progress_bar()

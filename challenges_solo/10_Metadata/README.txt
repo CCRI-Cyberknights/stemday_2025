@@ -1,55 +1,70 @@
 # 🧠 Challenge 10: Metadata Mystery
 
-You’ve recovered a suspicious image file: capybara.jpg.
+You’ve recovered a suspicious image file: `capybara.jpg`.
 
-It looks normal at first glance, but investigators suspect the flag is hidden in the metadata — information stored inside the file but not visible in the picture itself.
-
-Your mission is to inspect the metadata and uncover the correct flag.
+At first glance it seems harmless — just a goofy capybara. But appearances can be deceiving. Investigators believe someone embedded a flag inside the image's metadata, where it won’t show up just by opening the file.
 
 ---
 
-## 🧠 What is Metadata?
+## 🧠 What Is Metadata?
 
-Metadata is “data about data.” In images, it often includes information like camera settings, timestamps, GPS locations, or even user comments. Attackers sometimes hide secret messages in these fields.
+Metadata is “data about data.” In images, metadata can include things like:
+
+- Camera model and lens
+- Author and comments
+- Creation date and GPS location
+
+...and sometimes, secrets.
+
+Cybercriminals often hide sensitive or incriminating details in the metadata fields, knowing they’re rarely checked by casual viewers.
 
 ---
 
-## 🛠 Tools You Might Use
+## 🛠 Tools & Techniques
 
-- exiftool – Extracts and displays metadata from image and video files.  
-- strings – Lists readable text in binary files, which sometimes includes metadata.  
-- identify (from ImageMagick) – Shows basic image info.  
+Here are some helpful commands for analyzing metadata:
+
+| Tool       | Purpose                                      |
+|------------|----------------------------------------------|
+| `exiftool` | Inspect or edit metadata from media files    |
+| `strings`  | Search for readable text in any file         |
+| `identify` | Basic image info from ImageMagick suite      |
+| `grep`     | Filter specific fields from metadata dumps   |
+
+> 💡 Some metadata fields are rarely used — and perfect for hiding things.
 
 ---
 
 ## 📝 Challenge Instructions
 
-1. Examine capybara.jpg using exiftool or similar tools.  
-2. Search through the metadata fields for any flag-like strings.  
-3. Remember: the image contains 4 fake flags. Only one matches the agency’s official format and feels legitimate.  
+1. Use `exiftool` (or a similar tool) to examine the metadata in `capybara.jpg`.  
+2. Look for anything resembling a flag — but be cautious!  
+3. This image contains **four fake flags** and **one real one**. Only the correct one follows the agency’s format and feels authentic.
 
-Hint: Don’t trust the first flag you see.
+⚠️ Just because something *looks* like a flag doesn’t mean it’s real. Metadata lies.
 
-Note: If your tool doesn’t save the result automatically, and you find the correct flag, save it manually:
+When you’re confident you've found the real one, save it like this:
 
+```bash
 echo "CCRI-AAAA-1111" > flag.txt
+````
 
 ---
 
-## 📂 Files in this folder
+## 📂 Files in This Folder
 
-- capybara.jpg – Image containing hidden metadata.
+* `capybara.jpg` – Image file hiding something important.
 
 ---
 
 ## 🏁 Flag Format
 
-When you find the flag, it will look like this:
+The valid flag will match this format:
 
-CCRI-AAAA-1111
+**CCRI-AAAA-1111**
 
-Replace the AAAA and numbers with the real code you uncover.
+Replace `AAAA` and `1111` with the actual values you uncover.
 
 ---
 
-This challenge is about using forensic tools to dig beneath the surface of seemingly harmless files.
+🎯 Sometimes the most revealing information isn’t in the image — it’s in the silence between pixels.

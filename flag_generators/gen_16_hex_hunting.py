@@ -83,5 +83,14 @@ class HexHuntingFlagGenerator:
             real_flag = FlagUtils.generate_real_flag()
 
         self.generate_hex_file(challenge_folder, real_flag, fake_flags)
+
+        # Update metadata for master script
+        self.metadata = {
+            "real_flag": real_flag,
+            "challenge_file": str((challenge_folder / "hex_flag.bin").relative_to(self.project_root)),
+            "unlock_method": "Inspect hex_flag.bin with a hex editor or strings command to locate the flag",
+            "hint": "Try running 'strings hex_flag.bin' or open it in a hex editor like bless or GHex."
+        }
+
         print(f"✅ {self.mode.capitalize()} flag: {real_flag}")
         return real_flag

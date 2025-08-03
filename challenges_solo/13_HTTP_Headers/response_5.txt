@@ -1,19 +1,15 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:56:49 GMT
-Server: Liber8-Server/2.3.1
-Content-Type: text/plain; charset=UTF-8
+Date: Sun, 30 Jun 2025 15:59:04 GMT
+Server: Go HTTP Server/1.19
+Content-Type: application/json
 Cache-Control: no-store
 X-Powered-By: ASP.NET Core/7.0
-X-Flag: FTUH-5510-SCHM
+X-Flag: WFVB-SMSJ-1259
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
+Set-Cookie: sessionid=xf07oyo8npkp; HttpOnly; Secure
 
-<html>
-  <head><title>Liber8 Portal</title></head>
-  <body>
-    <h1>Welcome to Liber8</h1>
-    <p>System maintenance is underway. Some services may be unavailable.</p>
-  </body>
-</html>
+Welcome to the Liber8 data endpoint.
+This endpoint returns plain text responses.
 
-<!-- Debug: API response size 512 bytes -->
+<!-- Developer note: Remove X-Test headers before release -->

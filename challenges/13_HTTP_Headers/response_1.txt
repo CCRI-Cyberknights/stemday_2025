@@ -1,19 +1,18 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:47:47 GMT
-Server: Apache/2.4.54 (Ubuntu)
-Content-Type: text/plain; charset=UTF-8
-Cache-Control: no-store
-X-Powered-By: Ruby on Rails/7.1.0
-X-Flag: WZLY-3761-XKBE
+Date: Sun, 30 Jun 2025 15:49:15 GMT
+Server: Liber8-Server/3.0.0-beta
+Content-Type: text/html; charset=UTF-8
+Cache-Control: public, max-age=86400
+X-Powered-By: PHP/8.1.12
+X-Flag: LBPD-AIJC-0036
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
+Set-Cookie: sessionid=ivlr4s7v8grt; HttpOnly; Secure
 
-<html>
-  <head><title>Data Service</title></head>
-  <body>
-    <h1>Data Service Ready</h1>
-    <p>Connect your client application to begin.</p>
-  </body>
-</html>
+{
+  "status": "ok",
+  "message": "API version 1.2.4 is running.",
+  "notes": "No maintenance scheduled."
+}
 
 <!-- Developer note: Remove X-Test headers before release -->
