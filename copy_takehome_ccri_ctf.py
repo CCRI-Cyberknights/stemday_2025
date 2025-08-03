@@ -32,11 +32,11 @@ include = [
 ]
 
 def copy_and_fix(src: Path, dst: Path):
-    """Copy src to dst, replacing existing, then fix ownership and permissions."""
+    """Copy src to dst, replacing existing file/folder, then fix ownership and permissions."""
     if dst.exists():
-        if dst.is_dir():
+        if dst.is_dir() and src.is_dir():
             shutil.rmtree(dst)
-        else:
+        elif dst.is_file():
             dst.unlink()
 
     if src.is_dir():
@@ -52,6 +52,7 @@ def copy_and_fix(src: Path, dst: Path):
     else:
         shutil.copy2(src, dst)
 
+    # Fix ownership and permissions
     uid = pwd.getpwnam(target_user).pw_uid
     gid = pwd.getpwnam(target_user).pw_gid
 
@@ -61,21 +62,20 @@ def copy_and_fix(src: Path, dst: Path):
     def is_plain_text(fname):
         return fname.endswith((".txt", ".md", ".json"))
 
-    for dirpath, _, filenames in os.walk(dst) if dst.is_dir() else [(dst.parent, [], [dst.name])]:
-        os.chown(dirpath, uid, gid)
-        os.chmod(dirpath, 0o755)
-
-        for fname in filenames:
-            fpath = os.path.join(dirpath, fname)
-            os.chown(fpath, uid, gid)
-            if is_script(fname):
-                os.chmod(fpath, 0o755)
-            elif is_plain_text(fname):
-                os.chmod(fpath, 0o644)
-            else:
-                os.chmod(fpath, 0o644)
-
-    if dst.is_file():
+    if dst.is_dir():
+        for dirpath, _, filenames in os.walk(dst):
+            os.chown(dirpath, uid, gid)
+            os.chmod(dirpath, 0o755)
+            for fname in filenames:
+                fpath = os.path.join(dirpath, fname)
+                os.chown(fpath, uid, gid)
+                if is_script(fname):
+                    os.chmod(fpath, 0o755)
+                elif is_plain_text(fname):
+                    os.chmod(fpath, 0o644)
+                else:
+                    os.chmod(fpath, 0o644)
+    else:
         os.chown(dst, uid, gid)
         if is_script(dst.name):
             os.chmod(dst, 0o755)
@@ -88,10 +88,7 @@ def main():
     print(f"📂 Source: {source_root}")
     print(f"📥 Target: {target_root}")
 
-    if target_root.exists():
-        print(f"🗑️ Removing existing folder: {target_root}")
-        shutil.rmtree(target_root)
-
+    # Make sure target root exists but don't wipe it
     target_root.mkdir(parents=True, exist_ok=True)
 
     for item in include:
