@@ -48,7 +48,6 @@ include = [
     "web_version",
     "start_web_hub.py",
     "stop_web_hub.py",
-    "Launch_CCRI_CTF_HUB.desktop",
     ".mode",
     ".ccri_ctf_root"
 ]
@@ -132,7 +131,21 @@ def main():
             copy_and_fix(src, dst, uid, gid)
         else:
             print(f"⚠️ Skipping missing item: {item}")
+        
+    # Copy desktop launcher separately to the top-level desktop
+    desktop_launcher_src = source_root / "Launch_CCRI_CTF_HUB.desktop"
+    desktop_launcher_dst = target_desktop / "Launch_CCRI_CTF_HUB.desktop"
 
+    if desktop_launcher_src.exists():
+        print(f"📎 Placing launcher on desktop...")
+        copy_and_fix(desktop_launcher_src, desktop_launcher_dst, uid, gid)
+
+        # Mark .desktop file as trusted for MATE (Caja)
+        os.chmod(desktop_launcher_dst, 0o775)
+        print("🔐 Marked launcher as trusted (executable).")
+    else:
+        print(f"⚠️ Missing desktop launcher: {desktop_launcher_src}")
+    
     print("\n✅ Done. Content copied and ownership/permissions adjusted.")
     print(f"📎 Now accessible in: {target_root}")
     print("ℹ️ If you just added users to a group, log out and back in to apply membership.")
