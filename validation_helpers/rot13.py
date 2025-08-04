@@ -4,6 +4,7 @@ from pathlib import Path
 from common import find_project_root, load_unlock_data
 
 def rot13(text: str) -> str:
+    """Apply ROT13 cipher to input text."""
     result = []
     for c in text:
         if "a" <= c <= "z":
@@ -19,17 +20,16 @@ def main():
     root = find_project_root()
     data = load_unlock_data(root, challenge_id)
 
-    flag = data.get("real_flag")
+    flag = data["real_flag"]
     file_rel = data.get("challenge_file", "challenges/03_ROT13/cipher.txt")
     input_path = root / file_rel
 
-    if not input_path.exists():
+    if not input_path.is_file():
         print(f"❌ Input file not found: {input_path}", file=sys.stderr)
         sys.exit(1)
 
     try:
-        lines = input_path.read_text(encoding="utf-8").splitlines()
-        decoded = "\n".join(rot13(line) for line in lines)
+        decoded = "\n".join(rot13(line) for line in input_path.read_text(encoding="utf-8").splitlines())
     except Exception as e:
         print(f"❌ Failed to decode cipher file: {e}", file=sys.stderr)
         sys.exit(1)

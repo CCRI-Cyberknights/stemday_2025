@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 import sys
 import os
-import importlib
+import subprocess
 import json
-import traceback
 from pathlib import Path
 
 # === Paths ===
@@ -52,39 +51,29 @@ def load_unlock_data(mode):
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
-def run_validator(challenge_id, mode, unlocks):
+def run_validator(challenge_id, mode):
     module_name = CHALLENGE_TO_MODULE.get(challenge_id)
     if not module_name:
         print(f"⚠️  Skipped: No module mapping for {challenge_id}")
         return False
 
-    full_module = f"validation_helpers.{module_name}"
-    module_path = VALIDATION_MODULES / f"{module_name}.py"
+    script_path = VALIDATION_MODULES / f"{module_name}.py"
+    print(f"\n🔍 Validating {challenge_id} using {script_path}...")
 
-    print(f"\n🔍 Validating {challenge_id} via {full_module}...")
-
-    if not module_path.exists():
-        print(f"⚠️  Skipped: Module {module_name}.py not found.")
+    if not script_path.exists():
+        print(f"⚠️  Skipped: {script_path} not found.")
         return False
 
-    os.environ["CCRI_VALIDATE"] = "1"
-    os.environ["CCRI_MODE"] = mode
-
     try:
-        mod = importlib.import_module(full_module)
-        if hasattr(mod, "validate"):
-            success = mod.validate(unlocks.get(challenge_id, {}), mode)
-            if success:
-                print(f"✅ {challenge_id}: Validation passed.")
-                return True
-            else:
-                print(f"❌ {challenge_id}: Validation failed.")
-                return False
-        else:
-            print(f"❌ {challenge_id}: No validate(unlocks, mode) function in {module_name}.py")
-            return False
+        result = subprocess.run(
+            [sys.executable, str(script_path)],
+            env={**os.environ, "CCRI_MODE": mode},
+            stdout=sys.stdout,
+            stderr=sys.stderr
+        )
+        return result.returncode == 0
     except Exception as e:
-        print(f"❌ {challenge_id}: Exception during validation:\n{traceback.format_exc()}")
+        print(f"❌ Exception running validator: {e}")
         return False
 
 def main():
@@ -97,13 +86,12 @@ def main():
 
     print(f"🛠️ Mode: {mode.upper()}")
     challenges = load_challenges(mode)
-    unlocks = load_unlock_data(mode)
 
     success = 0
     fail = 0
 
     for challenge_id in challenges:
-        if run_validator(challenge_id, mode, unlocks):
+        if run_validator(challenge_id, mode):
             success += 1
         else:
             fail += 1

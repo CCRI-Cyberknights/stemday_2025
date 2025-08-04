@@ -1,27 +1,9 @@
 #!/usr/bin/env python3
-import os
 import sys
-import json
 import subprocess
+from common import find_project_root, load_unlock_data
 
 CHALLENGE_ID = "17_Nmap_Scanning"
-GUIDED_JSON = "validation_unlocks.json"
-SOLO_JSON = "validation_unlocks_solo.json"
-
-def find_project_root():
-    dir_path = os.path.abspath(os.path.dirname(__file__))
-    while dir_path != "/":
-        if os.path.exists(os.path.join(dir_path, ".ccri_ctf_root")):
-            return dir_path
-        dir_path = os.path.dirname(dir_path)
-    print("❌ ERROR: Could not find project root marker (.ccri_ctf_root).", file=sys.stderr)
-    sys.exit(1)
-
-def get_ctf_mode():
-    mode = os.environ.get("CCRI_MODE")
-    if mode in ("guided", "solo"):
-        return mode
-    return "solo" if "challenges_solo" in os.path.abspath(__file__) else "guided"
 
 def fetch_port_response(port):
     try:
@@ -33,7 +15,7 @@ def fetch_port_response(port):
         )
         return result.stdout.strip()
     except Exception as e:
-        print(f"❌ Curl failed: {e}")
+        print(f"❌ Curl failed: {e}", file=sys.stderr)
         return ""
 
 def validate_flag(expected_flag, expected_port):
@@ -48,19 +30,10 @@ def validate_flag(expected_flag, expected_port):
         return False
 
 def main():
-    project_root = find_project_root()
-    mode = get_ctf_mode()
-    unlock_file = os.path.join(project_root, "web_version_admin", SOLO_JSON if mode == "solo" else GUIDED_JSON)
-
-    try:
-        with open(unlock_file, "r", encoding="utf-8") as f:
-            unlocks = json.load(f)
-        meta = unlocks[CHALLENGE_ID]
-        expected_flag = meta["real_flag"]
-        expected_port = meta["real_port"]
-    except Exception as e:
-        print(f"❌ Could not load validation data: {e}", file=sys.stderr)
-        sys.exit(1)
+    root = find_project_root()
+    data = load_unlock_data(root, CHALLENGE_ID)
+    expected_flag = data["real_flag"]
+    expected_port = data["real_port"]
 
     if validate_flag(expected_flag, expected_port):
         sys.exit(0)

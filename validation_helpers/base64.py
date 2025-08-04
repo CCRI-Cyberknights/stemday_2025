@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+import os
 import base64
 from pathlib import Path
 from common import find_project_root, load_unlock_data
@@ -18,20 +19,28 @@ def main():
     data = load_unlock_data(root, challenge_id)
 
     flag = data.get("real_flag")
-    file_rel = data.get("challenge_file", "challenges/02_Base64/encoded.txt")
+    mode = os.environ.get("CCRI_MODE", "guided")
+
+    # For guided mode, use embedded path from JSON
+    if mode == "guided":
+        file_rel = data.get("challenge_file", f"challenges/{challenge_id}/encoded.txt")
+    else:
+        # For solo mode, infer path manually
+        file_rel = f"challenges_solo/{challenge_id}/encoded.txt"
+
     input_path = root / file_rel
 
     if not input_path.exists():
         print(f"❌ Challenge file not found: {input_path}")
-        sys.exit(1)
+        return 1
 
     decoded = decode_file(input_path)
     if flag in decoded:
         print(f"✅ Validation success: found flag {flag}")
-        sys.exit(0)
+        return 0
     else:
         print(f"❌ Validation failed: flag {flag} not found in decoded content")
-        sys.exit(1)
+        return 1
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

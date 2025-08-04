@@ -23,7 +23,7 @@ def vigenere_decrypt(ciphertext: str, key: str) -> str:
             result.append(char)
     return ''.join(result)
 
-def find_flag(text: str) -> str:
+def extract_flag(text: str) -> str:
     match = re.search(r"CCRI-[A-Z0-9]{4}-\d{4}", text)
     return match.group(0) if match else ""
 
@@ -32,7 +32,7 @@ def main():
     root = find_project_root()
     data = load_unlock_data(root, challenge_id)
 
-    flag = data.get("real_flag")
+    expected_flag = data.get("real_flag")
     file_rel = data.get("challenge_file", "challenges/04_Vigenere/cipher.txt")
     input_path = root / file_rel
 
@@ -43,17 +43,17 @@ def main():
     try:
         ciphertext = input_path.read_text(encoding="utf-8")
         decrypted = vigenere_decrypt(ciphertext, "login")  # fixed keyword
-        found_flag = find_flag(decrypted)
+        found_flag = extract_flag(decrypted)
     except Exception as e:
-        print(f"❌ Error decrypting file: {e}", file=sys.stderr)
+        print(f"❌ Error during decryption or extraction: {e}", file=sys.stderr)
         sys.exit(1)
 
     if found_flag:
-        if found_flag == flag:
+        if found_flag == expected_flag:
             print(f"✅ Validation success: found flag {found_flag}")
             sys.exit(0)
         else:
-            print(f"❌ Incorrect flag found: {found_flag}, expected {flag}", file=sys.stderr)
+            print(f"❌ Incorrect flag: found {found_flag}, expected {expected_flag}", file=sys.stderr)
             sys.exit(1)
     else:
         print("❌ No CCRI flag found in decrypted text.", file=sys.stderr)
