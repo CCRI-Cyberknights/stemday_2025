@@ -9,6 +9,27 @@ import subprocess
 import pwd
 import grp
 
+def ensure_group_and_members(group_name, users):
+    """Create group if missing, and ensure listed users are members."""
+    try:
+        group = grp.getgrnam(group_name)
+        print(f"✅ Group '{group_name}' already exists.")
+    except KeyError:
+        print(f"➕ Group '{group_name}' not found. Creating it...")
+        subprocess.run(["groupadd", group_name], check=True)
+        group = grp.getgrnam(group_name)
+
+    current_members = set(group.gr_mem)
+
+    for user in users:
+        if user not in current_members:
+            print(f"👥 Adding '{user}' to group '{group_name}'...")
+            subprocess.run(["usermod", "-aG", group_name, user], check=True)
+        else:
+            print(f"✅ User '{user}' is already in group '{group_name}'.")
+
+    return group.gr_gid
+
 # === Target student user and desktop path ===
 target_user = "ccri_stem"
 target_group = "ccri_ctf"
@@ -32,7 +53,7 @@ include = [
     ".ccri_ctf_root"
 ]
 
-def copy_and_fix(src: Path, dst: Path):
+def copy_and_fix(src: Path, dst: Path, uid: int, gid: int):
     """Copy src to dst, replacing existing, then fix ownership and permissions."""
     if dst.exists():
         if dst.is_dir():
@@ -44,9 +65,6 @@ def copy_and_fix(src: Path, dst: Path):
         shutil.copytree(src, dst)
     else:
         shutil.copy2(src, dst)
-
-    uid = pwd.getpwnam(target_user).pw_uid
-    gid = grp.getgrnam(target_group).gr_gid
 
     def is_script(fname):
         return fname.endswith((".py", ".sh", ".desktop"))
@@ -89,6 +107,14 @@ def main():
             print(f"❌ Failed to elevate privileges: {e}")
         sys.exit(0)
 
+    invoking_user = os.environ.get("SUDO_USER")
+    if not invoking_user:
+        print("❌ Could not determine invoking user via SUDO_USER.")
+        sys.exit(1)
+
+    uid = pwd.getpwnam(target_user).pw_uid
+    gid = ensure_group_and_members(target_group, [target_user, invoking_user])
+
     print(f"📂 Source: {source_root}")
     print(f"📥 Target: {target_root}")
 
@@ -103,12 +129,13 @@ def main():
         dst = target_root / item
         if src.exists():
             print(f"➡️ Copying {item}...")
-            copy_and_fix(src, dst)
+            copy_and_fix(src, dst, uid, gid)
         else:
             print(f"⚠️ Skipping missing item: {item}")
 
     print("\n✅ Done. Content copied and ownership/permissions adjusted.")
     print(f"📎 Now accessible in: {target_root}")
+    print("ℹ️ If you just added users to a group, log out and back in to apply membership.")
 
 if __name__ == "__main__":
     main()
