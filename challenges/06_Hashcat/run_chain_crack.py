@@ -3,57 +3,14 @@ import os
 import sys
 import subprocess
 import time
-import json
-
-# === Constants ===
-GUIDED_JSON = "validation_unlocks.json"
-SOLO_JSON = "validation_unlocks_solo.json"
-CHALLENGE_ID = "06_Hashcat"
-
-# === Detect Validation Mode
-validation_mode = os.getenv("CCRI_VALIDATE") == "1"
-
-# === Utilities
-def find_project_root():
-    dir_path = os.path.abspath(os.path.dirname(__file__))
-    while dir_path != "/":
-        if os.path.exists(os.path.join(dir_path, ".ccri_ctf_root")):
-            return dir_path
-        dir_path = os.path.dirname(dir_path)
-    print("❌ ERROR: Could not find project root marker.", file=sys.stderr)
-    sys.exit(1)
-
-def get_ctf_mode():
-    env = os.environ.get("CCRI_MODE")
-    if env in ("guided", "solo"):
-        return env
-    return "solo" if "challenges_solo" in os.path.abspath(__file__) else "guided"
-
-def load_unlock_data(project_root):
-    unlock_file = os.path.join(project_root, "web_version_admin", SOLO_JSON if get_ctf_mode() == "solo" else GUIDED_JSON)
-    try:
-        with open(unlock_file, "r", encoding="utf-8") as f:
-            unlocks = json.load(f)
-        entry = unlocks.get(CHALLENGE_ID)
-        expected_flag = entry["real_flag"]
-        password_map = entry["hash_password_zip_map"]
-        passwords = [v["password"] for v in password_map.values()]
-        return expected_flag, passwords
-    except Exception as e:
-        print(f"❌ ERROR: Could not load unlock data: {e}", file=sys.stderr)
-        sys.exit(1)
 
 def clear_screen():
-    if not validation_mode:
-        os.system('clear' if os.name == 'posix' else 'cls')
+    os.system('clear' if os.name == 'posix' else 'cls')
 
 def pause(prompt="Press ENTER to continue..."):
-    if not validation_mode:
-        input(prompt)
+    input(prompt)
 
 def print_progress_bar(length=30, delay=0.02):
-    if validation_mode:
-        return
     for _ in range(length):
         print("█", end="", flush=True)
         time.sleep(delay)
@@ -92,27 +49,6 @@ def flatten_extracted_dir(extracted_dir):
             except OSError:
                 pass
 
-def reassemble_flags(decoded_dir, assembled_file):
-    decoded_files = sorted(
-        [f for f in os.listdir(decoded_dir) if f.endswith(".txt")],
-        key=lambda x: int("".join(filter(str.isdigit, x)))
-    )
-    assembled_lines = []
-    try:
-        with open(assembled_file, "w") as out_f:
-            for i in range(5):
-                parts = []
-                for f in decoded_files:
-                    lines = open(os.path.join(decoded_dir, f)).readlines()
-                    parts.append(lines[i].strip() if i < len(lines) else "MISSING")
-                flag = "-".join(parts)
-                assembled_lines.append(flag)
-                out_f.write(flag + "\n")
-        return assembled_lines
-    except Exception as e:
-        print(f"❌ ERROR during flag reassembly: {e}", file=sys.stderr)
-        return []
-
 def extract_zip_files_with_passwords(passwords, segments_dir, extracted_dir, decoded_dir):
     os.makedirs(decoded_dir, exist_ok=True)
     for idx, password in enumerate(passwords, start=1):
@@ -136,26 +72,26 @@ def extract_zip_files_with_passwords(passwords, segments_dir, extracted_dir, dec
                     os.path.join(decoded_dir, f"decoded_{f}")
                 )
 
-def validate_challenge(script_dir, project_root):
-    segments_dir = os.path.join(script_dir, "segments")
-    extracted_dir = os.path.join(script_dir, "extracted")
-    decoded_dir = os.path.join(script_dir, "decoded_segments")
-    assembled_file = os.path.join(script_dir, "assembled_flag.txt")
-
-    expected_flag, passwords = load_unlock_data(project_root)
-
-    print("\n🛠️ [Validation] Using known passwords to unzip files...")
-    extract_zip_files_with_passwords(passwords, segments_dir, extracted_dir, decoded_dir)
-
-    print("\n🧩 Assembling candidate flags...")
-    candidate_flags = reassemble_flags(decoded_dir, assembled_file)
-
-    if expected_flag in candidate_flags:
-        print(f"✅ Validation success: found flag {expected_flag}")
-        sys.exit(0)
-    else:
-        print(f"❌ Validation failed: flag {expected_flag} not found.", file=sys.stderr)
-        sys.exit(1)
+def reassemble_flags(decoded_dir, assembled_file):
+    decoded_files = sorted(
+        [f for f in os.listdir(decoded_dir) if f.endswith(".txt")],
+        key=lambda x: int("".join(filter(str.isdigit, x)))
+    )
+    assembled_lines = []
+    try:
+        with open(assembled_file, "w") as out_f:
+            for i in range(5):
+                parts = []
+                for f in decoded_files:
+                    lines = open(os.path.join(decoded_dir, f)).readlines()
+                    parts.append(lines[i].strip() if i < len(lines) else "MISSING")
+                flag = "-".join(parts)
+                assembled_lines.append(flag)
+                out_f.write(flag + "\n")
+        return assembled_lines
+    except Exception as e:
+        print(f"❌ ERROR during flag reassembly: {e}", file=sys.stderr)
+        return []
 
 def run_hashcat(hashes_file, wordlist_file, potfile):
     subprocess.run(
@@ -235,9 +171,4 @@ def student_interactive(script_dir):
 
 if __name__ == "__main__":
     script_dir = os.path.abspath(os.path.dirname(__file__))
-    project_root = find_project_root()
-
-    if validation_mode:
-        validate_challenge(script_dir, project_root)
-    else:
-        student_interactive(script_dir)
+    student_interactive(script_dir)

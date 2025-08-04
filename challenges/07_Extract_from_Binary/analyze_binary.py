@@ -3,47 +3,16 @@ import os
 import sys
 import subprocess
 import time
-import json
 import re
 
-# === Constants ===
-GUIDED_JSON = "validation_unlocks.json"
-SOLO_JSON = "validation_unlocks_solo.json"
-CHALLENGE_ID = "07_ExtractBinary"
 regex_pattern = r'\b([A-Z0-9]{4}-){2}[A-Z0-9]{4}\b'
 
-# === Validation Mode Detection
-validation_mode = os.getenv("CCRI_VALIDATE") == "1"
+def clear_screen():
+    os.system('clear' if os.name == 'posix' else 'cls')
 
-# === Project Root Detection
-def find_project_root():
-    dir_path = os.path.abspath(os.path.dirname(__file__))
-    while dir_path != "/":
-        if os.path.exists(os.path.join(dir_path, ".ccri_ctf_root")):
-            return dir_path
-        dir_path = os.path.dirname(dir_path)
-    print("❌ ERROR: Could not find project root marker (.ccri_ctf_root).", file=sys.stderr)
-    sys.exit(1)
+def pause(prompt="Press ENTER to continue..."):
+    input(prompt)
 
-# === Mode Detection
-def get_ctf_mode():
-    env = os.environ.get("CCRI_MODE")
-    if env in ("guided", "solo"):
-        return env
-    return "solo" if "challenges_solo" in os.path.abspath(__file__) else "guided"
-
-# === Unlock File Loader
-def load_expected_flag(project_root):
-    unlock_file = os.path.join(project_root, "web_version_admin", SOLO_JSON if get_ctf_mode() == "solo" else GUIDED_JSON)
-    try:
-        with open(unlock_file, "r", encoding="utf-8") as f:
-            unlocks = json.load(f)
-        return unlocks[CHALLENGE_ID]["real_flag"]
-    except Exception as e:
-        print(f"❌ ERROR: Could not load validation unlocks: {e}", file=sys.stderr)
-        sys.exit(1)
-
-# === String Extraction
 def run_strings(binary_path, output_path):
     try:
         with open(output_path, "w") as out_f:
@@ -52,7 +21,6 @@ def run_strings(binary_path, output_path):
         print("❌ ERROR: Failed to run 'strings'.", file=sys.stderr)
         sys.exit(1)
 
-# === Flag Pattern Matching
 def search_for_flags(file_path, regex):
     matches = []
     try:
@@ -65,32 +33,11 @@ def search_for_flags(file_path, regex):
         sys.exit(1)
     return matches
 
-# === Main Logic
 def main():
-    project_root = find_project_root()
     script_dir = os.path.abspath(os.path.dirname(__file__))
     target_binary = os.path.join(script_dir, "hidden_flag")
     outfile = os.path.join(script_dir, "extracted_strings.txt")
 
-    # === Validation Mode ===
-    if validation_mode:
-        expected_flag = load_expected_flag(project_root)
-
-        if not os.path.isfile(target_binary):
-            print(f"❌ ERROR: Target binary '{target_binary}' missing.", file=sys.stderr)
-            sys.exit(1)
-
-        run_strings(target_binary, outfile)
-        matches = search_for_flags(outfile, regex_pattern)
-
-        if expected_flag in matches:
-            print(f"✅ Validation success: found flag {expected_flag}")
-            sys.exit(0)
-        else:
-            print(f"❌ Validation failed: flag {expected_flag} not found in extracted strings.", file=sys.stderr)
-            sys.exit(1)
-
-    # === Student Mode ===
     clear_screen()
     print("🧪 Binary Forensics Challenge")
     print("=============================\n")
@@ -149,6 +96,5 @@ def main():
     print("🧠 Remember: Only one string matches the official flag format: CCRI-AAAA-1111\n")
     pause("Press ENTER to close this terminal...")
 
-# === Entry Point
 if __name__ == "__main__":
     main()

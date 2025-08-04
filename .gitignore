@@ -28,6 +28,8 @@
 # Un-ignore folders AND their contents
 !flag_generators/
 !flag_generators/**
+!validation_helpers
+!validation_helpers/**
 
 # Ignore Python cache only in flag_generators
 flag_generators/__pycache__/

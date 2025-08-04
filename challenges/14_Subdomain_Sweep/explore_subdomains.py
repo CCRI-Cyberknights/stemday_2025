@@ -2,47 +2,12 @@
 import os
 import sys
 import subprocess
-import json
-
-# === Challenge Constants ===
-CHALLENGE_ID = "14_SubdomainSweep"
-GUIDED_JSON = "validation_unlocks.json"
-SOLO_JSON = "validation_unlocks_solo.json"
-validation_mode = os.getenv("CCRI_VALIDATE") == "1"
-
-def find_project_root():
-    dir_path = os.path.abspath(os.path.dirname(__file__))
-    while dir_path != "/":
-        if os.path.exists(os.path.join(dir_path, ".ccri_ctf_root")):
-            return dir_path
-        dir_path = os.path.dirname(dir_path)
-    print("❌ ERROR: Could not find project root marker (.ccri_ctf_root).", file=sys.stderr)
-    sys.exit(1)
-
-def get_ctf_mode():
-    mode = os.environ.get("CCRI_MODE")
-    if mode in ("guided", "solo"):
-        return mode
-    return "solo" if "challenges_solo" in os.path.abspath(__file__) else "guided"
-
-def load_expected_flag(project_root):
-    mode = get_ctf_mode()
-    unlock_path = os.path.join(project_root, "web_version_admin", SOLO_JSON if mode == "solo" else GUIDED_JSON)
-    try:
-        with open(unlock_path, "r", encoding="utf-8") as f:
-            unlocks = json.load(f)
-        return unlocks[CHALLENGE_ID]["real_flag"]
-    except Exception as e:
-        print(f"❌ ERROR: Could not load validation unlocks: {e}", file=sys.stderr)
-        sys.exit(1)
 
 def clear_screen():
-    if not validation_mode:
-        os.system('clear' if os.name == 'posix' else 'cls')
+    os.system('clear' if os.name == 'posix' else 'cls')
 
 def pause(prompt="Press ENTER to continue..."):
-    if not validation_mode:
-        input(prompt)
+    input(prompt)
 
 def flatten_html_files(script_dir):
     for root, dirs, files in os.walk(script_dir):
@@ -85,32 +50,12 @@ def auto_scan_for_flags(script_dir):
     except Exception as e:
         print(f"❌ ERROR during auto-scan: {e}")
 
-def validate_subdomains(domains, script_dir, expected_flag):
-    print("🔍 Validation: scanning all subdomain HTML pages for the expected flag...")
-    for domain in domains:
-        html_file = os.path.join(script_dir, f"{domain}.liber8.local.html")
-        try:
-            with open(html_file, "r", encoding="utf-8") as f:
-                if expected_flag in f.read():
-                    print(f"✅ Validation success: found flag {expected_flag} in {os.path.basename(html_file)}")
-                    return True
-        except Exception as e:
-            print(f"❌ ERROR reading {html_file}: {e}")
-    print(f"❌ Validation failed: flag {expected_flag} not found in any subdomain HTML file.", file=sys.stderr)
-    return False
-
 def main():
-    project_root = find_project_root()
     script_dir = os.path.abspath(os.path.dirname(__file__))
     domains = ["alpha", "beta", "gamma", "delta", "omega"]
 
     flatten_html_files(script_dir)
 
-    if validation_mode:
-        expected_flag = load_expected_flag(project_root)
-        sys.exit(0 if validate_subdomains(domains, script_dir, expected_flag) else 1)
-
-    # === Student Interactive Mode ===
     clear_screen()
     print("🌐 Subdomain Sweep")
     print("=================================\n")
@@ -120,8 +65,7 @@ def main():
     print("🧠 Flag format: CCRI-AAAA-1111")
     print("💡 In real CTFs, you'd use tools like curl, grep, or open the page in a browser to search for hidden data.\n")
 
-    missing_files = check_html_files(domains, script_dir)
-    if missing_files:
+    if check_html_files(domains, script_dir):
         pause("\n⚠️ One or more HTML files are missing. Press ENTER to exit.")
         sys.exit(1)
 
@@ -132,7 +76,7 @@ def main():
         print("6. Auto-scan all subdomains for flag patterns")
         print("7. Exit\n")
 
-        choice = input("Select an option (1-7): ").strip()
+        choice = input("Select an option (1–7): ").strip()
 
         if choice in {"1", "2", "3", "4", "5"}:
             idx = int(choice) - 1
@@ -140,7 +84,6 @@ def main():
             print(f"\n🌐 Opening {os.path.basename(html_file)} in your browser...")
             open_in_browser(html_file)
             print("\n💻 Tip: View the page AND its source (Ctrl+U) for hidden data.")
-            print("        You can also try searching for 'CCRI-' manually in the browser.\n")
             pause("Press ENTER to return to the menu.")
             clear_screen()
 

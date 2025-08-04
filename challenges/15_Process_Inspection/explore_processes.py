@@ -2,51 +2,16 @@
 import os
 import sys
 import subprocess
-import json
 import time
 
-# === Constants ===
-CHALLENGE_ID = "15_ProcessInspection"
-GUIDED_JSON = "validation_unlocks.json"
-SOLO_JSON = "validation_unlocks_solo.json"
-validation_mode = os.getenv("CCRI_VALIDATE") == "1"
-
-def find_project_root():
-    dir_path = os.path.abspath(os.path.dirname(__file__))
-    while dir_path != "/":
-        if os.path.exists(os.path.join(dir_path, ".ccri_ctf_root")):
-            return dir_path
-        dir_path = os.path.dirname(dir_path)
-    print("❌ ERROR: Could not find project root marker (.ccri_ctf_root).", file=sys.stderr)
-    sys.exit(1)
-
-def get_ctf_mode():
-    mode = os.environ.get("CCRI_MODE")
-    if mode in ("guided", "solo"):
-        return mode
-    return "solo" if "challenges_solo" in os.path.abspath(__file__) else "guided"
-
-def load_expected_flag(project_root):
-    mode = get_ctf_mode()
-    unlock_file = os.path.join(project_root, "web_version_admin", SOLO_JSON if mode == "solo" else GUIDED_JSON)
-    try:
-        with open(unlock_file, "r", encoding="utf-8") as f:
-            unlocks = json.load(f)
-        return unlocks[CHALLENGE_ID]["real_flag"]
-    except Exception as e:
-        print(f"❌ ERROR: Could not load validation unlocks: {e}", file=sys.stderr)
-        sys.exit(1)
-
 def clear_screen():
-    if not validation_mode:
-        os.system('clear' if os.name == 'posix' else 'cls')
+    os.system('clear' if os.name == 'posix' else 'cls')
 
 def pause(prompt="Press ENTER to continue..."):
-    if not validation_mode:
-        input(prompt)
+    input(prompt)
 
 def relaunch_in_bigger_terminal(script_path):
-    if validation_mode or os.environ.get("BIGGER_TERMINAL") == "1":
+    if os.environ.get("BIGGER_TERMINAL") == "1":
         return
     os.environ["BIGGER_TERMINAL"] = "1"
     print("🔄 Launching in a larger terminal window for better visibility...")
@@ -67,29 +32,10 @@ def relaunch_in_bigger_terminal(script_path):
 
     print("⚠️ Could not detect a graphical terminal. Continuing in current terminal.")
 
-def validate_flag_in_ps_dump(ps_dump_file, expected_flag):
-    print("🔍 Validation: scanning ps_dump.txt for the expected flag...")
-    try:
-        with open(ps_dump_file, "r", encoding="utf-8") as f:
-            for line in f:
-                if expected_flag in line:
-                    print(f"✅ Validation success: found flag {expected_flag} in ps_dump.txt")
-                    return True
-    except Exception as e:
-        print(f"❌ ERROR while validating: {e}", file=sys.stderr)
-    print(f"❌ Validation failed: flag {expected_flag} not found in ps_dump.txt", file=sys.stderr)
-    return False
-
 def main():
-    project_root = find_project_root()
     script_dir = os.path.abspath(os.path.dirname(__file__))
     ps_dump = os.path.join(script_dir, "ps_dump.txt")
 
-    if validation_mode:
-        expected_flag = load_expected_flag(project_root)
-        sys.exit(0 if validate_flag_in_ps_dump(ps_dump, expected_flag) else 1)
-
-    # === Student Interactive Mode ===
     relaunch_in_bigger_terminal(__file__)
     clear_screen()
 
