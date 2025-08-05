@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import os
+import shutil  # <-- MISSING EARLIER
 import subprocess
 from pathlib import Path
 from common import find_project_root, load_unlock_data, get_ctf_mode
@@ -41,10 +42,15 @@ def validate(mode="guided", challenge_id="05_ArchivePassword") -> bool:
 
     base_folder = "challenges_solo" if mode == "solo" else "challenges"
     sandbox_override = os.environ.get("CCRI_SANDBOX")
-        if sandbox_override:
-            challenge_dir = Path(sandbox_override)
-        else:
-            challenge_dir = root / "challenges" / CHALLENGE_ID
+    
+    if sandbox_override:
+        challenge_dir = Path(sandbox_override)
+        real_challenge_dir = root / base_folder / challenge_id
+        if not challenge_dir.exists():
+            print(f"🧪 Copying challenge files into sandbox: {challenge_dir}")
+            shutil.copytree(real_challenge_dir, challenge_dir)
+    else:
+        challenge_dir = root / base_folder / challenge_id
 
     zip_path = challenge_dir / "secret.zip"
     extract_dir = challenge_dir
@@ -76,6 +82,6 @@ def validate(mode="guided", challenge_id="05_ArchivePassword") -> bool:
         return False
 
 if __name__ == "__main__":
-    mode = os.environ.get("CCRI_MODE", "guided")
+    mode = get_ctf_mode()
     success = validate(mode=mode)
     sys.exit(0 if success else 1)

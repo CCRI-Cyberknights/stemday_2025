@@ -3,7 +3,7 @@ import sys
 import subprocess
 from common import find_project_root, load_unlock_data, get_ctf_mode
 
-CHALLENGE_ID = "17_Nmap_Scanning"
+CHALLENGE_ID = "17_NmapScanning"
 
 def fetch_port_response(port: int) -> str:
     try:
@@ -41,7 +41,12 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
 
     return validate_flag(expected_flag, expected_port)
 
-if __name__ == "__main__":
     mode = get_ctf_mode()
     success = validate(mode=mode)
     sys.exit(0 if success else 1)
+
+if __name__ == "__main__":
+    from common import get_ctf_mode
+    mode = get_ctf_mode()
+    success = validate(mode=mode)
+    import sys; sys.exit(0 if success else 1)

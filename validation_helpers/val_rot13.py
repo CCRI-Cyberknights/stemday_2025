@@ -46,7 +46,12 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
         print(f"❌ Validation failed: flag {flag} not found in decoded content", file=sys.stderr)
         return False
 
-if __name__ == "__main__":
     mode = get_ctf_mode()
     success = validate(mode=mode)
     sys.exit(0 if success else 1)
+
+if __name__ == "__main__":
+    from common import get_ctf_mode
+    mode = get_ctf_mode()
+    success = validate(mode=mode)
+    import sys; sys.exit(0 if success else 1)

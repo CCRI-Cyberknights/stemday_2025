@@ -89,19 +89,19 @@
     "flag": "CCRI-XYAW-6045",
     "script": "explore_processes.py"
   },
-  "16_Hex_Hunting": {
+  "16_HexHunting": {
     "name": "Hex Hunting",
     "folder": "16_Hex_Hunting",
     "flag": "CCRI-LLIU-4256",
     "script": "inspect_binary.py"
   },
-  "17_Nmap_Scanning": {
+  "17_NmapScanning": {
     "name": "Nmap Scanning",
     "folder": "17_Nmap_Scanning",
     "flag": "CCRI-WEDD-5766",
     "script": "helper_scan.py"
   },
-  "18_Pcap_Search": {
+  "18_PcapSearch": {
     "name": "Pcap Search",
     "folder": "18_Pcap_Search",
     "flag": "CCRI-GQVQ-8584",

@@ -4,7 +4,7 @@ import subprocess
 from pathlib import Path
 from common import find_project_root, load_unlock_data, get_ctf_mode
 
-CHALLENGE_ID = "18_Pcap_Search"
+CHALLENGE_ID = "18_PcapSearch"
 PCAP_FILE = "traffic.pcap"
 
 def fast_search_flag(pcap: Path, flag: str) -> bool:
@@ -37,7 +37,12 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
         print(f"❌ Flag '{flag}' NOT found in PCAP", file=sys.stderr)
         return False
 
-if __name__ == "__main__":
     mode = get_ctf_mode()
     success = validate(mode=mode)
     sys.exit(0 if success else 1)
+
+if __name__ == "__main__":
+    from common import get_ctf_mode
+    mode = get_ctf_mode()
+    success = validate(mode=mode)
+    import sys; sys.exit(0 if success else 1)

@@ -18,24 +18,24 @@ SANDBOX_ROOT = BASE_DIR / ".validation_sandbox"
 
 # === Mapping: challenge_id -> validation_helpers/module.py ===
 CHALLENGE_TO_MODULE = {
-    "01_Stego": "stego",
-    "02_Base64": "base64",
-    "03_ROT13": "rot13",
-    "04_Vigenere": "vigenere",
-    "05_ArchivePassword": "archive_password",
-    "06_Hashcat": "hashcat",
-    "07_ExtractBinary": "extract_from_binary",
-    "08_FakeAuthLog": "fake_auth_log",
-    "09_FixScript": "fix_the_script",
-    "10_Metadata": "metadata",
-    "11_HiddenFlag": "hidden_flag",
-    "12_QRCodes": "qr_codes",
-    "13_HTTPHeaders": "http_headers",
-    "14_SubdomainSweep": "subdomain_sweep",
-    "15_ProcessInspection": "process_inspection",
-    "16_Hex_Hunting": "hex_hunting",
-    "17_Nmap_Scanning": "nmap_scanning",
-    "18_Pcap_Search": "pcap_search"
+    "01_Stego": "val_stego",
+    "02_Base64": "val_base64",
+    "03_ROT13": "val_rot13",
+    "04_Vigenere": "val_vigenere",
+    "05_ArchivePassword": "val_archive_password",
+    "06_Hashcat": "val_hashcat",
+    "07_ExtractBinary": "val_extract_from_binary",
+    "08_FakeAuthLog": "val_fake_auth_log",
+    "09_FixScript": "val_fix_the_script",
+    "10_Metadata": "val_metadata",
+    "11_HiddenFlag": "val_hidden_flag",
+    "12_QRCodes": "val_qr_codes",
+    "13_HTTPHeaders": "val_http_headers",
+    "14_SubdomainSweep": "val_subdomain_sweep",
+    "15_ProcessInspection": "val_process_inspection",
+    "16_HexHunting": "val_hex_hunting",
+    "17_NmapScanning": "val_nmap_scanning",
+    "18_PcapSearch": "val_pcap_search"
 }
 
 def choose_mode():

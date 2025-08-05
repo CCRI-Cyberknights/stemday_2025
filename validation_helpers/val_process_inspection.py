@@ -29,7 +29,12 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
 
     return validate_flag_in_ps_dump(ps_path, expected_flag)
 
-if __name__ == "__main__":
     mode = get_ctf_mode()
     success = validate(mode=mode)
     sys.exit(0 if success else 1)
+
+if __name__ == "__main__":
+    from common import get_ctf_mode
+    mode = get_ctf_mode()
+    success = validate(mode=mode)
+    import sys; sys.exit(0 if success else 1)

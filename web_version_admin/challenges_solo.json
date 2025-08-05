@@ -74,17 +74,17 @@
     "folder": "15_Process_Inspection",
     "flag": "CCRI-PPBB-3797"
   },
-  "16_Hex_Hunting": {
+  "16_HexHunting": {
     "name": "Hex Hunting",
     "folder": "16_Hex_Hunting",
     "flag": "CCRI-UZGS-8701"
   },
-  "17_Nmap_Scanning": {
+  "17_NmapScanning": {
     "name": "Nmap Scanning",
     "folder": "17_Nmap_Scanning",
     "flag": "CCRI-SPUE-5908"
   },
-  "18_Pcap_Search": {
+  "18_PcapSearch": {
     "name": "Pcap Search",
     "folder": "18_Pcap_Search",
     "flag": "CCRI-CDEH-1222"

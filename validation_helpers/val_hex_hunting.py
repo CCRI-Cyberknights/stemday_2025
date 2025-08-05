@@ -4,7 +4,7 @@ import subprocess
 from pathlib import Path
 from common import find_project_root, load_unlock_data, get_ctf_mode
 
-CHALLENGE_ID = "16_Hex_Hunting"
+CHALLENGE_ID = "16_HexHunting"
 BINARY_NAME = "hex_flag.bin"
 
 def validate_flag_in_binary(binary_path: Path, expected_flag: str) -> bool:
@@ -44,7 +44,12 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
 
     return validate_flag_in_binary(binary_path, flag)
 
-if __name__ == "__main__":
     mode = get_ctf_mode()
     success = validate(mode=mode)
     sys.exit(0 if success else 1)
+
+if __name__ == "__main__":
+    from common import get_ctf_mode
+    mode = get_ctf_mode()
+    success = validate(mode=mode)
+    import sys; sys.exit(0 if success else 1)

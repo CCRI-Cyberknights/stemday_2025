@@ -73,11 +73,20 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
     root = find_project_root()
     data = load_unlock_data(root, challenge_id)
     flag = data.get("real_flag")
-    passwords = data.get("cracked_passwords")
-
-    if not flag or not passwords:
-        print(f"❌ ERROR: Missing flag or passwords in unlock data", file=sys.stderr)
+    
+    hash_map = data.get("hash_password_zip_map")
+    if not flag or not hash_map:
+        print(f"❌ ERROR: Missing flag or hash/password map in unlock data", file=sys.stderr)
         return False
+
+    # Extract passwords in sorted order by ZIP part (part1, part2, part3...)
+    zip_to_password = {
+        Path(entry["zip_file"]).name: entry["password"]
+        for entry in hash_map.values()
+    }
+    # Sort part1.zip, part2.zip, ... by part number
+    sorted_parts = sorted(zip_to_password.items(), key=lambda x: int(''.join(filter(str.isdigit, x[0]))))
+    passwords = [pw for _, pw in sorted_parts]
 
     base_path = "challenges_solo" if mode == "solo" else "challenges"
     challenge_dir = root / base_path / challenge_id
@@ -101,7 +110,12 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
         print(f"❌ Validation failed: flag {flag} not found", file=sys.stderr)
         return False
 
-if __name__ == "__main__":
     mode = get_ctf_mode()
     success = validate(mode=mode)
     sys.exit(0 if success else 1)
+
+if __name__ == "__main__":
+    from common import get_ctf_mode
+    mode = get_ctf_mode()
+    success = validate(mode=mode)
+    import sys; sys.exit(0 if success else 1)

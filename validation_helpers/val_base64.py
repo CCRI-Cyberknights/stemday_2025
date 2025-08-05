@@ -43,7 +43,12 @@ def required_files(mode="guided", challenge_id="02_Base64"):
     else:
         return [f"challenges_solo/{challenge_id}/encoded.txt"]
 
-if __name__ == "__main__":
     mode = os.environ.get("CCRI_MODE", "guided")
     success = validate(mode=mode)
     sys.exit(0 if success else 1)
+
+if __name__ == "__main__":
+    from common import get_ctf_mode
+    mode = get_ctf_mode()
+    success = validate(mode=mode)
+    import sys; sys.exit(0 if success else 1)

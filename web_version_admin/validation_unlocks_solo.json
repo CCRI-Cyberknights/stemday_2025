@@ -110,20 +110,20 @@
     "unlock_method": "Inspect ps_dump.txt for flags embedded in process commands",
     "hint": "Use grep to search for flags in ps_dump.txt"
   },
-  "16_Hex_Hunting": {
+  "16_HexHunting": {
     "real_flag": "CCRI-UZGS-8701",
     "challenge_file": "challenges_solo/16_Hex_Hunting/hex_flag.bin",
     "unlock_method": "Inspect hex_flag.bin with a hex editor or strings command to locate the flag",
     "hint": "Try running 'strings hex_flag.bin' or open it in a hex editor like bless or GHex."
   },
-  "17_Nmap_Scanning": {
+  "17_NmapScanning": {
     "real_flag": "CCRI-SPUE-5908",
     "real_port": 9036,
     "server_file": "web_version_admin/server.py",
     "unlock_method": "Scan ports 9000\u20139099 and query HTTP endpoints to locate the real flag (port 9036)",
     "hint": "Use nmap -p9000-9099 localhost to discover ports and curl to check flags."
   },
-  "18_Pcap_Search": {
+  "18_PcapSearch": {
     "real_flag": "CCRI-CDEH-1222",
     "challenge_file": "challenges_solo/18_Pcap_Search/traffic.pcap",
     "unlock_method": "Analyze traffic.pcap for flags in HTTP headers using Wireshark or tshark",
