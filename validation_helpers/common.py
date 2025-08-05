@@ -27,3 +27,14 @@ def load_unlock_data(project_root: Path, challenge_id: str) -> dict:
         sys.exit(1)
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f).get(challenge_id, {})
+
+def load_flag(project_root: Path, challenge_id: str) -> str:
+    return load_unlock_data(project_root, challenge_id).get("real_flag", "")
+
+def get_challenge_file(project_root: Path, challenge_id: str, unlock_data: dict) -> Path:
+    mode = get_ctf_mode()
+    if mode == "guided":
+        file_rel = unlock_data.get("challenge_file", f"challenges/{challenge_id}/encoded.txt")
+    else:
+        file_rel = f"challenges_solo/{challenge_id}/encoded.txt"
+    return project_root / file_rel

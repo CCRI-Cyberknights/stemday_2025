@@ -2,7 +2,9 @@
 import sys
 import re
 from pathlib import Path
-from common import find_project_root, load_unlock_data
+from common import find_project_root, load_unlock_data, get_ctf_mode
+
+CHALLENGE_ID = "04_Vigenere"
 
 def vigenere_decrypt(ciphertext: str, key: str) -> str:
     result = []
@@ -27,18 +29,21 @@ def extract_flag(text: str) -> str:
     match = re.search(r"CCRI-[A-Z0-9]{4}-\d{4}", text)
     return match.group(0) if match else ""
 
-def main():
-    challenge_id = "04_Vigenere"
+def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
     root = find_project_root()
     data = load_unlock_data(root, challenge_id)
-
     expected_flag = data.get("real_flag")
-    file_rel = data.get("challenge_file", "challenges/04_Vigenere/cipher.txt")
+
+    if mode == "guided":
+        file_rel = data.get("challenge_file", f"challenges/{challenge_id}/cipher.txt")
+    else:
+        file_rel = f"challenges_solo/{challenge_id}/cipher.txt"
+
     input_path = root / file_rel
 
     if not input_path.exists():
         print(f"❌ Input file not found: {input_path}", file=sys.stderr)
-        sys.exit(1)
+        return False
 
     try:
         ciphertext = input_path.read_text(encoding="utf-8")
@@ -46,18 +51,20 @@ def main():
         found_flag = extract_flag(decrypted)
     except Exception as e:
         print(f"❌ Error during decryption or extraction: {e}", file=sys.stderr)
-        sys.exit(1)
+        return False
 
-    if found_flag:
-        if found_flag == expected_flag:
-            print(f"✅ Validation success: found flag {found_flag}")
-            sys.exit(0)
-        else:
-            print(f"❌ Incorrect flag: found {found_flag}, expected {expected_flag}", file=sys.stderr)
-            sys.exit(1)
-    else:
+    if not found_flag:
         print("❌ No CCRI flag found in decrypted text.", file=sys.stderr)
-        sys.exit(1)
+        return False
+
+    if found_flag == expected_flag:
+        print(f"✅ Validation success: found flag {found_flag}")
+        return True
+    else:
+        print(f"❌ Incorrect flag: found {found_flag}, expected {expected_flag}", file=sys.stderr)
+        return False
 
 if __name__ == "__main__":
-    main()
+    mode = get_ctf_mode()
+    success = validate(mode=mode)
+    sys.exit(0 if success else 1)

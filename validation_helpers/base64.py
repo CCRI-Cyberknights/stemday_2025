@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-import sys
-import os
 import base64
+import os
+import sys
 from pathlib import Path
 from common import find_project_root, load_unlock_data
 
@@ -13,34 +13,37 @@ def decode_file(input_path: Path) -> str:
         print(f"❌ Error decoding base64: {e}")
         return ""
 
-def main():
-    challenge_id = "02_Base64"
+def validate(mode="guided", challenge_id="02_Base64") -> bool:
     root = find_project_root()
     data = load_unlock_data(root, challenge_id)
-
     flag = data.get("real_flag")
-    mode = os.environ.get("CCRI_MODE", "guided")
 
-    # For guided mode, use embedded path from JSON
     if mode == "guided":
         file_rel = data.get("challenge_file", f"challenges/{challenge_id}/encoded.txt")
     else:
-        # For solo mode, infer path manually
         file_rel = f"challenges_solo/{challenge_id}/encoded.txt"
 
     input_path = root / file_rel
-
     if not input_path.exists():
         print(f"❌ Challenge file not found: {input_path}")
-        return 1
+        return False
 
     decoded = decode_file(input_path)
     if flag in decoded:
         print(f"✅ Validation success: found flag {flag}")
-        return 0
+        return True
     else:
         print(f"❌ Validation failed: flag {flag} not found in decoded content")
-        return 1
+        return False
+
+def required_files(mode="guided", challenge_id="02_Base64"):
+    """Return a list of required files for validation (used for sandbox pre-checks)."""
+    if mode == "guided":
+        return [f"challenges/{challenge_id}/encoded.txt"]
+    else:
+        return [f"challenges_solo/{challenge_id}/encoded.txt"]
 
 if __name__ == "__main__":
-    sys.exit(main())
+    mode = os.environ.get("CCRI_MODE", "guided")
+    success = validate(mode=mode)
+    sys.exit(0 if success else 1)

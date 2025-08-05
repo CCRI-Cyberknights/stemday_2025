@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys
 from pathlib import Path
-from common import find_project_root, load_unlock_data
+from common import find_project_root, load_unlock_data, get_ctf_mode
 
 CHALLENGE_ID = "11_HiddenFlag"
 
@@ -18,18 +18,21 @@ def validate_hidden_flag(directory: Path, expected_flag: str) -> bool:
     print(f"❌ Validation failed: flag {expected_flag} not found.", file=sys.stderr)
     return False
 
-def main():
+def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
     root = find_project_root()
-    data = load_unlock_data(root, CHALLENGE_ID)
-    flag = data["real_flag"]
+    data = load_unlock_data(root, challenge_id)
+    flag = data.get("real_flag")
 
-    junk_dir = root / "challenges" / CHALLENGE_ID / "junk"
+    base_path = "challenges_solo" if mode == "solo" else "challenges"
+    junk_dir = root / base_path / challenge_id / "junk"
 
     if not junk_dir.is_dir():
         print(f"❌ ERROR: Expected directory not found: {junk_dir}", file=sys.stderr)
-        sys.exit(1)
+        return False
 
-    sys.exit(0 if validate_hidden_flag(junk_dir, flag) else 1)
+    return validate_hidden_flag(junk_dir, flag)
 
 if __name__ == "__main__":
-    main()
+    mode = get_ctf_mode()
+    success = validate(mode=mode)
+    sys.exit(0 if success else 1)

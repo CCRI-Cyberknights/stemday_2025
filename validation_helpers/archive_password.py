@@ -3,7 +3,7 @@ import sys
 import os
 import subprocess
 from pathlib import Path
-from common import find_project_root, load_unlock_data
+from common import find_project_root, load_unlock_data, get_ctf_mode
 
 def decode_base64(path: Path) -> str:
     try:
@@ -33,17 +33,18 @@ def unzip_with_password(zip_path: Path, password: str, extract_to: Path) -> bool
         print(f"❌ Failed to extract {zip_path.name} with given password.", file=sys.stderr)
         return False
 
-def main():
-    challenge_id = "05_ArchivePassword"
+def validate(mode="guided", challenge_id="05_ArchivePassword") -> bool:
     root = find_project_root()
-
-    mode = os.environ.get("CCRI_MODE", "guided")
-    base_folder = "challenges_solo" if mode == "solo" else "challenges"
-    challenge_dir = root / base_folder / challenge_id
-
     data = load_unlock_data(root, challenge_id)
     flag = data.get("real_flag")
     zip_password = data.get("last_zip_password")
+
+    base_folder = "challenges_solo" if mode == "solo" else "challenges"
+    sandbox_override = os.environ.get("CCRI_SANDBOX")
+        if sandbox_override:
+            challenge_dir = Path(sandbox_override)
+        else:
+            challenge_dir = root / "challenges" / CHALLENGE_ID
 
     zip_path = challenge_dir / "secret.zip"
     extract_dir = challenge_dir
@@ -52,27 +53,29 @@ def main():
 
     if not zip_path.exists():
         print(f"❌ Zip file missing: {zip_path}", file=sys.stderr)
-        return 1
+        return False
 
     if not unzip_with_password(zip_path, zip_password, extract_dir):
-        return 1
+        return False
 
     if not extracted_b64.exists():
         print(f"❌ Extracted file missing: {extracted_b64}", file=sys.stderr)
-        return 1
+        return False
 
     decoded = decode_base64(extracted_b64)
     if decoded is None:
-        return 1
+        return False
 
     output_file.write_text(decoded + "\n", encoding="utf-8")
 
     if flag in decoded:
         print(f"✅ Validation success: flag {flag} found")
-        return 0
+        return True
     else:
         print(f"❌ Validation failed: flag {flag} not found in decoded output", file=sys.stderr)
-        return 1
+        return False
 
 if __name__ == "__main__":
-    sys.exit(main())
+    mode = os.environ.get("CCRI_MODE", "guided")
+    success = validate(mode=mode)
+    sys.exit(0 if success else 1)

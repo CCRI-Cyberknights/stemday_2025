@@ -21,6 +21,8 @@
 !copy_takehome_ccri_ctf.py
 !debs/
 !debs/**
+web_version_admin/__pycache__/
+web_version_admin/__pycache__/**
 
 # Desktop shortcuts
 !Launch_CCRI_CTF_HUB.desktop
@@ -34,6 +36,12 @@
 # Ignore Python cache only in flag_generators
 flag_generators/__pycache__/
 flag_generators/**/__pycache__/
+
+# Ignore validation sandbox
+.validation_sandbox**
+.validation_sandbox/**
+validation_helpers/__pycache__/
+validation_helpers/__pycache__/**
 
 # Ignore dry run output
 dryrun_output

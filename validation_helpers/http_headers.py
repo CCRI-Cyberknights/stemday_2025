@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys
 from pathlib import Path
-from common import find_project_root, load_unlock_data
+from common import find_project_root, load_unlock_data, get_ctf_mode
 
 CHALLENGE_ID = "13_HTTPHeaders"
 
@@ -21,13 +21,17 @@ def validate_responses(challenge_dir: Path, expected_flag: str) -> bool:
     print(f"❌ Flag {expected_flag} not found in any response file.", file=sys.stderr)
     return False
 
-def main():
+def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
     root = find_project_root()
-    data = load_unlock_data(root, CHALLENGE_ID)
-    flag = data["real_flag"]
-    challenge_dir = root / "challenges" / CHALLENGE_ID
+    data = load_unlock_data(root, challenge_id)
+    flag = data.get("real_flag")
 
-    sys.exit(0 if validate_responses(challenge_dir, flag) else 1)
+    base_path = "challenges_solo" if mode == "solo" else "challenges"
+    challenge_dir = root / base_path / challenge_id
+
+    return validate_responses(challenge_dir, flag)
 
 if __name__ == "__main__":
-    main()
+    mode = get_ctf_mode()
+    success = validate(mode=mode)
+    sys.exit(0 if success else 1)

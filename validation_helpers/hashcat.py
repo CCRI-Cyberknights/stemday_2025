@@ -4,7 +4,9 @@ import subprocess
 import shutil
 import os
 from pathlib import Path
-from common import find_project_root, load_unlock_data
+from common import find_project_root, load_unlock_data, get_ctf_mode
+
+CHALLENGE_ID = "06_Hashcat"
 
 def decode_base64(input_path: Path, output_path: Path):
     try:
@@ -33,8 +35,12 @@ def flatten_directory(directory: Path):
 def extract_and_decode(passwords, segments_dir: Path, extracted_dir: Path, decoded_dir: Path):
     extracted_dir.mkdir(exist_ok=True)
     decoded_dir.mkdir(exist_ok=True)
+
     for idx, password in enumerate(passwords, 1):
         zip_file = segments_dir / f"part{idx}.zip"
+        if not zip_file.exists():
+            print(f"⚠️ Missing segment: {zip_file}", file=sys.stderr)
+            continue
         subprocess.run(
             ["unzip", "-P", password, str(zip_file), "-d", str(extracted_dir)],
             stdout=subprocess.DEVNULL,
@@ -46,7 +52,7 @@ def extract_and_decode(passwords, segments_dir: Path, extracted_dir: Path, decod
                 out_path = decoded_dir / f"decoded_{f.name}"
                 decode_base64(f, out_path)
 
-def assemble_flag(decoded_dir: Path, output_file: Path):
+def assemble_flag(decoded_dir: Path, output_file: Path) -> list[str]:
     decoded_files = sorted(
         [f for f in decoded_dir.iterdir() if f.name.endswith(".txt")],
         key=lambda f: int(''.join(filter(str.isdigit, f.name)))
@@ -63,20 +69,23 @@ def assemble_flag(decoded_dir: Path, output_file: Path):
 
     return candidate_flags
 
-def main():
-    challenge_id = "06_Hashcat"
+def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
     root = find_project_root()
     data = load_unlock_data(root, challenge_id)
-    flag = data["real_flag"]
-    passwords = data["cracked_passwords"]
+    flag = data.get("real_flag")
+    passwords = data.get("cracked_passwords")
 
-    challenge_dir = root / "challenges" / challenge_id
+    if not flag or not passwords:
+        print(f"❌ ERROR: Missing flag or passwords in unlock data", file=sys.stderr)
+        return False
+
+    base_path = "challenges_solo" if mode == "solo" else "challenges"
+    challenge_dir = root / base_path / challenge_id
     segments = challenge_dir / "segments"
     extracted = challenge_dir / "extracted"
     decoded = challenge_dir / "decoded_segments"
     assembled = challenge_dir / "assembled_flag.txt"
 
-    # Clean extracted/decoded folders if needed
     for d in [extracted, decoded]:
         if d.exists():
             shutil.rmtree(d)
@@ -87,10 +96,12 @@ def main():
 
     if flag in flags:
         print(f"✅ Validation success: flag {flag} found")
-        sys.exit(0)
+        return True
     else:
         print(f"❌ Validation failed: flag {flag} not found", file=sys.stderr)
-        sys.exit(1)
+        return False
 
 if __name__ == "__main__":
-    main()
+    mode = get_ctf_mode()
+    success = validate(mode=mode)
+    sys.exit(0 if success else 1)

@@ -2,57 +2,58 @@
 import os
 import sys
 import subprocess
-import json
 import re
 from pathlib import Path
-from common import find_project_root, load_unlock_data
+from common import find_project_root, load_unlock_data, get_ctf_mode
 
 CHALLENGE_ID = "07_ExtractBinary"
 REGEX_PATTERN = r'\b([A-Z0-9]{4}-){2}[A-Z0-9]{4}\b'
 
-def run_strings(binary_path: Path, output_path: Path):
+def run_strings(binary_path: Path, output_path: Path) -> bool:
     try:
         with output_path.open("w") as out_f:
             subprocess.run(["strings", str(binary_path)], stdout=out_f, check=True)
+        return True
     except subprocess.CalledProcessError:
         print("❌ ERROR: Failed to run 'strings'.", file=sys.stderr)
-        sys.exit(1)
+        return False
 
-def search_for_flags(file_path: Path, regex):
+def search_for_flags(file_path: Path, regex) -> list[str]:
     matches = []
     try:
-        with file_path.open("r") as f:
+        with file_path.open("r", encoding="utf-8", errors="ignore") as f:
             for line in f:
                 if re.search(regex, line):
                     matches.append(line.strip())
     except Exception as e:
         print(f"❌ ERROR during flag search: {e}", file=sys.stderr)
-        sys.exit(1)
     return matches
 
-def main():
+def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
     root = find_project_root()
-    mode = os.environ.get("CCRI_MODE", "guided")
-    unlock = load_unlock_data(root, CHALLENGE_ID)
+    unlock = load_unlock_data(root, challenge_id)
     expected_flag = unlock.get("real_flag")
 
-    binary_relpath = f"challenges/{CHALLENGE_ID}/hidden_flag" if mode == "guided" else f"challenges_solo/{CHALLENGE_ID}/hidden_flag"
-    binary_path = root / binary_relpath
-    extracted_path = Path(__file__).resolve().parent / "extracted_strings.txt"
+    base_folder = "challenges_solo" if mode == "solo" else "challenges"
+    binary_path = root / base_folder / challenge_id / "hidden_flag"
+    extracted_path = root / base_folder / challenge_id / "extracted_strings.txt"
 
     if not binary_path.is_file():
         print(f"❌ ERROR: Binary file not found: {binary_path}", file=sys.stderr)
-        return 1
+        return False
 
-    run_strings(binary_path, extracted_path)
+    if not run_strings(binary_path, extracted_path):
+        return False
+
     matches = search_for_flags(extracted_path, REGEX_PATTERN)
-
     if expected_flag in matches:
         print(f"✅ Validation success: found flag {expected_flag}")
-        return 0
+        return True
     else:
         print(f"❌ Validation failed: flag {expected_flag} not found in extracted strings.", file=sys.stderr)
-        return 1
+        return False
 
 if __name__ == "__main__":
-    sys.exit(main())
+    mode = get_ctf_mode()
+    success = validate(mode=mode)
+    sys.exit(0 if success else 1)

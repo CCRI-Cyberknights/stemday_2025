@@ -3,14 +3,16 @@ import os
 import sys
 import subprocess
 from pathlib import Path
-from common import find_project_root, load_unlock_data
+from common import find_project_root, load_unlock_data, get_ctf_mode
+
+CHALLENGE_ID = "01_Stego"
 
 def run_steghide(password: str, image_path: Path, output_path: Path) -> bool:
     """Attempt to extract hidden data from an image using steghide."""
     try:
         result = subprocess.run(
             ["steghide", "extract", "-sf", str(image_path), "-xf", str(output_path), "-p", password, "-f"],
-            input=b"\n",  # Avoids prompt for overwrite
+            input=b"\n",  # Avoids overwrite prompt
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL
         )
@@ -19,31 +21,35 @@ def run_steghide(password: str, image_path: Path, output_path: Path) -> bool:
         print("❌ ERROR: steghide is not installed.", file=sys.stderr)
         return False
 
-def main():
-    challenge_id = "01_Stego"
+def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
     root = find_project_root()
     unlock = load_unlock_data(root, challenge_id)
 
     password = unlock.get("last_password")
     if not password:
         print("❌ ERROR: No password found in unlock metadata.", file=sys.stderr)
-        sys.exit(1)
+        return False
 
-    file_rel = unlock.get("challenge_file", "challenges/01_Stego/squirrel.jpg")
-    challenge_dir = root / Path(file_rel).parts[0] / Path(file_rel).parts[1]
-    image_path = challenge_dir / "squirrel.jpg"
-    output_path = challenge_dir / "decoded_message.txt"
+    if mode == "guided":
+        file_rel = unlock.get("challenge_file", f"challenges/{challenge_id}/squirrel.jpg")
+    else:
+        file_rel = f"challenges_solo/{challenge_id}/squirrel.jpg"
+
+    image_path = root / file_rel
+    output_path = image_path.parent / "decoded_message.txt"
 
     if not image_path.is_file():
         print(f"❌ ERROR: Image file not found: {image_path}", file=sys.stderr)
-        sys.exit(1)
+        return False
 
     if run_steghide(password, image_path, output_path):
         print(f"✅ Validation success: extracted flag using password '{password}'")
-        sys.exit(0)
+        return True
     else:
         print(f"❌ Validation failed: could not extract flag with password '{password}'", file=sys.stderr)
-        sys.exit(1)
+        return False
 
 if __name__ == "__main__":
-    main()
+    mode = get_ctf_mode()
+    success = validate(mode=mode)
+    sys.exit(0 if success else 1)

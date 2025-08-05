@@ -3,14 +3,18 @@ import sys
 import os
 import subprocess
 import json
+import shutil
 from pathlib import Path
 
 # === Paths ===
-CHALLENGES_JSON = Path("web_version_admin/challenges.json")
-CHALLENGES_JSON_SOLO = Path("web_version_admin/challenges_solo.json")
-UNLOCKS_GUIDED = Path("web_version_admin/validation_unlocks.json")
-UNLOCKS_SOLO = Path("web_version_admin/validation_unlocks_solo.json")
-VALIDATION_MODULES = Path("validation_helpers")
+BASE_DIR = Path.cwd()
+CHALLENGES_ROOT = BASE_DIR / "challenges"
+CHALLENGES_JSON = BASE_DIR / "web_version_admin/challenges.json"
+CHALLENGES_JSON_SOLO = BASE_DIR / "web_version_admin/challenges_solo.json"
+UNLOCKS_GUIDED = BASE_DIR / "web_version_admin/validation_unlocks.json"
+UNLOCKS_SOLO = BASE_DIR / "web_version_admin/validation_unlocks_solo.json"
+VALIDATION_MODULES = BASE_DIR / "validation_helpers"
+SANDBOX_ROOT = BASE_DIR / ".validation_sandbox"
 
 # === Mapping: challenge_id -> validation_helpers/module.py ===
 CHALLENGE_TO_MODULE = {
@@ -20,12 +24,12 @@ CHALLENGE_TO_MODULE = {
     "04_Vigenere": "vigenere",
     "05_ArchivePassword": "archive_password",
     "06_Hashcat": "hashcat",
-    "07_ExtractBinary": "extract_binary",
-    "08_FakeAuthLog": "fake_authlog",
-    "09_FixScript": "fix_script",
+    "07_ExtractBinary": "extract_from_binary",
+    "08_FakeAuthLog": "fake_auth_log",
+    "09_FixScript": "fix_the_script",
     "10_Metadata": "metadata",
     "11_HiddenFlag": "hidden_flag",
-    "12_QRCodes": "qrcodes",
+    "12_QRCodes": "qr_codes",
     "13_HTTPHeaders": "http_headers",
     "14_SubdomainSweep": "subdomain_sweep",
     "15_ProcessInspection": "process_inspection",
@@ -51,6 +55,23 @@ def load_unlock_data(mode):
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
+def setup_sandbox(challenge_id, mode):
+    """Copy challenge folder into a temp sandbox for validation."""
+    folder_name = "challenges_solo" if mode == "solo" else "challenges"
+    src = BASE_DIR / folder_name / challenge_id
+    sandbox_dir = SANDBOX_ROOT / challenge_id
+
+    if sandbox_dir.exists():
+        shutil.rmtree(sandbox_dir)
+    sandbox_dir.parent.mkdir(parents=True, exist_ok=True)
+
+    if src.exists():
+        shutil.copytree(src, sandbox_dir)
+    else:
+        print(f"⚠️ Challenge folder not found: {src}")
+
+    return sandbox_dir
+
 def run_validator(challenge_id, mode):
     module_name = CHALLENGE_TO_MODULE.get(challenge_id)
     if not module_name:
@@ -64,10 +85,17 @@ def run_validator(challenge_id, mode):
         print(f"⚠️  Skipped: {script_path} not found.")
         return False
 
+    # Setup sandbox
+    sandbox = setup_sandbox(challenge_id, mode)
+    env = os.environ.copy()
+    env["CCRI_MODE"] = mode
+    env["CCRI_SANDBOX"] = str(sandbox)
+
     try:
         result = subprocess.run(
             [sys.executable, str(script_path)],
-            env={**os.environ, "CCRI_MODE": mode},
+            cwd=VALIDATION_MODULES,
+            env=env,
             stdout=sys.stdout,
             stderr=sys.stderr
         )
@@ -83,6 +111,11 @@ def main():
     if mode not in ("guided", "solo"):
         print("❌ Invalid mode. Use: validate_all_flags.py [guided|solo]")
         sys.exit(1)
+
+    # Clean sandbox
+    if SANDBOX_ROOT.exists():
+        shutil.rmtree(SANDBOX_ROOT)
+    SANDBOX_ROOT.mkdir()
 
     print(f"🛠️ Mode: {mode.upper()}")
     challenges = load_challenges(mode)
