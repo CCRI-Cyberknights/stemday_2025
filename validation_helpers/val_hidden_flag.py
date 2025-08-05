@@ -23,18 +23,20 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
     data = load_unlock_data(root, challenge_id)
     flag = data.get("real_flag")
 
-    base_path = "challenges_solo" if mode == "solo" else "challenges"
-    junk_dir = root / base_path / challenge_id / "junk"
+    sandbox_override = os.environ.get("CCRI_SANDBOX")
+
+    if sandbox_override:
+        junk_dir = Path(sandbox_override) / "junk"
+    else:
+        base_path = "challenges_solo" if mode == "solo" else "challenges"
+        junk_dir = root / base_path / challenge_id / "junk"
+
 
     if not junk_dir.is_dir():
         print(f"❌ ERROR: Expected directory not found: {junk_dir}", file=sys.stderr)
         return False
 
     return validate_hidden_flag(junk_dir, flag)
-
-    mode = get_ctf_mode()
-    success = validate(mode=mode)
-    sys.exit(0 if success else 1)
 
 if __name__ == "__main__":
     from common import get_ctf_mode

@@ -23,7 +23,12 @@ def validate(mode="guided", challenge_id="02_Base64") -> bool:
     else:
         file_rel = f"challenges_solo/{challenge_id}/encoded.txt"
 
-    input_path = root / file_rel
+    sandbox_override = os.environ.get("CCRI_SANDBOX")
+    if sandbox_override:
+        input_path = Path(sandbox_override) / "encoded.txt"
+    else:
+        input_path = root / file_rel
+
     if not input_path.exists():
         print(f"❌ Challenge file not found: {input_path}")
         return False
@@ -42,10 +47,6 @@ def required_files(mode="guided", challenge_id="02_Base64"):
         return [f"challenges/{challenge_id}/encoded.txt"]
     else:
         return [f"challenges_solo/{challenge_id}/encoded.txt"]
-
-    mode = os.environ.get("CCRI_MODE", "guided")
-    success = validate(mode=mode)
-    sys.exit(0 if success else 1)
 
 if __name__ == "__main__":
     from common import get_ctf_mode

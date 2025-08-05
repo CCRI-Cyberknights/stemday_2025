@@ -39,14 +39,15 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
     data = load_unlock_data(root, challenge_id)
     flag = data.get("real_flag")
 
-    base_folder = "challenges_solo" if mode == "solo" else "challenges"
-    binary_path = root / base_folder / challenge_id / BINARY_NAME
+    sandbox_override = os.environ.get("CCRI_SANDBOX")
+    if sandbox_override:
+        binary_path = Path(sandbox_override) / BINARY_NAME
+    else:
+        base_folder = "challenges_solo" if mode == "solo" else "challenges"
+        binary_path = root / base_folder / challenge_id / BINARY_NAME
+
 
     return validate_flag_in_binary(binary_path, flag)
-
-    mode = get_ctf_mode()
-    success = validate(mode=mode)
-    sys.exit(0 if success else 1)
 
 if __name__ == "__main__":
     from common import get_ctf_mode

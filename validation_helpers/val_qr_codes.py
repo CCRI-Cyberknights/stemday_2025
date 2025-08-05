@@ -24,8 +24,13 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
     data = load_unlock_data(root, challenge_id)
     expected_flag = data.get("real_flag")
 
-    base_path = "challenges_solo" if mode == "solo" else "challenges"
-    challenge_dir = root / base_path / challenge_id
+    sandbox_override = os.environ.get("CCRI_SANDBOX")
+    if sandbox_override:
+        challenge_dir = Path(sandbox_override)
+    else:
+        base_path = "challenges_solo" if mode == "solo" else "challenges"
+        challenge_dir = root / base_path / challenge_id
+
     qr_codes = [challenge_dir / f"qr_0{i}.png" for i in range(1, 6)]
 
     for qr in qr_codes:
@@ -39,10 +44,6 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
 
     print(f"❌ Flag {expected_flag} not found in any QR code.", file=sys.stderr)
     return False
-
-    mode = get_ctf_mode()
-    success = validate(mode=mode)
-    sys.exit(0 if success else 1)
 
 if __name__ == "__main__":
     from common import get_ctf_mode

@@ -30,12 +30,17 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
         print("❌ ERROR: No password found in unlock metadata.", file=sys.stderr)
         return False
 
-    if mode == "guided":
-        file_rel = unlock.get("challenge_file", f"challenges/{challenge_id}/squirrel.jpg")
-    else:
-        file_rel = f"challenges_solo/{challenge_id}/squirrel.jpg"
+    base_path = "challenges_solo" if mode == "solo" else "challenges"
+    default_rel = f"{base_path}/{challenge_id}/squirrel.jpg"
+    file_rel = unlock.get("challenge_file", default_rel)
 
-    image_path = root / file_rel
+    # 🧪 Sandbox override support
+    sandbox_override = os.environ.get("CCRI_SANDBOX")
+    if sandbox_override:
+        image_path = Path(sandbox_override) / "squirrel.jpg"
+    else:
+        image_path = root / file_rel
+
     output_path = image_path.parent / "decoded_message.txt"
 
     if not image_path.is_file():
@@ -49,12 +54,7 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
         print(f"❌ Validation failed: could not extract flag with password '{password}'", file=sys.stderr)
         return False
 
+if __name__ == "__main__":
     mode = get_ctf_mode()
     success = validate(mode=mode)
     sys.exit(0 if success else 1)
-
-if __name__ == "__main__":
-    from common import get_ctf_mode
-    mode = get_ctf_mode()
-    success = validate(mode=mode)
-    import sys; sys.exit(0 if success else 1)

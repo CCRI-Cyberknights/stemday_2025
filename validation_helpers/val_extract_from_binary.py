@@ -36,7 +36,12 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
 
     base_folder = "challenges_solo" if mode == "solo" else "challenges"
     binary_path = root / base_folder / challenge_id / "hidden_flag"
-    extracted_path = root / base_folder / challenge_id / "extracted_strings.txt"
+    sandbox_override = os.environ.get("CCRI_SANDBOX")
+    if sandbox_override:
+        extracted_path = Path(sandbox_override) / "extracted_strings.txt"
+    else:
+        extracted_path = root / base_folder / challenge_id / "extracted_strings.txt"
+
 
     if not binary_path.is_file():
         print(f"❌ ERROR: Binary file not found: {binary_path}", file=sys.stderr)

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+import os
 import re
 from pathlib import Path
 from common import find_project_root, load_unlock_data, get_ctf_mode
@@ -33,13 +34,20 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
     root = find_project_root()
     data = load_unlock_data(root, challenge_id)
     expected_flag = data.get("real_flag")
+    key = data.get("vigenere_key")
 
-    if mode == "guided":
-        file_rel = data.get("challenge_file", f"challenges/{challenge_id}/cipher.txt")
+    if not expected_flag or not key:
+        print("❌ ERROR: Missing flag or Vigenère key in unlock data.", file=sys.stderr)
+        return False
+
+    file_rel = f"challenges_solo/{challenge_id}/cipher.txt" if mode == "solo" else data.get("challenge_file", f"challenges/{challenge_id}/cipher.txt")
+
+    # 🧪 Sandbox override support
+    sandbox_override = os.environ.get("CCRI_SANDBOX")
+    if sandbox_override:
+        input_path = Path(sandbox_override) / "cipher.txt"
     else:
-        file_rel = f"challenges_solo/{challenge_id}/cipher.txt"
-
-    input_path = root / file_rel
+        input_path = root / file_rel
 
     if not input_path.exists():
         print(f"❌ Input file not found: {input_path}", file=sys.stderr)
@@ -47,7 +55,6 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
 
     try:
         ciphertext = input_path.read_text(encoding="utf-8")
-        key = data.get("vigenere_key")
         decrypted = vigenere_decrypt(ciphertext, key)
         found_flag = extract_flag(decrypted)
     except Exception as e:
@@ -65,12 +72,7 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
         print(f"❌ Incorrect flag: found {found_flag}, expected {expected_flag}", file=sys.stderr)
         return False
 
+if __name__ == "__main__":
     mode = get_ctf_mode()
     success = validate(mode=mode)
     sys.exit(0 if success else 1)
-
-if __name__ == "__main__":
-    from common import get_ctf_mode
-    mode = get_ctf_mode()
-    success = validate(mode=mode)
-    import sys; sys.exit(0 if success else 1)

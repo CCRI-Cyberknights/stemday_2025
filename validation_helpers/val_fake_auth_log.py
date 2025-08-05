@@ -21,7 +21,11 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
     expected_flag = data.get("real_flag")
 
     base_folder = "challenges_solo" if mode == "solo" else "challenges"
-    log_path = root / base_folder / challenge_id / "auth.log"
+    sandbox_override = os.environ.get("CCRI_SANDBOX")
+    if sandbox_override:
+        log_path = Path(sandbox_override) / "auth.log"
+    else:
+        log_path = root / base_folder / challenge_id / "auth.log"
 
     if not log_path.is_file():
         print(f"❌ ERROR: auth.log not found at {log_path}", file=sys.stderr)
@@ -34,10 +38,6 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
     else:
         print(f"❌ Validation failed: flag {expected_flag} not found in auth.log.", file=sys.stderr)
         return False
-
-    mode = get_ctf_mode()
-    success = validate(mode=mode)
-    sys.exit(0 if success else 1)
 
 if __name__ == "__main__":
     from common import get_ctf_mode

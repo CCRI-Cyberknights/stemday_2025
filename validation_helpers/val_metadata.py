@@ -12,8 +12,15 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
     expected_flag = data.get("real_flag")
 
     base_path = "challenges_solo" if mode == "solo" else "challenges"
-    challenge_dir = root / base_path / challenge_id
+    sandbox_override = os.environ.get("CCRI_SANDBOX")
+
+    if sandbox_override:
+        challenge_dir = Path(sandbox_override)
+    else:
+        challenge_dir = root / base_path / challenge_id
+
     target_image = challenge_dir / "capybara.jpg"
+
 
     if not target_image.exists():
         print(f"❌ ERROR: File not found: {target_image}", file=sys.stderr)
@@ -36,10 +43,6 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
     except subprocess.CalledProcessError:
         print("❌ ERROR: exiftool failed to run.", file=sys.stderr)
         return False
-
-    mode = get_ctf_mode()
-    success = validate(mode=mode)
-    sys.exit(0 if success else 1)
 
 if __name__ == "__main__":
     from common import get_ctf_mode

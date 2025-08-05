@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import os
-import shutil  # <-- MISSING EARLIER
+import shutil
 import subprocess
 from pathlib import Path
 from common import find_project_root, load_unlock_data, get_ctf_mode
@@ -55,7 +55,6 @@ def validate(mode="guided", challenge_id="05_ArchivePassword") -> bool:
     zip_path = challenge_dir / "secret.zip"
     extract_dir = challenge_dir
     extracted_b64 = extract_dir / "message_encoded.txt"
-    output_file = extract_dir / "decoded_output.txt"
 
     if not zip_path.exists():
         print(f"❌ Zip file missing: {zip_path}", file=sys.stderr)
@@ -72,7 +71,10 @@ def validate(mode="guided", challenge_id="05_ArchivePassword") -> bool:
     if decoded is None:
         return False
 
-    output_file.write_text(decoded + "\n", encoding="utf-8")
+    # Only write output in the sandbox, for debugging or verification
+    if sandbox_override:
+        output_file = Path(sandbox_override) / "decoded_output.txt"
+        output_file.write_text(decoded + "\n", encoding="utf-8")
 
     if flag in decoded:
         print(f"✅ Validation success: flag {flag} found")

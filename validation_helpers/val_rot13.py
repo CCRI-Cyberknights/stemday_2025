@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+import os
 from pathlib import Path
 from common import find_project_root, load_unlock_data, get_ctf_mode
 
@@ -22,12 +23,14 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
     data = load_unlock_data(root, challenge_id)
     flag = data.get("real_flag")
 
-    if mode == "guided":
-        file_rel = data.get("challenge_file", f"challenges/{challenge_id}/cipher.txt")
-    else:
-        file_rel = f"challenges_solo/{challenge_id}/cipher.txt"
+    base_path = "challenges_solo" if mode == "solo" else "challenges"
 
-    input_path = root / file_rel
+    # 🧪 Check for sandbox override
+    sandbox_override = os.environ.get("CCRI_SANDBOX")
+    if sandbox_override:
+        input_path = Path(sandbox_override) / "cipher.txt"
+    else:
+        input_path = root / base_path / challenge_id / "cipher.txt"
 
     if not input_path.is_file():
         print(f"❌ Input file not found: {input_path}", file=sys.stderr)
@@ -46,12 +49,7 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
         print(f"❌ Validation failed: flag {flag} not found in decoded content", file=sys.stderr)
         return False
 
+if __name__ == "__main__":
     mode = get_ctf_mode()
     success = validate(mode=mode)
     sys.exit(0 if success else 1)
-
-if __name__ == "__main__":
-    from common import get_ctf_mode
-    mode = get_ctf_mode()
-    success = validate(mode=mode)
-    import sys; sys.exit(0 if success else 1)

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import subprocess
+import shutil
 from pathlib import Path
 from common import find_project_root, load_unlock_data, get_ctf_mode
 
@@ -41,7 +42,18 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
     correct_op = data.get("correct_operator", "+")
 
     base_path = "challenges_solo" if mode == "solo" else "challenges"
-    script_path = root / base_path / challenge_id / "broken_flag.py"
+    sandbox_override = os.environ.get("CCRI_SANDBOX")
+    
+    if sandbox_override:
+        challenge_dir = Path(sandbox_override)
+        real_dir = root / base_path / challenge_id
+        if not challenge_dir.exists():
+            print(f"🧪 Copying challenge files into sandbox: {challenge_dir}")
+            shutil.copytree(real_dir, challenge_dir)
+    else:
+        challenge_dir = root / base_path / challenge_id
+
+    script_path = challenge_dir / "broken_flag.py"
 
     if not script_path.is_file():
         print(f"❌ ERROR: broken_flag.py not found at {script_path}", file=sys.stderr)
@@ -57,10 +69,6 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
     else:
         print(f"❌ Validation failed: flag {flag} not found in output.", file=sys.stderr)
         return False
-
-    mode = get_ctf_mode()
-    success = validate(mode=mode)
-    sys.exit(0 if success else 1)
 
 if __name__ == "__main__":
     from common import get_ctf_mode

@@ -88,12 +88,18 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
     sorted_parts = sorted(zip_to_password.items(), key=lambda x: int(''.join(filter(str.isdigit, x[0]))))
     passwords = [pw for _, pw in sorted_parts]
 
-    base_path = "challenges_solo" if mode == "solo" else "challenges"
-    challenge_dir = root / base_path / challenge_id
+    sandbox_override = os.environ.get("CCRI_SANDBOX")
+    if sandbox_override:
+        challenge_dir = Path(sandbox_override)
+    else:
+        base_path = "challenges_solo" if mode == "solo" else "challenges"
+        challenge_dir = root / base_path / challenge_id
+
     segments = challenge_dir / "segments"
     extracted = challenge_dir / "extracted"
     decoded = challenge_dir / "decoded_segments"
     assembled = challenge_dir / "assembled_flag.txt"
+
 
     for d in [extracted, decoded]:
         if d.exists():
@@ -109,10 +115,6 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
     else:
         print(f"❌ Validation failed: flag {flag} not found", file=sys.stderr)
         return False
-
-    mode = get_ctf_mode()
-    success = validate(mode=mode)
-    sys.exit(0 if success else 1)
 
 if __name__ == "__main__":
     from common import get_ctf_mode

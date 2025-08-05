@@ -26,14 +26,14 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
     data = load_unlock_data(root, challenge_id)
     flag = data.get("real_flag")
 
-    base_path = "challenges_solo" if mode == "solo" else "challenges"
-    challenge_dir = root / base_path / challenge_id
+    sandbox_override = os.environ.get("CCRI_SANDBOX")
+    if sandbox_override:
+        challenge_dir = Path(sandbox_override)
+    else:
+        base_path = "challenges_solo" if mode == "solo" else "challenges"
+        challenge_dir = root / base_path / challenge_id
 
     return validate_responses(challenge_dir, flag)
-
-    mode = get_ctf_mode()
-    success = validate(mode=mode)
-    sys.exit(0 if success else 1)
 
 if __name__ == "__main__":
     from common import get_ctf_mode
