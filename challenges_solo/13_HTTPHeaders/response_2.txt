@@ -1,12 +1,13 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:52:24 GMT
+Date: Sun, 30 Jun 2025 15:56:10 GMT
 Server: Liber8-Server/3.0.0-beta
-Content-Type: text/html; charset=UTF-8
+Content-Type: application/json
 Cache-Control: private, no-cache
-X-Powered-By: ASP.NET Core/7.0
-X-Flag: UAJR-1388-IBHK
+X-Powered-By: Node.js/18.16.0
+X-Flag: ODSO-5536-CBPG
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
+Set-Cookie: sessionid=eltil4q3l7dw; HttpOnly; Secure
 
 <html>
   <head><title>Data Service</title></head>

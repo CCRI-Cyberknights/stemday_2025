@@ -48,9 +48,9 @@ GENERATOR_CLASSES = {
     "13_HTTPHeaders": HTTPHeaderFlagGenerator,
     "14_SubdomainSweep": SubdomainSweepFlagGenerator,
     "15_ProcessInspection": ProcessInspectionFlagGenerator,
-    "16_Hex_Hunting": HexHuntingFlagGenerator,
-    "17_Nmap_Scanning": NmapScanFlagGenerator,
-    "18_Pcap_Search": PcapSearchFlagGenerator,
+    "16_HexHunting": HexHuntingFlagGenerator,
+    "17_NmapScanning": NmapScanFlagGenerator,
+    "18_PcapSearch": PcapSearchFlagGenerator,
 }
 
 # === Master Flag Generation Class ===

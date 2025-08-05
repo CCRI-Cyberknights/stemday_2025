@@ -1,20 +1,20 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:54:28 GMT
-Server: Go HTTP Server/1.19
-Content-Type: text/plain; charset=UTF-8
+Date: Sun, 30 Jun 2025 15:55:54 GMT
+Server: Liber8-Server/2.3.1
+Content-Type: application/json
 Cache-Control: no-store
-X-Powered-By: Ruby on Rails/7.1.0
-X-Flag: RSDO-YIRD-6336
+X-Powered-By: Node.js/18.16.0
+X-Flag: ZTFT-9334-KWZZ
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=meps2q7h3p0i; HttpOnly; Secure
+Set-Cookie: sessionid=g8cexn1ngoxo; HttpOnly; Secure
 
 <html>
-  <head><title>Liber8 Portal</title></head>
+  <head><title>Internal Dashboard</title></head>
   <body>
-    <h1>Welcome to Liber8</h1>
-    <p>System maintenance is underway. Some services may be unavailable.</p>
+    <h1>Liber8 Ops Dashboard</h1>
+    <p>Authentication successful. Redirecting...</p>
   </body>
 </html>
 
-<!-- Debug: Session created for client 10.6.112.3 -->
+<!-- Debug: Temporary caching enabled -->

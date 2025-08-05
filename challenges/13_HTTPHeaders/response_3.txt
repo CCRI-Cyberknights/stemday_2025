@@ -1,19 +1,19 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:53:26 GMT
-Server: Liber8-Server/3.0.0-beta
-Content-Type: text/html; charset=UTF-8
-Cache-Control: no-store
-X-Powered-By: ASP.NET Core/7.0
-X-Flag: CCRI-QFGV-8721
+Date: Sun, 30 Jun 2025 15:50:14 GMT
+Server: nginx/1.24.0
+Content-Type: text/plain; charset=UTF-8
+Cache-Control: private, no-cache
+X-Powered-By: Python/3.11.4
+X-Flag: NMOF-TKBK-4198
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
 
 <html>
-  <head><title>Liber8 Portal</title></head>
+  <head><title>Internal Dashboard</title></head>
   <body>
-    <h1>Welcome to Liber8</h1>
-    <p>System maintenance is underway. Some services may be unavailable.</p>
+    <h1>Liber8 Ops Dashboard</h1>
+    <p>Authentication successful. Redirecting...</p>
   </body>
 </html>
 
-<!-- Developer note: Remove X-Test headers before release -->
+<!-- To-do: Update security headers on staging -->

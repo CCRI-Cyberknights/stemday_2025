@@ -58,76 +58,82 @@ print(f"DEBUG: Base mode = {base_mode}")
 
 # === Simulated Open Ports (dictionaries will be overwritten by generator) ===
 GUIDED_FAKE_FLAGS = {
-    8009: "CCRI-WEDD-5766",       # ✅ REAL FLAG
-    8079: "PLUV-1326-MFXV",       # fake
-    8038: "JZOS-QSAN-6388",       # fake
-    8098: "YLWH-ENXO-2197",       # fake
-    8022: "JBVK-OXIV-8617",       # fake
+    8084: "CCRI-RHYY-3413",       # ✅ REAL FLAG
+    8095: "KEWK-DGQM-7495",       # fake
+    8083: "CTIV-3261-UELW",       # fake
+    8065: "YDWN-6482-ZHQU",       # fake
+    8042: "TOSL-7930-BKCJ",       # fake
 }
 GUIDED_JUNK_RESPONSES = {
-    8002: "DEBUG: Connection established successfully.",
-    8005: "System maintenance in progress.",
-    8007: "System maintenance in progress.",
     8012: "System maintenance in progress.",
-    8031: "System maintenance in progress.",
-    8043: "DEBUG: Connection established successfully.",
-    8047: "🔒 Unauthorized: API key required.",
-    8059: "<html><body><h1>It works!</h1><p>Apache2 default page.</p></body></html>",
-    8060: "Welcome to Experimental IoT Server (beta build).",
-    8067: "ERROR 400: Bad request syntax.",
-    8080: "Welcome to Experimental IoT Server (beta build).",
-    8083: "Server under maintenance.\nPlease retry later."
+    8031: "💡 Tip: Scan only the ports you really need.",
+    8039: "503 Service Unavailable\nTry again later.",
+    8044: "Python HTTP Server: directory listing not allowed.",
+    8052: "Hello World!\nTest endpoint active.",
+    8058: "Welcome to Dev HTTP Server v1.3\nPlease login to continue.",
+    8059: "Error 418: I’m a teapot.",
+    8078: "DEBUG: Connection established successfully.",
+    8093: "Hello World!\nTest endpoint active.",
+    8094: "💻 Dev API v0.1 — POST requests only.",
+    8096: "ERROR 400: Bad request syntax."
 }
 GUIDED_SERVICE_NAMES = {
-    8002: "configd",
-    8005: "gamma-relay",
-    8007: "metricsd",
-    8009: "theta-daemon",
-    8012: "epsilon-sync",
-    8022: "lambda-api",
-    8031: "omega-stream",
-    8038: "auth-service",
-    8043: "update-agent",
-    8047: "delta-proxy",
-    8059: "sysmon-api",
-    8060: "delta-sync",
-    8067: "alpha-core",
-    8079: "kappa-node",
-    8080: "theta-daemon",
-    8083: "zeta-cache",
-    8098: "beta-hub"
+    8012: "metricsd",
+    8031: "epsilon-sync",
+    8039: "sysmon-api",
+    8042: "gamma-relay",
+    8044: "theta-daemon",
+    8052: "kappa-node",
+    8058: "alpha-core",
+    8059: "delta-proxy",
+    8065: "zeta-cache",
+    8078: "lambda-api",
+    8083: "update-agent",
+    8084: "beta-hub",
+    8093: "auth-service",
+    8094: "omega-stream",
+    8095: "delta-sync",
+    8096: "configd"
 }
 SOLO_FAKE_FLAGS = {
-    9036: "CCRI-SPUE-5908",       # ✅ REAL FLAG
-    9099: "UXOP-1879-UHHN",       # fake
-    9049: "DWGS-XCQN-1000",       # fake
-    9057: "CABW-1652-BXZY",       # fake
-    9024: "GCYY-9544-LVQW",       # fake
+    9039: "CCRI-ATFD-2882",       # ✅ REAL FLAG
+    9019: "DUPG-JYHI-3915",       # fake
+    9016: "GRPG-RLXB-2438",       # fake
+    9052: "HGFP-6897-SLPO",       # fake
+    9027: "ARQO-9184-WXGK",       # fake
 }
 SOLO_JUNK_RESPONSES = {
-    9000: "403 Forbidden: You don’t have permission to access this resource.",
-    9023: "403 Forbidden: You don’t have permission to access this resource.",
-    9027: "💻 Dev API v0.1 — POST requests only.",
-    9042: "403 Forbidden: You don’t have permission to access this resource.",
-    9054: "System maintenance in progress.",
-    9055: "🔒 Unauthorized: API key required.",
-    9059: "Hello World!\nTest endpoint active.",
-    9077: "Welcome to Dev HTTP Server v1.3\nPlease login to continue."
+    9010: "<html><body><h1>It works!</h1><p>Apache2 default page.</p></body></html>",
+    9020: "Error 418: I’m a teapot.",
+    9028: "Hello World!\nTest endpoint active.",
+    9033: "Welcome to Experimental IoT Server (beta build).",
+    9043: "Hello World!\nTest endpoint active.",
+    9044: "Error 418: I’m a teapot.",
+    9067: "🔒 Unauthorized: API key required.",
+    9070: "Welcome to Dev HTTP Server v1.3\nPlease login to continue.",
+    9073: "403 Forbidden: You don’t have permission to access this resource.",
+    9079: "ERROR 400: Bad request syntax.",
+    9092: "Python HTTP Server: directory listing not allowed.",
+    9096: "Welcome to Dev HTTP Server v1.3\nPlease login to continue."
 }
 SOLO_SERVICE_NAMES = {
-    9000: "sysmon-api",
-    9023: "metricsd",
-    9024: "kappa-node",
-    9027: "delta-proxy",
-    9036: "omega-stream",
-    9042: "theta-daemon",
-    9049: "gamma-relay",
-    9054: "delta-sync",
-    9055: "epsilon-sync",
-    9057: "zeta-cache",
-    9059: "lambda-api",
-    9077: "auth-service",
-    9099: "configd"
+    9010: "gamma-relay",
+    9016: "kappa-node",
+    9019: "zeta-cache",
+    9020: "delta-proxy",
+    9027: "configd",
+    9028: "beta-hub",
+    9033: "update-agent",
+    9039: "auth-service",
+    9043: "theta-daemon",
+    9044: "omega-stream",
+    9052: "metricsd",
+    9067: "sysmon-api",
+    9070: "lambda-api",
+    9073: "auth-service",
+    9079: "delta-sync",
+    9092: "epsilon-sync",
+    9096: "alpha-core"
 }
 
 GUIDED_ALL_PORTS = {**GUIDED_JUNK_RESPONSES, **GUIDED_FAKE_FLAGS}

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import sys
 from pathlib import Path
 from common import find_project_root, load_unlock_data, get_ctf_mode

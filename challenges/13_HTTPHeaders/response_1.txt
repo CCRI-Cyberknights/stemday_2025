@@ -1,18 +1,20 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:49:15 GMT
-Server: Liber8-Server/3.0.0-beta
-Content-Type: text/html; charset=UTF-8
-Cache-Control: public, max-age=86400
-X-Powered-By: PHP/8.1.12
-X-Flag: LBPD-AIJC-0036
+Date: Sun, 30 Jun 2025 15:47:40 GMT
+Server: Apache/2.4.54 (Ubuntu)
+Content-Type: application/json
+Cache-Control: no-store
+X-Powered-By: Node.js/18.16.0
+X-Flag: ZBBN-3023-BILZ
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=ivlr4s7v8grt; HttpOnly; Secure
+Set-Cookie: sessionid=dsk8y8b6pedq; HttpOnly; Secure
 
-{
-  "status": "ok",
-  "message": "API version 1.2.4 is running.",
-  "notes": "No maintenance scheduled."
-}
+<html>
+  <head><title>Liber8 Portal</title></head>
+  <body>
+    <h1>Welcome to Liber8</h1>
+    <p>System maintenance is underway. Some services may be unavailable.</p>
+  </body>
+</html>
 
-<!-- Developer note: Remove X-Test headers before release -->
+<!-- To-do: Update security headers on staging -->

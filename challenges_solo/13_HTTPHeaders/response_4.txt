@@ -1,20 +1,20 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:53:15 GMT
-Server: Go HTTP Server/1.19
-Content-Type: text/html; charset=UTF-8
-Cache-Control: private, no-cache
-X-Powered-By: ASP.NET Core/7.0
-X-Flag: CCRI-XBWS-0795
+Date: Sun, 30 Jun 2025 15:48:39 GMT
+Server: nginx/1.24.0
+Content-Type: application/json
+Cache-Control: public, max-age=86400
+X-Powered-By: Python/3.11.4
+X-Flag: UEQO-3614-OHRM
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=p4tp21rhgv1h; HttpOnly; Secure
+Set-Cookie: sessionid=plgkaewjamb4; HttpOnly; Secure
 
 <html>
-  <head><title>Data Service</title></head>
+  <head><title>Internal Dashboard</title></head>
   <body>
-    <h1>Data Service Ready</h1>
-    <p>Connect your client application to begin.</p>
+    <h1>Liber8 Ops Dashboard</h1>
+    <p>Authentication successful. Redirecting...</p>
   </body>
 </html>
 
-<!-- Debug: Temporary caching enabled -->
+<!-- To-do: Update security headers on staging -->
