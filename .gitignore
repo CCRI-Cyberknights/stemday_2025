@@ -21,8 +21,7 @@
 !copy_takehome_ccri_ctf.py
 !debs/
 !debs/**
-web_version_admin/__pycache__/
-web_version_admin/__pycache__/**
+
 
 # Desktop shortcuts
 !Launch_CCRI_CTF_HUB.desktop
@@ -62,3 +61,5 @@ web_version/**
 !web_version_admin/**
 web_version_admin/server.bak
 web_version_admin/challenges.json.bak
+web_version_admin/__pycache__/Challenge.cpython-311.pyc
+web_version_admin/__pycache__/ChallengeList.cpython-311.pyc

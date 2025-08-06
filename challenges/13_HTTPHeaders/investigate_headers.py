@@ -2,6 +2,7 @@
 import os
 import subprocess
 import sys
+import glob
 
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
@@ -26,12 +27,20 @@ def view_file_with_less(file_path):
 
 def bulk_scan(script_dir):
     try:
+        pattern = os.path.join(script_dir, "response_*.txt")
+        matching_files = glob.glob(pattern)
+
+        if not matching_files:
+            print("⚠️ No response_*.txt files found.")
+            return
+
         result = subprocess.run(
-            ["grep", "-E", "CCRI-[A-Z]{4}-[0-9]{4}", os.path.join(script_dir, "response_*.txt")],
+            ["grep", "-E", "CCRI-[A-Z]{4}-[0-9]{4}"] + matching_files,
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
             text=True
         )
+
         if result.stdout.strip():
             print(result.stdout)
         else:
@@ -73,7 +82,7 @@ def main():
 
         elif choice == "6":
             print("\n🔎 Bulk scanning for flags...")
-            print("💻 Running: grep -E 'CCRI-[A-Z]{{4}}-[0-9]{{4}}' response_*.txt\n")
+            print("💻 Running: grep -E 'CCRI-[A-Z]{4}-[0-9]{4}' response_*.txt\n")
             bulk_scan(script_dir)
             pause("\nPress ENTER to return to the menu.")
 

@@ -1,20 +1,19 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:56:10 GMT
-Server: Liber8-Server/3.0.0-beta
+Date: Sun, 30 Jun 2025 15:47:57 GMT
+Server: Liber8-Server/2.3.1
 Content-Type: application/json
-Cache-Control: private, no-cache
+Cache-Control: no-store
 X-Powered-By: Node.js/18.16.0
-X-Flag: ODSO-5536-CBPG
+X-Flag: VCUO-ZIIB-9827
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=eltil4q3l7dw; HttpOnly; Secure
 
 <html>
-  <head><title>Data Service</title></head>
+  <head><title>Liber8 Portal</title></head>
   <body>
-    <h1>Data Service Ready</h1>
-    <p>Connect your client application to begin.</p>
+    <h1>Welcome to Liber8</h1>
+    <p>System maintenance is underway. Some services may be unavailable.</p>
   </body>
 </html>
 
-<!-- Debug: Temporary caching enabled -->
+<!-- Debug: API response size 512 bytes -->

@@ -1,8 +1,6 @@
-This folder contains assorted documentation.
-Review each file carefully.
-JVEA-8324-NQXU
-Review each file carefully.
 Welcome to the reference directory.
-Review each file carefully.
-Review each file carefully.
+Welcome to the reference directory.
+This folder contains assorted documentation.
+Welcome to the reference directory.
+BKOB-OFZH-9008
 Review each file carefully.

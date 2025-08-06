@@ -1,20 +1,20 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:55:54 GMT
-Server: Liber8-Server/2.3.1
+Date: Sun, 30 Jun 2025 15:49:06 GMT
+Server: nginx/1.24.0
 Content-Type: application/json
-Cache-Control: no-store
-X-Powered-By: Node.js/18.16.0
-X-Flag: ZTFT-9334-KWZZ
+Cache-Control: public, max-age=86400
+X-Powered-By: PHP/8.1.12
+X-Flag: CCRI-SSXC-8857
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=g8cexn1ngoxo; HttpOnly; Secure
+Set-Cookie: sessionid=hiptne73bign; HttpOnly; Secure
 
 <html>
-  <head><title>Internal Dashboard</title></head>
+  <head><title>Liber8 Portal</title></head>
   <body>
-    <h1>Liber8 Ops Dashboard</h1>
-    <p>Authentication successful. Redirecting...</p>
+    <h1>Welcome to Liber8</h1>
+    <p>System maintenance is underway. Some services may be unavailable.</p>
   </body>
 </html>
 
-<!-- Debug: Temporary caching enabled -->
+<!-- To-do: Update security headers on staging -->

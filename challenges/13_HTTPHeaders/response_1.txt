@@ -1,13 +1,12 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:47:40 GMT
-Server: Apache/2.4.54 (Ubuntu)
-Content-Type: application/json
-Cache-Control: no-store
-X-Powered-By: Node.js/18.16.0
-X-Flag: ZBBN-3023-BILZ
+Date: Sun, 30 Jun 2025 15:55:45 GMT
+Server: Liber8-Server/2.3.1
+Content-Type: text/html; charset=UTF-8
+Cache-Control: public, max-age=86400
+X-Powered-By: Ruby on Rails/7.1.0
+X-Flag: ABIQ-PIJO-6837
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=dsk8y8b6pedq; HttpOnly; Secure
 
 <html>
   <head><title>Liber8 Portal</title></head>
@@ -17,4 +16,4 @@ Set-Cookie: sessionid=dsk8y8b6pedq; HttpOnly; Secure
   </body>
 </html>
 
-<!-- To-do: Update security headers on staging -->
+<!-- Debug: Temporary caching enabled -->

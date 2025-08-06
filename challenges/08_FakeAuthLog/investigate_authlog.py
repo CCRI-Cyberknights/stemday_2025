@@ -5,7 +5,7 @@ import subprocess
 import time
 import re
 
-regex_pattern = r"\bCCRI-[A-Z0-9]{4}-\d{4}\b"
+regex_pattern = r"\b[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}\b"
 
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
@@ -50,7 +50,7 @@ def main():
     print("🕵️‍♂️ Auth Log Investigation")
     print("==============================\n")
     print("📄 Target file: auth.log")
-    print("🔧 Tool in use: grep\n")
+    print("🔧 Tool in use: grep, regex\n")
     print("🎯 Goal: Identify a suspicious login record by analyzing fake auth logs.")
     print("   ➡️ One of these records contains a **PID** that hides the real flag!\n")
     pause()
@@ -74,7 +74,7 @@ def main():
     print("-------------------------------------------\n")
     pause("Press ENTER to scan for suspicious entries...")
 
-    print("\n🔍 Scanning for entries with flag-like patterns (format: CCRI-XXXX-1234)...")
+    print("🔎 Scanning for flag-like patterns (format: CCRI-AAAA-1111)...")
     time.sleep(0.5)
     matches = scan_for_flags(log_file, regex_pattern)
 
@@ -83,33 +83,36 @@ def main():
             for line in matches:
                 f_out.write(line + "\n")
 
-        print(f"\n📌 Found {len(matches)} potential flag(s).")
+        print(f"\n📌 Found {len(matches)} potential flag-like strings.")
         print(f"💾 Saved to: {candidates_file}\n")
-        pause("Press ENTER to preview suspicious entries...")
-        print("\n-------------------------------------------")
+
+        pause("Press ENTER to preview flagged lines...")
+        print("🧾 Sample of suspicious entries:")
+        print("-------------------------------------------")
         for i, line in enumerate(matches):
-            if i >= 5:
-                print("... (only first 5 shown)")
+            print(f"   ➡️ {line}")
+            if i >= 4 and len(matches) > 5:
+                print("   ... (more found)")
                 break
-            print(line)
         print("-------------------------------------------\n")
     else:
         print("⚠️ No suspicious entries found in auth.log.")
         pause("Press ENTER to close this terminal...")
         sys.exit(0)
 
-    pattern = input("🔎 Enter a username, IP, or keyword to search in the full log (or press ENTER to skip): ").strip()
+    pattern = input("🔎 Enter a username, IP, or keyword to search the full log (or press ENTER to skip): ").strip()
     if pattern:
-        print(f"\n🔎 Searching for '{pattern}' in auth.log...")
+        print(f"\n🔎 Searching for '{pattern}' in auth.log...\n")
         try:
             subprocess.run(["grep", "--color=always", pattern, log_file], check=False)
         except FileNotFoundError:
             print("❌ ERROR: grep command not found.")
     else:
-        print("⏭️  Skipping custom search.")
+        print("⏭️  Skipping keyword search.")
 
-    print("\n🧠 Hint: One of the flagged PIDs hides the official flag!")
-    print("   Format: CCRI-AAAA-1111\n")
+    print("\n🧠 Hint: Only one of the PID entries hides the **real** CCRI flag.")
+    print("   🔍 Investigate patterns or anomalies in the auth.log to uncover it.")
+    print("   🪪 Format to watch for: CCRI-AAAA-1111\n")
     pause("Press ENTER to close this terminal...")
 
 if __name__ == "__main__":

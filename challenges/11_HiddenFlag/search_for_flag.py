@@ -54,6 +54,10 @@ def main():
         print("5️⃣  Exit explorer\n")
 
         choice = input("Enter your choice (1-5): ").strip()
+        if choice not in {"1", "2", "3", "4", "5"}:
+            print("❌ Invalid option. Please enter a number from 1 to 5.")
+            pause()
+            continue
 
         if choice == "1":
             clear_screen()
@@ -70,19 +74,22 @@ def main():
                 print("\n⚠️  No subdirectories found here.")
                 pause()
                 continue
+
             clear_screen()
             print(f"📂 Subdirectories in '{relative_dir}':")
             print("--------------------------------------")
             for idx, subdir in enumerate(subdirs, 1):
                 print(f"{idx:2d}) {subdir}")
-            try:
-                index = int(input("\nEnter the number of the directory to enter: ").strip())
+
+            index_input = input("\nEnter the number of the directory to enter: ").strip()
+            if index_input.isdigit():
+                index = int(index_input)
                 if 1 <= index <= len(subdirs):
                     current_dir = os.path.join(current_dir, subdirs[index - 1])
                 else:
                     print("❌ Invalid selection.")
                     pause()
-            except ValueError:
+            else:
                 print("❌ Invalid input. Please enter a number.")
                 pause()
 
@@ -92,13 +99,16 @@ def main():
                 print("\n⚠️  No files found here.")
                 pause()
                 continue
+
             clear_screen()
             print(f"📄 Files in '{relative_dir}':")
             print("--------------------------------------")
             for idx, file in enumerate(files, 1):
                 print(f"{idx:2d}) {file}")
-            try:
-                index = int(input("\nEnter the number of the file to view: ").strip())
+
+            index_input = input("\nEnter the number of the file to view: ").strip()
+            if index_input.isdigit():
+                index = int(index_input)
                 if 1 <= index <= len(files):
                     filepath = os.path.join(current_dir, files[index - 1])
                     clear_screen()
@@ -110,7 +120,9 @@ def main():
                             print(content)
                     except Exception as e:
                         print(f"❌ Could not read file: {e}")
+                        content = ""
                     print("--------------------------------------\n")
+
                     save_choice = input(f"Would you like to save this output to {os.path.basename(results_file)}? (y/n): ").strip().lower()
                     if save_choice == "y":
                         with open(results_file, "a") as rf:
@@ -121,7 +133,7 @@ def main():
                 else:
                     print("❌ Invalid selection.")
                     pause()
-            except ValueError:
+            else:
                 print("❌ Invalid input. Please enter a number.")
                 pause()
 
@@ -137,9 +149,6 @@ def main():
         elif choice == "5":
             print("👋 Exiting explorer. Good luck finding the *real* flag!")
             break
-        else:
-            print("❌ Invalid option. Please enter a number from 1 to 5.")
-            pause()
 
 if __name__ == "__main__":
     main()

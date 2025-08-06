@@ -1,19 +1,19 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:50:14 GMT
+Date: Sun, 30 Jun 2025 15:55:07 GMT
 Server: nginx/1.24.0
-Content-Type: text/plain; charset=UTF-8
-Cache-Control: private, no-cache
-X-Powered-By: Python/3.11.4
-X-Flag: NMOF-TKBK-4198
+Content-Type: application/json
+Cache-Control: public, max-age=86400
+X-Powered-By: Ruby on Rails/7.1.0
+X-Flag: LJYQ-6641-OLYB
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
 
 <html>
-  <head><title>Internal Dashboard</title></head>
+  <head><title>Liber8 Portal</title></head>
   <body>
-    <h1>Liber8 Ops Dashboard</h1>
-    <p>Authentication successful. Redirecting...</p>
+    <h1>Welcome to Liber8</h1>
+    <p>System maintenance is underway. Some services may be unavailable.</p>
   </body>
 </html>
 
-<!-- To-do: Update security headers on staging -->
+<!-- Debug: Session created for client 10.6.112.3 -->

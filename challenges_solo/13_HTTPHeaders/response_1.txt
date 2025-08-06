@@ -1,20 +1,18 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:49:07 GMT
-Server: nginx/1.24.0
+Date: Sun, 30 Jun 2025 15:46:42 GMT
+Server: Liber8-Server/2.3.1
 Content-Type: text/html; charset=UTF-8
-Cache-Control: private, no-cache
-X-Powered-By: Ruby on Rails/7.1.0
-X-Flag: PTPY-CBTN-4351
+Cache-Control: public, max-age=86400
+X-Powered-By: PHP/8.1.12
+X-Flag: CCRI-RCDZ-2724
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=pv1i1j3vunkh; HttpOnly; Secure
+Set-Cookie: sessionid=z1tgj0nuv8xe; HttpOnly; Secure
 
-<html>
-  <head><title>Internal Dashboard</title></head>
-  <body>
-    <h1>Liber8 Ops Dashboard</h1>
-    <p>Authentication successful. Redirecting...</p>
-  </body>
-</html>
+{
+  "status": "ok",
+  "message": "API version 1.2.4 is running.",
+  "notes": "No maintenance scheduled."
+}
 
 <!-- To-do: Update security headers on staging -->

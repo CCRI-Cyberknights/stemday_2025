@@ -24,8 +24,8 @@ def run_strings(binary_path, output_path):
 def search_for_flags(file_path, regex):
     matches = []
     try:
-        with open(file_path, "r") as f:
-            for line in f:
+        with open(file_path, "r", errors="ignore") as f:
+            for i, line in enumerate(f):
                 if re.search(regex, line):
                     matches.append(line.strip())
     except Exception as e:
@@ -68,8 +68,21 @@ def main():
     except FileNotFoundError:
         print("❌ ERROR: Could not open extracted_strings.txt.")
     print("--------------------------------------------------\n")
-    pause("Press ENTER to scan for flag patterns...")
 
+    # 🔍 KEYWORD SEARCH FIRST
+    pause("Press ENTER to search for a specific keyword...")
+    keyword = input("🔍 Enter a keyword to search (or hit ENTER to skip): ").strip()
+    if keyword:
+        print(f"\n🔎 Searching for '{keyword}' in {outfile}...\n")
+        try:
+            subprocess.run(["grep", "-i", "--color=always", keyword, outfile], check=False)
+        except FileNotFoundError:
+            print("❌ ERROR: grep command not found.")
+    else:
+        print("⏭️  Skipping keyword search.\n")
+
+    # 🔎 FLAG PATTERN SEARCH
+    pause("Press ENTER to scan for potential flags...")
     print("🔎 Scanning for flag-like patterns (format: XXXX-YYYY-ZZZZ)...")
     time.sleep(0.5)
     matches = search_for_flags(outfile, regex_pattern)
@@ -80,17 +93,6 @@ def main():
             print(f"   ➡️ {m}")
     else:
         print("\n⚠️ No obvious flags found. Try scanning manually in extracted_strings.txt.")
-
-    print()
-    keyword = input("🔍 Enter a keyword to search in the full dump (or hit ENTER to skip): ").strip()
-    if keyword:
-        print(f"\n🔎 Searching for '{keyword}' in {outfile}...")
-        try:
-            subprocess.run(["grep", "-i", "--color=always", keyword, outfile], check=False)
-        except FileNotFoundError:
-            print("❌ ERROR: grep command not found.")
-    else:
-        print("⏭️  Skipping keyword search.")
 
     print("\n✅ Done! You can inspect extracted_strings.txt further or try other tools like 'hexdump' for deeper analysis.")
     print("🧠 Remember: Only one string matches the official flag format: CCRI-AAAA-1111\n")

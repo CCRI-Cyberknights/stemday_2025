@@ -112,19 +112,20 @@ class MetadataFlagGenerator:
 
     def generate_flag(self, challenge_folder: Path) -> str:
         """Generate flags, embed them in metadata, and return the real flag."""
-        real_flag = FlagUtils.generate_real_flag().replace("CCRI-", "CCRI-META-")
+        real_flag = FlagUtils.generate_real_flag()  # No replace here
 
         fake_flags = set()
         attempts = 0
         while len(fake_flags) < 4:
-            fake = FlagUtils.generate_fake_flag().replace("CCRI-", "FAKE-")
+            fake = FlagUtils.generate_fake_flag()
             if fake != real_flag:
                 fake_flags.add(fake)
             attempts += 1
             if attempts > 1000:
-                raise RuntimeError("❌ Too many attempts generating unique fake flags.")
+               raise RuntimeError("❌ Too many attempts generating unique fake flags.")
         fake_flags = list(fake_flags)
 
         self.embed_flags(challenge_folder, real_flag, fake_flags)
         print(f"✅ {self.mode.capitalize()} flag: {real_flag}")
         return real_flag
+

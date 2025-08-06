@@ -1,10 +1,10 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:51:12 GMT
-Server: Liber8-Server/3.0.0-beta
-Content-Type: application/json
-Cache-Control: no-store
+Date: Sun, 30 Jun 2025 15:58:49 GMT
+Server: Apache/2.4.54 (Ubuntu)
+Content-Type: text/plain; charset=UTF-8
+Cache-Control: public, max-age=86400
 X-Powered-By: Python/3.11.4
-X-Flag: FIWF-5066-ZYLJ
+X-Flag: QUIZ-RVSZ-6800
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
 
@@ -16,4 +16,4 @@ X-Content-Type-Options: nosniff
   </body>
 </html>
 
-<!-- To-do: Update security headers on staging -->
+<!-- Debug: API response size 512 bytes -->

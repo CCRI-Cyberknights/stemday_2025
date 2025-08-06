@@ -1,13 +1,12 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:51:03 GMT
-Server: Go HTTP Server/1.19
+Date: Sun, 30 Jun 2025 15:48:07 GMT
+Server: Liber8-Server/3.0.0-beta
 Content-Type: application/json
-Cache-Control: no-store
+Cache-Control: public, max-age=86400
 X-Powered-By: Python/3.11.4
-X-Flag: JECG-XLCY-4444
+X-Flag: TXCN-AEXY-0377
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=bvdv0zyqjkg0; HttpOnly; Secure
 
 {
   "status": "ok",

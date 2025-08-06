@@ -1,4 +1,7 @@
-enable_logging=true
-LJKM-7101-SHKH
-enable_logging=true
 user=guest
+# Legacy configuration file
+# [No sensitive data found here]
+user=guest
+user=guest
+# Legacy configuration file
+enable_logging=true

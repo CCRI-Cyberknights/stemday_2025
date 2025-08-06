@@ -1,19 +1,14 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:58:44 GMT
-Server: Go HTTP Server/1.19
-Content-Type: text/plain; charset=UTF-8
-Cache-Control: no-store
-X-Powered-By: ASP.NET Core/7.0
-X-Flag: CCRI-NFHJ-8965
+Date: Sun, 30 Jun 2025 15:54:41 GMT
+Server: nginx/1.24.0
+Content-Type: application/json
+Cache-Control: public, max-age=86400
+X-Powered-By: Node.js/18.16.0
+X-Flag: QVVU-VUIQ-6768
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
 
-<html>
-  <head><title>Data Service</title></head>
-  <body>
-    <h1>Data Service Ready</h1>
-    <p>Connect your client application to begin.</p>
-  </body>
-</html>
+Welcome to the Liber8 data endpoint.
+This endpoint returns plain text responses.
 
-<!-- Debug: Temporary caching enabled -->
+<!-- Developer note: Remove X-Test headers before release -->

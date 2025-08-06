@@ -3,12 +3,30 @@ import os
 import sys
 import subprocess
 import time
+import random
+import re
 
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
 
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
+
+def extract_flag_candidates(text):
+    """Extract and display a few plausible flag-like values from metadata."""
+    pattern = r"\b[A-Z]{4}-[A-Z0-9]{4}-[0-9]{4}\b"
+    matches = re.findall(pattern, text)
+
+    # Add 2–4 random-looking fake flags if needed
+    while len(matches) < 5:
+        fake = f"{''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZ', k=4))}-" \
+               f"{''.join(random.choices('ABCDEFGHJKLMNPQRSTUVWXYZ23456789', k=4))}-" \
+               f"{random.randint(1000, 9999)}"
+        if fake not in matches:
+            matches.append(fake)
+
+    random.shuffle(matches)
+    return matches
 
 def main():
     script_dir = os.path.abspath(os.path.dirname(__file__))
@@ -49,15 +67,18 @@ def main():
 
     print(f"✅ All metadata saved to: {os.path.basename(output_file)}\n")
 
+    # Read metadata
+    with open(output_file, "r") as f:
+        metadata_text = f.read()
+
     print("👀 Let’s preview a few key fields:")
     print("----------------------------------------")
-    try:
-        subprocess.run(
-            ["grep", "-E", "Camera|Date|Comment|Artist|CCRI", output_file],
-            check=False
-        )
-    except FileNotFoundError:
-        print("⚠️ No common fields found.")
+    preview_lines = []
+    for line in metadata_text.splitlines():
+        if any(keyword in line for keyword in ["Camera", "Date", "Comment", "Artist", "Profile", "CCRI"]):
+            preview_lines.append(line)
+    preview_lines = preview_lines[:10]  # Just first 10 key lines
+    print("\n".join(preview_lines))
     print("----------------------------------------\n")
 
     keyword = input("🔎 Enter a keyword to search in the metadata (or press ENTER to skip): ").strip()
@@ -68,10 +89,17 @@ def main():
             check=False
         )
     else:
-        print("⏭️  Skipping custom search.")
+        print("⏭️  Skipping custom search.\n")
 
-    print("\n🧠 One of these fields hides the correct flag in the format: CCRI-AAAA-1111")
-    pause("Press ENTER to close this terminal...")
+    # Blind flag hunt
+    flag_candidates = extract_flag_candidates(metadata_text)
+
+    print("🧠 One of these fields hides the correct flag in the format: CCRI-AAAA-1111")
+    print("👁️‍🗨️ Candidate flag-like values found in metadata:")
+    for fake in flag_candidates:
+        print(f"   ➡️ {fake}")
+
+    pause("\nPress ENTER to close this terminal...")
 
 if __name__ == "__main__":
     main()

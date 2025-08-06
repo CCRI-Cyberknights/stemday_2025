@@ -3,6 +3,7 @@ import os
 import sys
 import subprocess
 import time
+import re
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -37,6 +38,20 @@ def run_python_script(script_path):
         print("❌ ERROR: Python interpreter not found.")
         sys.exit(1)
 
+def patch_operator_in_script(script_path, new_operator):
+    try:
+        with open(script_path, "r") as f:
+            lines = f.readlines()
+        with open(script_path, "w") as f:
+            for line in lines:
+                if line.strip().startswith("code = part1"):
+                    f.write(f"code = part1 {new_operator} part2  # <- fixed math\n")
+                else:
+                    f.write(line)
+    except Exception as e:
+        print(f"❌ ERROR patching script: {e}")
+        sys.exit(1)
+
 def main():
     script_dir = os.path.abspath(os.path.dirname(__file__))
     broken_script = os.path.join(script_dir, "broken_flag.py")
@@ -49,40 +64,45 @@ def main():
     print("===============================================\n")
     print(f"📄 Broken script located: {broken_script}\n")
     print("⚠️ This script calculates part of the flag incorrectly.")
-    print("👉 Open it in a text editor (nano, vim, or mousepad) and examine the math.")
-    print("💡 Your goal: fix the math operation and re-run the script.\n")
+    print("💡 Your goal: try different math operations to fix it.\n")
+
     pause("Press ENTER to attempt running the broken script...")
 
-    if not os.path.isfile(broken_script):
-        print("❌ ERROR: missing required file 'broken_flag.py'.")
-        pause("Press ENTER to close this terminal...")
-        sys.exit(1)
-
-    print("\n💻 Running: python broken_flag.py")
-    print("----------------------------------------------")
-    output = run_python_script(broken_script)
-    print(output)
-    print("----------------------------------------------\n")
-    time.sleep(1)
-
-    print("😮 If that output doesn't look right, edit the script and fix the math.")
-    pause("Press ENTER once you've fixed it to test again...")
-
-    print("\n🎉 Re-running fixed script...")
-    fixed_output = run_python_script(broken_script)
-    flag_line = next((line for line in fixed_output.splitlines() if "CCRI-SCRP" in line), None)
-
-    if flag_line:
+    while True:
+        print("\n💻 Running: python broken_flag.py")
         print("----------------------------------------------")
-        print(flag_line)
-        print("----------------------------------------------")
-        with open(flag_output_file, "w") as f:
-            f.write(flag_line + "\n")
-        print(f"📄 Flag saved to: {flag_output_file}\n")
-        pause("🎯 Copy the flag and enter it in the scoreboard when ready. Press ENTER to finish...")
-    else:
-        print("⚠️ Still no valid flag. Double-check your math and try again.")
-        pause("Press ENTER to close this terminal...")
+        output = run_python_script(broken_script)
+        print(output)
+        print("----------------------------------------------\n")
+
+        flag_line = next((line for line in output.splitlines() if "CCRI-SCRP" in line), None)
+
+        if flag_line:
+            match = re.search(r"CCRI-SCRP-(\d+)", flag_line)
+            if match and len(match.group(1)) == 4:
+                print("✅ Valid flag found!")
+                print("----------------------------------------------")
+                print(flag_line)
+                print("----------------------------------------------")
+                with open(flag_output_file, "w") as f:
+                    f.write(flag_line + "\n")
+                print(f"📄 Flag saved to: {flag_output_file}\n")
+                pause("🎯 Copy the flag and enter it in the scoreboard when ready. Press ENTER to finish...")
+                break
+            else:
+                print("⚠️ That flag isn't 4 digits long. Try a different operator.")
+        else:
+            print("⚠️ No flag found. Double-check the script.")
+
+        print("\n🛠️ Try a different operator to fix the math.")
+        op = input("Enter operator to use (+, -, *, /): ").strip()
+        if op not in ["+", "-", "*", "/"]:
+            print("❌ Invalid operator. Please enter one of: +  -  *  /")
+            continue
+
+        patch_operator_in_script(broken_script, op)
+        time.sleep(0.5)
+        clear_screen()
 
 if __name__ == "__main__":
     main()

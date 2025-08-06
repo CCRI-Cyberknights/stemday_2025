@@ -10,10 +10,13 @@ def pause(prompt="Press ENTER to continue..."):
     input(prompt)
 
 def open_image(file_path, duration=20):
+    """Open an image for a limited duration using the default viewer."""
     try:
-        viewer = subprocess.Popen(["xdg-open", file_path],
-                                  stdout=subprocess.DEVNULL,
-                                  stderr=subprocess.DEVNULL)
+        viewer = subprocess.Popen(
+            ["xdg-open", file_path],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
         time.sleep(duration)
         viewer.terminate()
         print("⏳ Time’s up! Closing the viewer...")
@@ -21,6 +24,7 @@ def open_image(file_path, duration=20):
         print(f"❌ Could not open image: {e}")
 
 def decode_qr(file_path):
+    """Run zbarimg to extract QR content."""
     try:
         result = subprocess.run(
             ["zbarimg", file_path],
@@ -50,9 +54,8 @@ def main():
     print("🛠️ Your options:")
     print("  • Scan with your phone’s QR scanner")
     print("  • OR use this tool to open and auto-decode them\n")
-    print("📖 Behind the scenes: This script runs:")
-    print("    zbarimg qr_XX.png\n")
-    print("⏳ Each QR will open for 20 seconds, then decode + save the result.\n")
+    print("📖 Behind the scenes: This script runs: zbarimg qr_XX.png")
+    print("⏳ Each QR opens for 20 seconds, then decodes + saves the result.\n")
     pause("Press ENTER to begin exploring.")
     clear_screen()
 
@@ -68,39 +71,43 @@ def main():
             print("👋 Exiting QR Explorer.")
             break
 
-        try:
-            index = int(choice) - 1
-            if 0 <= index < len(qr_codes):
-                file_path = qr_codes[index]
-                txt_file = file_path.replace(".png", ".txt")
+        if not choice.isdigit():
+            print("❌ Invalid input. Please enter a number.")
+            pause()
+            clear_screen()
+            continue
 
-                print(f"\n🖼️ Opening {os.path.basename(file_path)}...")
-                open_image(file_path)
+        index = int(choice) - 1
+        if 0 <= index < len(qr_codes):
+            file_path = qr_codes[index]
+            txt_file = file_path.replace(".png", ".txt")
 
-                print(f"\n🔎 Scanning {os.path.basename(file_path)}...")
-                print(f"💻 Running: zbarimg \"{os.path.basename(file_path)}\"\n")
+            print(f"\n🖼️ Opening {os.path.basename(file_path)}...")
+            open_image(file_path)
 
-                result = decode_qr(file_path)
+            print(f"\n🔎 Scanning {os.path.basename(file_path)}...")
+            print(f"💻 Running: zbarimg \"{os.path.basename(file_path)}\"\n")
 
-                if not result:
-                    print("❌ No QR code found.")
-                else:
-                    print("✅ Decoded:")
-                    print("----------------------------")
-                    print(result)
-                    print("----------------------------")
+            result = decode_qr(file_path)
+
+            if not result:
+                print("❌ No QR code found.")
+            else:
+                print("✅ Decoded Result:")
+                print("----------------------------")
+                print(result)
+                print("----------------------------")
+                try:
                     with open(txt_file, "w") as f:
                         f.write(result + "\n")
                     print(f"💾 Saved to: {os.path.basename(txt_file)}")
+                except Exception as e:
+                    print(f"⚠️ Could not save output: {e}")
 
-                pause("\nPress ENTER to continue...")
-                clear_screen()
-            else:
-                print("❌ Invalid selection.")
-                pause()
-                clear_screen()
-        except ValueError:
-            print("❌ Invalid input. Enter a number.")
+            pause("\nPress ENTER to continue...")
+            clear_screen()
+        else:
+            print("❌ Invalid selection. Please choose 1–5.")
             pause()
             clear_screen()
 
