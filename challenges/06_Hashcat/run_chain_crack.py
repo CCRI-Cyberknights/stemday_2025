@@ -55,7 +55,7 @@ def extract_zip_files_with_passwords(passwords, segments_dir, extracted_dir, dec
         zipfile = os.path.join(segments_dir, f"part{idx}.zip")
         print(f"\n🔑 Unlocking {zipfile} with password: {password}")
         result = subprocess.run(
-            ["unzip", "-P", password, zipfile, "-d", extracted_dir],
+            ["unzip", "-o", "-P", password, zipfile, "-d", extracted_dir],
             capture_output=True,
             text=True
         )
@@ -63,14 +63,32 @@ def extract_zip_files_with_passwords(passwords, segments_dir, extracted_dir, dec
             print(f"❌ Failed to unzip {zipfile} with password '{password}'", file=sys.stderr)
             print(f"📄 unzip error: {result.stderr.strip()}", file=sys.stderr)
             continue
+
         print(f"✅ Unzipped {zipfile} successfully.")
         flatten_extracted_dir(extracted_dir)
+
         for f in os.listdir(extracted_dir):
             if f.startswith("encoded_"):
-                decode_base64_file(
-                    os.path.join(extracted_dir, f),
-                    os.path.join(decoded_dir, f"decoded_{f}")
-                )
+                encoded_path = os.path.join(extracted_dir, f)
+                decoded_path = os.path.join(decoded_dir, f"decoded_" + f)
+
+                print(f"\n📦 Encoded Base64 contents from {f}:")
+                print("--------------------------")
+                with open(encoded_path, "r") as ef:
+                    print(ef.read().strip())
+                print("--------------------------")
+
+                decoded = decode_base64_file(encoded_path, decoded_path)
+
+                if decoded:
+                    print(f"\n🧾 Decoded contents from {f}:")
+                    print("--------------------------")
+                    print(decoded)
+                    print("--------------------------")
+                else:
+                    print("❌ Failed to decode base64 content.")
+
+        pause("Press ENTER to continue to the next ZIP...")
 
 def reassemble_flags(decoded_dir, assembled_file):
     decoded_files = sorted(
@@ -145,16 +163,27 @@ def student_interactive(script_dir):
         run_hashcat(hashes_file, wordlist_file, potfile)
 
         print("\n[✅] Cracked hashes:")
-        cracked_passwords = []
+        cracked_passwords_by_hash = {}
         with open(potfile, "r") as pf:
             for line in pf:
                 if ':' in line:
                     hash_val, password = line.strip().split(':', 1)
-                    cracked_passwords.append(password)
+                    cracked_passwords_by_hash[hash_val] = password
                     print(f"🔓 {hash_val} : {password}")
 
         pause("\nPress ENTER to extract ZIPs and decode segments...")
-        extract_zip_files_with_passwords(cracked_passwords, segments_dir, extracted_dir, decoded_dir)
+        ordered_passwords = []
+        with open(hashes_file, "r") as hf:
+            for line in hf:
+                hash_val = line.strip()
+                pw = cracked_passwords_by_hash.get(hash_val)
+                if pw:
+                    ordered_passwords.append(pw)
+                else:
+                    ordered_passwords.append(None)  # No match
+
+        extract_zip_files_with_passwords(ordered_passwords, segments_dir, extracted_dir, decoded_dir)
+
 
         print("\n🧩 Assembling candidate flags...")
         print_progress_bar()

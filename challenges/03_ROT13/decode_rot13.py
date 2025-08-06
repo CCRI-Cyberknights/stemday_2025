@@ -4,12 +4,14 @@ import sys
 import time
 from pathlib import Path
 
+# === Terminal Utilities ===
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
 
 def pause(msg="Press ENTER to continue..."):
     input(msg)
 
+# === ROT13 Cipher ===
 def rot13(text: str) -> str:
     result = []
     for c in text:
@@ -21,12 +23,24 @@ def rot13(text: str) -> str:
             result.append(c)
     return "".join(result)
 
-def animate_rot13(lines, delay=0.05):
+# === Animated Decoder (in-place clean overwrite) ===
+def animate_rot13_lines(lines, delay=0.25):
+    # Print scrambled lines
+    for line in lines:
+        print(f"> {line}")
+
+    pause("\n🧠 The message above is scrambled using ROT13. Press ENTER to decode...\n")
+
+    # ✅ Move cursor to top of block (including "🔓..." above)
+    print(f"\033[{len(lines) + 4}A", end="")
+
     for line in lines:
         decoded = rot13(line)
-        print(f"> {decoded.strip()}")
+        print("\033[2K\r> " + decoded)
         time.sleep(delay)
 
+
+# === Main Flow ===
 def main():
     clear_screen()
     print("🔐 ROT13 Decoder Helper")
@@ -34,17 +48,16 @@ def main():
     print("📄 File to analyze: cipher.txt")
     print("🎯 Goal: Decode this message and find the hidden CCRI flag.\n")
     print("💡 What is ROT13?")
-    print("   ➡️ A Caesar cipher that shifts each letter 13 places in the alphabet.")
-    print("   ➡️ Encoding and decoding are the same.\n")
+    print("   ➤ A Caesar cipher that shifts each letter 13 positions.")
+    print("   ➤ Encoding and decoding are the same.\n")
     pause()
 
     clear_screen()
     print("🛠️ Behind the Scenes")
     print("---------------------------")
-    print("For every line in cipher.txt:")
-    print("  ➡️ Rotate each letter by 13 positions (A→N, N→A).")
-    print("  ➡️ We’ll animate the decoding so you can see it happen.\n")
-    pause("Press ENTER to launch the animated decoder...")
+    print("We intercepted a scrambled message in cipher.txt.")
+    print("Let’s watch it decode — line by line.\n")
+    pause("Press ENTER to begin live decoding...")
 
     script_dir = Path(__file__).resolve().parent
     input_path = script_dir / "cipher.txt"
@@ -57,8 +70,8 @@ def main():
 
     lines = input_path.read_text(encoding="utf-8").splitlines()
     clear_screen()
-    print("🔓 Decoding intercepted message...\n")
-    animate_rot13(lines)
+    print("🔓 Scanning and preparing ROT13 animation...\n")
+    animate_rot13_lines(lines, delay=1.0)
 
     decoded = "\n".join(rot13(line) for line in lines)
     output_path.write_text(decoded + "\n", encoding="utf-8")
@@ -69,5 +82,6 @@ def main():
     print("📋 Copy the correct flag and paste it into the scoreboard when ready.\n")
     pause("Press ENTER to close this terminal...")
 
+# === Entry Point ===
 if __name__ == "__main__":
     main()

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import os
 import subprocess
-import sys
 
+# === Utilities ===
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
 
@@ -10,6 +10,7 @@ def pause(prompt="Press ENTER to continue..."):
     input(prompt)
 
 def decode_base64(input_file, output_file):
+    """Decode a Base64-encoded file and save the result."""
     try:
         result = subprocess.run(
             ["base64", "--decode", input_file],
@@ -25,6 +26,7 @@ def decode_base64(input_file, output_file):
     except subprocess.CalledProcessError:
         return None
 
+# === Main Flow ===
 def main():
     clear_screen()
     print("📡 Intercepted Transmission Decoder")
@@ -32,47 +34,64 @@ def main():
     print("📄 File to analyze: encoded.txt")
     print("🎯 Goal: Decode the intercepted transmission and locate the hidden CCRI flag.\n")
     print("💡 What is Base64?")
-    print("   ➡️ A text-based encoding scheme that transforms binary data into readable text.")
-    print("   ➡️ Commonly used for encoding transmissions so they aren’t corrupted over text-only channels.\n")
+    print("   ➤ A text-based encoding scheme used to represent binary data as text.")
+    print("   ➤ Common in email, HTTP, and digital certificates.\n")
     pause()
 
     clear_screen()
     print("🛠️ Behind the Scenes")
     print("---------------------------")
-    print("This message was captured from a compromised Liber8 system.\n")
-    print("It’s been Base64-encoded for secure transit. To recover it, we’ll use the Linux tool `base64`:\n")
+    print("This message was intercepted from a compromised Liber8 system.\n")
+    print("We’ll use the built-in `base64` tool to decode it:\n")
     print("   base64 --decode encoded.txt\n")
-    print("🔑 Breakdown:")
-    print("   base64         → Call the Base64 tool")
-    print("   --decode       → Switch from encoding to decoding")
-    print("   encoded.txt    → Input file to decode\n")
+    print("🔍 Command breakdown:")
+    print("   base64         → Launch the decoder")
+    print("   --decode       → Convert encoded text back to original form")
+    print("   encoded.txt    → The file we captured\n")
     pause()
 
-    print("\n🔍 Scanning file for Base64 structure...")
-    pause("Press ENTER to continue decoding...")
-    print("✅ Base64 structure confirmed!\n")
-    print("⏳ Decoding intercepted transmission...\n")
-
-    script_dir = os.path.abspath(os.path.dirname(__file__))
+    script_dir = os.path.dirname(os.path.abspath(__file__))
     input_file = os.path.join(script_dir, "encoded.txt")
     output_file = os.path.join(script_dir, "decoded_output.txt")
 
+    clear_screen()
+    print("🔍 Scanning for Base64 structure...")
+    pause("Press ENTER to continue...\n")
+
+    print("📄 Intercepted Base64 Message (encoded.txt):")
+    print("---------------------------------------------")
+    try:
+        with open(input_file, "r", errors="replace") as f:
+            print(f.read().strip())
+    except FileNotFoundError:
+        print("❌ ERROR: encoded.txt not found!")
+        pause("Press ENTER to close this terminal...")
+        return
+    print("---------------------------------------------\n")
+    print("🧠 This may look like nonsense, but it's a Base64-encoded message.")
+    print("Let's decode it and reveal the original data!\n")
+    pause("Press ENTER to decode the message...")
+
+    print("⏳ Decoding intercepted transmission...\n")
     decoded = decode_base64(input_file, output_file)
 
     if not decoded:
-        print("\n❌ Decoding failed! This may not be valid Base64, or the file is corrupted.")
-        print("💡 Tip: Ensure 'encoded.txt' exists and contains proper Base64 text.\n")
+        print("❌ Decoding failed!")
+        print("📛 'encoded.txt' may be missing or corrupted.")
+        print("💡 Double-check the file contents. They should look like random A-Z, a-z, 0-9, +, and / characters.\n")
         pause("Press ENTER to close this terminal...")
-        sys.exit(1)
+        return
 
-    print("\n📡 Decoded Transmission:")
+    print("✅ Decoding complete!\n")
+    print("📡 Decoded Transmission:")
     print("-----------------------------")
     print(decoded)
-    print("-----------------------------")
-    print(f"\n📁 Decoded output saved as: {output_file}")
-    print("🔎 Search carefully for the CCRI flag format: CCRI-AAAA-1111")
-    print("🧠 This is your flag. Copy it into the scoreboard!\n")
+    print("-----------------------------\n")
+    print(f"📁 Decoded message saved to: {output_file}")
+    print("🔎 Look for a flag in this format: CCRI-XXXX-1234")
+    print("🧠 Copy the flag into the scoreboard to complete this challenge.\n")
     pause("Press ENTER to close this terminal...")
 
+# === Entry Point ===
 if __name__ == "__main__":
     main()
