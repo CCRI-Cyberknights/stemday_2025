@@ -7,7 +7,8 @@ import re
 from pathlib import Path
 
 CHALLENGE_ID = "16_Hex_Hunting"
-FLAG_PATTERN = r"CCRI-[A-Z]{4}-[0-9]{4}"
+REAL_FLAG_PATTERN = r"CCRI-[A-Z]{4}-\d{4}"
+FAKE_FLAG_PATTERN = r"[A-Z]{4}-[A-Z]{4}-\d{4}|[A-Z]{4}-\d{4}-[A-Z]{4}"
 BINARY_FILE = "hex_flag.bin"
 NOTES_FILE = "notes.txt"
 
@@ -24,27 +25,38 @@ def scanning_animation():
         print(".", end="", flush=True)
     print()
 
-def search_flags(binary_file, pattern=FLAG_PATTERN):
+def extract_flag_candidates(binary_file):
     try:
-        result = subprocess.run(["strings", binary_file], stdout=subprocess.PIPE, text=True)
-        return [line.strip() for line in result.stdout.splitlines() if re.match(pattern, line.strip())]
-    except Exception as e:
-        print(f"❌ Error while scanning binary: {e}")
-        return []
+        with open(binary_file, "rb") as f:
+            data = f.read()
 
-def find_offset(binary_file, target_string):
-    try:
-        result = subprocess.run(["grep", "-abo", target_string, binary_file], stdout=subprocess.PIPE, text=True)
-        for line in result.stdout.strip().splitlines():
-            return int(line.split(":")[0])
-    except:
-        return None
+        # Match CCRI-XXXX-1234, XXXX-YYYY-1234, XXXX-1234-YYYY
+        flag_pattern = re.compile(
+            rb"(CCRI-[A-Z]{4}-\d{4})|([A-Z]{4}-[A-Z]{4}-\d{4})|([A-Z]{4}-\d{4}-[A-Z]{4})"
+        )
+
+        matches = []
+        for match in flag_pattern.finditer(data):
+            flag_bytes = match.group(0)
+            try:
+                flag_str = flag_bytes.decode("ascii")
+                matches.append((match.start(), flag_str))
+            except UnicodeDecodeError:
+                continue
+
+        return matches
+
+    except Exception as e:
+        print(f"❌ Binary scan failed: {e}")
+        return []
 
 def show_hex_context(binary_file, offset, context=64):
     start = max(0, offset - 16)
     try:
-        dd = subprocess.Popen(["dd", f"if={binary_file}", "bs=1", f"skip={start}", f"count={context}"],
-                              stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        dd = subprocess.Popen(
+            ["dd", f"if={binary_file}", "bs=1", f"skip={start}", f"count={context}"],
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL
+        )
         xxd = subprocess.Popen(["xxd"], stdin=dd.stdout)
         dd.stdout.close()
         xxd.wait()
@@ -55,64 +67,64 @@ def main():
     clear_screen()
     print("🔍 Hex Flag Hunter")
     print("============================\n")
-    print("🎯 Target binary:", BINARY_FILE)
+    print(f"🎯 Target binary: {BINARY_FILE}")
     print("💡 Goal: Locate the real flag (format: CCRI-XXXX-1234).")
     print("⚠️  Multiple candidate flags are embedded, but only ONE is correct!\n")
 
     if not os.path.exists(BINARY_FILE):
-        print(f"❌ Cannot find {BINARY_FILE}")
+        print(f"❌ Error: Cannot find {BINARY_FILE}")
         sys.exit(1)
 
-    pause("Press ENTER to begin scanning...")
+    # Clean or create notes file
+    if os.path.exists(NOTES_FILE):
+        os.remove(NOTES_FILE)
+
+    pause("🔑 Press ENTER to begin scanning...")
     scanning_animation()
-    flags = search_flags(BINARY_FILE)
+    flags = extract_flag_candidates(BINARY_FILE)
 
     if not flags:
         print("❌ No flag-like patterns found in binary.")
         sys.exit(1)
 
-    print(f"\n✅ Found {len(flags)} candidate flag(s):\n")
-    for i, flag in enumerate(flags):
-        print(f"  [{i+1}] {flag}")
-    print()
+    print(f"\n✅ Detected {len(flags)} flag-like pattern(s)!")
+    print("🧪 You'll now investigate each one by reviewing its raw hex context.")
+    pause("🔬 Press ENTER to begin reviewing candidates...")
 
-    for i, flag in enumerate(flags):
+    for i, (offset, flag) in enumerate(flags):
+        clear_screen()
         print("-------------------------------------------------")
-        print(f"[{i+1}/{len(flags)}] Candidate Flag: {flag}")
-        offset = find_offset(BINARY_FILE, flag)
-        if offset is not None:
-            print(f"📍 Approximate byte offset: {offset}")
-            print("📖 Hex context (around flag):")
-            show_hex_context(BINARY_FILE, offset)
-        else:
-            print("⚠️ Could not find offset for this flag.")
+        print(f"[{i+1}/{len(flags)}] 🏷️  Candidate Flag: {flag}")
+        print(f"📍 Approximate Byte Offset: {offset}")
+        print("📖 Hex Dump Around Candidate:")
+        show_hex_context(BINARY_FILE, offset)
 
         while True:
-            print("\nOptions:")
-            print("1) ✅ Mark this flag as POSSIBLE and save to notes.txt")
-            print("2) ➡️ Skip to next flag")
-            print("3) 🚪 Quit investigation")
-            choice = input("Choose an option (1-3): ").strip()
+            print("\nActions:")
+            print("  [1] ✅ Mark as POSSIBLE (save to notes.txt)")
+            print("  [2] ➡️  Skip to next candidate")
+            print("  [3] 🚪 Quit investigation")
+            choice = input("Choose an action (1-3): ").strip()
             if choice == "1":
                 with open(NOTES_FILE, "a") as f:
                     f.write(flag + "\n")
                 print(f"✅ Saved '{flag}' to {NOTES_FILE}")
-                time.sleep(0.5)
+                time.sleep(0.6)
                 break
             elif choice == "2":
-                print("➡️ Skipping to next candidate...\n")
-                time.sleep(0.5)
+                print("➡️ Skipping to next candidate...")
+                time.sleep(0.4)
                 break
             elif choice == "3":
-                print("👋 Exiting investigation early.")
-                print(f"📁 All saved candidate flags are in {NOTES_FILE}")
+                print("👋 Exiting early. Your saved flags are in notes.txt.")
+                print(f"📁 Saved flags: {NOTES_FILE}")
                 sys.exit(0)
             else:
-                print("⚠️ Invalid choice. Please enter 1, 2, or 3.")
+                print("⚠️ Invalid input. Please enter 1, 2, or 3.")
 
-    print("\n🎉 Investigation complete!")
-    print(f"📁 All saved candidate flags are in {NOTES_FILE}")
-    pause()
+    print("\n🎉 Flag inspection complete!")
+    print(f"📁 Review your notes: {NOTES_FILE}")
+    pause("🔚 Press ENTER to exit.")
 
 if __name__ == "__main__":
     main()
