@@ -3,10 +3,14 @@ import os
 import sys
 import subprocess
 import time
+import re
 
+# === Configuration ===
 PCAP_FILE = "traffic.pcap"
 NOTES_FILE = "pcap_notes.txt"
+FLAG_REGEX = re.compile(r"(CCRI-[A-Z]{4}-\d{4}|[A-Z]{4}-[A-Z]{4}-\d{4}|[A-Z]{4}-\d{4}-[A-Z]{4})")
 
+# === Helpers ===
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
 
@@ -21,23 +25,64 @@ def check_tshark():
         pause()
         sys.exit(1)
 
-def extract_tcp_streams(pcap):
+# === Flag Extraction Phase ===
+def extract_flag_candidates(pcap):
+    print("🔍 Scanning entire PCAP for flag-like patterns...\n")
+    cmd = f"tshark -r {pcap} -Y tcp -T fields -e tcp.payload | xxd -r -p | strings"
+    result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, text=True)
+
+    found = set()
+    for line in result.stdout.splitlines():
+        match = FLAG_REGEX.search(line)
+        if match:
+            found.add(match.group(0).strip())
+
+    return list(found)
+
+# === Flag-to-Stream Mapping ===
+def map_flags_to_streams(pcap, flags):
+    print("🔗 Mapping detected flags to their TCP stream IDs...\n")
+    stream_map = {}
+
     result = subprocess.run(
-        ["tshark", "-r", pcap, "-Y", "tcp", "-T", "fields", "-e", "tcp.stream"],
+        ["tshark", "-r", pcap, "-Y", "tcp", "-T", "fields", "-e", "tcp.stream", "-e", "tcp.payload"],
         stdout=subprocess.PIPE, text=True
     )
-    return sorted(set(result.stdout.strip().splitlines()))
 
-def scan_for_candidates(pcap, streams):
-    pattern = r"[A-Z]{4}-[A-Z]{4}-[0-9]{4}|[A-Z]{4}-[0-9]{4}-[A-Z]{4}"
-    candidate_streams = []
-    for sid in streams:
-        cmd = f"tshark -r {pcap} -Y 'tcp.stream=={sid}' -T fields -e tcp.payload | xxd -r -p | strings"
-        result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
-        if any(line for line in result.stdout.splitlines() if pattern in line):
-            candidate_streams.append(sid)
-    return candidate_streams
+    stream_data = {}
+    for line in result.stdout.strip().splitlines():
+        parts = line.split('\t')
+        if len(parts) != 2:
+            continue
+        stream_id, hex_payload = parts
+        if not stream_id or not hex_payload:
+            continue
+        try:
+            stream_id = int(stream_id)
+        except ValueError:
+            continue
+        stream_data.setdefault(stream_id, []).append(hex_payload)
 
+    for stream_id, chunks in stream_data.items():
+        full_data = '\n'.join(chunks)
+        try:
+            payload = subprocess.run(
+                ["xxd", "-r", "-p"],
+                input=full_data,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                text=True
+            ).stdout
+        except Exception:
+            continue
+
+        for flag in flags:
+            if flag in payload:
+                stream_map.setdefault(stream_id, set()).add(flag)
+
+    return stream_map
+
+# === Display & Interaction ===
 def show_stream_summary(pcap, sid):
     print(f"\n🔗 Stream ID: {sid}")
     subprocess.run(["tshark", "-r", pcap, "-qz", f"follow,tcp,ascii,{sid}"])
@@ -50,9 +95,11 @@ def save_summary(pcap, sid):
     print(f"✅ Saved to {NOTES_FILE}")
     time.sleep(1)
 
+# === Main Driver ===
 def main():
     clear_screen()
-    print("📡 PCAP Investigation Tool\n==============================\n")
+    print("📡 PCAP Investigation Tool")
+    print("==============================\n")
     print(f"Analyzing: {PCAP_FILE}\n")
     print("🎯 Goal: Discover the real flag (CCRI-XXXX-1234).")
     print("🧪 Some streams contain fakes. Only one is correct!\n")
@@ -68,24 +115,31 @@ def main():
     if os.path.exists(NOTES_FILE):
         os.remove(NOTES_FILE)
 
-    streams = extract_tcp_streams(PCAP_FILE)
-    print(f"✅ Found {len(streams)} TCP streams.")
-    pause()
-
-    candidates = scan_for_candidates(PCAP_FILE, streams)
-    if not candidates:
-        print("❌ No flag-like data found in any stream.")
+    # Phase 1: Find flag-like values
+    flags_found = extract_flag_candidates(PCAP_FILE)
+    if not flags_found:
+        print("❌ No flag-like patterns found.")
         pause()
-        sys.exit(1)
+        sys.exit(0)
 
+    # Phase 2: Map flags to streams
+    stream_map = map_flags_to_streams(PCAP_FILE, flags_found)
+    if not stream_map:
+        print("❌ No streams matched the candidate flags.")
+        pause()
+        sys.exit(0)
+
+    candidates = sorted(stream_map.keys())
     print(f"✅ {len(candidates)} stream(s) contain flag-like data.")
     pause()
 
+    # Phase 3: Exploration UI
     while True:
         clear_screen()
-        print("📜 Candidate Streams:\n---------------------------")
+        print("📜 Candidate Streams:")
+        print("---------------------------")
         for idx, sid in enumerate(candidates, 1):
-            print(f"{idx}. Stream ID: {sid}")
+            print(f"{idx}. Stream ID: {sid} (flag-like content detected)")
         print(f"{len(candidates)+1}. Exit\n")
 
         try:
@@ -99,7 +153,10 @@ def main():
             show_stream_summary(PCAP_FILE, sid)
 
             while True:
-                print("\nOptions:\n1) 🔁 Back to list\n2) 💾 Save summary\n3) 🚪 Exit")
+                print("\nOptions:")
+                print("1) 🔁 Back to list")
+                print("2) 💾 Save summary")
+                print("3) 🚪 Exit")
                 opt = input("Choose (1-3): ").strip()
                 if opt == "1":
                     break
