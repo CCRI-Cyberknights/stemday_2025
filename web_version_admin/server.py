@@ -231,21 +231,22 @@ def challenge_view(challenge_id):
         return f"⚠️ Challenge folder not found: {folder}", 404
 
     readme_html = ""
-    readme_path = os.path.join(folder, 'README.txt')
+    readme_path = os.path.join(folder, 'README.md')
     if os.path.exists(readme_path):
         try:
             with open(readme_path, 'r', encoding='utf-8') as f:
                 raw_readme = f.read()
-                readme_html = Markup(markdown.markdown(raw_readme))
+                readme_html = Markup(markdown.markdown(raw_readme, extensions=["tables"]))
         except Exception as e:
-            readme_html = f"<p><strong>Error loading README:</strong> {e}</p>"
+            readme_html = f"<p><strong>Error loading README.md:</strong> {e}</p>"
 
     file_list = [
         f for f in os.listdir(folder)
         if os.path.isfile(os.path.join(folder, f))
-        and f != "README.txt"
+        and f != "README.md"
         and not f.startswith(".")
     ]
+
 
     template = "challenge_solo.html" if mode == "solo" else "challenge.html"
     print(f"➡️ Opening {selectedChallenge.getName()} in {mode.upper()} mode.")

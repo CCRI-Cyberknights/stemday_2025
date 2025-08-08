@@ -16,15 +16,15 @@ Steganography is the art of hiding messages in plain sight — like embedding a 
 
 Try out some of these Linux tools — each reveals different kinds of secrets:
 
-| Tool         | Use Case                                               | Example Command                            |
-|--------------|--------------------------------------------------------|--------------------------------------------|
-| `strings`    | View readable text inside binary files                 | `strings squirrel.jpg \| less`             |
-| `exiftool`   | Inspect metadata (camera info, author, hidden tags)    | `exiftool squirrel.jpg`                    |
-| `binwalk`    | Detect and extract embedded files                      | `binwalk -e squirrel.jpg`                  |
-| `zsteg`      | Analyze LSB steganography in PNGs (JPG support limited)| `zsteg squirrel.jpg` *(may not work here)* |
-| `steghide`   | Embed/extract files using a passphrase                 | `steghide extract -sf squirrel.jpg`        |
-| `file`       | Check file type and structure                          | `file squirrel.jpg`                        |
-| `xxd`        | View raw hex data                                      | `xxd squirrel.jpg \| less`                 |
+| Tool      | Use Case                                              | Example Command                      |
+|-----------|--------------------------------------------------------|--------------------------------------|
+| `strings` | View readable text inside binary files                | `strings squirrel.jpg \| less`       |
+| `exiftool`| Inspect metadata (camera info, author, hidden tags)   | `exiftool squirrel.jpg`              |
+| `binwalk` | Detect and extract embedded files                     | `binwalk -e squirrel.jpg`            |
+| `zsteg`   | Analyze LSB steganography in PNGs (JPG support limited)| `zsteg squirrel.jpg *(may not work here)*` |
+| `steghide`| Embed/extract files using a passphrase                | `steghide extract -sf squirrel.jpg`  |
+| `file`    | Check file type and structure                         | `file squirrel.jpg`                  |
+| `xxd`     | View raw hex data                                     | `xxd squirrel.jpg \| less`           |
 
 > Tip: Use `man` or `--help` with any command to learn more.
 
