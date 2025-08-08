@@ -27,9 +27,9 @@ Here are some tools commonly used in binary string analysis:
 | Tool       | Use Case                                           | Example Command                        |
 |------------|----------------------------------------------------|----------------------------------------|
 | `strings`  | Extract readable text from binary files            | `strings hidden_flag`                  |
-| `grep`     | Filter for possible flag formats                   | `strings hidden_flag \| grep 'CCRI-'`  |
-| `hexdump`  | View binary contents in hex and ASCII format       | `hexdump -C hidden_flag \| less`       |
-| `xxd`      | Another hex viewer (can be reversed too)           | `xxd hidden_flag \| less`              |
+| `grep`     | Filter for possible flag formats                   | `strings hidden_flag | grep 'CCRI-'`  |
+| `hexdump`  | View binary contents in hex and ASCII format       | `hexdump -C hidden_flag | less`       |
+| `xxd`      | Another hex viewer (can be reversed too)           | `xxd hidden_flag | less`              |
 | `radare2`  | Interactive disassembler for advanced exploration  | `radare2 -AA hidden_flag`              |
 
 > Tip: Most challenges won’t require disassembly — but knowing a few patterns helps. Look for structured strings and patterns like `CCRI-XXXX-YYYY`.

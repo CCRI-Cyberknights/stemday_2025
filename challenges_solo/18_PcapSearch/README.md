@@ -33,7 +33,7 @@ Somewhere in this captured traffic lies the real agency flag. But beware — dec
 | `tshark -r traffic.pcap` | Basic overview of packet contents |
 | `tshark -r traffic.pcap -Y "frame contains \"CCRI-\""` | Search for flag strings |
 | `tshark -r traffic.pcap -qz follow,tcp,ascii,<stream#>` | View contents of TCP stream |
-| `strings traffic.pcap \| grep "CCRI-"` | Look for embedded flags as ASCII |
+| `strings traffic.pcap | grep "CCRI-"` | Look for embedded flags as ASCII |
 | `grep` / `xxd` | Inspect and filter binary content |
 | `wireshark traffic.pcap` (optional) | GUI inspection of all packets |
 

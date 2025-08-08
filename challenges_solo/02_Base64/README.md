@@ -28,7 +28,7 @@ Here are some tools and methods that can help decode Base64 content:
 | `base64`     | Standard command-line utility     | `base64 --decode encoded.txt`            |
 | `openssl`    | Cryptographic tool with Base64    | `openssl enc -d -base64 -in encoded.txt` |
 | `python3`    | Script your own decoding logic    | `python3 -c "import base64; print(base64.b64decode(open('encoded.txt').read()))"` |
-| `xxd`        | View file as hex dump (optional)  | `xxd encoded.txt \| less`                |
+| `xxd`        | View file as hex dump (optional)  | `xxd encoded.txt | less`                |
 | Online tools | Browser-based Base64 decoders     | *(Use with caution. Avoid uploading real flags.)* |
 
 > Tip: If you see something readable in the decoded result — **don't overlook it**. Sometimes the message is buried in formatting or surrounded by noise.
