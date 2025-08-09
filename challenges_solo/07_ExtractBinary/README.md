@@ -53,9 +53,9 @@ Here are some tools commonly used in binary string analysis:
 
 If your tool doesn’t save output for you, you can record your finding manually:
 
-```bash
+```
 echo "CCRI-AAAA-1111" > flag.txt
-````
+```
 
 ---
 

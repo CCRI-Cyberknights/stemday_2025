@@ -57,9 +57,9 @@ The valid flag will match this structure:
 
 Once you’ve found it, submit it by running:
 
-```bash
+```
 echo "CCRI-AAAA-1111" > flag.txt
-````
+```
 
 (Replace `AAAA-1111` with the real flag string.)
 

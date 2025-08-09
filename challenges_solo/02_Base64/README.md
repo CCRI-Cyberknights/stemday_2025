@@ -51,9 +51,9 @@ Then decode it using one of the tools above. The result may include several fake
 
 If your decoding tool doesn't save output to a file, you can do it manually like this:
 
-```bash
+```
 echo "CCRI-AAAA-1111" > decoded_output.txt
-````
+```
 
 ---
 

@@ -59,9 +59,9 @@ The authentic flag will always match this structure:
 
 If you're confident you’ve found it, save it with:
 
-```bash
+```
 echo "CCRI-AAAA-1111" > flag.txt
-````
+```
 
 Replace `AAAA-1111` with what you discover.
 

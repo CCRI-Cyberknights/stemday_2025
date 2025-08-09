@@ -47,9 +47,9 @@ These commands will help you uncover hidden files and examine their contents:
 
 Once you’re confident you’ve found the **real** flag, save it like this:
 
-```bash
+```
 echo "CCRI-AAAA-1111" > flag.txt
-````
+```
 
 ---
 

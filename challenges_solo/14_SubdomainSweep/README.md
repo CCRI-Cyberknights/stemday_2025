@@ -40,9 +40,9 @@ All others contain clever imitations — wrong prefixes, reversed formats, or fa
 3. Ignore decoys that are malformed, use other prefixes, or break the flag structure.
 4. Once you confirm the correct flag, save it to a file using:
 
-```bash
+```
 echo "CCRI-AAAA-1111" > flag.txt
-````
+```
 
 ---
 

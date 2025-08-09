@@ -51,9 +51,9 @@ Ask yourself:
 
 If you discover the flag in output or extract a file, be sure to save it manually:
 
-```bash
+```
 echo "CCRI-AAAA-1111" > flag.txt
-````
+```
 
 ---
 

@@ -44,9 +44,9 @@ Choose your approach — command-line or visual inspection.
 3. Look carefully — some results are fake. Only one flag has the **correct format**.  
 4. When you find the real flag, save it manually like this:
 
-```bash
+```
 echo "CCRI-AAAA-1111" > flag.txt
-````
+```
 
 ---
 

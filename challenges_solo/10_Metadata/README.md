@@ -45,9 +45,9 @@ Here are some helpful commands for analyzing metadata:
 
 When you’re confident you've found the real one, save it like this:
 
-```bash
+```
 echo "CCRI-AAAA-1111" > flag.txt
-````
+```
 
 ---
 

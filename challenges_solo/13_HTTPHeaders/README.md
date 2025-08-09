@@ -48,9 +48,9 @@ Only one of the five responses has the **true** agency flag in this format:
 3. Validate whether the value follows the official flag format.  
 4. When you’re sure you've found the correct flag, save it like this:
 
-```bash
+```
 echo "CCRI-AAAA-1111" > flag.txt
-````
+```
 
 ---
 

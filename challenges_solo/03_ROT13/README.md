@@ -50,9 +50,9 @@ Use one of the tools above to decode the message and search for a string matchin
 
 If your decoding method displays output to the screen, save the result manually:
 
-```bash
+```
 echo "CCRI-AAAA-1111" > decoded_output.txt
-````
+```
 
 ---
 

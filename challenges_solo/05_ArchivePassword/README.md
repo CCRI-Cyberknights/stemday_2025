@@ -51,9 +51,9 @@ Try using a combination of these tools for different phases of this challenge:
 
 > If your decoder prints the flag on screen, you can save it like this:
 
-```bash
+```
 echo "CCRI-AAAA-1111" > decoded_output.txt
-````
+```
 
 ---
 

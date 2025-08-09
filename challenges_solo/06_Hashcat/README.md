@@ -62,9 +62,9 @@ Here’s a selection of tools that may help you complete each phase:
 
 > If your tools print the final flag on screen, don’t forget to save it:
 
-```bash
+```
 echo "CCRI-AAAA-1111" > final_flag.txt
-````
+```
 
 ---
 

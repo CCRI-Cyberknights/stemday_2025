@@ -34,9 +34,9 @@ Here are some common tools you can use while debugging Python scripts:
 3. Correct the mistake and re-run the script.  
 4. When the correct flag appears in your terminal, save it like this:
 
-```bash
+```
 echo "CCRI-AAAA-1111" > flag.txt
-````
+```
 
 ---
 

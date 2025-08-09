@@ -7,7 +7,7 @@ Your job is to **scan**, **probe**, and **identify** the real agency flag hiding
 
 ## 🎯 Your Mission
 
-1. Scan for open TCP ports on localhost in the 8000–8100 range.  
+1. Scan for open TCP ports on localhost in the 9000–9100 range.  
 2. Investigate the responses from any open ports you find.  
 3. Identify the **real** flag from among decoys and noise.  
 4. Save it to a file named `flag.txt`.
@@ -29,8 +29,8 @@ Your job is to **scan**, **probe**, and **identify** the real agency flag hiding
 
 | Tool / Command                                  | Purpose                                             |
 |-------------------------------------------------|-----------------------------------------------------|
-| `nmap -p8000-8100 localhost`                    | Discover open ports in the specified range          |
-| `nmap -sV --version-light -p8000-8100 localhost`| Identify possible service versions (optional)       |
+| `nmap -p9000-9100 localhost`                    | Discover open ports in the specified range          |
+| `nmap -sV --version-light -p9000-9100 localhost`| Identify possible service versions (optional)       |
 | `curl http://localhost:PORT`                    | Retrieve response data from a specific service      |
 | `nc localhost PORT`                             | Manually connect to a service for raw interaction   |
 | `grep "CCRI-"` or regex                         | Help spot flag-like strings in output               |
@@ -62,9 +62,9 @@ The real flag will look like:
 
 When you find it, submit it by running:
 
-```bash
+```
 echo "CCRI-AAAA-1111" > flag.txt
-````
+```
 
 (Replace `AAAA-1111` with the correct code.)
 

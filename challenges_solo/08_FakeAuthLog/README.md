@@ -48,9 +48,9 @@ Can you spot something unusual about the PIDs?
 
 To capture your finding:
 
-```bash
+```
 echo "CCRI-AAAA-1111" > flag.txt
-````
+```
 
 ---
 

@@ -52,9 +52,9 @@ Then:
 
 > If your decoding tool doesn’t save output to a file, you can save the correct result manually:
 
-```bash
+```
 echo "CCRI-AAAA-1111" > decoded_output.txt
-````
+```
 
 ---
 

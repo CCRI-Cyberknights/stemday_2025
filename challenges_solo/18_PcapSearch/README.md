@@ -48,9 +48,9 @@ Somewhere in this captured traffic lies the real agency flag. But beware — dec
 
 Once you've found the real flag, save it like this:
 
-```bash
+```
 echo "CCRI-AAAA-1111" > flag.txt
-````
+```
 
 (Replace `AAAA-1111` with your discovered flag.)
 
