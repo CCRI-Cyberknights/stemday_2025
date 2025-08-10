@@ -53,7 +53,7 @@
             <button class="view-btn">🚀 Start Guided Challenge List</button>
           </a>
         </div>
-
+      
         <div class="challenge-card">
           <h3>🔥 Solo Mode</h3>
           <p>No helpers. Solve challenges manually for the full experience.</p>
@@ -63,12 +63,11 @@
         </div>
       </div>
 
-      <!-- CyberKnights logo -->
-      <img
-        src="{{ url_for('static', filename='assets/CyberKnights_2.png') }}"
-        alt="CyberKnights Logo"
-        class="landing-logo"
-      />
+      <div class="info-section">
+        {{ welcome_html|safe }}
+        <img src="{{ url_for('static', filename='assets/CyberKnights_2.png') }}" alt="CyberKnights Logo"
+          class="landing-logo" />
+      </div>
     </div>
   </body>
 </html>

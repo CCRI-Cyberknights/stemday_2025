@@ -3,10 +3,6 @@ body {
 	background: #292524;
 	margin: 0;
 	padding: 20px;
-	/* background-image: url('/static/assets/v-for-vigilence.jpg');
-	background-repeat: no-repeat;
-	background-size: contain;
-	background-position: center; */
 }
 
 h1 {
@@ -31,10 +27,12 @@ a {
 	color: #f3e600;
 	text-decoration: none;
 }
+
 a:hover {
 	color: #f3e7004b;
 	text-decoration: underline;
 }
+
 a:visited {
 	color: #6a009b;
 }
@@ -80,10 +78,12 @@ a:visited {
 	border-radius: 5px;
 	overflow-x: auto;
 }
+
 .readme ul {
 	margin: 10px 0;
 	padding-left: 20px;
 }
+
 .readme strong {
 	font-weight: bold;
 }
@@ -92,6 +92,7 @@ a:visited {
 	width: 300px;
 	padding: 5px;
 }
+
 #flagStatus {
 	margin-top: 10px;
 	font-weight: bold;
@@ -102,7 +103,10 @@ a:visited {
 	grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 	gap: 15px;
 	margin-top: 20px;
+	margin-bottom: 10px;
+	/* tightened gap before info section */
 }
+
 .challenge-card {
 	background: transparent;
 	border: 2px solid #ccc;
@@ -115,24 +119,23 @@ a:visited {
 	transition: transform 0.2s ease;
 	backdrop-filter: blur(3px);
 }
+
 .challenge-card:hover {
 	transform: scale(1.03);
 	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
+
 .challenge-card.completed {
 	background-color: transparent;
 	border: 2px solid #4CAF50;
-	/* subtle green border */
 	backdrop-filter: blur(3px);
 	box-shadow: none;
 }
 
-/* Remove green background and giant emoji */
 .challenge-card.completed::after {
 	content: none;
 }
 
-/* Final styling for the completed label */
 .challenge-status {
 	font-weight: bold;
 	color: #4CAF50;
@@ -143,10 +146,12 @@ a:visited {
 	gap: 0.4em;
 	margin-top: 10px;
 }
+
 .progress {
 	font-weight: bold;
 	margin-bottom: 10px;
 }
+
 .view-btn {
 	margin: 8px;
 	padding: 10px 16px;
@@ -158,6 +163,7 @@ a:visited {
 	cursor: pointer;
 	transition: background 0.3s ease;
 }
+
 .view-btn:hover {
 	background: linear-gradient(135deg, #6a009b, #48006a);
 }
@@ -165,6 +171,7 @@ a:visited {
 .actions {
 	margin: 15px 0;
 }
+
 .actions button {
 	margin-right: 10px;
 	height: 3em;
@@ -178,16 +185,14 @@ a:visited {
 
 /* 🎯 Bottom Buttons Styling */
 .actions.bottom-buttons {
-  margin-top: 30px;
+	margin-top: 30px;
 }
 
 .actions.bottom-buttons button {
-  font-size: 0.9em;
-  height: 2.5em;
-  padding: 0 12px;
+	font-size: 0.9em;
+	height: 2.5em;
+	padding: 0 12px;
 }
-
-/* Challenge Page Body */
 
 #challenge-wrapper {
 	background: #1e1e1e;
@@ -202,18 +207,11 @@ a:visited {
 	word-wrap: break-word;
 	min-width: 24em;
 	max-width: 80em;
-
 	margin-left: auto;
 	margin-right: auto;
-
 	display: flex;
 	flex-direction: column;
 }
-
-/* #challenge-wrapper-section {
-	margin-bottom: 20px;
-	width: 100%;
-} */
 
 .challenge-wrapper-footer {
 	margin-left: auto;
@@ -223,145 +221,138 @@ a:visited {
 	align-items: center;
 }
 
-.challenge-wrapper-footer > * {
+.challenge-wrapper-footer>* {
 	margin: 0;
 }
 
-/* .challenge-wrapper-footer button {
-	margin-top: 10px;
-	padding: 10px 20px;
-	border: 1px solid #ffffff;
-	border-radius: 6px;
-	background: #1e1e1e;
-	color: #ffffff;
-	font-size: 1em;
-	font-weight: bold;
-	cursor: pointer;
-	transition: background 0.3s ease;
-}
-.challenge-wrapper-footer button:hover {
-	background: linear-gradient(135deg, #6a009b, #48006a);
-	color: #f3e600;
-	transform: scale(1.03);
-	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-} */
-
-
-
-/* From Uiverse.io by vinodjangid07 */ 
+/* From Uiverse.io by vinodjangid07 */
 .input-wrapper {
-  width: fit-content;
-  height: 45px;
-  border-radius: 20px;
-  padding: 5px;
-  box-sizing: content-box;
-  display: flex;
-  align-items: center;
-  background-color: #292524;
+	width: fit-content;
+	height: 45px;
+	border-radius: 20px;
+	padding: 5px;
+	box-sizing: content-box;
+	display: flex;
+	align-items: center;
+	background-color: #292524;
 }
 
 .icon {
-  width: 30px;
-  fill: rgb(255, 255, 255);
-  margin-left: 8px;
-  transition: all 0.3s;
+	width: 30px;
+	fill: rgb(255, 255, 255);
+	margin-left: 8px;
+	transition: all 0.3s;
 }
+
 .input {
-  max-width: 225px;
-  height: 100%;
-  border: none;
-  outline: none;
-  padding-left: 15px;
-  background-color: #292524;
-  color: #50ff16ff;
-  font-size: 1em;
+	max-width: 225px;
+	height: 100%;
+	border: none;
+	outline: none;
+	padding-left: 15px;
+	background-color: #292524;
+	color: #50ff16ff;
+	font-size: 1em;
 }
+
 .input:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0px 1000px #292524 inset;
-  -webkit-text-fill-color: #ffffff;
+	-webkit-box-shadow: 0 0 0px 1000px #292524 inset;
+	-webkit-text-fill-color: #ffffff;
 }
+
 .Subscribe-btn {
-  height: 100%;
-  width: 95px;
-  border: none;
-  border-radius: 15px;
-  color: rgb(0, 0, 0);
-  cursor: pointer;
-  background-color: #ffffff;
-  font-weight: 500;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  transition: all 0.3s;
+	height: 100%;
+	width: 95px;
+	border: none;
+	border-radius: 15px;
+	color: rgb(0, 0, 0);
+	cursor: pointer;
+	background-color: #ffffff;
+	font-weight: 500;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	transition: all 0.3s;
 }
+
 .arrow {
-  /* display: none; */
-  position: absolute;
-  margin-right: 150px;
-  transition: all 0.3s;
+	position: absolute;
+	margin-right: 150px;
+	transition: all 0.3s;
 }
+
 .input-wrapper:active .icon {
-  transform: scale(1.3);
+	transform: scale(1.3);
 }
+
 .Subscribe-btn:hover {
-  color: white;
+	color: white;
 }
+
 .Subscribe-btn:hover .arrow {
-  margin-right: 0;
-  animation: jello-vertical 0.9s both;
-  transform-origin: right;
+	margin-right: 0;
+	animation: jello-vertical 0.9s both;
+	transform-origin: right;
 }
 
 @keyframes jello-vertical {
-  0% {
-    transform: scale3d(1, 1, 1);
-  }
-  30% {
-    transform: scale3d(0.75, 1.25, 1);
-  }
-  40% {
-    transform: scale3d(1.25, 0.75, 1);
-  }
-  50% {
-    transform: scale3d(0.85, 1.15, 1);
-  }
-  65% {
-    transform: scale3d(1.05, 0.95, 1);
-  }
-  75% {
-    transform: scale3d(0.95, 1.05, 1);
-  }
-  100% {
-    transform: scale3d(1, 1, 1);
-  }
+	0% {
+		transform: scale3d(1, 1, 1);
+	}
+
+	30% {
+		transform: scale3d(0.75, 1.25, 1);
+	}
+
+	40% {
+		transform: scale3d(1.25, 0.75, 1);
+	}
+
+	50% {
+		transform: scale3d(0.85, 1.15, 1);
+	}
+
+	65% {
+		transform: scale3d(1.05, 0.95, 1);
+	}
+
+	75% {
+		transform: scale3d(0.95, 1.05, 1);
+	}
+
+	100% {
+		transform: scale3d(1, 1, 1);
+	}
 }
+
 .Subscribe-btn:active {
-  transform: scale(0.9);
+	transform: scale(0.9);
 }
-/* 🆕 Top Right Button for "Back to Hub" (matches view-btn) */
+
 .top-right {
-  position: absolute;
-  top: 20px;
-  right: 20px;
+	position: absolute;
+	top: 20px;
+	right: 20px;
 }
 
 .home-btn {
-  margin: 8px;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 6px;
-  background: #1e1e1e;
-  color: #fff;
-  font-size: 1em;
-  cursor: pointer;
-  transition: background 0.3s ease;
+	margin: 8px;
+	padding: 10px 16px;
+	border: none;
+	border-radius: 6px;
+	background: #1e1e1e;
+	color: #fff;
+	font-size: 1em;
+	cursor: pointer;
+	transition: background 0.3s ease;
 }
 
 .home-btn:hover {
-  background: linear-gradient(135deg, #6a009b, #48006a);
+	background: linear-gradient(135deg, #6a009b, #48006a);
 }
+
 .readme table {
 	width: 100%;
 	border-collapse: collapse;
@@ -392,4 +383,48 @@ a:visited {
 	padding: 2px 4px;
 	border-radius: 4px;
 	font-family: monospace;
+}
+
+.info-section {
+	max-width: 700px;
+	margin: 16px 0;
+	/* tightened */
+	padding: 20px;
+	background: rgba(255, 255, 255, 0.05);
+	border-radius: 8px;
+	color: #fff;
+	text-align: left;
+}
+
+.info-section h1,
+.info-section h2 {
+	color: #f3e600;
+}
+
+.info-section ul {
+	padding-left: 20px;
+}
+
+.info-section pre {
+	background: rgba(0, 0, 0, 0.5);
+	border-radius: 8px;
+	padding: 12px;
+	overflow-x: auto;
+	margin: 10px 0;
+}
+
+.info-section code {
+	background: rgba(0, 0, 0, 0.4);
+	padding: 2px 6px;
+	border-radius: 4px;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+	font-size: 0.95em;
+}
+
+/* tightened logo spacing */
+.landing-logo {
+	display: block;
+	margin: 20px auto 0;
+	max-width: 250px;
+	width: 70%;
 }

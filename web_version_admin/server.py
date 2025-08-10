@@ -200,8 +200,22 @@ def load_challenges(mode="regular"):
 def landing_page():
     # ensure a consistent default list mode for new sessions
     session.setdefault("mode", "regular")
+
+    # Load optional Markdown welcome text from /static/welcome.md
+    welcome_md_path = os.path.join(app.static_folder, "welcome.md")
+    if os.path.exists(welcome_md_path):
+        with open(welcome_md_path, "r", encoding="utf-8") as f:
+            welcome_html = Markup(markdown.markdown(
+            f.read(),
+            extensions=["fenced_code", "sane_lists", "tables"]  # add what you like
+    ))
+
+    else:
+        welcome_html = Markup("<p><em>No welcome text found.</em></p>")
+
     print(f"🌐 {base_mode.capitalize()} Hub loaded at http://127.0.0.1:5000")
-    return render_template('landing.html', base_mode=base_mode)
+    return render_template('landing.html', base_mode=base_mode, welcome_html=welcome_html)
+
 
 @app.route('/set_mode/<mode>')
 def set_mode(mode):
@@ -332,8 +346,6 @@ def run_script(challenge_id):
 @app.route('/challenge/<challenge_id>/file/<path:filename>')
 def get_challenge_file(challenge_id, filename):
     mode = session.get("mode", "regular")
-    if base_mode == "student" and mode == "solo":
-        return "File downloads are disabled in Solo Mode.", 403
 
     challenge_list, _ = load_challenges(mode)
     selectedChallenge = challenge_list.get_challenge_by_id(challenge_id)
