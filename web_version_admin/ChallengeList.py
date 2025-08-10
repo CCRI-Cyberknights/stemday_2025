@@ -20,6 +20,7 @@ class ChallengeList:
         self.challenges = []
         self.completed_challenges = []
         self.numOfChallenges = 0
+        self._encoded_flags = {}  # id -> encoded flag as read from JSON (for safe persistence)
 
         # === Resolve path to JSON relative to web_version folder ===
         base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -62,13 +63,16 @@ class ChallengeList:
         print(f"✅ Loaded {len(data)} challenges from {self.challenges_path}")
         order = 1
         for key, entry in data.items():
+            # remember the encoded flag exactly as it was in the file
+            self._encoded_flags[key] = entry['flag']
+
             challenge = Challenge(
                 id=key,
                 ch_number=order,
                 name=entry['name'],
                 folder=entry['folder'],
-                flag=entry['flag'],
-                script=entry.get('script'),  # May not exist in Solo JSON
+                flag=entry['flag'],          # Challenge will decode at runtime in student mode
+                script=entry.get('script'),
                 solo_mode=self.solo_mode
             )
             print(f"➡️  Challenge #{order}: {challenge.getName()} (ID={key})")
@@ -98,18 +102,23 @@ class ChallengeList:
         try:
             data = {}
             for c in self.challenges:
-                folder_name = os.path.basename(c.getFolder())  # Just the folder name
+                folder_name = os.path.basename(c.getFolder())
+
+                # If student mode, persist the original encoded flag we loaded.
+                # If admin mode, we can persist whatever Challenge holds (plaintext).
+                encoded_from_file = self._encoded_flags.get(c.getId())
+                flag_to_write = encoded_from_file if self.mode == "student" and encoded_from_file else c.getFlag()
+
                 entry = {
                     "name": c.getName(),
                     "folder": folder_name,
-                    "flag": c.getFlag()
+                    "flag": flag_to_write,
                 }
                 if not self.solo_mode and c.getScript():
-                    # Only include script in Guided mode
-                    script_name = os.path.basename(c.getScript())
-                    entry["script"] = script_name
+                    entry["script"] = os.path.basename(c.getScript())
 
                 data[c.getId()] = entry
+
 
             with open(self.challenges_path, 'w', encoding='utf-8') as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)

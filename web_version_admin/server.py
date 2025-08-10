@@ -53,6 +53,15 @@ if not base_mode:
     else:
         base_mode = "student"
 
+# 🔒 HARD GUARD: If admin assets are missing, force student mode
+has_admin = os.path.isdir(os.path.join(BASE_DIR, "web_version_admin"))
+if base_mode == "admin" and not has_admin:
+    print("⚠️ Admin mode requested but admin assets missing; forcing STUDENT mode.")
+    base_mode = "student"
+
+# ✅ Ensure Challenge/ChallengeList sees the correct mode for decoding
+os.environ["CCRI_CTF_MODE"] = base_mode
+
 print(f"📖 Using template folder at: {template_folder}")
 print(f"DEBUG: Base mode = {base_mode}")
 
@@ -189,6 +198,8 @@ def load_challenges(mode="regular"):
 # === Flask Routes ===
 @app.route('/')
 def landing_page():
+    # ensure a consistent default list mode for new sessions
+    session.setdefault("mode", "regular")
     print(f"🌐 {base_mode.capitalize()} Hub loaded at http://127.0.0.1:5000")
     return render_template('landing.html', base_mode=base_mode)
 
@@ -247,7 +258,6 @@ def challenge_view(challenge_id):
         and not f.startswith(".")
     ]
 
-
     template = "challenge_solo.html" if mode == "solo" else "challenge.html"
     print(f"➡️ Opening {selectedChallenge.getName()} in {mode.upper()} mode.")
     return render_template(template, 
@@ -276,8 +286,6 @@ def submit_flag(challenge_id):
     else:
         print(f"❌ Incorrect flag submitted for {challenge_id}")
         return jsonify({"status": "incorrect"})
-
-
 
 @app.route('/open_folder/<challenge_id>', methods=['POST'])
 def open_folder(challenge_id):

@@ -7,7 +7,6 @@
 !CONTRIBUTING.md
 !LICENSE
 !.ccri_ctf_root
-!.mode
 
 # Setup scripts
 !setup_contributor.py

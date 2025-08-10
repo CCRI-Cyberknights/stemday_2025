@@ -48,7 +48,6 @@ include = [
     "web_version",
     "start_web_hub.py",
     "stop_web_hub.py",
-    ".mode",
     ".ccri_ctf_root"
 ]
 
