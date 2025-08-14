@@ -2,6 +2,7 @@
 import os
 import sys
 import subprocess
+import argparse
 
 # === 🌟 CCRI CyberKnights Full Environment Setup ===
 
@@ -69,23 +70,69 @@ Pin-Priority: 1001
         f.write(pin_contents)
     run(["sudo", "mv", "/tmp/steghide-pin", pin_file])
 
-def configure_git():
-    """Prompt user to configure Git if not already configured."""
+def get_git_config(key):
+    res = subprocess.run(["git", "config", "--global", key],
+                         capture_output=True, text=True)
+    if res.returncode == 0:
+        val = res.stdout.strip()
+        return val if val else None
+    return None
+
+def configure_git(git_name=None, git_email=None):
+    """Configure Git non-interactively when stdin is not a TTY."""
     print("\n🔧 Checking Git configuration...")
-    try:
-        username = subprocess.check_output(["git", "config", "user.name"], text=True).strip()
-        email = subprocess.check_output(["git", "config", "user.email"], text=True).strip()
-        print(f"✅ Git is already configured:\n   Name : {username}\n   Email: {email}")
-    except subprocess.CalledProcessError:
-        print("⚠️  Git is not configured. Let's set it up:")
-        git_name = input("Enter your Git name: ").strip()
-        git_email = input("Enter your Git email: ").strip()
+
+    current_name = get_git_config("user.name")
+    current_email = get_git_config("user.email")
+
+    if current_name and current_email:
+        print(f"✅ Git is already configured:\n   Name : {current_name}\n   Email: {current_email}")
+        return
+
+    # Prefer provided args/env if present
+    if not git_name:
+        git_name = os.environ.get("GIT_NAME")
+    if not git_email:
+        git_email = os.environ.get("GIT_EMAIL")
+
+    if git_name and git_email:
+        print("📝 Setting Git config from flags/env...")
+        run(["git", "config", "--global", "user.name", git_name])
+        run(["git", "config", "--global", "user.email", git_email])
+        run(["git", "config", "--global", "credential.helper", "store"])
+        print(f"✅ Git configuration saved:\n   Name : {git_name}\n   Email: {git_email}")
+        return
+
+    # If interactive, prompt; if not, skip safely
+    if sys.stdin.isatty():
+        try:
+            git_name = input("Enter your Git name: ").strip()
+            git_email = input("Enter your Git email: ").strip()
+        except EOFError:
+            git_name = git_email = None
+    else:
+        git_name = git_email = None  # ensure non-interactive path
+
+    if git_name and git_email:
         run(["git", "config", "--global", "user.name", git_name])
         run(["git", "config", "--global", "user.email", git_email])
         run(["git", "config", "--global", "credential.helper", "store"])
         print("✅ Git configuration saved.")
+    else:
+        print("⚠️  Skipping Git prompts (non-interactive).")
+        print("    Set these and rerun if needed:")
+        print("    - Flags: --git-name 'Your Name' --git-email 'you@example.com'")
+        print("    - Or env: GIT_NAME='Your Name' GIT_EMAIL='you@example.com'")
+
+def parse_args():
+    p = argparse.ArgumentParser(description="CCRI CyberKnights environment setup")
+    p.add_argument("--git-name", help="Git user.name (non-interactive)")
+    p.add_argument("--git-email", help="Git user.email (non-interactive)")
+    return p.parse_args()
 
 def main():
+    args = parse_args()
+
     print("\n🚀 Setting up your CCRI_CTF contributor environment...")
     print("=" * 60 + "\n")
 
@@ -104,7 +151,7 @@ def main():
     install_steghide_deb()
     pip_install()
     install_zsteg()
-    configure_git()
+    configure_git(args.git_name, args.git_email)
 
     print("\n🎉 Setup complete! You are now ready to contribute to the CCRI CTF project.")
 
