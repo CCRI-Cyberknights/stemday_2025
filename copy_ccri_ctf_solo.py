@@ -27,7 +27,8 @@ include = [
     "start_web_hub.py",
     "stop_web_hub.py",
     "Launch_CCRI_CTF_HUB.desktop",
-    ".ccri_ctf_root"
+    ".ccri_ctf_root",
+    "LICENSE"
 ]
 
 def ensure_owner_perms(path: Path, uid: int, gid: int):
