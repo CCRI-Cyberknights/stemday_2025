@@ -68,7 +68,7 @@ def patch_desktop_file(src: Path, dst: Path):
     content = src.read_text(encoding="utf-8", errors="ignore").splitlines()
     out = []
     exec_pattern = re.compile(r"^Exec\s*=\s*(.*)$")
-    new_exec = f'Exec=bash -lc "/home/{target_user}/Desktop/{target_folder_name}/start_web_hub.py"'
+    new_exec = f'Exec=bash -c "cd \$HOME/Desktop/{target_folder_name} && python3 start_web_hub.py"'
     for line in content:
         if exec_pattern.match(line):
             out.append(new_exec)
