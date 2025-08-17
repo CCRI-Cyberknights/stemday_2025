@@ -65,6 +65,32 @@ os.environ["CCRI_CTF_MODE"] = base_mode
 print(f"📖 Using template folder at: {template_folder}")
 print(f"DEBUG: Base mode = {base_mode}")
 
+# === Mode availability (folder-based, per your plan) ===
+GUIDED_DIR = os.path.join(BASE_DIR, "challenges")
+SOLO_DIR   = os.path.join(BASE_DIR, "challenges_solo")
+
+def detect_available_modes():
+    """
+    Decide available modes strictly by folder presence:
+      - Only challenges/      -> ['regular']
+      - Only challenges_solo/ -> ['solo']
+      - Both present          -> ['regular', 'solo']
+      - None                  -> []
+    """
+    modes = []
+    if os.path.isdir(GUIDED_DIR):
+        modes.append("regular")  # 'regular' == guided in your app
+    if os.path.isdir(SOLO_DIR):
+        modes.append("solo")
+    return modes
+
+AVAILABLE_MODES = detect_available_modes()
+DEFAULT_MODE = (
+    "regular" if "regular" in AVAILABLE_MODES else
+    ("solo" if "solo" in AVAILABLE_MODES else None)
+)
+print(f"🧭 AVAILABLE_MODES = {AVAILABLE_MODES} | DEFAULT_MODE = {DEFAULT_MODE}")
+
 # === Simulated Open Ports (dictionaries will be overwritten by generator) ===
 GUIDED_FAKE_FLAGS = {
     8025: "CCRI-CAUF-7042",       # ✅ REAL FLAG
@@ -154,7 +180,7 @@ def PortHandlerFactory(response_map, service_map):
             return
     return CustomPortHandler
 
-# === Start Simulated Services ===
+# === Start Simulated Services (only for present modes) ===
 def start_fake_service(port, response_map, service_map):
     try:
         server = HTTPServer(('0.0.0.0', port), PortHandlerFactory(response_map, service_map))
@@ -163,22 +189,41 @@ def start_fake_service(port, response_map, service_map):
     except OSError as e:
         print(f"❌ Could not bind port {port}: {e}")
 
-# Start Guided Mode Services (8000–8100)
-for port in GUIDED_ALL_PORTS.keys():
-    start_fake_service(port, GUIDED_ALL_PORTS, GUIDED_SERVICE_NAMES)
+if "regular" in AVAILABLE_MODES:
+    for port in GUIDED_ALL_PORTS.keys():
+        start_fake_service(port, GUIDED_ALL_PORTS, GUIDED_SERVICE_NAMES)
 
-# Start Solo Mode Services (9000–9100)
-for port in SOLO_ALL_PORTS.keys():
-    start_fake_service(port, SOLO_ALL_PORTS, SOLO_SERVICE_NAMES)
+if "solo" in AVAILABLE_MODES:
+    for port in SOLO_ALL_PORTS.keys():
+        start_fake_service(port, SOLO_ALL_PORTS, SOLO_SERVICE_NAMES)
 
-# === Helper: Load Challenges ===
-def load_challenges(mode="regular"):
+# === Helper: Load Challenges (folder-aware & graceful fallback) ===
+def load_challenges(mode=None):
+    """
+    Returns (ChallengeList, challenges_folder_name)
+    Tries requested mode, falls back to DEFAULT_MODE, then tries the 'other' mode before failing.
+    """
+    # normalize and guard
+    if mode not in ("regular", "solo"):
+        mode = DEFAULT_MODE
+
+    # If requested mode isn't available, use default
+    if mode not in AVAILABLE_MODES:
+        mode = DEFAULT_MODE
+
+    if mode is None:
+        raise FileNotFoundError("No challenges folders present.")
+
     if mode == "solo":
         challenges_path = os.path.join(server_dir, "challenges_solo.json")
         challenges_folder = "challenges_solo"
+        other_mode = "regular"
+        other_path = os.path.join(server_dir, "challenges.json")
     else:
         challenges_path = os.path.join(server_dir, "challenges.json")
         challenges_folder = "challenges"
+        other_mode = "solo"
+        other_path = os.path.join(server_dir, "challenges_solo.json")
 
     print(f"📖 Loading {mode.upper()} challenges from {challenges_path}")
 
@@ -188,47 +233,71 @@ def load_challenges(mode="regular"):
         user_type = "Admin" if base_mode == "admin" else "Student"
         print(f"✅ {user_type} {list_type} Challenge List loaded ({challenge_list.numOfChallenges} challenges).")
         return challenge_list, challenges_folder
-    except FileNotFoundError:
-        print(f"❌ ERROR: Could not find '{challenges_path}'!")
-        exit(1)
-    except json.JSONDecodeError:
-        print(f"❌ ERROR: '{challenges_path}' contains invalid JSON!")
-        exit(1)
+    except (FileNotFoundError, json.JSONDecodeError) as err:
+        print(f"⚠️ {err.__class__.__name__}: {err}")
+        # Try the other mode if its folder is present
+        if other_mode in AVAILABLE_MODES and os.path.exists(other_path):
+            print(f"↪️ Falling back to {other_mode.upper()} due to missing/invalid JSON.")
+            return load_challenges(other_mode)
+        # Final fail
+        raise
 
 # === Flask Routes ===
 @app.route('/')
 def landing_page():
-    # ensure a consistent default list mode for new sessions
-    session.setdefault("mode", "regular")
+    # Choose sane default for the session based on what's present
+    session.setdefault("mode", DEFAULT_MODE if DEFAULT_MODE else "regular")
 
     # Load optional Markdown welcome text from /static/welcome.md
     welcome_md_path = os.path.join(app.static_folder, "welcome.md")
     if os.path.exists(welcome_md_path):
         with open(welcome_md_path, "r", encoding="utf-8") as f:
             welcome_html = Markup(markdown.markdown(
-            f.read(),
-            extensions=["fenced_code", "sane_lists", "tables"]  # add what you like
-    ))
-
+                f.read(),
+                extensions=["fenced_code", "sane_lists", "tables"]
+            ))
     else:
         welcome_html = Markup("<p><em>No welcome text found.</em></p>")
 
     print(f"🌐 {base_mode.capitalize()} Hub loaded at http://127.0.0.1:5000")
-    return render_template('landing.html', base_mode=base_mode, welcome_html=welcome_html)
-
+    return render_template(
+        'landing.html',
+        base_mode=base_mode,
+        welcome_html=welcome_html,
+        available_modes=AVAILABLE_MODES,   # 👈 expose to template
+        default_mode=DEFAULT_MODE
+    )
 
 @app.route('/set_mode/<mode>')
 def set_mode(mode):
     if mode not in ["regular", "solo"]:
         return "Invalid mode", 400
+    if mode not in AVAILABLE_MODES:
+        # Graceful redirect to whatever exists
+        if DEFAULT_MODE:
+            print(f"⚠️ Requested mode '{mode}' not available. Redirecting to {DEFAULT_MODE}.")
+            session["mode"] = DEFAULT_MODE
+            return redirect(url_for('index'))
+        return "No challenges available in this build.", 404
     session["mode"] = mode
     print(f"🌐 Mode set to: {mode.upper()}")
     return redirect(url_for('index'))
 
 @app.route('/challenges')
 def index():
-    mode = session.get("mode", "regular")
-    challenge_list, challenges_folder = load_challenges(mode)
+    mode = session.get("mode", DEFAULT_MODE if DEFAULT_MODE else "regular")
+    if mode not in AVAILABLE_MODES:
+        mode = DEFAULT_MODE
+        session["mode"] = mode
+
+    try:
+        challenge_list, challenges_folder = load_challenges(mode)
+    except Exception as e:
+        print(f"❌ ERROR loading challenges: {e}")
+        return render_template(
+            'error.html',
+            message="No challenges available in this build."
+        ), 404
 
     if base_mode == "admin":
         list_title = f"Admin {'Guided' if mode == 'regular' else 'Solo'} Challenge List"
@@ -236,23 +305,51 @@ def index():
         list_title = f"Student {'Guided' if mode == 'regular' else 'Solo'} Challenge List"
 
     print(f"📄 Opening {list_title}...")
-    return render_template('index.html', 
-                           challenges=challenge_list, 
-                           base_mode=base_mode, 
-                           mode=mode, 
+    return render_template('index.html',
+                           challenges=challenge_list,
+                           base_mode=base_mode,
+                           mode=mode,
                            list_title=list_title)
 
 @app.route('/challenge/<challenge_id>')
 def challenge_view(challenge_id):
-    mode = session.get("mode", "regular")
-    challenge_list, challenges_folder = load_challenges(mode)
+    mode = session.get("mode", DEFAULT_MODE if DEFAULT_MODE else "regular")
+    if mode not in AVAILABLE_MODES:
+        mode = DEFAULT_MODE
+        session["mode"] = mode
+
+    try:
+        challenge_list, challenges_folder = load_challenges(mode)
+    except Exception as e:
+        return render_template('error.html', message=str(e)), 404
 
     selectedChallenge = challenge_list.get_challenge_by_id(challenge_id)
     if selectedChallenge is None:
+        # Try the other mode before 404
+        other = "solo" if mode == "regular" else "regular"
+        if other in AVAILABLE_MODES:
+            try:
+                other_list, _ = load_challenges(other)
+                selectedChallenge = other_list.get_challenge_by_id(challenge_id)
+                if selectedChallenge:
+                    return redirect(url_for('challenge_view', challenge_id=challenge_id) + f"?mode={other}")
+            except Exception:
+                pass
         return "Challenge not found", 404
 
     folder = selectedChallenge.getFolder()
     if not os.path.exists(folder):
+        # Try other mode's folder before 404
+        other = "solo" if mode == "regular" else "regular"
+        if other in AVAILABLE_MODES:
+            try:
+                other_list, _ = load_challenges(other)
+                sc_other = other_list.get_challenge_by_id(challenge_id)
+                if sc_other and os.path.exists(sc_other.getFolder()):
+                    session["mode"] = other
+                    return redirect(url_for('challenge_view', challenge_id=challenge_id))
+            except Exception:
+                pass
         return f"⚠️ Challenge folder not found: {folder}", 404
 
     readme_html = ""
@@ -274,19 +371,22 @@ def challenge_view(challenge_id):
 
     template = "challenge_solo.html" if mode == "solo" else "challenge.html"
     print(f"➡️ Opening {selectedChallenge.getName()} in {mode.upper()} mode.")
-    return render_template(template, 
-                           challenge=selectedChallenge, 
-                           readme=readme_html, 
-                           files=file_list, 
-                           base_mode=base_mode, 
+    return render_template(template,
+                           challenge=selectedChallenge,
+                           readme=readme_html,
+                           files=file_list,
+                           base_mode=base_mode,
                            mode=mode)
 
 @app.route('/submit_flag/<challenge_id>', methods=['POST'])
 def submit_flag(challenge_id):
-    mode = session.get("mode", "regular")
-    challenge_list, _ = load_challenges(mode)
-    selected_challenge = challenge_list.get_challenge_by_id(challenge_id)
+    mode = session.get("mode", DEFAULT_MODE if DEFAULT_MODE else "regular")
+    try:
+        challenge_list, _ = load_challenges(mode)
+    except Exception:
+        return jsonify({"status": "error", "message": "No challenges available"}), 404
 
+    selected_challenge = challenge_list.get_challenge_by_id(challenge_id)
     if selected_challenge is None:
         return jsonify({"status": "error", "message": "Challenge not found"}), 404
 
@@ -303,7 +403,12 @@ def submit_flag(challenge_id):
 
 @app.route('/open_folder/<challenge_id>', methods=['POST'])
 def open_folder(challenge_id):
-    challenge_list, _ = load_challenges(session.get("mode", "regular"))
+    mode = session.get("mode", DEFAULT_MODE if DEFAULT_MODE else "regular")
+    try:
+        challenge_list, _ = load_challenges(mode)
+    except Exception:
+        return jsonify({"status": "error", "message": "No challenges available"}), 404
+
     selectedChallenge = challenge_list.get_challenge_by_id(challenge_id)
     if selectedChallenge is None:
         return jsonify({"status": "error", "message": "Challenge not found"}), 404
@@ -325,11 +430,15 @@ def open_folder(challenge_id):
 
 @app.route('/run_script/<challenge_id>', methods=['POST'])
 def run_script(challenge_id):
-    mode = session.get("mode", "regular")
+    mode = session.get("mode", DEFAULT_MODE if DEFAULT_MODE else "regular")
     if mode == "solo":
         return jsonify({"status": "error", "message": "Helper scripts are disabled in Solo Mode."}), 403
 
-    challenge_list, _ = load_challenges(mode)
+    try:
+        challenge_list, _ = load_challenges(mode)
+    except Exception:
+        return jsonify({"status": "error", "message": "No challenges available"}), 404
+
     selectedChallenge = challenge_list.get_challenge_by_id(challenge_id)
     if selectedChallenge is None:
         return jsonify({"status": "error", "message": "Challenge not found"}), 404
@@ -345,9 +454,12 @@ def run_script(challenge_id):
 
 @app.route('/challenge/<challenge_id>/file/<path:filename>')
 def get_challenge_file(challenge_id, filename):
-    mode = session.get("mode", "regular")
+    mode = session.get("mode", DEFAULT_MODE if DEFAULT_MODE else "regular")
+    try:
+        challenge_list, _ = load_challenges(mode)
+    except Exception:
+        return "No challenges available", 404
 
-    challenge_list, _ = load_challenges(mode)
     selectedChallenge = challenge_list.get_challenge_by_id(challenge_id)
     if selectedChallenge is None:
         return "Challenge not found", 404
@@ -359,6 +471,16 @@ def get_challenge_file(challenge_id, filename):
 
     print(f"📂 Serving file '{filename}' for challenge {challenge_id}.")
     return send_from_directory(folder, filename)
+
+# (Optional) quick health probe
+@app.route('/healthz')
+def healthz():
+    return jsonify({
+        "available_modes": AVAILABLE_MODES,
+        "default_mode": DEFAULT_MODE,
+        "guided_present": os.path.isdir(GUIDED_DIR),
+        "solo_present": os.path.isdir(SOLO_DIR),
+    })
 
 # === Start Server ===
 if __name__ == '__main__':

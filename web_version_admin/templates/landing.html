@@ -1,73 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>🚀 CCRI CTF {{ base_mode|capitalize }} Hub</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-    <style>
-      /* Center content and add spacing */
-      .landing-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        margin-top: 30px;
-      }
 
-      .grid {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        flex-wrap: wrap;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <title>🚀 CCRI CTF {{ base_mode|capitalize }} Hub</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <style>
+    /* Center content and add spacing */
+    .landing-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-top: 30px;
+    }
 
-      .challenge-card {
-        width: 300px;
-        background: transparent;
-        border: 2px solid #ccc;
-        color: #f3e600;
-        padding: 15px;
-        border-radius: 8px;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-        text-align: center;
-      }
+    .grid {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
 
-      .landing-logo {
-        margin-top: 40px;
-        max-width: 400px;
-        width: 80%;
-        height: auto;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="landing-container">
-      <h1>🚀 CCRI CTF {{ base_mode|capitalize }} Hub</h1>
-      <p>Select which version of the challenges you want to start:</p>
+    .challenge-card {
+      width: 300px;
+      background: transparent;
+      border: 2px solid #ccc;
+      color: #f3e600;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
 
-      <div class="grid">
-        <div class="challenge-card">
-          <h3>🛠 Guided Mode</h3>
-          <p>Includes helper scripts and walkthroughs for each challenge.</p>
-          <a href="{{ url_for('set_mode', mode='regular') }}">
-            <button class="view-btn">🚀 Start Guided Challenge List</button>
-          </a>
-        </div>
-      
-        <div class="challenge-card">
-          <h3>🔥 Solo Mode</h3>
-          <p>No helpers. Solve challenges manually for the full experience.</p>
-          <a href="{{ url_for('set_mode', mode='solo') }}">
-            <button class="view-btn">🚀 Start Solo Challenge List</button>
-          </a>
-        </div>
+    .landing-logo {
+      margin-top: 40px;
+      max-width: 400px;
+      width: 80%;
+      height: auto;
+    }
+
+    .empty-state {
+      color: #fff;
+      border: 1px dashed #666;
+      padding: 16px;
+      border-radius: 8px;
+      max-width: 520px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="landing-container">
+    <h1>🚀 CCRI CTF {{ base_mode|capitalize }} Hub</h1>
+    <p>Select which version of the challenges you want to start:</p>
+
+    <div class="grid">
+      {% if 'regular' in available_modes %}
+      <div class="challenge-card">
+        <h3>🛠 Guided Mode</h3>
+        <p>Includes helper scripts and walkthroughs for each challenge.</p>
+        <a href="{{ url_for('set_mode', mode='regular') }}">
+          <button class="view-btn">🚀 Start Guided Challenge List</button>
+        </a>
       </div>
+      {% endif %}
 
-      <div class="info-section">
-        {{ welcome_html|safe }}
-        <img src="{{ url_for('static', filename='assets/CyberKnights_2.png') }}" alt="CyberKnights Logo"
-          class="landing-logo" />
+      {% if 'solo' in available_modes %}
+      <div class="challenge-card">
+        <h3>🔥 Solo Mode</h3>
+        <p>No helpers. Solve challenges manually for the full experience.</p>
+        <a href="{{ url_for('set_mode', mode='solo') }}">
+          <button class="view-btn">🚀 Start Solo Challenge List</button>
+        </a>
       </div>
+      {% endif %}
     </div>
-  </body>
+
+    {% if available_modes|length == 0 %}
+    <div class="empty-state" style="margin-top:16px">
+      <h3>No challenges found</h3>
+      <p>This build doesn’t include <code>challenges/</code> or <code>challenges_solo/</code>.</p>
+    </div>
+    {% endif %}
+
+    <div class="info-section">
+      {{ welcome_html|safe }}
+      <img src="{{ url_for('static', filename='assets/CyberKnights_2.png') }}" alt="CyberKnights Logo"
+        class="landing-logo" />
+    </div>
+  </div>
+</body>
+
 </html>
