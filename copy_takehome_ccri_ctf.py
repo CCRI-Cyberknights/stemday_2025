@@ -49,14 +49,14 @@ def copy_and_fix(src: Path, dst: Path):
         # Replace common Desktop path variants
         content = re.sub(
             r'(?P<prefix>(~|\$HOME|\$\{HOME\}|/home/[^/]+))/Desktop/stemday_2025(?P<trail>(/|\b))',
-            r'\g<prefix>/Desktop/stemday2025_takehome\g<trail>',
+            r'\g<prefix>/Desktop/stemday_2025_takehome\g<trail>',
             content
         )
 
         # Also normalize Exec line explicitly
         content = re.sub(
             r'^Exec=.*$',
-            'Exec=bash -c \'cd "$HOME/Desktop/stemday2025_takehome" && python3 start_web_hub.py\'',
+            'Exec=bash -c \'cd "$HOME/Desktop/stemday_2025_takehome" && python3 start_web_hub.py\'',
             content,
             flags=re.MULTILINE
         )
