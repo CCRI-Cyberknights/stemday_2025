@@ -3,34 +3,76 @@ import os
 import sys
 import subprocess
 import argparse
+import shlex
 
-# === 🌟 CCRI CyberKnights Full Environment Setup ===
+# === 🌟 CCRI CyberKnights Full Environment Setup (Non-Interactive / Parrot-ready) ===
 
 STEGO_DEB_URL = "https://raw.githubusercontent.com/CCRI-Cyberknights/stemday_2025/main/debs/steghide_0.6.0-1_amd64.deb"
 
-def run(cmd, check=True):
-    """Run a command (str or list) and print it."""
+# Environment to suppress interactive prompts (apt/needrestart/debconf)
+APT_ENV = {
+    **os.environ,
+    "DEBIAN_FRONTEND": "noninteractive",
+    "NEEDRESTART_SUSPEND": "1",      # avoid restart prompts
+    "UCF_FORCE_CONFOLD": "1",        # keep existing confs by default
+}
+
+def run(cmd, check=True, env=None):
+    """Run a command (str or list) with our non-interactive env and show it."""
     if isinstance(cmd, str):
         print(f"💻 Running: {cmd}")
-        result = subprocess.run(cmd, shell=True)
+        result = subprocess.run(cmd, shell=True, env=env or APT_ENV)
     else:
-        print(f"💻 Running: {' '.join(cmd)}")
-        result = subprocess.run(cmd)
+        print(f"💻 Running: {' '.join(shlex.quote(c) for c in cmd)}")
+        result = subprocess.run(cmd, env=env or APT_ENV)
     if check and result.returncode != 0:
         print(f"❌ ERROR: Command failed -> {cmd}", file=sys.stderr)
         sys.exit(1)
+    return result.returncode
 
-def apt_install(packages):
-    """Install system packages via apt."""
-    print("📦 Installing system dependencies...")
-    run("sudo apt update")
-    run(f"sudo apt install -y {' '.join(packages)}")
+def apt_update():
+    run(["sudo", "-E", "apt-get", "update", "-y"])
+
+def apt_install_packages(packages):
+    """
+    Install system packages via apt-get, non-interactively, with safe dpkg options.
+    Using apt-get here is more scripting-friendly than 'apt'.
+    """
+    print("📦 Installing system dependencies (non-interactive)...")
+    apt_update()
+    base_cmd = [
+        "sudo", "-E", "apt-get", "install", "-yq",
+        "-o", 'Dpkg::Options::=--force-confdef',
+        "-o", 'Dpkg::Options::=--force-confold',
+    ]
+    run(base_cmd + packages)
+
+def preseed_wireshark_and_install():
+    """
+    Preseed wireshark-common so it won't prompt about setuid dumpcap,
+    then install wireshark-common + tshark, reconfigure non-interactively,
+    and add the current user to the 'wireshark' group.
+    """
+    print("🧪 Preseeding Wireshark (allow non-root capture) and installing non-interactively...")
+    # Preseed BEFORE installing
+    preseed = 'wireshark-common wireshark-common/install-setuid boolean true'
+    run(f"echo '{preseed}' | sudo debconf-set-selections")
+
+    apt_install_packages(["wireshark-common", "tshark"])
+
+    # Reconfigure to apply setuid without prompting
+    run(["sudo", "dpkg-reconfigure", "-f", "noninteractive", "wireshark-common"])
+
+    # Add current user to wireshark group (log out/in required to take effect)
+    run(["sudo", "usermod", "-aG", "wireshark", os.environ.get("SUDO_USER") or os.environ.get("USER") or ""])
 
 def pip_install():
-    """Install Python CLI tools via pipx and Python libs via pip."""
+    """Install Python CLI tools via pipx and libs via pip (system pip on Parrot)."""
     print("🐍 Installing Python CLI tools via pipx...")
-    run(["sudo", "apt", "install", "-y", "pipx"])
+    apt_install_packages(["pipx"])
     run(["pipx", "ensurepath"])
+
+    # Flask via pipx (CLI) and via pip for import at runtime
     run(["pipx", "install", "flask"])
 
     print("📚 Installing Flask and MarkupSafe via pip (for Python imports)...")
@@ -39,8 +81,9 @@ def pip_install():
 def install_zsteg():
     """Install zsteg via Ruby gem."""
     print("💎 Installing Ruby and zsteg...")
-    run(["sudo", "apt", "install", "-y", "ruby", "ruby-dev", "libmagic-dev"])
-    run(["sudo", "gem", "install", "zsteg"])
+    apt_install_packages(["ruby", "ruby-dev", "libmagic-dev"])
+    # --no-document avoids ri/rdoc prompts/installs
+    run(["sudo", "gem", "install", "zsteg", "--no-document"])
 
 def install_steghide_deb():
     """Download and install patched Steghide 0.6.0 from custom .deb."""
@@ -53,12 +96,21 @@ def install_steghide_deb():
     except Exception:
         print("ℹ️ Steghide not found or outdated. Installing patched version...")
 
+    # Ensure wget is available
+    apt_install_packages(["wget"])
+
     print("⬇️ Downloading Steghide 0.6.0 .deb package...")
     run(["wget", "-q", STEGO_DEB_URL, "-O", "/tmp/steghide.deb"])
 
-    print("📦 Installing patched Steghide...")
-    run("sudo dpkg -i /tmp/steghide.deb || sudo apt --fix-broken install -y")
-    run("rm /tmp/steghide.deb")
+    print("📦 Installing patched Steghide (auto-fix deps if needed)...")
+    # Try dpkg, then auto-fix any missing deps non-interactively
+    rc = run("sudo dpkg -i /tmp/steghide.deb", check=False)
+    if rc != 0:
+        run(["sudo", "-E", "apt-get", "-f", "install", "-yq",
+             "-o", 'Dpkg::Options::=--force-confdef',
+             "-o", 'Dpkg::Options::=--force-confold'])
+
+    run("rm -f /tmp/steghide.deb")
 
     print("📌 Pinning Steghide 0.6.0 to prevent downgrade...")
     pin_file = "/etc/apt/preferences.d/steghide"
@@ -136,6 +188,10 @@ def main():
     print("\n🚀 Setting up your CCRI_CTF contributor environment...")
     print("=" * 60 + "\n")
 
+    # --- Preseed + install Wireshark/Tshark first to avoid prompts
+    preseed_wireshark_and_install()
+
+    # --- Everything else
     apt_packages = [
         # Essential tools
         "git", "python3", "python3-pip", "python3-venv", "gcc", "build-essential", "fonts-noto-color-emoji",
@@ -143,19 +199,19 @@ def main():
         "python3-markdown", "python3-scapy",
         # Challenge tools
         "exiftool", "zbar-tools", "hashcat", "unzip", "libmcrypt4",
-        "nmap", "tshark", "qrencode", "xdg-utils", "lsof", "vim-common", "util-linux",
+        "nmap", "qrencode", "xdg-utils", "lsof", "vim-common", "util-linux",
         "binwalk", "fcrackzip", "john", "radare2", "imagemagick", "hexedit", "feh"
     ]
+    apt_install_packages(apt_packages)
 
-    apt_install(apt_packages)
     install_steghide_deb()
     pip_install()
     install_zsteg()
     configure_git(args.git_name, args.git_email)
 
-    print("\n🎉 Setup complete! You are now ready to contribute to the CCRI CTF project.")
+    print("\n🎉 Setup complete! If Wireshark group membership was added, log out/in once to capture without sudo.")
 
 if __name__ == "__main__":
     if os.geteuid() != 0:
-        print("⚠️  This script may require sudo for installing system packages.")
+        print("⚠️  This script may perform privileged operations via sudo.")
     main()
