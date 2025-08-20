@@ -8,6 +8,7 @@ import sys
 import subprocess
 import pwd
 import grp
+import re
 
 # === Target take-home destination on ccri_admin's desktop ===
 target_user = "ccri_admin"
@@ -44,11 +45,23 @@ def copy_and_fix(src: Path, dst: Path):
     elif src.name == "Launch_CCRI_CTF_HUB.desktop":
         # Patch .desktop path reference before copying
         content = src.read_text(encoding="utf-8")
-        patched = content.replace(
-            "~/Desktop/stemday_2025/",
-            "~/Desktop/stemday_2025_takehome/"
+
+        # Replace common Desktop path variants
+        content = re.sub(
+            r'(?P<prefix>(~|\$HOME|\$\{HOME\}|/home/[^/]+))/Desktop/stemday_2025(?P<trail>(/|\b))',
+            r'\g<prefix>/Desktop/stemday_2025_takehome\g<trail>',
+            content
         )
-        dst.write_text(patched, encoding="utf-8")
+
+        # Also normalize Exec line explicitly
+        content = re.sub(
+            r'^Exec=.*$',
+            'Exec=bash -c \'cd "$HOME/Desktop/stemday_2025_takehome" && python3 start_web_hub.py\'',
+            content,
+            flags=re.MULTILINE
+        )
+
+        dst.write_text(content, encoding="utf-8")
     else:
         shutil.copy2(src, dst)
 
