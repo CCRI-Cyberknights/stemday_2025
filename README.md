@@ -1,150 +1,132 @@
-# 🌟 `stemday_2025` Project README (Admin-Only)
+Got it 👍 — your current README is written as **admin-only instructions**. Since you now have **two copy scripts** (`copy_ccri_ctf.py` and `copy_ccri_ctf_solo.py`) and `.pyz` packaging, it’d help to clarify what’s for admins vs what ends up in the student VM.
 
-Welcome to the **CCRI CyberKnights STEM Day VM Project!** 🎉
-This repository powers a custom **Parrot Linux Capture The Flag (CTF)** experience designed for high school students.
-
-👥 **This repository is for CCRI CyberKnights club members only.**
-It contains source files, admin tools, and scripts used to **build and maintain** the student-facing version of the CTF.
-
-To download Parrot Linux for testing: [https://www.parrotsec.org/download/](https://www.parrotsec.org/download/)
-The student VM uses the **Home Edition**, but testing on the **Security Edition** is fine.
+Here’s a suggested edit (lean and precise, with **explanations where needed**):
 
 ---
 
-## 🌀 Quick Setup (Admin Environment → Then Clone)
+# 🌟 `stemday_2025` Project README (Admin-Only)
 
-**Step 1 — Install tools (non-interactive):**
+Welcome to the **CCRI CyberKnights STEM Day VM Project!** 🎉
+This repository powers the custom **Parrot Linux Capture The Flag (CTF)** used for STEM Day.
+
+👥 **This repository is for CCRI CyberKnights club members only.**
+It contains source files, admin tools, and scripts used to **build and package** the student-facing VM.
+
+---
+
+## 🌀 Quick Setup (Admin Environment)
+
+**Install dependencies & clone repo:**
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/CCRI-Cyberknights/stemday_2025/main/setup_contributor.py | python3 -
-```
-
-> This installs dependencies and *may* skip Git prompts if stdin isn’t a TTY (which is normal for `curl | python`). If you want to set Git identity non-interactively:
-
-```bash
-GIT_NAME="Your Name" GIT_EMAIL="you@example.com" \
-  curl -fsSL https://raw.githubusercontent.com/CCRI-Cyberknights/stemday_2025/main/setup_contributor.py | python3 -
-```
-
-**Step 2 — Clone this repository:**
-
-```bash
 git clone https://github.com/CCRI-Cyberknights/stemday_2025.git
 cd stemday_2025
 ```
 
-**Optional one-liner (do both in one shot):**
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/CCRI-Cyberknights/stemday_2025/main/setup_contributor.py | python3 - && \
-git clone https://github.com/CCRI-Cyberknights/stemday_2025.git && \
-cd stemday_2025
-```
-
 ---
 
-## 🗂️ Project Structure (Admin Repo)
+## 🗂️ Project Layout
 
 ```
-Desktop/
-├── stemday_2025/
-│   ├── challenges/                 # Guided-mode challenges (with helper scripts)
-│   ├── challenges_solo/            # Solo-mode challenges (minimal hints)
-│   ├── web_version/                # Student-facing web portal (generated)
-│   ├── web_version_admin/          # Admin-only tools and templates
-│   ├── Launch CCRI CTF Hub.desktop # Student launcher shortcut
-│   ├── generate_all_flags.py       # 🔐 Generate real/fake flags + metadata
-│   ├── validate_all_flags.py       # ✅ Simulate solving to verify challenges
-│   ├── copy_ccri_ctf.py            # 📦 Copies student-ready files to VM desktop
-│   ├── README.md                   # This file
-│   └── CONTRIBUTING.md             # Contribution guidelines
+stemday_2025/
+├── challenges/                 # Guided-mode challenges (with helpers)
+├── challenges_solo/            # Solo-mode challenges (minimal hints)
+├── web_version/                # Student-facing web portal
+├── web_version_admin/          # Admin-only validation + templates
+├── Launch_CCRI_CTF_Hub.desktop # Student launcher shortcut
+├── copy_ccri_ctf.py            # Bundle → guided+solo VM build
+├── copy_ccri_ctf_solo.py       # Bundle → solo-only VM build
+├── copy_takehome_ccri_ctf.py   # Bundle → for takehome repo
+├── generate_all_flags.py       # Generate flags + JSON metadata
+├── validate_all_flags.py       # Admin validator (guided + solo)
+├── start_web_hub.py / stop_*.py # Flask launcher
+├── ccri_ctf.pyz                # 🔒 Student .pyz bundle (no .pyc needed)
+└── README.md / CONTRIBUTING.md
 ```
 
 ---
 
 ## 🧭 Guided vs Solo Modes
 
-* **Guided Mode** (`challenges/`): interactive helper scripts walk students through.
-* **Solo Mode** (`challenges_solo/`): same objectives, fewer hints.
+* **Guided Mode** (`challenges/`): interactive helper scripts available.
+* **Solo Mode** (`challenges_solo/`): same objectives, **no helpers**.
 
-The **web portal** in `web_version/` lets students choose a track.
+The **student launcher** auto-detects if it’s running:
 
----
-
-## 🚩 Flag Generation & Validation
-
-### 🔨 Flag Generation
-
-`generate_all_flags.py` will:
-
-* Create **real** flags and plant **fake** ones.
-* Populate `challenges/` and `challenges_solo/`.
-* Write metadata to:
-
-  * `web_version_admin/validation_unlocks.json` (guided)
-  * `web_version_admin/validation_unlocks_solo.json` (solo)
-  * `web_version_admin/challenges.json` and `.../challenges_solo.json` (web validation)
-
-### ✅ Validation Layers
-
-1. **Admin validator** — `validate_all_flags.py`
-   Simulates the student workflow to ensure each challenge and its embed/logic work.
-   Solo challenges reuse hidden validation logic living in guided helpers.
-
-2. **Student web portal**
-   `server.py` checks submissions against the generated JSON and updates the UI.
-
-> ⚠️ Start the Flask server before validating—**Challenge #17 (Nmap Scan)** expects simulated open ports.
+* Admin repo (with `web_version_admin`) → asks which mode.
+* Student VM (no admin files, but has `ccri_ctf.pyz`) → launches directly, no prompt.
 
 ---
 
-## 🚀 Preparing the Student VM
+## 🚩 Flag Lifecycle
 
-From the repo root (admin box):
+### 🔨 Generation
+
+`generate_all_flags.py` creates:
+
+* Real + fake flags inside challenges
+* Metadata for validation
+* `challenges.json` / `challenges_solo.json` (student checks)
+* `validation_unlocks*.json` (admin checks only)
+
+### ✅ Validation
+
+* **Admin**: run `validate_all_flags.py` → simulates solving all challenges
+* **Students**: flags validated only against `challenges.json` / `...solo.json` inside the VM
+
+---
+
+## 🚀 Building Student VM Bundles
+
+From the **admin repo**:
 
 ```bash
 ./generate_all_flags.py
-./start_web_hub.py
+./start_web_hub.py      # make sure server is healthy
 ./validate_all_flags.py
-./web_version_admin/create_website/build_web_version.py
-./copy_ccri_ctf.py
 ```
 
-On the **student VM desktop**:
+Then choose the bundle type:
 
-* Right-click `Launch CCRI CTF Hub.desktop` → **Properties → Permissions**
-* Enable **“Allow this file to run as a program.”**
+* **Guided+Solo VM (classroom use):**
+
+  ```bash
+  ./copy_ccri_ctf.py
+  ```
+
+* **Solo-only VM (take-home / advanced):**
+
+  ```bash
+  ./copy_ccri_ctf_solo.py or ./copy_takehome_ccri_ctf.py
+  ```
+
+Both scripts:
+
+* Copy only the needed files
+* Patch the desktop shortcut to point at the right folder
+* Clean out admin-only content (`web_version_admin/`, guided HTML, etc.)
+* Apply correct ownership/permissions for `ccri_admin`
+
+Students will only see:
+
+```
+Desktop/stemday_2025/
+  ├── challenges/
+  ├── challenges_solo/
+  ├── web_version/
+  ├── start_web_hub.py
+  ├── stop_web_hub.py
+  ├── Launch_CCRI_CTF_Hub.desktop
+  ├── ccri_ctf.pyz
+  └── .ccri_ctf_root
+```
 
 ---
 
-## 🔧 Troubleshooting Git after curl
+## 🙌 Notes for Contributors
 
-If you skipped Git prompts during the setup one-liner, set identity now:
-
-```bash
-git config --global user.name  "Your Name"
-git config --global user.email "you@example.com"
-git config --global credential.helper store
-```
-
-Then clone:
-
-```bash
-git clone https://github.com/CCRI-Cyberknights/stemday_2025.git
-cd stemday_2025
-```
-
----
-
-## 🙌 Club Member Guidelines
-
-* Keep admin-only files out of student deliverables
-* Test both guided and solo tracks
-* Use relative paths
-* Don’t commit `.pyc` or generated bundles (see `.gitignore`)
-
----
-
-## 🎓 Thanks for helping build CCRI CyberKnights STEM Day CTF!
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution details.
+* **Never commit .pyz or generated bundles to this repo**
+* **Test both guided and solo builds before release**
+* **.pyz is the only runtime path on student VMs** — ensures no bytecode mismatch
+* Admin-only JSONs (`validation_unlocks*.json`) **stay in admin repo only**

@@ -3,11 +3,9 @@
 import os
 import shutil
 from pathlib import Path
-import stat
 import sys
 import subprocess
 import pwd
-import grp
 import re
 
 # === Target take-home destination on ccri_admin's desktop ===
@@ -25,35 +23,34 @@ include = [
     "challenges",
     "challenges_solo",
     "web_version",
+    "ccri_ctf.pyz",                 # ⬅️ NEW: student deliverable
     "start_web_hub.py",
     "stop_web_hub.py",
     "Launch_CCRI_CTF_HUB.desktop",
     ".mode",
-    ".ccri_ctf_root"
+    ".ccri_ctf_root",
 ]
 
-def copy_and_fix(src: Path, dst: Path):
-    """Copy src to dst, replacing existing file/folder, then fix ownership and permissions."""
+def copy_and_fix(src: Path, dst: Path, uid: int, gid: int):
+    """Copy src to dst (replace if exists) and set ownership/perms."""
     if dst.exists():
         if dst.is_dir() and src.is_dir():
             shutil.rmtree(dst)
-        elif dst.is_file():
+        else:
             dst.unlink()
 
-    if src.is_dir():
-        shutil.copytree(src, dst)
-    elif src.name == "Launch_CCRI_CTF_HUB.desktop":
-        # Patch .desktop path reference before copying
-        content = src.read_text(encoding="utf-8")
+    # Special-case: patch the desktop shortcut before writing
+    if src.name == "Launch_CCRI_CTF_HUB.desktop":
+        content = src.read_text(encoding="utf-8", errors="ignore")
 
-        # Replace common Desktop path variants
+        # Normalize any previous folder reference → *_takehome
         content = re.sub(
-            r'(?P<prefix>(~|\$HOME|\$\{HOME\}|/home/[^/]+))/Desktop/stemday_2025(?P<trail>(/|\b))',
+            r'(?P<prefix>(~|\$HOME|\${HOME}|/home/[^/]+))/Desktop/stemday_2025(?P<trail>(/|\b))',
             r'\g<prefix>/Desktop/stemday_2025_takehome\g<trail>',
             content
         )
 
-        # Also normalize Exec line explicitly
+        # Force Exec line to run our launcher in the take-home dir
         content = re.sub(
             r'^Exec=.*$',
             'Exec=bash -c \'cd "$HOME/Desktop/stemday_2025_takehome" && python3 start_web_hub.py\'',
@@ -61,18 +58,27 @@ def copy_and_fix(src: Path, dst: Path):
             flags=re.MULTILINE
         )
 
+        # Prefer a generic icon so it works on Mint & Parrot alike
+        content = re.sub(
+            r'^Icon=.*$',
+            'Icon=firefox',
+            content,
+            flags=re.MULTILINE
+        )
+
         dst.write_text(content, encoding="utf-8")
     else:
-        shutil.copy2(src, dst)
+        if src.is_dir():
+            shutil.copytree(src, dst)
+        else:
+            shutil.copy2(src, dst)
 
-    # Fix ownership and permissions
-    uid = pwd.getpwnam(target_user).pw_uid
-    gid = pwd.getpwnam(target_user).pw_gid
+    # Ownership & permissions
+    def is_script(fname: str) -> bool:
+        # Treat .pyz and .desktop as executables
+        return fname.endswith((".py", ".sh", ".desktop", ".pyz"))
 
-    def is_script(fname):
-        return fname.endswith((".py", ".sh", ".desktop"))
-
-    def is_plain_text(fname):
+    def is_plain_text(fname: str) -> bool:
         return fname.endswith((".txt", ".md", ".json"))
 
     if dst.is_dir():
@@ -81,7 +87,10 @@ def copy_and_fix(src: Path, dst: Path):
             os.chmod(dirpath, 0o755)
             for fname in filenames:
                 fpath = os.path.join(dirpath, fname)
-                os.chown(fpath, uid, gid)
+                try:
+                    os.chown(fpath, uid, gid)
+                except FileNotFoundError:
+                    continue
                 if is_script(fname):
                     os.chmod(fpath, 0o755)
                 elif is_plain_text(fname):
@@ -97,21 +106,44 @@ def copy_and_fix(src: Path, dst: Path):
         else:
             os.chmod(dst, 0o644)
 
+def mark_launcher_trusted(launcher_path: Path):
+    """Mark the .desktop file as trusted (Mint/Nemo) via gio; safe to skip if not present."""
+    try:
+        subprocess.run(
+            ["gio", "set", str(launcher_path), "metadata::trusted", "true"],
+            check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
+        print("🔐 Marked launcher as trusted with gio metadata.")
+    except Exception as e:
+        print(f"ℹ️ Skipped gio trust (not available or failed): {e}")
+
 def main():
     print(f"📂 Source: {source_root}")
     print(f"📥 Target: {target_root}")
 
-    # Make sure target root exists but don't wipe it
+    # Ensure target root exists (don't wipe the whole folder automatically for take-home)
     target_root.mkdir(parents=True, exist_ok=True)
+
+    uid = pwd.getpwnam(target_user).pw_uid
+    gid = pwd.getpwnam(target_user).pw_gid
 
     for item in include:
         src = source_root / item
         dst = target_root / item
         if src.exists():
             print(f"➡️ Copying {item}...")
-            copy_and_fix(src, dst)
+            copy_and_fix(src, dst, uid, gid)
         else:
             print(f"⚠️ Skipping missing item: {item}")
+
+    # Ensure .desktop is executable & trusted
+    launcher = target_root / "Launch_CCRI_CTF_HUB.desktop"
+    if launcher.exists():
+        os.chmod(launcher, 0o755)
+        os.chown(launcher, uid, gid)
+        mark_launcher_trusted(launcher)
+    else:
+        print("⚠️ No desktop launcher found to trust.")
 
     print("\n✅ Done. Take-home version populated.")
     print(f"📎 Check: {target_root}")

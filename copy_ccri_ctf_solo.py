@@ -2,11 +2,9 @@
 import os
 import shutil
 from pathlib import Path
-import stat
 import sys
 import subprocess
 import pwd
-import grp
 import re
 
 # === Target solo-only destination on ccri_admin's desktop ===
@@ -24,18 +22,20 @@ source_root = Path(__file__).resolve().parent
 include = [
     "challenges_solo",
     "web_version",
+    "ccri_ctf.pyz",                 # ⬅️ add the student zipapp
     "start_web_hub.py",
     "stop_web_hub.py",
     "Launch_CCRI_CTF_HUB.desktop",
     ".ccri_ctf_root",
-    "LICENSE"
+    "LICENSE",
 ]
 
 def ensure_owner_perms(path: Path, uid: int, gid: int):
-    def is_script(fname):
-        return fname.endswith((".py", ".sh", ".desktop"))
+    def is_script(fname: str) -> bool:
+        # Treat .pyz and .desktop as executables
+        return fname.endswith((".py", ".sh", ".desktop", ".pyz"))
 
-    def is_plain_text(fname):
+    def is_plain_text(fname: str) -> bool:
         return fname.endswith((".txt", ".md", ".json"))
 
     if path.is_dir():
@@ -44,7 +44,10 @@ def ensure_owner_perms(path: Path, uid: int, gid: int):
             os.chmod(dirpath, 0o755)
             for fname in filenames:
                 fpath = os.path.join(dirpath, fname)
-                os.chown(fpath, uid, gid)
+                try:
+                    os.chown(fpath, uid, gid)
+                except FileNotFoundError:
+                    continue
                 if is_script(fname):
                     os.chmod(fpath, 0o755)
                 elif is_plain_text(fname):
@@ -53,28 +56,45 @@ def ensure_owner_perms(path: Path, uid: int, gid: int):
                     os.chmod(fpath, 0o644)
     else:
         os.chown(path, uid, gid)
-        if path.name.endswith((".py", ".sh", ".desktop")):
+        if is_script(path.name):
             os.chmod(path, 0o755)
-        elif path.name.endswith((".txt", ".md", ".json")):
+        elif is_plain_text(path.name):
             os.chmod(path, 0o644)
         else:
             os.chmod(path, 0o644)
 
 def patch_desktop_file(src: Path, dst: Path):
     """
-    Rewrites the Exec= line to point at the new folder.
-    Works whether the original used ~ or an absolute path.
+    Rewrites the Exec= line to point at the solo folder and start_web_hub.py.
+    Also normalizes Icon to a generic 'firefox' for cross-distro compatibility.
     """
-    content = src.read_text(encoding="utf-8", errors="ignore").splitlines()
-    out = []
-    exec_pattern = re.compile(r"^Exec\s*=\s*(.*)$")
-    new_exec = f'Exec=bash -c "cd \$HOME/Desktop/{target_folder_name} && python3 start_web_hub.py"'
-    for line in content:
-        if exec_pattern.match(line):
-            out.append(new_exec)
-        else:
-            out.append(line)
-    dst.write_text("\n".join(out) + "\n", encoding="utf-8")
+    content = src.read_text(encoding="utf-8", errors="ignore")
+    # Exec line → cd into solo folder then run launcher
+    content = re.sub(
+        r'^Exec=.*$',
+        f'Exec=bash -c \'cd "$HOME/Desktop/{target_folder_name}" && python3 start_web_hub.py\'',
+        content,
+        flags=re.MULTILINE,
+    )
+    # Icon normalization (optional but helpful)
+    if "Icon=" in content:
+        content = re.sub(r'^Icon=.*$', 'Icon=firefox', content, flags=re.MULTILINE)
+    else:
+        if not content.endswith("\n"): content += "\n"
+        content += "Icon=firefox\n"
+
+    dst.write_text(content, encoding="utf-8")
+
+def mark_launcher_trusted(launcher_path: Path):
+    """Mark the .desktop file as trusted in Nemo/Cinnamon (Mint). Harmless if gio missing."""
+    try:
+        subprocess.run(
+            ["gio", "set", str(launcher_path), "metadata::trusted", "true"],
+            check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
+        print("🔐 Marked launcher as trusted with gio metadata.")
+    except Exception as e:
+        print(f"ℹ️ Skipped gio trust (not available or failed): {e}")
 
 def prune_web_version(dst_web: Path):
     """
@@ -106,7 +126,7 @@ def copy_item(src: Path, dst: Path):
     if src.is_dir():
         shutil.copytree(src, dst)
     else:
-        # Special-case the .desktop file so Exec points to _solo folder
+        # Patch the .desktop file so Exec points to the solo folder
         if src.name == "Launch_CCRI_CTF_HUB.desktop":
             patch_desktop_file(src, dst)
         else:
@@ -134,7 +154,7 @@ def main():
     if dst_web.exists():
         prune_web_version(dst_web)
 
-    # Defensive: remove any guided folder if it slipped in
+    # Defensive: remove guided folder if it slipped in
     guided_dir = target_root / "challenges"
     if guided_dir.exists():
         shutil.rmtree(guided_dir, ignore_errors=True)
@@ -144,6 +164,15 @@ def main():
     uid = pwd.getpwnam(target_user).pw_uid
     gid = pwd.getpwnam(target_user).pw_gid
     ensure_owner_perms(target_root, uid, gid)
+
+    # Ensure launcher is executable & trusted
+    launcher = target_root / "Launch_CCRI_CTF_HUB.desktop"
+    if launcher.exists():
+        os.chmod(launcher, 0o755)
+        os.chown(launcher, uid, gid)
+        mark_launcher_trusted(launcher)
+    else:
+        print("⚠️ No desktop launcher found to trust.")
 
     print("\n✅ Solo-only bundle ready.")
     print(f"📎 Open: {target_root}")

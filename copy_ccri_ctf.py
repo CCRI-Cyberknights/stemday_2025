@@ -3,11 +3,11 @@
 import os
 import shutil
 from pathlib import Path
-import stat
 import sys
 import subprocess
 import pwd
 import grp
+import re
 
 def ensure_group_and_members(group_name, users):
     """Create group if missing, and ensure listed users are members."""
@@ -46,9 +46,10 @@ include = [
     "challenges",
     "challenges_solo",
     "web_version",
+    "ccri_ctf.pyz",        # student deliverable
     "start_web_hub.py",
     "stop_web_hub.py",
-    ".ccri_ctf_root"
+    ".ccri_ctf_root",
 ]
 
 def copy_and_fix(src: Path, dst: Path, uid: int, gid: int):
@@ -65,29 +66,29 @@ def copy_and_fix(src: Path, dst: Path, uid: int, gid: int):
         shutil.copy2(src, dst)
 
     def is_script(fname):
-        return fname.endswith((".py", ".sh", ".desktop"))
+        # Treat .pyz and .desktop as executables
+        return fname.endswith((".py", ".sh", ".desktop", ".pyz"))
 
     def is_plain_text(fname):
         return fname.endswith((".txt", ".md", ".json"))
 
-    # Apply ownership and permissions
-    for dirpath, _, filenames in os.walk(dst) if dst.is_dir() else [(dst.parent, [], [dst.name])]:
-        os.chown(dirpath, uid, gid)
-        os.chmod(dirpath, 0o2775)
-
-        for fname in filenames:
-            fpath = os.path.join(dirpath, fname)
-            os.chown(fpath, uid, gid)
-
-            if is_script(fname):
-                os.chmod(fpath, 0o775)
-            elif is_plain_text(fname):
-                os.chmod(fpath, 0o664)
-            else:
-                os.chmod(fpath, 0o664)
-
-    # Top-level single file
-    if dst.is_file():
+    if dst.is_dir():
+        for dirpath, _, filenames in os.walk(dst):
+            os.chown(dirpath, uid, gid)
+            os.chmod(dirpath, 0o2775)  # rwx for owner/group; setgid
+            for fname in filenames:
+                fpath = os.path.join(dirpath, fname)
+                try:
+                    os.chown(fpath, uid, gid)
+                except FileNotFoundError:
+                    continue
+                if is_script(fname):
+                    os.chmod(fpath, 0o775)
+                elif is_plain_text(fname):
+                    os.chmod(fpath, 0o664)
+                else:
+                    os.chmod(fpath, 0o664)
+    else:
         os.chown(dst, uid, gid)
         if is_script(dst.name):
             os.chmod(dst, 0o775)
@@ -96,11 +97,54 @@ def copy_and_fix(src: Path, dst: Path, uid: int, gid: int):
         else:
             os.chmod(dst, 0o664)
 
+def write_or_patch_desktop_launcher(launcher_dst: Path, uid: int, gid: int):
+    """
+    Ensure the .desktop launcher exists and points to start_web_hub.py.
+    Then mark it trusted with gio (if available) and executable.
+    """
+    desired_exec = 'Exec=bash -c "cd $HOME/Desktop/stemday_2025 && python3 start_web_hub.py"'
+    template = (
+        "[Desktop Entry]\n"
+        "Version=1.0\n"
+        "Type=Application\n"
+        "Terminal=true\n"
+        "Name=Launch_CCRI_CTF_Hub\n"
+        f"{desired_exec}\n"
+        "Icon=firefox\n"
+        "Name[en_US]=Launch_CCRI_CTF_Hub\n"
+    )
+
+    if launcher_dst.exists():
+        try:
+            text = launcher_dst.read_text(encoding="utf-8", errors="ignore")
+        except Exception:
+            text = ""
+        if "Exec=" in text:
+            text = re.sub(r"^Exec=.*$", desired_exec, text, flags=re.MULTILINE)
+        else:
+            text = (text + ("\n" if not text.endswith("\n") else "")) + desired_exec + "\n"
+    else:
+        text = template
+
+    launcher_dst.write_text(text, encoding="utf-8")
+    os.chown(launcher_dst, uid, gid)
+    os.chmod(launcher_dst, 0o775)
+
+    # Mark as trusted in Nemo/Cinnamon (Mint); harmless elsewhere
+    try:
+        subprocess.run(
+            ["gio", "set", str(launcher_dst), "metadata::trusted", "true"],
+            check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
+        print("🔐 Marked launcher as trusted with gio metadata.")
+    except Exception as e:
+        print(f"ℹ️ Skipped gio trust (not available or failed): {e}")
+
 def main():
     if os.geteuid() != 0:
         print("🛡️ Elevation required. Re-running with sudo...")
         try:
-            subprocess.run(["sudo", "python3"] + sys.argv)
+            subprocess.run(["sudo", "python3"] + sys.argv, check=True)
         except Exception as e:
             print(f"❌ Failed to elevate privileges: {e}")
         sys.exit(0)
@@ -130,21 +174,12 @@ def main():
             copy_and_fix(src, dst, uid, gid)
         else:
             print(f"⚠️ Skipping missing item: {item}")
-        
-    # Copy desktop launcher separately to the top-level desktop
-    desktop_launcher_src = source_root / "Launch_CCRI_CTF_HUB.desktop"
-    desktop_launcher_dst = target_desktop / "Launch_CCRI_CTF_HUB.desktop"
 
-    if desktop_launcher_src.exists():
-        print(f"📎 Placing launcher on desktop...")
-        copy_and_fix(desktop_launcher_src, desktop_launcher_dst, uid, gid)
+    # Desktop launcher (always ensure it exists & points to start_web_hub.py)
+    launcher_dst = target_desktop / "Launch_CCRI_CTF_HUB.desktop"
+    print("📎 Ensuring desktop launcher...")
+    write_or_patch_desktop_launcher(launcher_dst, uid, gid)
 
-        # Mark .desktop file as trusted for MATE (Caja)
-        os.chmod(desktop_launcher_dst, 0o775)
-        print("🔐 Marked launcher as trusted (executable).")
-    else:
-        print(f"⚠️ Missing desktop launcher: {desktop_launcher_src}")
-    
     print("\n✅ Done. Content copied and ownership/permissions adjusted.")
     print(f"📎 Now accessible in: {target_root}")
     print("ℹ️ If you just added users to a group, log out and back in to apply membership.")
