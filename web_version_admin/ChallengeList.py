@@ -3,6 +3,10 @@ import os
 import re
 from Challenge import Challenge
 
+# When running from the .pyz, __main__ sets this to the on-disk web_version path
+ASSETS_DIR_OVERRIDE = os.environ.get("CCRI_ASSETS_DIR")
+
+
 class ChallengeList:
     """
     Manages a list of challenges loaded from a JSON mapping:
@@ -17,20 +21,31 @@ class ChallengeList:
       }
     """
 
+    _num_prefix = re.compile(r"^(\d+)")
+
     def __init__(self, challenges_file: str = "challenges.json"):
         """
         Initializes the ChallengeList by loading challenges from a JSON file.
-        Supports absolute or relative paths (relative resolved to this file's dir).
+        Supports absolute or relative paths (relative resolved under assets dir).
         """
         self.challenges = []
         self.completed_challenges = []
         self.numOfChallenges = 0
         self._encoded_flags = {}  # id -> encoded flag exactly as read from JSON
 
-        base_dir = os.path.dirname(os.path.abspath(__file__))
+        # === Where JSON/templates/static live ===
+        assets_dir = (
+            os.path.abspath(ASSETS_DIR_OVERRIDE)
+            if ASSETS_DIR_OVERRIDE
+            else os.path.dirname(os.path.abspath(__file__))
+        )
 
-        # Absolute paths override in os.path.join; relative resolves under this module's dir.
-        self.challenges_path = os.path.join(base_dir, challenges_file)
+        # Absolute paths stay absolute; relative resolves under assets_dir
+        self.challenges_path = (
+            challenges_file
+            if os.path.isabs(challenges_file)
+            else os.path.join(assets_dir, challenges_file)
+        )
 
         # === Determine Solo vs Guided based on filename ===
         if os.path.basename(self.challenges_path) == "challenges_solo.json":
@@ -44,18 +59,17 @@ class ChallengeList:
         self.mode = os.environ.get("CCRI_CTF_MODE", "student").lower()
         print(f"🔍 Environment mode detected: {self.mode}")
 
-        # Root where challenge folders live (not strictly required by this class;
-        # kept for reference/logging parity with your previous version).
+        # === Where the real challenge folders live ===
+        # parent of the assets dir (project root): .../(challenges|challenges_solo)
+        project_root = os.path.abspath(os.path.join(assets_dir, ".."))
         self.challenges_root = os.path.normpath(
-            os.path.join(base_dir, "..", challenges_folder_name)
+            os.path.join(project_root, challenges_folder_name)
         )
 
         print(f"📖 Checking for challenges file at: {self.challenges_path}")
         self.load_challenges()
 
     # -------- Helpers --------
-
-    _num_prefix = re.compile(r"^(\d+)")
 
     @staticmethod
     def _natural_key(ch_id: str):
@@ -81,19 +95,19 @@ class ChallengeList:
             json.JSONDecodeError: if JSON invalid or schema issues detected.
         """
         if not os.path.exists(self.challenges_path):
-            # Let server fallback logic handle it
             raise FileNotFoundError(self.challenges_path)
 
         try:
-            with open(self.challenges_path, 'r', encoding='utf-8') as f:
+            with open(self.challenges_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
         except json.JSONDecodeError:
-            # Bubble up as-is for server fallback
             raise
 
         # Expect a mapping id -> entry
         if not isinstance(data, dict):
-            raise json.JSONDecodeError("Top-level JSON must be an object (mapping of id->entry).", "", 0)
+            raise json.JSONDecodeError(
+                "Top-level JSON must be an object (mapping of id->entry).", "", 0
+            )
 
         print(f"✅ Loaded {len(data)} challenges from {self.challenges_path}")
 
@@ -102,7 +116,7 @@ class ChallengeList:
         for key in sorted(data.keys(), key=self._natural_key):
             entry = data[key]
 
-            # Validate required fields; surface as JSON errors to trigger server fallback
+            # Validate required fields; surface as JSON errors
             for req in ("name", "folder", "flag"):
                 if req not in entry:
                     raise json.JSONDecodeError(
@@ -116,10 +130,10 @@ class ChallengeList:
                 id=key,
                 ch_number=order,
                 name=entry["name"],
-                folder=entry["folder"],   # Path handling remains in Challenge class (unchanged)
+                folder=entry["folder"],   # Challenge resolves full path itself
                 flag=entry["flag"],       # Challenge decodes at runtime in student mode
                 script=entry.get("script"),
-                solo_mode=self.solo_mode
+                solo_mode=self.solo_mode,
             )
 
             print(f"➡️  Challenge #{order}: {challenge.getName()} (ID={key})")
@@ -154,7 +168,9 @@ class ChallengeList:
 
             # Preserve encoded flag in student mode
             encoded_from_file = self._encoded_flags.get(c.getId())
-            flag_to_write = encoded_from_file if (self.mode == "student" and encoded_from_file) else c.getFlag()
+            flag_to_write = (
+                encoded_from_file if (self.mode == "student" and encoded_from_file) else c.getFlag()
+            )
 
             entry = {
                 "name": c.getName(),
@@ -162,14 +178,14 @@ class ChallengeList:
                 "flag": flag_to_write,
             }
 
-            # Only persist script for guided (regular) sets, and normalize to basename
+            # Only persist script for guided (regular) sets, normalize to basename
             if not self.solo_mode and c.getScript():
                 entry["script"] = os.path.basename(c.getScript())
 
             data[c.getId()] = entry
 
         try:
-            with open(self.challenges_path, 'w', encoding='utf-8') as f:
+            with open(self.challenges_path, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
             print(f"✅ Saved updated challenges to {self.challenges_path}")
         except Exception as e:

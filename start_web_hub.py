@@ -14,88 +14,79 @@ def find_project_root():
     print("❌ ERROR: Could not find .ccri_ctf_root marker. Are you inside the CTF folder?")
     sys.exit(1)
 
-def launch_flask_server(server_path, log_file):
-    print(f"🌐 Launching Flask web server from: {server_path}")
+def launch_process(cmd, log_file):
+    print(f"🟢 Launching: {' '.join(cmd)}")
     with open(log_file, "w") as log:
-        subprocess.Popen(
-            [sys.executable, server_path],
-            stdout=log,
-            stderr=subprocess.STDOUT,
-            preexec_fn=os.setpgrp
-        )
+        subprocess.Popen(cmd, stdout=log, stderr=subprocess.STDOUT, preexec_fn=os.setpgrp)
     time.sleep(2)
     try:
         subprocess.check_call(
-            ["curl", "-s", "http://localhost:5000"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
+            ["curl", "-s", "http://127.0.0.1:5000/healthz"],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
-        print("✅ Flask server started successfully.")
+        print("✅ Web server responded on /healthz.")
     except subprocess.CalledProcessError:
-        print(f"❌ ERROR: Flask server failed to start. Check logs at: {log_file}")
-        sys.exit(1)
+        # try root path as fallback probe
+        try:
+            subprocess.check_call(["curl", "-s", "http://127.0.0.1:5000"],
+                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            print("✅ Web server started successfully.")
+        except subprocess.CalledProcessError:
+            print(f"❌ ERROR: Web server failed to start. Check logs at: {log_file}")
+            sys.exit(1)
 
 def open_browser():
-    print("🌐 Opening browser to http://localhost:5000 ...")
+    print("🌐 Opening http://127.0.0.1:5000 ...")
     firefox = shutil.which("firefox")
     if firefox:
-        try:
-            subprocess.Popen(
-                [firefox, "--new-window", "http://localhost:5000"],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                preexec_fn=os.setpgrp
-            )
-            print("✅ Firefox launched successfully.")
-            return
-        except Exception as e:
-            print(f"⚠️ Could not launch Firefox: {e}")
-    elif shutil.which("xdg-open"):
-        subprocess.Popen(
-            ["xdg-open", "http://localhost:5000"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
-        )
-        print("✅ Browser launched using xdg-open.")
+        subprocess.Popen([firefox, "--new-window", "http://127.0.0.1:5000"],
+                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, preexec_fn=os.setpgrp)
+        return
+    if shutil.which("xdg-open"):
+        subprocess.Popen(["xdg-open", "http://127.0.0.1:5000"],
+                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     else:
-        print("❌ No browser launcher found. Please open manually: http://localhost:5000")
+        print("❌ No browser launcher found. Open manually: http://127.0.0.1:5000")
 
 def main():
     print("🚀 Starting the CCRI CTF Hub...\n")
     project_root = find_project_root()
 
-    has_admin = os.path.isdir(os.path.join(project_root, "web_version_admin"))
-    has_student = os.path.isdir(os.path.join(project_root, "web_version"))
+    pyz_path      = os.path.join(project_root, "ccri_ctf.pyz")
+    admin_server  = os.path.join(project_root, "web_version_admin", "server.py")
+    has_pyz       = os.path.isfile(pyz_path)
+    has_admin     = os.path.isfile(admin_server)
 
-    if has_admin and has_student:
-        print("🧭 Both Admin and Student environments detected.")
-        choice = input("🔄 Launch which mode? [1] Admin [2] Student (default): ").strip()
+    if not has_pyz and not has_admin:
+        print("❌ ERROR: Neither ccri_ctf.pyz (student) nor web_version_admin/server.py (admin) found.")
+        sys.exit(1)
+
+    # Decide mode: prompt only if both exist
+    if has_admin and has_pyz:
+        print("🧭 Both Admin and Student builds detected.")
+        choice = input("🔄 Launch which mode? [1] Admin  [2] Student (default): ").strip()
         base_mode = "admin" if choice == "1" else "student"
     elif has_admin:
-        print("🛠️ Only Admin environment detected.")
+        print("🛠️ Only Admin build detected.")
         base_mode = "admin"
-    elif has_student:
-        print("🎓 Only Student environment detected.")
-        base_mode = "student"
     else:
-        print("❌ ERROR: No valid web_version or web_version_admin folder found.")
-        sys.exit(1)
+        print("🎓 Only Student build detected.")
+        base_mode = "student"
 
     os.environ["CCRI_CTF_MODE"] = base_mode
-    server_dir = os.path.join(project_root, "web_version_admin" if base_mode == "admin" else "web_version")
-    server_file = "server.py" if base_mode == "admin" else "server.pyc"
-    server_path = os.path.join(server_dir, server_file)
 
-    if not os.path.isfile(server_path):
-        print(f"❌ ERROR: Cannot find {server_file} in {server_dir}")
-        sys.exit(1)
-
+    # If already running on 5000, don't launch another
     try:
         subprocess.check_call(["lsof", "-i:5000"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        print("🌐 Flask web server is already running. Skipping launch.")
+        print("🌐 Web server already running (port 5000). Skipping launch.")
     except subprocess.CalledProcessError:
         log_file = os.path.join(project_root, "web_server.log")
-        launch_flask_server(server_path, log_file)
+        if base_mode == "admin":
+            cmd = [sys.executable, admin_server]
+        else:
+            # Student ALWAYS runs the .pyz; no fallbacks.
+            cmd = [sys.executable, pyz_path]
+        launch_process(cmd, log_file)
 
     open_browser()
     print("✅ CCRI CTF Hub is ready!")

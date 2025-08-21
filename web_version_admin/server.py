@@ -16,10 +16,20 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import markdown
 import sys
 
+# === Allow assets dir override when running from a zipapp ===
+ASSETS_DIR_OVERRIDE = os.environ.get("CCRI_ASSETS_DIR")
+
 sys.dont_write_bytecode = True  # 🔡 prevent .pyc files in admin
 
-# === Base Directory ===
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+# === Resolve server_dir (allow override when launched from a zipapp) ===
+server_dir = (
+    os.path.abspath(ASSETS_DIR_OVERRIDE)
+    if ASSETS_DIR_OVERRIDE
+    else os.path.dirname(os.path.abspath(__file__))
+)
+
+# === Base Directory (one level up from assets dir) ===
+BASE_DIR = os.path.abspath(os.path.join(server_dir, ".."))
 
 # === Add BASE_DIR to sys.path for imports ===
 if BASE_DIR not in sys.path:
@@ -29,8 +39,6 @@ if BASE_DIR not in sys.path:
 from ChallengeList import ChallengeList
 
 # === Flask App Initialization ===
-server_dir = os.path.dirname(os.path.abspath(__file__))
-
 template_folder = os.path.join(server_dir, "templates")
 static_folder = os.path.join(server_dir, "static")
 

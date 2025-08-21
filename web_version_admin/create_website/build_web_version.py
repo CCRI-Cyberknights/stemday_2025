@@ -3,9 +3,9 @@ import json
 import base64
 import os
 import shutil
-import py_compile
 import stat
 import sys
+import zipapp  # NEW
 
 # === CCRI Web Version Builder (Dual Setup Edition) ===
 
@@ -45,7 +45,6 @@ def sanitize_templates(template_dir):
             path = os.path.join(root, file)
             with open(path, "r", encoding="utf-8") as f:
                 content = f.read()
-            # Use dynamic title for student/admin
             content = content.replace(
                 "CCRI CTF Admin Hub",
                 "{{ 'CCRI CTF Admin Hub' if base_mode == 'admin' else 'CCRI CTF Student Hub' }}"
@@ -63,7 +62,7 @@ def _looks_base64(s: str) -> bool:
 
 def prepare_web_version(base_dir):
     admin_dir = os.path.join(base_dir, "web_version_admin")
-    student_dir = os.path.join(base_dir, "web_version")
+    student_dir = os.path.join(base_dir, "web_version")  # assets live here on disk
     admin_json = os.path.join(admin_dir, "challenges.json")
     solo_json = os.path.join(admin_dir, "challenges_solo.json")
     templates_folder = os.path.join(admin_dir, "templates")
@@ -81,7 +80,7 @@ def prepare_web_version(base_dir):
         if not os.path.isdir(d):
             abort(f"Missing required folder: {d}")
 
-    # === Clean and recreate student web folder ===
+    # === Clean and recreate student web folder (assets dir) ===
     if os.path.exists(student_dir):
         print("🧹 Cleaning existing web_version folder...")
         shutil.rmtree(student_dir)
@@ -103,7 +102,6 @@ def prepare_web_version(base_dir):
             entry["script"] = meta["script"]
         guided_data[cid] = entry
 
-    # Make helper scripts executable for guided (if present)
     make_scripts_executable(admin_data, base_dir)
 
     guided_json_path = os.path.join(student_dir, "challenges.json")
@@ -126,10 +124,8 @@ def prepare_web_version(base_dir):
             "folder": meta["folder"],
             "flag": xor_encode(raw_flag, ENCODE_KEY),
         }
-        # Only include a script for solo if you explicitly ship one
         if meta.get("script"):
             entry["script"] = meta["script"]
-        # Keep a mild hint if present (optional)
         if "hint" in meta:
             entry["hint"] = meta["hint"]
         solo_data[cid] = entry
@@ -139,7 +135,7 @@ def prepare_web_version(base_dir):
         json.dump(solo_data, f, indent=4, ensure_ascii=False)
     print(f"✅ Created Solo: {solo_json_path}")
 
-    # === Verify encoding sanity (optional but helpful) ===
+    # === Verify encoding sanity ===
     for path in (guided_json_path, solo_json_path):
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
@@ -148,7 +144,7 @@ def prepare_web_version(base_dir):
             abort(f"Non-encoded flags found in {os.path.basename(path)}: {bad}")
         print(f"🔎 Verified encoding in {os.path.basename(path)}")
 
-    # === Copy templates and static assets ===
+    # === Copy templates/static into the on-disk assets dir ===
     print("📂 Copying templates and static files...")
     shutil.copytree(templates_folder, os.path.join(student_dir, "templates"), dirs_exist_ok=True)
     shutil.copytree(static_folder, os.path.join(student_dir, "static"), dirs_exist_ok=True)
@@ -156,12 +152,34 @@ def prepare_web_version(base_dir):
     # === Sanitize templates ===
     sanitize_templates(os.path.join(student_dir, "templates"))
 
-    # === Compile backend .py files ===
-    print("⚙️ Compiling backend Python files to .pyc...")
-    py_compile.compile(server_source, cfile=os.path.join(student_dir, "server.pyc"), optimize=1)
-    py_compile.compile(challenge_py, cfile=os.path.join(student_dir, "Challenge.pyc"), optimize=1)
-    py_compile.compile(challenge_list_py, cfile=os.path.join(student_dir, "ChallengeList.pyc"), optimize=1)
-    print("✅ Compiled backend .py files to .pyc in student folder")
+    # === Build the tiny zipapp that points to these assets ===
+    print("📦 Preparing zipapp source...")
+    pyz_src = os.path.join(base_dir, "_pyz_src")
+    if os.path.exists(pyz_src):
+        shutil.rmtree(pyz_src)
+    os.makedirs(pyz_src, exist_ok=True)
+
+    # Copy ONLY python backend files into pyz src
+    shutil.copy2(server_source,      os.path.join(pyz_src, "server.py"))
+    shutil.copy2(challenge_py,       os.path.join(pyz_src, "Challenge.py"))
+    shutil.copy2(challenge_list_py,  os.path.join(pyz_src, "ChallengeList.py"))
+
+    # __main__.py sets CCRI_ASSETS_DIR -> student_dir and runs server like a script
+    main_code = f"""\
+import os, runpy
+os.environ['CCRI_ASSETS_DIR'] = {repr(os.path.abspath(student_dir))}
+runpy.run_module('server', run_name='__main__')
+"""
+    with open(os.path.join(pyz_src, "__main__.py"), "w", encoding="utf-8") as f:
+        f.write(main_code)
+
+    # Create the .pyz at repo root
+    pyz_path = os.path.join(base_dir, "ccri_ctf.pyz")
+    if os.path.exists(pyz_path):
+        os.remove(pyz_path)
+    zipapp.create_archive(pyz_src, pyz_path, interpreter="/usr/bin/env python3")
+    print(f"🎁 Built zipapp: {pyz_path}")
+    print("👉 Run with: python3 " + pyz_path)
 
     print("\n🎉 Student web_version build completed successfully!\n")
 

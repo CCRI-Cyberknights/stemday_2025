@@ -4,8 +4,20 @@ import sys
 import subprocess
 import signal
 import shutil
+import time
 
-# === CCRI CTF Hub Stopper (Python Edition) ===
+# === CCRI CTF Hub Stopper (pyz + admin-safe) ===
+
+PATTERNS = [
+    r"python.*ccri_ctf\.pyz",   # Student zipapp
+    r"python.*web_version_admin/server\.py",  # Admin server
+    r"/usr/bin/python.*ccri_ctf\.pyz",
+    r"/usr/bin/python.*web_version_admin/server\.py",
+]
+
+GUIDED_PORT_RANGE = (8000, 8100)
+SOLO_PORT_RANGE   = (9000, 9100)
+WEB_PORT          = 5000
 
 def find_project_root():
     """Walk upwards to find the .ccri_ctf_root marker."""
@@ -17,116 +29,121 @@ def find_project_root():
     print("❌ ERROR: Could not find .ccri_ctf_root marker. Are you inside the CTF folder?")
     sys.exit(1)
 
-def kill_processes_by_pattern(pattern):
-    """Find and kill processes matching a pattern (no prompt)."""
+def pids_from_pattern(pattern: str):
+    """Return a list of PIDs matching a pgrep -f pattern."""
     try:
-        result = subprocess.run(
+        res = subprocess.run(
             ["pgrep", "-f", pattern],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-            text=True
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True
         )
-        pids = result.stdout.strip().splitlines()
-        if pids:
-            print(f"⚠️ Found matching process(es): {' '.join(pids)}")
-            for pid in pids:
-                try:
-                    os.kill(int(pid), signal.SIGKILL)
-                    print(f"✅ Killed process {pid}.")
-                except ProcessLookupError:
-                    print(f"⚠️ Process {pid} already stopped.")
-        else:
-            print(f"⚠️ No processes found matching: {pattern}")
+        if res.returncode != 0 or not res.stdout.strip():
+            return []
+        return [int(x) for x in res.stdout.strip().splitlines() if x.strip().isdigit()]
     except FileNotFoundError:
-        print("❌ ERROR: 'pgrep' not found on this system.")
+        print("❌ ERROR: 'pgrep' not found.")
+        return []
     except Exception as e:
-        print(f"❌ ERROR killing processes: {e}")
+        print(f"❌ pgrep failed for pattern {pattern}: {e}")
+        return []
 
-def clear_port(port):
-    """Kill any process listening on a given port (no prompt)."""
-    if not shutil.which("lsof"):
-        print("⚠️ WARNING: 'lsof' not found. Skipping port cleanup.")
-        return
+def term_then_kill(pids, grace=2.0):
+    """SIGTERM then SIGKILL after a grace period if still alive."""
+    dead = set()
+    for pid in pids:
+        try:
+            os.kill(pid, signal.SIGTERM)
+        except ProcessLookupError:
+            dead.add(pid)
+    if pids:
+        time.sleep(grace)
 
-    try:
-        result = subprocess.run(
+    # Check who’s still alive
+    still = []
+    for pid in pids:
+        if pid in dead:
+            continue
+        try:
+            os.kill(pid, 0)
+            still.append(pid)
+        except ProcessLookupError:
+            pass
+
+    # SIGKILL stragglers
+    for pid in still:
+        try:
+            os.kill(pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+
+    if pids:
+        killed = [str(p) for p in pids]
+        print(f"🛑 Terminated PIDs: {' '.join(killed)} (SIGTERM→SIGKILL as needed)")
+    return len(pids)
+
+def clear_port(port: int):
+    """Kill any process listening on a TCP port."""
+    # Prefer lsof, fallback to fuser
+    if shutil.which("lsof"):
+        res = subprocess.run(
             ["lsof", "-ti", f":{port}"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-            text=True
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True
         )
-        pids = result.stdout.strip().splitlines()
-        if pids:
-            print(f"⚠️ Found process(es) on port {port}: {' '.join(pids)}")
-            for pid in pids:
-                try:
-                    os.kill(int(pid), signal.SIGKILL)
-                    print(f"✅ Cleared process {pid} on port {port}.")
-                except ProcessLookupError:
-                    print(f"⚠️ Process {pid} already stopped.")
-        else:
-            print(f"⚠️ No processes found on port {port}.")
-    except Exception as e:
-        print(f"❌ ERROR clearing port {port}: {e}")
+        pids = [int(x) for x in res.stdout.strip().splitlines() if x.strip().isdigit()]
+    elif shutil.which("fuser"):
+        res = subprocess.run(
+            ["fuser", "-n", "tcp", str(port)],
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True
+        )
+        pids = [int(x) for x in res.stdout.strip().split()] if res.stdout else []
+    else:
+        print("⚠️ Neither 'lsof' nor 'fuser' present; skipping port cleanup.")
+        return 0
+
+    if not pids:
+        return 0
+    term_then_kill(pids)
+    return len(pids)
+
+def sweep_port_range(start: int, end: int):
+    total = 0
+    for port in range(start, end + 1):
+        total += clear_port(port)
+    return total
 
 def main():
     print("🛑 Stopping CCRI CTF Hub...\n")
-    project_root = find_project_root()
+    _ = find_project_root()
 
-    # Stop Flask server processes (Admin or Student)
-    print("🔍 Searching for running Flask server processes...")
-    kill_processes_by_pattern("python3.*server.py")  # Matches Admin server
-    kill_processes_by_pattern("python3.*server.pyc") # Matches Student server
+    # 1) Kill by process patterns (student/admin)
+    total_matched = 0
+    for pat in PATTERNS:
+        pids = pids_from_pattern(pat)
+        if pids:
+            print(f"🔍 Pattern match `{pat}` → PIDs: {' '.join(map(str, pids))}")
+            total_matched += term_then_kill(pids)
+        else:
+            print(f"ℹ️ No processes matched `{pat}`")
 
-    # Stop Flask on port 5000 (backup)
-    print("🔍 Checking for processes on port 5000...")
-    clear_port(5000)
-
-    # Stop simulated services (Guided: 8000–8100)
-    print("🔍 Checking for simulated services on ports 8000–8100...")
-    guided_ports_cleared = 0
-    for port in range(8000, 8101):
-        try:
-            result = subprocess.run(
-                ["lsof", "-iTCP:%d" % port, "-sTCP:LISTEN"],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.DEVNULL,
-                text=True
-            )
-            if result.stdout.strip():
-                clear_port(port)
-                guided_ports_cleared += 1
-        except Exception:
-            break
-
-    if guided_ports_cleared > 0:
-        print(f"✅ Cleared {guided_ports_cleared} simulated service(s) on ports 8000–8100.")
+    # 2) Ensure web port 5000 is free
+    print("\n🔧 Ensuring port 5000 is clear...")
+    cleared = clear_port(WEB_PORT)
+    if cleared:
+        print(f"✅ Cleared {cleared} process(es) on port {WEB_PORT}")
     else:
-        print("⚠️ No simulated services running on ports 8000–8100.")
+        print("ℹ️ Port 5000 already clear.")
 
-    # Stop simulated services (Solo: 9000–9100)
-    print("🔍 Checking for simulated services on ports 9000–9100...")
-    solo_ports_cleared = 0
-    for port in range(9000, 9101):
-        try:
-            result = subprocess.run(
-                ["lsof", "-iTCP:%d" % port, "-sTCP:LISTEN"],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.DEVNULL,
-                text=True
-            )
-            if result.stdout.strip():
-                clear_port(port)
-                solo_ports_cleared += 1
-        except Exception:
-            break
+    # 3) (Usually redundant) Sweep simulated service ranges
+    # These are in-process threads under server.py; killing main proc should suffice,
+    # but we’ll be thorough in case anything was orphaned.
+    print("\n🔧 Sweeping guided ports 8000–8100...")
+    g = sweep_port_range(*GUIDED_PORT_RANGE)
+    print("✅ Cleared guided range." if g else "ℹ️ Guided range already clear.")
 
-    if solo_ports_cleared > 0:
-        print(f"✅ Cleared {solo_ports_cleared} simulated service(s) on ports 9000–9100.")
-    else:
-        print("⚠️ No simulated services running on ports 9000–9100.")
+    print("\n🔧 Sweeping solo ports 9000–9100...")
+    s = sweep_port_range(*SOLO_PORT_RANGE)
+    print("✅ Cleared solo range." if s else "ℹ️ Solo range already clear.")
 
-    print("\n🎯 All cleanup complete.")
+    print("\n🎯 Cleanup complete.")
 
 if __name__ == "__main__":
     main()
