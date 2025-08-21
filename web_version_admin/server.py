@@ -19,29 +19,39 @@ import sys
 # === Allow assets dir override when running from a zipapp ===
 ASSETS_DIR_OVERRIDE = os.environ.get("CCRI_ASSETS_DIR")
 
+def detect_assets_dir():
+    """
+    Priority:
+      1) CCRI_ASSETS_DIR (if set)
+      2) Folder next to the running .pyz: <pyz_dir>/web_version (if it exists)
+      3) Source-tree fallback: directory of this file
+    """
+    if ASSETS_DIR_OVERRIDE:
+        return os.path.abspath(ASSETS_DIR_OVERRIDE)
+
+    pyz_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
+    candidate = os.path.join(pyz_dir, "web_version")
+    if os.path.isdir(candidate):
+        return candidate
+
+    return os.path.dirname(os.path.abspath(__file__))
+
+# === Use the detected assets dir ===
+server_dir = detect_assets_dir()
+BASE_DIR   = os.path.abspath(os.path.join(server_dir, ".."))
+
 sys.dont_write_bytecode = True  # 🔡 prevent .pyc files in admin
 
-# === Resolve server_dir (allow override when launched from a zipapp) ===
-# When running from ccri_ctf.pyz, start_web_hub.py sets CCRI_ASSETS_DIR=<.../web_version>
-server_dir = (
-    os.path.abspath(ASSETS_DIR_OVERRIDE)
-    if ASSETS_DIR_OVERRIDE
-    else os.path.dirname(os.path.abspath(__file__))
-)
-
-# === Project root (one level up from assets dir) ===
-BASE_DIR = os.path.abspath(os.path.join(server_dir, ".."))
-
-# === Add BASE_DIR to sys.path for imports (so ChallengeList etc. resolve) ===
+# === Add BASE_DIR to sys.path for imports ===
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
 # === Import backend logic ===
 from ChallengeList import ChallengeList
 
-# === Flask App Initialization (point at on-disk web_version) ===
+# === Flask App Initialization ===
 template_folder = os.path.join(server_dir, "templates")
-static_folder = os.path.join(server_dir, "static")
+static_folder   = os.path.join(server_dir, "static")
 
 app = Flask(
     __name__,
@@ -49,35 +59,33 @@ app = Flask(
     static_folder=static_folder
 )
 
-app.secret_key = "super_secret_key"  # required for session tracking
+app.secret_key = "super_secret_key"
 DEBUG_MODE = os.environ.get("CCRI_DEBUG", "0") == "1"
 logging.basicConfig(level=logging.DEBUG if DEBUG_MODE else logging.INFO)
 
-# === Detect Admin or Student Mode (ENV-first, then folder name) ===
+# === Detect Admin or Student Mode ===
 base_mode = os.environ.get("CCRI_CTF_MODE", "").strip().lower()
 if not base_mode:
     base_mode = "admin" if os.path.basename(server_dir) == "web_version_admin" else "student"
 
-# 🔒 HARD GUARD: If admin assets are missing, force student mode
 has_admin = os.path.isdir(os.path.join(BASE_DIR, "web_version_admin"))
 if base_mode == "admin" and not has_admin:
     print("⚠️ Admin mode requested but admin assets missing; forcing STUDENT mode.")
     base_mode = "student"
 
-# ✅ Ensure Challenge/ChallengeList sees the correct mode for decoding
 os.environ["CCRI_CTF_MODE"] = base_mode
 
 print(f"📖 Using template folder at: {template_folder}")
 print(f"DEBUG: Base mode = {base_mode}")
 
-# === Mode availability (folder-based) ===
+# === Mode availability ===
 GUIDED_DIR = os.path.join(BASE_DIR, "challenges")
 SOLO_DIR   = os.path.join(BASE_DIR, "challenges_solo")
 
 def detect_available_modes():
     modes = []
     if os.path.isdir(GUIDED_DIR):
-        modes.append("regular")  # 'regular' == guided
+        modes.append("regular")
     if os.path.isdir(SOLO_DIR):
         modes.append("solo")
     return modes
