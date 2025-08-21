@@ -152,23 +152,40 @@ def prepare_web_version(base_dir):
     # === Sanitize templates ===
     sanitize_templates(os.path.join(student_dir, "templates"))
 
-    # === Build the tiny zipapp that points to these assets ===
+    # === Build the zipapp (portable; no hardcoded paths) ===
     print("📦 Preparing zipapp source...")
     pyz_src = os.path.join(base_dir, "_pyz_src")
     if os.path.exists(pyz_src):
         shutil.rmtree(pyz_src)
     os.makedirs(pyz_src, exist_ok=True)
 
-    # Copy ONLY python backend files into pyz src
+    # Copy backend modules that the zipapp imports
     shutil.copy2(server_source,      os.path.join(pyz_src, "server.py"))
     shutil.copy2(challenge_py,       os.path.join(pyz_src, "Challenge.py"))
     shutil.copy2(challenge_list_py,  os.path.join(pyz_src, "ChallengeList.py"))
 
-    # __main__.py sets CCRI_ASSETS_DIR -> student_dir and runs server like a script
-    main_code = f"""\
-import os, runpy
-os.environ['CCRI_ASSETS_DIR'] = {repr(os.path.abspath(student_dir))}
-runpy.run_module('server', run_name='__main__')
+    # __main__.py: detect assets at runtime next to the .pyz (or honor env override)
+    main_code = r"""\
+import os, sys
+
+def main():
+    # Prefer existing env if already set by a launcher
+    if "CCRI_ASSETS_DIR" not in os.environ:
+        pyz_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
+        candidate = os.path.join(pyz_dir, "web_version")
+        if os.path.isdir(candidate):
+            os.environ["CCRI_ASSETS_DIR"] = candidate
+
+    os.environ.setdefault("CCRI_CTF_MODE", "student")
+
+    import server  # picks up CCRI_ASSETS_DIR
+    print(f"📖 Using template folder at: {server.app.template_folder}")
+    print(f"🧰 Static folder at: {server.app.static_folder}")
+    print(f"🚀 {os.environ['CCRI_CTF_MODE'].capitalize()} Hub running on http://127.0.0.1:5000")
+    server.app.run(host='127.0.0.1', port=5000, debug=False, threaded=True)
+
+if __name__ == "__main__":
+    main()
 """
     with open(os.path.join(pyz_src, "__main__.py"), "w", encoding="utf-8") as f:
         f.write(main_code)

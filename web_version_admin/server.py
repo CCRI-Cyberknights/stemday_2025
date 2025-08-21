@@ -1,30 +1,21 @@
 try:
-    # Flask 2.x: Markup is part of flask
     from flask import Flask, render_template, request, jsonify, Markup, send_from_directory, redirect, url_for, session
 except ImportError:
-    # Flask 3.x: Markup moved to markupsafe
     from flask import Flask, render_template, request, jsonify, send_from_directory, redirect, url_for, session
     from markupsafe import Markup
 
-import subprocess
-import json
-import os
-import base64
-import threading
-import logging
+import os, sys, json, threading, logging, subprocess, base64, markdown
 from http.server import BaseHTTPRequestHandler, HTTPServer
-import markdown
-import sys
 
-# === Allow assets dir override when running from a zipapp ===
+# ---------- PATH RESOLUTION (only place we decide paths) ----------
 ASSETS_DIR_OVERRIDE = os.environ.get("CCRI_ASSETS_DIR")
 
 def detect_assets_dir():
     """
     Priority:
-      1) CCRI_ASSETS_DIR (if set)
-      2) Folder next to the running .pyz: <pyz_dir>/web_version (if it exists)
-      3) Source-tree fallback: directory of this file
+      1) CCRI_ASSETS_DIR (env)
+      2) <dir_of_running_pyz>/web_version (next to the pyz)
+      3) directory of this source file (dev/admin tree)
     """
     if ASSETS_DIR_OVERRIDE:
         return os.path.abspath(ASSETS_DIR_OVERRIDE)
@@ -36,34 +27,28 @@ def detect_assets_dir():
 
     return os.path.dirname(os.path.abspath(__file__))
 
-# === Use the detected assets dir ===
 server_dir = detect_assets_dir()
 BASE_DIR   = os.path.abspath(os.path.join(server_dir, ".."))
+# ---------------------------------------------------------------
 
-sys.dont_write_bytecode = True  # 🔡 prevent .pyc files in admin
+sys.dont_write_bytecode = True
 
-# === Add BASE_DIR to sys.path for imports ===
+# Make sure we can import Challenge/ChallengeList from BASE_DIR
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
-# === Import backend logic ===
 from ChallengeList import ChallengeList
 
-# === Flask App Initialization ===
 template_folder = os.path.join(server_dir, "templates")
 static_folder   = os.path.join(server_dir, "static")
 
-app = Flask(
-    __name__,
-    template_folder=template_folder,
-    static_folder=static_folder
-)
-
+app = Flask(__name__, template_folder=template_folder, static_folder=static_folder)
 app.secret_key = "super_secret_key"
+
 DEBUG_MODE = os.environ.get("CCRI_DEBUG", "0") == "1"
 logging.basicConfig(level=logging.DEBUG if DEBUG_MODE else logging.INFO)
 
-# === Detect Admin or Student Mode ===
+# Mode selection
 base_mode = os.environ.get("CCRI_CTF_MODE", "").strip().lower()
 if not base_mode:
     base_mode = "admin" if os.path.basename(server_dir) == "web_version_admin" else "student"
@@ -78,7 +63,7 @@ os.environ["CCRI_CTF_MODE"] = base_mode
 print(f"📖 Using template folder at: {template_folder}")
 print(f"DEBUG: Base mode = {base_mode}")
 
-# === Mode availability ===
+# Folders containing challenge data
 GUIDED_DIR = os.path.join(BASE_DIR, "challenges")
 SOLO_DIR   = os.path.join(BASE_DIR, "challenges_solo")
 
@@ -91,10 +76,7 @@ def detect_available_modes():
     return modes
 
 AVAILABLE_MODES = detect_available_modes()
-DEFAULT_MODE = (
-    "regular" if "regular" in AVAILABLE_MODES else
-    ("solo" if "solo" in AVAILABLE_MODES else None)
-)
+DEFAULT_MODE = "regular" if "regular" in AVAILABLE_MODES else ("solo" if "solo" in AVAILABLE_MODES else None)
 print(f"🧭 AVAILABLE_MODES = {AVAILABLE_MODES} | DEFAULT_MODE = {DEFAULT_MODE}")
 
 # === Simulated Open Ports (dictionaries will be overwritten by generator) ===
@@ -478,7 +460,6 @@ def get_challenge_file(challenge_id, filename):
     print(f"📂 Serving file '{filename}' for challenge {challenge_id}.")
     return send_from_directory(folder, filename)
 
-# (Optional) quick health probe
 @app.route('/healthz')
 def healthz():
     return jsonify({
@@ -486,7 +467,13 @@ def healthz():
         "default_mode": DEFAULT_MODE,
         "guided_present": os.path.isdir(GUIDED_DIR),
         "solo_present": os.path.isdir(SOLO_DIR),
+        "server_dir": server_dir,
+        "base_dir": BASE_DIR,
+        "assets_env": os.environ.get("CCRI_ASSETS_DIR"),
+        "argv0": sys.argv[0],
     })
+
+# DO NOT auto-run here; __main__.py will run app.run()
 
 # === Start Server ===
 if __name__ == '__main__':
