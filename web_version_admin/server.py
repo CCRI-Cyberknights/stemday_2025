@@ -22,23 +22,24 @@ ASSETS_DIR_OVERRIDE = os.environ.get("CCRI_ASSETS_DIR")
 sys.dont_write_bytecode = True  # 🔡 prevent .pyc files in admin
 
 # === Resolve server_dir (allow override when launched from a zipapp) ===
+# When running from ccri_ctf.pyz, start_web_hub.py sets CCRI_ASSETS_DIR=<.../web_version>
 server_dir = (
     os.path.abspath(ASSETS_DIR_OVERRIDE)
     if ASSETS_DIR_OVERRIDE
     else os.path.dirname(os.path.abspath(__file__))
 )
 
-# === Base Directory (one level up from assets dir) ===
+# === Project root (one level up from assets dir) ===
 BASE_DIR = os.path.abspath(os.path.join(server_dir, ".."))
 
-# === Add BASE_DIR to sys.path for imports ===
+# === Add BASE_DIR to sys.path for imports (so ChallengeList etc. resolve) ===
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
 # === Import backend logic ===
 from ChallengeList import ChallengeList
 
-# === Flask App Initialization ===
+# === Flask App Initialization (point at on-disk web_version) ===
 template_folder = os.path.join(server_dir, "templates")
 static_folder = os.path.join(server_dir, "static")
 
@@ -54,12 +55,8 @@ logging.basicConfig(level=logging.DEBUG if DEBUG_MODE else logging.INFO)
 
 # === Detect Admin or Student Mode (ENV-first, then folder name) ===
 base_mode = os.environ.get("CCRI_CTF_MODE", "").strip().lower()
-
 if not base_mode:
-    if os.path.basename(server_dir) == "web_version_admin":
-        base_mode = "admin"
-    else:
-        base_mode = "student"
+    base_mode = "admin" if os.path.basename(server_dir) == "web_version_admin" else "student"
 
 # 🔒 HARD GUARD: If admin assets are missing, force student mode
 has_admin = os.path.isdir(os.path.join(BASE_DIR, "web_version_admin"))
@@ -73,21 +70,14 @@ os.environ["CCRI_CTF_MODE"] = base_mode
 print(f"📖 Using template folder at: {template_folder}")
 print(f"DEBUG: Base mode = {base_mode}")
 
-# === Mode availability (folder-based, per your plan) ===
+# === Mode availability (folder-based) ===
 GUIDED_DIR = os.path.join(BASE_DIR, "challenges")
 SOLO_DIR   = os.path.join(BASE_DIR, "challenges_solo")
 
 def detect_available_modes():
-    """
-    Decide available modes strictly by folder presence:
-      - Only challenges/      -> ['regular']
-      - Only challenges_solo/ -> ['solo']
-      - Both present          -> ['regular', 'solo']
-      - None                  -> []
-    """
     modes = []
     if os.path.isdir(GUIDED_DIR):
-        modes.append("regular")  # 'regular' == guided in your app
+        modes.append("regular")  # 'regular' == guided
     if os.path.isdir(SOLO_DIR):
         modes.append("solo")
     return modes
@@ -272,7 +262,7 @@ def landing_page():
         'landing.html',
         base_mode=base_mode,
         welcome_html=welcome_html,
-        available_modes=AVAILABLE_MODES,   # 👈 expose to template
+        available_modes=AVAILABLE_MODES,
         default_mode=DEFAULT_MODE
     )
 
