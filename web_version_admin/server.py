@@ -81,70 +81,74 @@ print(f"🧭 AVAILABLE_MODES = {AVAILABLE_MODES} | DEFAULT_MODE = {DEFAULT_MODE}
 
 # === Simulated Open Ports (dictionaries will be overwritten by generator) ===
 GUIDED_FAKE_FLAGS = {
-    8025: "CCRI-CAUF-7042",       # ✅ REAL FLAG
-    8045: "STCZ-FMIN-8138",       # fake
-    8003: "SEZI-7973-KYCG",       # fake
-    8088: "OXDH-RCLZ-7945",       # fake
-    8002: "UDCC-2879-PUUE",       # fake
+    8065: "CCRI-TUBF-6442",       # ✅ REAL FLAG
+    8008: "OGHH-9089-QWDI",       # fake
+    8053: "AMHP-ODKB-1326",       # fake
+    8003: "TYWU-8115-HTRV",       # fake
+    8067: "MPVL-QHBK-1850",       # fake
 }
 GUIDED_JUNK_RESPONSES = {
-    8008: "💡 Tip: Scan only the ports you really need.",
-    8028: "Python HTTP Server: directory listing not allowed.",
-    8047: "DEBUG: Connection established successfully.",
-    8048: "💡 Tip: Scan only the ports you really need.",
-    8049: "ERROR 400: Bad request syntax.",
-    8061: "💻 Dev API v0.1 — POST requests only.",
-    8089: "💡 Tip: Scan only the ports you really need.",
-    8099: "ERROR 400: Bad request syntax."
+    8019: "Python HTTP Server: directory listing not allowed.",
+    8032: "Error 418: I’m a teapot.",
+    8042: "Error 418: I’m a teapot.",
+    8058: "Welcome to Experimental IoT Server (beta build).",
+    8061: "Error 418: I’m a teapot.",
+    8068: "ERROR 400: Bad request syntax.",
+    8077: "Python HTTP Server: directory listing not allowed.",
+    8084: "Welcome to Experimental IoT Server (beta build)."
 }
 GUIDED_SERVICE_NAMES = {
-    8002: "beta-hub",
-    8003: "kappa-node",
-    8008: "update-agent",
-    8025: "sysmon-api",
-    8028: "auth-service",
-    8045: "theta-daemon",
-    8047: "delta-proxy",
-    8048: "alpha-core",
-    8049: "lambda-api",
-    8061: "metricsd",
-    8088: "omega-stream",
-    8089: "delta-sync",
-    8099: "zeta-cache"
+    8003: "zeta-cache",
+    8008: "metricsd",
+    8019: "delta-proxy",
+    8032: "gamma-relay",
+    8042: "alpha-core",
+    8053: "omega-stream",
+    8058: "beta-hub",
+    8061: "lambda-api",
+    8065: "theta-daemon",
+    8067: "sysmon-api",
+    8068: "delta-sync",
+    8077: "update-agent",
+    8084: "auth-service"
 }
 SOLO_FAKE_FLAGS = {
-    9029: "CCRI-RVSU-2416",       # ✅ REAL FLAG
-    9011: "IKDX-AVHQ-8310",       # fake
-    9053: "GAJL-6131-NBBK",       # fake
-    9054: "TVRL-ZYCR-7790",       # fake
-    9047: "CFDY-UPGR-2840",       # fake
+    9084: "CCRI-IICX-0946",       # ✅ REAL FLAG
+    9032: "RLUE-OAZH-0764",       # fake
+    9060: "XRVK-3104-EASL",       # fake
+    9083: "JODV-QLFZ-9035",       # fake
+    9098: "TGWP-6603-TFNC",       # fake
 }
 SOLO_JUNK_RESPONSES = {
-    9003: "Python HTTP Server: directory listing not allowed.",
-    9022: "Welcome to Dev HTTP Server v1.3\nPlease login to continue.",
-    9032: "403 Forbidden: You don’t have permission to access this resource.",
-    9035: "System maintenance in progress.",
-    9046: "Error 418: I’m a teapot.",
-    9051: "503 Service Unavailable\nTry again later.",
-    9077: "🔒 Unauthorized: API key required.",
-    9078: "System maintenance in progress.",
-    9084: "403 Forbidden: You don’t have permission to access this resource."
+    9017: "<html><body><h1>It works!</h1><p>Apache2 default page.</p></body></html>",
+    9026: "System maintenance in progress.",
+    9027: "ERROR 400: Bad request syntax.",
+    9029: "System maintenance in progress.",
+    9031: "Python HTTP Server: directory listing not allowed.",
+    9038: "Server under maintenance.\nPlease retry later.",
+    9046: "<html><body><h1>It works!</h1><p>Apache2 default page.</p></body></html>",
+    9054: "Python HTTP Server: directory listing not allowed.",
+    9059: "Server under maintenance.\nPlease retry later.",
+    9067: "🔒 Unauthorized: API key required.",
+    9097: "<html><body><h1>It works!</h1><p>Apache2 default page.</p></body></html>"
 }
 SOLO_SERVICE_NAMES = {
-    9003: "sysmon-api",
-    9011: "epsilon-sync",
-    9022: "update-agent",
-    9029: "configd",
-    9032: "theta-daemon",
-    9035: "alpha-core",
-    9046: "gamma-relay",
-    9047: "kappa-node",
-    9051: "zeta-cache",
-    9053: "delta-sync",
-    9054: "auth-service",
-    9077: "omega-stream",
-    9078: "beta-hub",
-    9084: "lambda-api"
+    9017: "theta-daemon",
+    9026: "gamma-relay",
+    9027: "update-agent",
+    9029: "delta-proxy",
+    9031: "zeta-cache",
+    9032: "lambda-api",
+    9038: "delta-sync",
+    9046: "omega-stream",
+    9054: "configd",
+    9059: "auth-service",
+    9060: "metricsd",
+    9067: "epsilon-sync",
+    9083: "alpha-core",
+    9084: "beta-hub",
+    9097: "kappa-node",
+    9098: "sysmon-api"
 }
 
 GUIDED_ALL_PORTS = {**GUIDED_JUNK_RESPONSES, **GUIDED_FAKE_FLAGS}

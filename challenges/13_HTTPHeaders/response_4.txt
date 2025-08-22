@@ -1,20 +1,15 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:49:06 GMT
-Server: nginx/1.24.0
-Content-Type: application/json
+Date: Sun, 30 Jun 2025 15:47:56 GMT
+Server: Liber8-Server/3.0.0-beta
+Content-Type: text/plain; charset=UTF-8
 Cache-Control: public, max-age=86400
-X-Powered-By: PHP/8.1.12
-X-Flag: CCRI-SSXC-8857
+X-Powered-By: Ruby on Rails/7.1.0
+X-Flag: NEFW-9243-CMJM
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=hiptne73bign; HttpOnly; Secure
+Set-Cookie: sessionid=bema6h1al0pz; HttpOnly; Secure
 
-<html>
-  <head><title>Liber8 Portal</title></head>
-  <body>
-    <h1>Welcome to Liber8</h1>
-    <p>System maintenance is underway. Some services may be unavailable.</p>
-  </body>
-</html>
+Welcome to the Liber8 data endpoint.
+This endpoint returns plain text responses.
 
-<!-- To-do: Update security headers on staging -->
+<!-- Debug: API response size 512 bytes -->

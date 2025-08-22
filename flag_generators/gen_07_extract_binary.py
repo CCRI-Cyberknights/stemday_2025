@@ -54,23 +54,24 @@ class ExtractBinaryFlagGenerator:
 
         binary_junk = ", ".join(str(random.randint(0, 255)) for _ in range(600))
 
+        # Note: __attribute__((used)) is optional but helps if you enable section GC/LTO.
         return f"""
 #include <stdio.h>
 #include <string.h>
 
-char flag1[] = "{fake_flags[0]}";
+__attribute__((used)) char flag1[] = "{fake_flags[0]}";
 char junk1[300] = "{junk_strings[0]}";
 
-char flag2[] = "{real_flag}";
+__attribute__((used)) char flag2[] = "{real_flag}";
 char junk2[500] = "{junk_strings[1]}";
 
-char flag3[] = "{fake_flags[1]}";
+__attribute__((used)) char flag3[] = "{fake_flags[1]}";
 char junk3[400] = "{junk_strings[2]}";
 
-char flag4[] = "{fake_flags[2]}";
+__attribute__((used)) char flag4[] = "{fake_flags[2]}";
 char junk4[600] = {{{binary_junk}}};
 
-char flag5[] = "{fake_flags[3]}";
+__attribute__((used)) char flag5[] = "{fake_flags[3]}";
 char junk5[350] = "{junk_strings[3]}";
 
 void keep_strings_alive() {{
@@ -129,11 +130,14 @@ int main() {{
     def generate_flag(self, challenge_folder: Path) -> str:
         """Generate and embed flag. Return real flag."""
         real_flag = FlagUtils.generate_real_flag()
-        fake_flags = [FlagUtils.generate_fake_flag() for _ in range(4)]
 
-        while real_flag in fake_flags:
-            real_flag = FlagUtils.generate_real_flag()
+        # Ensure EXACTLY 4 unique fakes
+        fake_set = set()
+        while len(fake_set) < 4:
+            fake_set.add(FlagUtils.generate_fake_flag())
+        fake_flags = list(fake_set)
 
+        # real != fakes by construction (fakes never start with 'CCRI')
         self.embed_flags(challenge_folder, real_flag, fake_flags)
         print("   🎭 Fake flags:", ", ".join(fake_flags))
         print(f"✅ {self.mode.capitalize()} flag: {real_flag}")

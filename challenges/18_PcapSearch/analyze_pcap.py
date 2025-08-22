@@ -101,7 +101,7 @@ def main():
     print("📡 PCAP Investigation Tool")
     print("==============================\n")
     print(f"Analyzing: {PCAP_FILE}\n")
-    print("🎯 Goal: Discover the real flag (CCRI-XXXX-1234).")
+    print("🎯 Goal: Discover the real flag (CCRI-AAAA-1111).")
     print("🧪 Some streams contain fakes. Only one is correct!\n")
     pause()
 

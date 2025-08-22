@@ -69,7 +69,7 @@ def main():
                 print(f.read().strip())
             print("--------------------------------------\n")
             print(f"📁 Saved as {OUTPUT_FILE}")
-            print("💡 Look for a string like CCRI-XXXX-#### to use as your flag.")
+            print("💡 Look for a string like CCRI-AAAA-1111 to use as your flag.")
             pause()
             break
         else:

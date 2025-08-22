@@ -88,7 +88,7 @@ def main():
     print(decoded)
     print("-----------------------------\n")
     print(f"📁 Decoded message saved to: {output_file}")
-    print("🔎 Look for a flag in this format: CCRI-XXXX-1234")
+    print("🔎 Look for a flag in this format: CCRI-AAAA-1111")
     print("🧠 Copy the flag into the scoreboard to complete this challenge.\n")
     pause("Press ENTER to close this terminal...")
 

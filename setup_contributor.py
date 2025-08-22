@@ -5,27 +5,16 @@ import subprocess
 import argparse
 import shlex
 
-# === 🌟 CCRI CyberKnights Full Environment Setup (Non-Interactive / Parrot & Mint ready) ===
-#
-# This prepares a contributor/dev box for:
-# - Running the Admin hub from source (web_version_admin/server.py)
-# - Running the Student hub via the zipapp (ccri_ctf.pyz) launched by start_web_hub.py
-# - Copy scripts that mark .desktop files trusted (needs 'gio' from libglib2.0-bin)
-#
-# NOTE: We no longer rely on .pyc files. Student builds use the .pyz zipapp.
-
 STEGO_DEB_URL = "https://raw.githubusercontent.com/CCRI-Cyberknights/stemday_2025/main/debs/steghide_0.6.0-1_amd64.deb"
 
-# Environment to suppress interactive prompts (apt/needrestart/debconf)
 APT_ENV = {
     **os.environ,
     "DEBIAN_FRONTEND": "noninteractive",
-    "NEEDRESTART_SUSPEND": "1",      # avoid restart prompts
-    "UCF_FORCE_CONFOLD": "1",        # keep existing confs by default
+    "NEEDRESTART_SUSPEND": "1",
+    "UCF_FORCE_CONFOLD": "1",
 }
 
 def run(cmd, check=True, env=None):
-    """Run a command (str or list) with our non-interactive env and show it."""
     if isinstance(cmd, str):
         print(f"💻 Running: {cmd}")
         result = subprocess.run(cmd, shell=True, env=env or APT_ENV)
@@ -41,10 +30,6 @@ def apt_update():
     run(["sudo", "-E", "apt-get", "update", "-y"])
 
 def apt_install_packages(packages):
-    """
-    Install system packages via apt-get, non-interactively, with safe dpkg options.
-    Using apt-get here is more scripting-friendly than 'apt'.
-    """
     print("📦 Installing system dependencies (non-interactive)...")
     apt_update()
     base_cmd = [
@@ -54,40 +39,59 @@ def apt_install_packages(packages):
     ]
     run(base_cmd + packages)
 
+# --- NEW: OS detection helpers ---
+def read_os_release():
+    info = {}
+    try:
+        with open("/etc/os-release", "r") as f:
+            for line in f:
+                line = line.strip()
+                if not line or "=" not in line:
+                    continue
+                k, v = line.split("=", 1)
+                v = v.strip().strip('"')
+                info[k] = v
+    except FileNotFoundError:
+        pass
+    return info
+
+def is_parrot():
+    info = read_os_release()
+    id_ = info.get("ID", "").lower()
+    like = (info.get("ID_LIKE", "") or "").lower()
+    return id_ == "parrot" or "parrot" in like
+
+def arch():
+    try:
+        out = subprocess.check_output(["dpkg", "--print-architecture"], text=True).strip()
+        return out
+    except Exception:
+        return None
+
+# --- Existing helpers (unmodified) ---
 def preseed_wireshark_and_install():
-    """
-    Preseed wireshark-common so it won't prompt about setuid dumpcap,
-    then install wireshark-common + tshark, reconfigure non-interactively,
-    and add the current user to the 'wireshark' group.
-    """
     print("🧪 Preseeding Wireshark (allow non-root capture) and installing non-interactively...")
     preseed = 'wireshark-common wireshark-common/install-setuid boolean true'
     run(f"echo '{preseed}' | sudo debconf-set-selections")
-
     apt_install_packages(["wireshark-common", "tshark"])
     run(["sudo", "dpkg-reconfigure", "-f", "noninteractive", "wireshark-common"])
     run(["sudo", "usermod", "-aG", "wireshark", os.environ.get("SUDO_USER") or os.environ.get("USER") or ""])
 
 def pip_install():
-    """Install Python CLI tools via pipx and libs via pip (system pip on Parrot/Mint)."""
     print("🐍 Installing Python CLI tools via pipx...")
     apt_install_packages(["pipx"])
     run(["pipx", "ensurepath"])
-
-    # Flask via pipx (optional CLI) and via pip for imports at runtime
     run(["pipx", "install", "flask"])
-
     print("📚 Installing Flask and MarkupSafe via pip (for Python imports)...")
     run(["python3", "-m", "pip", "install", "--break-system-packages", "flask", "markupsafe"])
 
 def install_zsteg():
-    """Install zsteg via Ruby gem."""
     print("💎 Installing Ruby and zsteg...")
     apt_install_packages(["ruby", "ruby-dev", "libmagic-dev"])
     run(["sudo", "gem", "install", "zsteg", "--no-document"])
 
+# --- Old function kept (used by auto when on Parrot) ---
 def install_steghide_deb():
-    """Download and install patched Steghide 0.6.0 from custom .deb."""
     print("🕵️ Checking Steghide version...")
     try:
         version_output = subprocess.check_output(["steghide", "--version"], text=True).strip()
@@ -96,6 +100,11 @@ def install_steghide_deb():
             return
     except Exception:
         print("ℹ️ Steghide not found or outdated. Installing patched version...")
+
+    if arch() not in ("amd64",):
+        print("⚠️  Patched .deb is built for amd64. Falling back to repo install.")
+        apt_install_packages(["steghide"])
+        return
 
     apt_install_packages(["wget"])
     print("⬇️ Downloading Steghide 0.6.0 .deb package...")
@@ -109,15 +118,43 @@ def install_steghide_deb():
              "-o", 'Dpkg::Options::=--force-confold'])
     run("rm -f /tmp/steghide.deb")
 
-    print("📌 Pinning Steghide 0.6.0 to prevent downgrade...")
-    pin_file = "/etc/apt/preferences.d/steghide"
-    pin_contents = """Package: steghide
+    # Only pin on Parrot to avoid fighting with other distros’ repos
+    if is_parrot():
+        print("📌 Pinning Steghide 0.6.0 on Parrot to prevent downgrade...")
+        pin_file = "/etc/apt/preferences.d/steghide"
+        pin_contents = """Package: steghide
 Pin: version 0.6.0*
 Pin-Priority: 1001
 """
-    with open("/tmp/steghide-pin", "w") as f:
-        f.write(pin_contents)
-    run(["sudo", "mv", "/tmp/steghide-pin", pin_file])
+        with open("/tmp/steghide-pin", "w") as f:
+            f.write(pin_contents)
+        run(["sudo", "mv", "/tmp/steghide-pin", pin_file])
+
+# --- NEW: unified, OS-aware installer ---
+def install_steghide_auto(mode: str = "auto"):
+    """
+    mode: 'auto' (default), 'deb', or 'apt'
+    - auto: Parrot => deb, others => apt
+    - deb: force .deb path (honors arch check)
+    - apt: force repo install
+    ENV override: FORCE_STEGHIDE_DEB=1 behaves like mode='deb'
+    """
+    env_force_deb = os.environ.get("FORCE_STEGHIDE_DEB") == "1"
+    if env_force_deb and mode == "auto":
+        mode = "deb"
+
+    if mode not in ("auto", "deb", "apt"):
+        print(f"⚠️ Unknown steghide mode '{mode}', falling back to 'auto'")
+        mode = "auto"
+
+    if mode == "apt" or (mode == "auto" and not is_parrot()):
+        print("🧩 Installing Steghide from distro repositories...")
+        apt_install_packages(["steghide"])
+        return
+
+    # mode == 'deb' OR (auto and Parrot)
+    print("🧩 Installing Steghide via patched .deb...")
+    install_steghide_deb()
 
 def get_git_config(key):
     res = subprocess.run(["git", "config", "--global", key],
@@ -128,21 +165,16 @@ def get_git_config(key):
     return None
 
 def configure_git(git_name=None, git_email=None):
-    """Configure Git non-interactively when stdin is not a TTY."""
     print("\n🔧 Checking Git configuration...")
-
     current_name = get_git_config("user.name")
     current_email = get_git_config("user.email")
-
     if current_name and current_email:
         print(f"✅ Git is already configured:\n   Name : {current_name}\n   Email: {current_email}")
         return
-
     if not git_name:
         git_name = os.environ.get("GIT_NAME")
     if not git_email:
         git_email = os.environ.get("GIT_EMAIL")
-
     if git_name and git_email:
         print("📝 Setting Git config from flags/env...")
         run(["git", "config", "--global", "user.name", git_name])
@@ -150,7 +182,6 @@ def configure_git(git_name=None, git_email=None):
         run(["git", "config", "--global", "credential.helper", "store"])
         print(f"✅ Git configuration saved:\n   Name : {git_name}\n   Email: {git_email}")
         return
-
     if sys.stdin.isatty():
         try:
             git_name = input("Enter your Git name: ").strip()
@@ -159,7 +190,6 @@ def configure_git(git_name=None, git_email=None):
             git_name = git_email = None
     else:
         git_name = git_email = None
-
     if git_name and git_email:
         run(["git", "config", "--global", "user.name", git_name])
         run(["git", "config", "--global", "user.email", git_email])
@@ -171,10 +201,15 @@ def configure_git(git_name=None, git_email=None):
         print("    - Flags: --git-name 'Your Name' --git-email 'you@example.com'")
         print("    - Or env: GIT_NAME='Your Name' GIT_EMAIL='you@example.com'")
 
+# --- UPDATED: add CLI for steghide mode ---
 def parse_args():
     p = argparse.ArgumentParser(description="CCRI CyberKnights environment setup")
     p.add_argument("--git-name", help="Git user.name (non-interactive)")
     p.add_argument("--git-email", help="Git user.email (non-interactive)")
+    p.add_argument("--steghide-mode",
+                   choices=["auto", "deb", "apt"],
+                   default="auto",
+                   help="Install Steghide using patched deb, repo apt, or auto (default)")
     return p.parse_args()
 
 def main():
@@ -183,31 +218,23 @@ def main():
     print("\n🚀 Setting up your CCRI_CTF contributor environment...")
     print("=" * 60 + "\n")
 
-    # --- Preseed + install Wireshark/Tshark first to avoid prompts
     preseed_wireshark_and_install()
 
-    # --- System packages for your flow ---
     apt_packages = [
-        # Essential tools
         "git", "python3", "python3-pip", "python3-venv", "gcc", "build-essential",
         "fonts-noto-color-emoji",
-
-        # Python libs used by the app / challenges
         "python3-markdown", "python3-scapy",
-
-        # Utilities your scripts rely on
-        "curl", "lsof", "xdg-utils", "libglib2.0-bin",  # 'gio' comes from libglib2.0-bin
-        "gnome-terminal",                               # used by /run_script endpoint
-
-        # Challenge tools (same as before)
+        "curl", "lsof", "xdg-utils", "libglib2.0-bin",
+        "gnome-terminal",
         "exiftool", "zbar-tools", "hashcat", "unzip", "libmcrypt4",
         "nmap", "qrencode", "vim-common", "util-linux",
         "binwalk", "fcrackzip", "john", "radare2", "imagemagick", "hexedit", "feh",
     ]
     apt_install_packages(apt_packages)
 
-    # Challenge helpers / languages
-    install_steghide_deb()
+    # ⬇️ OS-aware Steghide install
+    install_steghide_auto(args.steghide_mode)
+
     pip_install()
     install_zsteg()
     configure_git(args.git_name, args.git_email)

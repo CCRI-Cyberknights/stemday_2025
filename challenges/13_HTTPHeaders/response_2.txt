@@ -1,19 +1,20 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:58:49 GMT
+Date: Sun, 30 Jun 2025 15:52:27 GMT
 Server: Apache/2.4.54 (Ubuntu)
-Content-Type: text/plain; charset=UTF-8
-Cache-Control: public, max-age=86400
-X-Powered-By: Python/3.11.4
-X-Flag: QUIZ-RVSZ-6800
+Content-Type: text/html; charset=UTF-8
+Cache-Control: private, no-cache
+X-Powered-By: PHP/8.1.12
+X-Flag: EBLD-6460-EQJM
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
+Set-Cookie: sessionid=ihaqizla45xk; HttpOnly; Secure
 
 <html>
-  <head><title>Liber8 Portal</title></head>
+  <head><title>Internal Dashboard</title></head>
   <body>
-    <h1>Welcome to Liber8</h1>
-    <p>System maintenance is underway. Some services may be unavailable.</p>
+    <h1>Liber8 Ops Dashboard</h1>
+    <p>Authentication successful. Redirecting...</p>
   </body>
 </html>
 
-<!-- Debug: API response size 512 bytes -->
+<!-- Debug: Temporary caching enabled -->

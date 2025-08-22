@@ -30,7 +30,7 @@ def extract_flag_candidates(binary_file):
         with open(binary_file, "rb") as f:
             data = f.read()
 
-        # Match CCRI-XXXX-1234, XXXX-YYYY-1234, XXXX-1234-YYYY
+        # Match CCRI-AAAA-1111, XXXX-YYYY-1111, XXXX-1111-YYYY
         flag_pattern = re.compile(
             rb"(CCRI-[A-Z]{4}-\d{4})|([A-Z]{4}-[A-Z]{4}-\d{4})|([A-Z]{4}-\d{4}-[A-Z]{4})"
         )
@@ -68,7 +68,7 @@ def main():
     print("🔍 Hex Flag Hunter")
     print("============================\n")
     print(f"🎯 Target binary: {BINARY_FILE}")
-    print("💡 Goal: Locate the real flag (format: CCRI-XXXX-1234).")
+    print("💡 Goal: Locate the real flag (format: CCRI-AAAA-1111).")
     print("⚠️  Multiple candidate flags are embedded, but only ONE is correct!\n")
 
     if not os.path.exists(BINARY_FILE):

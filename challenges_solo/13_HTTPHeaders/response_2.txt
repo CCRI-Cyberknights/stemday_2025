@@ -1,19 +1,20 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:47:57 GMT
-Server: Liber8-Server/2.3.1
-Content-Type: application/json
-Cache-Control: no-store
-X-Powered-By: Node.js/18.16.0
-X-Flag: VCUO-ZIIB-9827
+Date: Sun, 30 Jun 2025 15:51:08 GMT
+Server: Apache/2.4.54 (Ubuntu)
+Content-Type: text/plain; charset=UTF-8
+Cache-Control: public, max-age=86400
+X-Powered-By: Python/3.11.4
+X-Flag: GIOP-FDHT-9818
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
+Set-Cookie: sessionid=he481oxenkot; HttpOnly; Secure
 
 <html>
-  <head><title>Liber8 Portal</title></head>
+  <head><title>Internal Dashboard</title></head>
   <body>
-    <h1>Welcome to Liber8</h1>
-    <p>System maintenance is underway. Some services may be unavailable.</p>
+    <h1>Liber8 Ops Dashboard</h1>
+    <p>Authentication successful. Redirecting...</p>
   </body>
 </html>
 
-<!-- Debug: API response size 512 bytes -->
+<!-- Developer note: Remove X-Test headers before release -->

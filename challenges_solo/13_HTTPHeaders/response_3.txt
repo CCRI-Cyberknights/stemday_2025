@@ -1,14 +1,20 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:54:41 GMT
-Server: nginx/1.24.0
-Content-Type: application/json
-Cache-Control: public, max-age=86400
-X-Powered-By: Node.js/18.16.0
-X-Flag: QVVU-VUIQ-6768
+Date: Sun, 30 Jun 2025 15:53:39 GMT
+Server: Liber8-Server/2.3.1
+Content-Type: text/plain; charset=UTF-8
+Cache-Control: private, no-cache
+X-Powered-By: Python/3.11.4
+X-Flag: UPIY-1959-TOBG
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
+Set-Cookie: sessionid=quc0xbucg5nq; HttpOnly; Secure
 
-Welcome to the Liber8 data endpoint.
-This endpoint returns plain text responses.
+<html>
+  <head><title>Internal Dashboard</title></head>
+  <body>
+    <h1>Liber8 Ops Dashboard</h1>
+    <p>Authentication successful. Redirecting...</p>
+  </body>
+</html>
 
-<!-- Developer note: Remove X-Test headers before release -->
+<!-- Debug: API response size 512 bytes -->
