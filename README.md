@@ -1,15 +1,9 @@
-Got it 👍 — your current README is written as **admin-only instructions**. Since you now have **two copy scripts** (`copy_ccri_ctf.py` and `copy_ccri_ctf_solo.py`) and `.pyz` packaging, it’d help to clarify what’s for admins vs what ends up in the student VM.
-
-Here’s a suggested edit (lean and precise, with **explanations where needed**):
-
----
-
 # 🌟 `stemday_2025` Project README (Admin-Only)
 
-Welcome to the **CCRI CyberKnights STEM Day VM Project!** 🎉
+Welcome to the **CCRI CyberKnights STEM Day VM Project!** 🎉  
 This repository powers the custom **Parrot Linux Capture The Flag (CTF)** used for STEM Day.
 
-👥 **This repository is for CCRI CyberKnights club members only.**
+👥 **This repository is for CCRI CyberKnights club members only.**  
 It contains source files, admin tools, and scripts used to **build and package** the student-facing VM.
 
 ---
@@ -22,7 +16,7 @@ It contains source files, admin tools, and scripts used to **build and package**
 curl -fsSL https://raw.githubusercontent.com/CCRI-Cyberknights/stemday_2025/main/setup_contributor.py | python3 -
 git clone https://github.com/CCRI-Cyberknights/stemday_2025.git
 cd stemday_2025
-```
+````
 
 ---
 
@@ -98,7 +92,7 @@ Then choose the bundle type:
 * **Solo-only VM (take-home / advanced):**
 
   ```bash
-  ./copy_ccri_ctf_solo.py or ./copy_takehome_ccri_ctf.py
+  ./copy_ccri_ctf_solo.py
   ```
 
 Both scripts:
@@ -130,3 +124,10 @@ Desktop/stemday_2025/
 * **Test both guided and solo builds before release**
 * **.pyz is the only runtime path on student VMs** — ensures no bytecode mismatch
 * Admin-only JSONs (`validation_unlocks*.json`) **stay in admin repo only**
+
+---
+
+## 📖 Contributing
+
+If you want to contribute to this project, please read our [CONTRIBUTING.md](./CONTRIBUTING.md) guide.
+It explains branching, workflows, and best practices for making changes.
