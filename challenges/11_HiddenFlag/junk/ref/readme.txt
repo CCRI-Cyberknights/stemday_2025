@@ -1,6 +1,7 @@
 Review each file carefully.
+This folder contains assorted documentation.
+This folder contains assorted documentation.
 Review each file carefully.
-Welcome to the reference directory.
 Review each file carefully.
-ZQQG-5866-USWT
-Welcome to the reference directory.
+TPHO-SKDG-8995
+This folder contains assorted documentation.

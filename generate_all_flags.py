@@ -5,6 +5,7 @@ import sys
 import shutil
 import json
 from pathlib import Path
+import base64
 
 # === Import backend classes ===
 sys.path.insert(0, str(Path(__file__).resolve().parent / "web_version_admin"))
@@ -53,6 +54,25 @@ GENERATOR_CLASSES = {
     "18_PcapSearch": PcapSearchFlagGenerator,
 }
 
+# --- Small helpers ---
+def load_json(path: Path) -> dict:
+    if not path.exists():
+        return {}
+    with path.open("r", encoding="utf-8") as f:
+        return json.load(f)
+
+def save_json(path: Path, data: dict):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
+
+def backup_file(path: Path):
+    if path.exists():
+        backup = path.with_suffix(path.suffix + ".bak")
+        shutil.copy2(path, backup)
+        return backup
+    return None
+
 # === Master Flag Generation Class ===
 class FlagGenerationManager:
     def __init__(self, dry_run=False, mode="guided"):
@@ -62,17 +82,22 @@ class FlagGenerationManager:
         self.dry_run = dry_run
         self.mode = mode  # guided or solo
 
-        # Explicit filename mapping
-        filename_map = {
-            "guided": "challenges.json",
-            "solo": "challenges_solo.json"
-        }
-        self.challenges_file = self.web_admin_dir / filename_map[self.mode]
-        self.challenges_dir = self.project_root / ("challenges" if self.mode == "guided" else "challenges_solo")
-        self.unlocks_file = self.web_admin_dir / f"validation_unlocks{'_solo' if self.mode == 'solo' else ''}.json"
-        self.challenge_list = ChallengeList(challenges_file=self.challenges_file)
+        filename_map = {"guided": "challenges.json", "solo": "challenges_solo.json"}
 
+        # Admin files (we ONLY update admin side here)
+        self.challenges_file = self.web_admin_dir / filename_map[self.mode]  # decoded flags
+        self.unlocks_file = self.web_admin_dir / f"validation_unlocks{'_solo' if self.mode == 'solo' else ''}.json"
+
+        # Challenge folders destination (so generators can drop artifacts)
+        self.challenges_dir = self.project_root / ("challenges" if self.mode == "guided" else "challenges_solo")
+
+        # Load
+        self.challenge_list = ChallengeList(challenges_file=self.challenges_file)
+        self.admin_challenges_data = load_json(self.challenges_file) or {}   # will be updated directly
         self.validation_unlocks = self.load_existing_unlocks()
+
+        # Collect generated flags per id for post-write
+        self.decoded_flags_by_id = {}
 
     @staticmethod
     def find_project_root():
@@ -92,15 +117,39 @@ class FlagGenerationManager:
                 print(f"⚠️ Warning: {self.unlocks_file.name} is not valid JSON. Starting fresh.")
         return {}
 
-    def prepare_backup(self):
-        backup_file = self.challenges_file.with_suffix(".json.bak")
-        shutil.copy2(self.challenges_file, backup_file)
-        print(f"📦 Backup created: {backup_file.relative_to(self.project_root)}")
+    def prepare_backups(self):
+        # Back up admin challenges file
+        admin_bak = backup_file(self.challenges_file)
+        if admin_bak:
+            print(f"📦 Backup created: {admin_bak.relative_to(self.project_root)}")
+        # Back up unlocks, too
+        unlocks_bak = backup_file(self.unlocks_file)
+        if unlocks_bak:
+            print(f"📦 Backup created: {unlocks_bak.relative_to(self.project_root)}")
 
     def save_unlocks(self):
-        with open(self.unlocks_file, "w", encoding="utf-8") as f:
-            json.dump(self.validation_unlocks, f, indent=2)
+        save_json(self.unlocks_file, self.validation_unlocks)
         print(f"🔑 Unlock data saved: {self.unlocks_file.relative_to(self.project_root)}")
+
+    def save_admin_challenges_with_flags(self):
+        """
+        Update the admin challenges JSON on disk with the decoded flags we just generated.
+        We do not touch web_version/ here.
+        """
+        if not self.admin_challenges_data:
+            # Fallback to ChallengeList's view if file was empty
+            self.admin_challenges_data = load_json(self.challenges_file) or {}
+
+        # Ensure all generated flags are written into the admin JSON
+        for cid, flag in self.decoded_flags_by_id.items():
+            entry = self.admin_challenges_data.get(cid)
+            if not entry:
+                # If the file is sparse, create a minimal entry
+                entry = self.admin_challenges_data[cid] = {"name": cid, "folder": "", "script": ""}
+            entry["flag"] = flag
+
+        save_json(self.challenges_file, self.admin_challenges_data)
+        print(f"📝 Admin challenges updated: {self.challenges_file.relative_to(self.project_root)}")
 
     def print_flag_report(self, real_flag, fake_flags):
         print(f"   🏁 Real flag: {real_flag}")
@@ -114,7 +163,7 @@ class FlagGenerationManager:
             print("📝 Dry-run mode enabled: outputs will be written to 'dryrun_output/'\n")
             self.dryrun_dir.mkdir(parents=True, exist_ok=True)
         else:
-            self.prepare_backup()
+            self.prepare_backups()
 
         success_count = 0
         fail_count = 0
@@ -141,14 +190,18 @@ class FlagGenerationManager:
                 fake_flags = getattr(generator, "last_fake_flags", [])
                 unlock_data = getattr(generator, "metadata", {})
 
+                # Attach common optional metadata if present
                 for attr in ["last_password", "last_zip_password", "last_subdomains", "last_ports"]:
                     value = getattr(generator, attr, None)
                     if value:
                         unlock_data[attr] = value
 
+                # Record decoded flag for admin file update
+                self.decoded_flags_by_id[challenge.getId()] = real_flag
+
                 if not self.dry_run:
+                    # Update unlocks (admin)
                     self.validation_unlocks[challenge.getId()] = unlock_data
-                    challenge.flag = real_flag
                     print(f"✅ {challenge.getId()}: Real flag = {real_flag}\n")
                 else:
                     print(f"✅ [Dry-Run] {challenge.getId()}: Real flag = {real_flag}")
@@ -162,9 +215,10 @@ class FlagGenerationManager:
                 fail_count += 1
 
         if not self.dry_run:
-            self.challenge_list.save_challenges()
+            # Persist admin challenges (decoded flags) and unlocks
+            self.save_admin_challenges_with_flags()
             self.save_unlocks()
-            print(f"🎉 All flags generated and {self.challenges_file.name} updated.")
+            print(f"🎉 All flags generated and admin files updated for {self.mode.upper()}.")
 
         print(f"\n📊 Summary ({self.mode.upper()}): {success_count} successful | {fail_count} failed")
 

@@ -1,20 +1,19 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:52:27 GMT
-Server: Apache/2.4.54 (Ubuntu)
+Date: Sun, 30 Jun 2025 15:52:43 GMT
+Server: Liber8-Server/2.3.1
 Content-Type: text/html; charset=UTF-8
-Cache-Control: private, no-cache
-X-Powered-By: PHP/8.1.12
-X-Flag: EBLD-6460-EQJM
+Cache-Control: public, max-age=86400
+X-Powered-By: Ruby on Rails/7.1.0
+X-Flag: NDMA-ZFWH-8811
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=ihaqizla45xk; HttpOnly; Secure
 
 <html>
-  <head><title>Internal Dashboard</title></head>
+  <head><title>Data Service</title></head>
   <body>
-    <h1>Liber8 Ops Dashboard</h1>
-    <p>Authentication successful. Redirecting...</p>
+    <h1>Data Service Ready</h1>
+    <p>Connect your client application to begin.</p>
   </body>
 </html>
 
-<!-- Debug: Temporary caching enabled -->
+<!-- Debug: API response size 512 bytes -->

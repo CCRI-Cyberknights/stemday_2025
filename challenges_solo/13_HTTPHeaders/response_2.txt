@@ -1,19 +1,18 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:51:08 GMT
-Server: Apache/2.4.54 (Ubuntu)
-Content-Type: text/plain; charset=UTF-8
-Cache-Control: public, max-age=86400
-X-Powered-By: Python/3.11.4
-X-Flag: GIOP-FDHT-9818
+Date: Sun, 30 Jun 2025 15:51:50 GMT
+Server: nginx/1.24.0
+Content-Type: application/json
+Cache-Control: no-store
+X-Powered-By: Ruby on Rails/7.1.0
+X-Flag: UWFU-FHXN-2649
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=he481oxenkot; HttpOnly; Secure
 
 <html>
-  <head><title>Internal Dashboard</title></head>
+  <head><title>Data Service</title></head>
   <body>
-    <h1>Liber8 Ops Dashboard</h1>
-    <p>Authentication successful. Redirecting...</p>
+    <h1>Data Service Ready</h1>
+    <p>Connect your client application to begin.</p>
   </body>
 </html>
 

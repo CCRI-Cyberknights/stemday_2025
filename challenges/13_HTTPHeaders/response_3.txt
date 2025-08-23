@@ -1,15 +1,19 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:50:30 GMT
-Server: nginx/1.24.0
-Content-Type: text/html; charset=UTF-8
+Date: Sun, 30 Jun 2025 15:58:07 GMT
+Server: Liber8-Server/2.3.1
+Content-Type: text/plain; charset=UTF-8
 Cache-Control: public, max-age=86400
-X-Powered-By: Node.js/18.16.0
-X-Flag: CPTY-9552-HRWJ
+X-Powered-By: Ruby on Rails/7.1.0
+X-Flag: CCRI-UWYU-5524
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=xm7ej7v8n173; HttpOnly; Secure
 
-Welcome to the Liber8 data endpoint.
-This endpoint returns plain text responses.
+<html>
+  <head><title>Data Service</title></head>
+  <body>
+    <h1>Data Service Ready</h1>
+    <p>Connect your client application to begin.</p>
+  </body>
+</html>
 
-<!-- To-do: Update security headers on staging -->
+<!-- Debug: Temporary caching enabled -->

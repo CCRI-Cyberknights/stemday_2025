@@ -1,15 +1,20 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:47:56 GMT
-Server: Liber8-Server/3.0.0-beta
-Content-Type: text/plain; charset=UTF-8
+Date: Sun, 30 Jun 2025 15:53:57 GMT
+Server: Go HTTP Server/1.19
+Content-Type: application/json
 Cache-Control: public, max-age=86400
-X-Powered-By: Ruby on Rails/7.1.0
-X-Flag: NEFW-9243-CMJM
+X-Powered-By: Python/3.11.4
+X-Flag: NFDO-ZBHP-6204
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=bema6h1al0pz; HttpOnly; Secure
+Set-Cookie: sessionid=zmzb59zr3mub; HttpOnly; Secure
 
-Welcome to the Liber8 data endpoint.
-This endpoint returns plain text responses.
+<html>
+  <head><title>Data Service</title></head>
+  <body>
+    <h1>Data Service Ready</h1>
+    <p>Connect your client application to begin.</p>
+  </body>
+</html>
 
-<!-- Debug: API response size 512 bytes -->
+<!-- Developer note: Remove X-Test headers before release -->

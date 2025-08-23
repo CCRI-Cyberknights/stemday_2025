@@ -20,14 +20,12 @@ def ensure_group_and_members(group_name, users):
         group = grp.getgrnam(group_name)
 
     current_members = set(group.gr_mem)
-
     for user in users:
-        if user not in current_members:
+        if user and user not in current_members:
             print(f"👥 Adding '{user}' to group '{group_name}'...")
             subprocess.run(["usermod", "-aG", group_name, user], check=True)
         else:
             print(f"✅ User '{user}' is already in group '{group_name}'.")
-
     return group.gr_gid
 
 # === Target student user and desktop path ===
@@ -61,12 +59,11 @@ def copy_and_fix(src: Path, dst: Path, uid: int, gid: int):
             dst.unlink()
 
     if src.is_dir():
-        shutil.copytree(src, dst)
+        shutil.copytree(src, dst)  # permissions are normalized below
     else:
         shutil.copy2(src, dst)
 
     def is_script(fname):
-        # Treat .pyz and .desktop as executables
         return fname.endswith((".py", ".sh", ".desktop", ".pyz"))
 
     def is_plain_text(fname):
@@ -98,10 +95,7 @@ def copy_and_fix(src: Path, dst: Path, uid: int, gid: int):
             os.chmod(dst, 0o664)
 
 def write_or_patch_desktop_launcher(launcher_dst: Path, uid: int, gid: int):
-    """
-    Ensure the .desktop launcher exists and points to start_web_hub.py.
-    Then mark it trusted with gio (if available) and executable.
-    """
+    """Ensure the .desktop launcher exists and points to start_web_hub.py."""
     desired_exec = 'Exec=bash -c "cd $HOME/Desktop/stemday_2025 && python3 start_web_hub.py"'
     template = (
         "[Desktop Entry]\n"
@@ -110,7 +104,7 @@ def write_or_patch_desktop_launcher(launcher_dst: Path, uid: int, gid: int):
         "Terminal=true\n"
         "Name=Launch_CCRI_CTF_Hub\n"
         f"{desired_exec}\n"
-        "Icon=firefox\n"
+        "Icon=utilities-terminal\n"
         "Name[en_US]=Launch_CCRI_CTF_Hub\n"
     )
 
@@ -140,7 +134,23 @@ def write_or_patch_desktop_launcher(launcher_dst: Path, uid: int, gid: int):
     except Exception as e:
         print(f"ℹ️ Skipped gio trust (not available or failed): {e}")
 
+def fix_tree_owner_perms(root: Path, uid: int, gid: int):
+    """Final sweep to ensure everything under root (including root) has correct owner/perms."""
+    for dirpath, dirnames, filenames in os.walk(root):
+        os.chown(dirpath, uid, gid)
+        os.chmod(dirpath, 0o2775)
+        for name in filenames:
+            p = os.path.join(dirpath, name)
+            try:
+                os.chown(p, uid, gid)
+            except FileNotFoundError:
+                continue
+            # keep file modes as set earlier; don’t overwrite here
+
 def main():
+    # NEW: make group-writable defaults (so copies land 775/664 when we chmod)
+    old_umask = os.umask(0o002)  # NEW
+
     if os.geteuid() != 0:
         print("🛡️ Elevation required. Re-running with sudo...")
         try:
@@ -160,12 +170,22 @@ def main():
     print(f"📂 Source: {source_root}")
     print(f"📥 Target: {target_root}")
 
+    # Ensure target Desktop exists and is owned by the student
+    if not target_desktop.exists():
+        target_desktop.mkdir(parents=True, exist_ok=True)
+        os.chown(target_desktop, uid, gid)
+        os.chmod(target_desktop, 0o755)
+
     if target_root.exists():
         print(f"🗑️ Removing existing folder: {target_root}")
         shutil.rmtree(target_root)
 
+    # Create the top-level folder and FIX ITS OWNER/PERMS RIGHT AWAY (IMPORTANT)
     target_root.mkdir(parents=True, exist_ok=True)
+    os.chown(target_root, uid, gid)             # UPDATED (fix “locked”)
+    os.chmod(target_root, 0o2775)               # UPDATED (group write + setgid)
 
+    # Copy selected items
     for item in include:
         src = source_root / item
         dst = target_root / item
@@ -175,14 +195,19 @@ def main():
         else:
             print(f"⚠️ Skipping missing item: {item}")
 
-    # Desktop launcher (always ensure it exists & points to start_web_hub.py)
+    # Desktop launcher
     launcher_dst = target_desktop / "Launch_CCRI_CTF_HUB.desktop"
     print("📎 Ensuring desktop launcher...")
     write_or_patch_desktop_launcher(launcher_dst, uid, gid)
 
+    # FINAL SWEEP to catch anything missed (e.g., empty dirs, race conditions)
+    fix_tree_owner_perms(target_root, uid, gid)  # NEW
+
     print("\n✅ Done. Content copied and ownership/permissions adjusted.")
     print(f"📎 Now accessible in: {target_root}")
     print("ℹ️ If you just added users to a group, log out and back in to apply membership.")
+
+    os.umask(old_umask)  # restore
 
 if __name__ == "__main__":
     main()

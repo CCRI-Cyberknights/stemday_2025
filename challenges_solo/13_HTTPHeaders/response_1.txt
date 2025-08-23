@@ -1,13 +1,13 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:54:17 GMT
-Server: nginx/1.24.0
-Content-Type: application/json
+Date: Sun, 30 Jun 2025 15:49:40 GMT
+Server: Apache/2.4.54 (Ubuntu)
+Content-Type: text/html; charset=UTF-8
 Cache-Control: private, no-cache
-X-Powered-By: Node.js/18.16.0
-X-Flag: DNXS-2321-OEZV
+X-Powered-By: Python/3.11.4
+X-Flag: CCRI-NZJR-2577
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=61nn1a6on0p4; HttpOnly; Secure
+Set-Cookie: sessionid=t5zgiox1ir4p; HttpOnly; Secure
 
 {
   "status": "ok",
@@ -15,4 +15,4 @@ Set-Cookie: sessionid=61nn1a6on0p4; HttpOnly; Secure
   "notes": "No maintenance scheduled."
 }
 
-<!-- Debug: Temporary caching enabled -->
+<!-- Developer note: Remove X-Test headers before release -->
