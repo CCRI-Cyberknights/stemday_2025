@@ -1,9 +1,9 @@
 # 🤝 Contributing to `stemday_2025` (Admin-Only)
 
-Welcome to the **CCRI CyberKnights STEM Day CTF Project!** 🎉
+Welcome to the **CCRI CyberKnights STEM Day CTF Project!** 🎉  
 This repository contains **all admin tools, source challenges, and packaging scripts** used to create the student VM.
 
-> ⚠️ **Important:** Students only receive a **bundled version** with `ccri_ctf.pyz`.
+> ⚠️ **Important:** Students only receive a **bundled version** with `ccri_ctf.pyz`.  
 > Never commit generated artifacts (`.pyz`, JSONs, builds) to this repo.
 
 ---
@@ -13,31 +13,35 @@ This repository contains **all admin tools, source challenges, and packaging scr
 **Admin repo (this one):**
 
 ```
-stemday_2025/
+
+stemday\_2025/
 ├── challenges/              # Guided challenges
-├── challenges_solo/         # Solo challenges
-├── web_version/             # Student-facing portal
-├── web_version_admin/       # Admin-only validation + templates
-├── copy_ccri_ctf*.py        # Bundling scripts
-├── generate_all_flags.py    # Flag + metadata generator
-├── validate_all_flags.py    # Admin validator
-├── ccri_ctf.pyz             # (⚠️ Generated only — don’t commit)
+├── challenges\_solo/         # Solo challenges
+├── web\_version/             # Student-facing portal
+├── web\_version\_admin/       # Admin-only validation + templates
+├── copy\_ccri\_ctf\*.py        # Bundling scripts
+├── generate\_all\_flags.py    # Flag + metadata generator
+├── validate\_all\_flags.py    # Admin validator
+├── ccri\_ctf.pyz             # (⚠️ Generated only — don’t commit)
 └── README.md / CONTRIBUTING.md
+
 ```
 
 **Student VM (after bundling):**
 
 ```
-Desktop/stemday_2025/
+
+Desktop/stemday\_2025/
 ├── challenges/
-├── challenges_solo/
-├── web_version/
-├── start_web_hub.py
-├── stop_web_hub.py
-├── Launch_CCRI_CTF_Hub.desktop
-├── ccri_ctf.pyz   # 🔒 only runtime path
-└── .ccri_ctf_root
-```
+├── challenges\_solo/
+├── web\_version/
+├── start\_web\_hub.py
+├── stop\_web\_hub.py
+├── Launch\_CCRI\_CTF\_Hub.desktop
+├── ccri\_ctf.pyz   # 🔒 only runtime path
+└── .ccri\_ctf\_root
+
+````
 
 ---
 
@@ -47,7 +51,7 @@ Desktop/stemday_2025/
 
    ```bash
    curl -fsSL https://raw.githubusercontent.com/CCRI-Cyberknights/stemday_2025/main/setup_contributor.py | python3 -
-   ```
+````
 
 2. Clone repo:
 
@@ -56,11 +60,14 @@ Desktop/stemday_2025/
    cd stemday_2025
    ```
 
-3. Make a feature branch:
+3. Create a branch for your work:
 
    ```bash
    git checkout -b feature/my-change
    ```
+
+   ✅ For **CyberKnights org members**: branch directly inside this repo.
+   ❌ For **external contributors**: fork the repo first, then create your branch on the fork and open a PR back.
 
 ---
 
@@ -90,7 +97,8 @@ Desktop/stemday_2025/
    git push origin feature/my-change
    ```
 
-4. **Open PR** → submit for review.
+4. **Open a Pull Request (PR)** → submit for review.
+   (Branches are preferred. Forks only if you lack write access.)
 
 ---
 
@@ -102,10 +110,12 @@ Desktop/stemday_2025/
 * `ccri_ctf.pyz`
 * `validation_unlocks*.json`
 * Take-home bundles or packaged folders
-  ✅ Keep **admin-only** scripts inside `web_version_admin/`
-  ✅ Test both **guided + solo** build flows before merging
-  ✅ Use **relative paths** (no `/home/username/...`) for portability
-  ✅ PRs should explain:
+
+✅ Keep **admin-only** scripts inside `web_version_admin/`
+✅ Test both **guided + solo** build flows before merging
+✅ Use **relative paths** (no `/home/username/...`) for portability
+✅ PRs should explain:
+
 * Which challenges/scripts changed
 * Whether flags were regenerated
 
