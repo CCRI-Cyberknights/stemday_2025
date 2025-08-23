@@ -50,8 +50,7 @@ Desktop/stemday\_2025/
 1. Install contributor environment:
 
    ```bash
-   curl -fsSL https://raw.githubusercontent.com/CCRI-Cyberknights/stemday_2025/main/setup_contributor.py | python3 -
-````
+   curl -fsSL https://raw.githubusercontent.com/CCRI-Cyberknights/stemday_2025/main/setup_contributor.py | python3 -````
 
 2. Clone repo:
 
