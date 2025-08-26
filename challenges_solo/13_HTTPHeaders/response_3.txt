@@ -1,15 +1,20 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:46:24 GMT
-Server: nginx/1.24.0
-Content-Type: text/html; charset=UTF-8
-Cache-Control: private, no-cache
-X-Powered-By: PHP/8.1.12
-X-Flag: ZZSF-8899-KJEF
+Date: Sun, 30 Jun 2025 15:58:07 GMT
+Server: Liber8-Server/3.0.0-beta
+Content-Type: application/json
+Cache-Control: public, max-age=86400
+X-Powered-By: ASP.NET Core/7.0
+X-Flag: DSIY-5278-LWXA
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=p9phxygecimn; HttpOnly; Secure
+Set-Cookie: sessionid=84c9ulehmnld; HttpOnly; Secure
 
-Welcome to the Liber8 data endpoint.
-This endpoint returns plain text responses.
+<html>
+  <head><title>Data Service</title></head>
+  <body>
+    <h1>Data Service Ready</h1>
+    <p>Connect your client application to begin.</p>
+  </body>
+</html>
 
-<!-- Developer note: Remove X-Test headers before release -->
+<!-- Debug: Session created for client 10.6.112.3 -->

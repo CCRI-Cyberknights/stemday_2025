@@ -179,7 +179,7 @@ class NmapScanFlagGenerator:
         unlocks_file = self.project_root / "web_version_admin" / (
             "validation_unlocks.json" if self.mode == "guided" else "validation_unlocks_solo.json"
         )
-        challenge_id = "17_Nmap_Scanning"
+        challenge_id = "17_NmapScanning"
         existing = {}
         if unlocks_file.exists():
             with open(unlocks_file, "r", encoding="utf-8") as f:

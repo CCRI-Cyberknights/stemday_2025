@@ -1,8 +1,6 @@
-last_modified=2019-08-12
 user=guest
-# Legacy configuration file
 last_modified=2019-08-12
 # Legacy configuration file
 # [No sensitive data found here]
-user=guest
-last_modified=2019-08-12
+enable_logging=true
+enable_logging=true

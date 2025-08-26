@@ -1,19 +1,20 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:52:43 GMT
+Date: Sun, 30 Jun 2025 15:50:22 GMT
 Server: Liber8-Server/2.3.1
-Content-Type: text/html; charset=UTF-8
-Cache-Control: public, max-age=86400
-X-Powered-By: Ruby on Rails/7.1.0
-X-Flag: NDMA-ZFWH-8811
+Content-Type: application/json
+Cache-Control: no-store
+X-Powered-By: Node.js/18.16.0
+X-Flag: IUVZ-1981-MWER
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
+Set-Cookie: sessionid=4p99vdzct6sj; HttpOnly; Secure
 
 <html>
-  <head><title>Data Service</title></head>
+  <head><title>Liber8 Portal</title></head>
   <body>
-    <h1>Data Service Ready</h1>
-    <p>Connect your client application to begin.</p>
+    <h1>Welcome to Liber8</h1>
+    <p>System maintenance is underway. Some services may be unavailable.</p>
   </body>
 </html>
 
-<!-- Debug: API response size 512 bytes -->
+<!-- To-do: Update security headers on staging -->

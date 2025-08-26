@@ -1,13 +1,12 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:49:40 GMT
-Server: Apache/2.4.54 (Ubuntu)
-Content-Type: text/html; charset=UTF-8
-Cache-Control: private, no-cache
-X-Powered-By: Python/3.11.4
-X-Flag: CCRI-NZJR-2577
+Date: Sun, 30 Jun 2025 15:48:06 GMT
+Server: Liber8-Server/2.3.1
+Content-Type: text/plain; charset=UTF-8
+Cache-Control: no-store
+X-Powered-By: Node.js/18.16.0
+X-Flag: BFEK-BCTC-9373
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=t5zgiox1ir4p; HttpOnly; Secure
 
 {
   "status": "ok",

@@ -1,13 +1,12 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:53:10 GMT
+Date: Sun, 30 Jun 2025 15:59:47 GMT
 Server: Apache/2.4.54 (Ubuntu)
 Content-Type: text/html; charset=UTF-8
-Cache-Control: public, max-age=86400
-X-Powered-By: PHP/8.1.12
-X-Flag: UXZU-5953-LIMP
+Cache-Control: no-store
+X-Powered-By: Node.js/18.16.0
+X-Flag: QAHQ-5388-EWHT
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=jcpoydw28763; HttpOnly; Secure
 
 <html>
   <head><title>Internal Dashboard</title></head>

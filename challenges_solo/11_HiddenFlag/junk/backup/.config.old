@@ -1,6 +1,8 @@
-ESIL-LUTJ-3364
-user=guest
-user=guest
 enable_logging=true
 # Legacy configuration file
 last_modified=2019-08-12
+last_modified=2019-08-12
+user=guest
+enable_logging=true
+# [No sensitive data found here]
+# Legacy configuration file

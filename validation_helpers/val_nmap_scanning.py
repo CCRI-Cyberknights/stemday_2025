@@ -22,12 +22,16 @@ def fetch_port_response(port: int) -> str:
 def validate_flag(expected_flag: str, expected_port: int) -> bool:
     print(f"🔎 Validating port {expected_port} for expected flag...")
     response = fetch_port_response(expected_port)
+
+    # Keep the containment check if your server includes extra text with the flag
     if expected_flag in response:
-        print(f"✅ Found flag at port {expected_port}")
+        print(f"✅ Validation success: found real flag {expected_flag} on port {expected_port}")
         return True
     else:
+        preview = (response[:200] + "…") if len(response) > 200 else response
         print("❌ Flag not found in response.")
-        print("Response:", response)
+        print(f"   Expected flag: {expected_flag}")
+        print(f"   Response preview: {preview}")
         return False
 
 def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:

@@ -1,20 +1,14 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:53:57 GMT
-Server: Go HTTP Server/1.19
-Content-Type: application/json
-Cache-Control: public, max-age=86400
-X-Powered-By: Python/3.11.4
-X-Flag: NFDO-ZBHP-6204
+Date: Sun, 30 Jun 2025 15:59:27 GMT
+Server: Apache/2.4.54 (Ubuntu)
+Content-Type: text/plain; charset=UTF-8
+Cache-Control: private, no-cache
+X-Powered-By: ASP.NET Core/7.0
+X-Flag: TKFJ-UXMO-1639
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=zmzb59zr3mub; HttpOnly; Secure
 
-<html>
-  <head><title>Data Service</title></head>
-  <body>
-    <h1>Data Service Ready</h1>
-    <p>Connect your client application to begin.</p>
-  </body>
-</html>
+Welcome to the Liber8 data endpoint.
+This endpoint returns plain text responses.
 
 <!-- Developer note: Remove X-Test headers before release -->

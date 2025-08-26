@@ -95,8 +95,24 @@ class StegoFlagGenerator:
 
         self.last_fake_flags = fake_flags
         self.last_password = "password" if self.mode == "guided" else "liber8"
-        self.metadata = {}  # Can populate more metadata here if needed
 
+        # Build standardized metadata so the master script writes a rich unlock entry
+        base_path = "challenges_solo" if self.mode == "solo" else "challenges"
+        challenge_id = challenge_folder.name  # e.g., "01_Stego"
+        challenge_file = f"{base_path}/{challenge_id}/squirrel.jpg"
+
+        # ✅ Put everything the validator needs here (mirrors other challenges)
+        self.metadata = {
+            "real_flag": real_flag,
+            "challenge_file": challenge_file,
+            "unlock_method": "steghide extract -sf squirrel.jpg -p <password>",
+            "hint": "Use: steghide extract -sf squirrel.jpg -p password",
+            "last_password": self.last_password,
+            # Optional but handy for audits:
+            "fake_flags": fake_flags,
+        }
+
+        # Do the actual embedding
         self.embed_flags(challenge_folder, real_flag, fake_flags, passphrase=self.last_password)
         print('   🎭 Fake flags:', ', '.join(fake_flags))
         print(f"✅ {self.mode.capitalize()} flag: {real_flag} (passphrase: {self.last_password})")
