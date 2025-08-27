@@ -102,6 +102,10 @@ Desktop/stemday\_2025/
 
 ---
 
+I've included a markdown cheatsheet here [Markdown Cheatsheet](https://github.com/CCRI-Cyberknights/stemday_2025/blob/main/markdown-cheat-sheet.md). To test out edits to the various README.md, start the webserver in admin mode, load the page with said readme and see how it renders. The readmes will change on a page refresh, but if you edit any actual html files, stop the server first and then restart it just to be sure the edits came over.
+
+---
+
 ## 🛡️ Rules & Best Practices
 
 ✅ **.pyz is the only runtime path for students** — no `.pyc` or raw source leaks
