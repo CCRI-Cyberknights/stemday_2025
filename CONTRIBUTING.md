@@ -102,7 +102,7 @@ Desktop/stemday\_2025/
 
 ---
 
-I've included a markdown cheatsheet here [Markdown Cheatsheet](https://github.com/CCRI-Cyberknights/stemday_2025/blob/main/markdown-cheat-sheet.md). To test out edits to the various README.md, start the webserver in admin mode, load the page with said readme and see how it renders. The readmes will change on a page refresh, but if you edit any actual html files, stop the server first and then restart it just to be sure the edits came over.
+I've included a markdown cheatsheet here [Markdown Cheatsheet](https://github.com/CCRI-Cyberknights/stemday_2025/blob/main/markdown-cheat-sheet.md). See it on the github webpage for the examples, and open it as a text file to see the formatting code. To test out edits to the various README.md, start the webserver in admin mode, load the page with said readme and see how it renders. The readmes will change on a page refresh, but if you edit any actual html files, stop the server first and then restart it just to be sure the edits came over.
 
 ---
 
