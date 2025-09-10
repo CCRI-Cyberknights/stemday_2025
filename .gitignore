@@ -59,11 +59,12 @@ web_version_admin/server.bak
 web_version_admin/challenges.json.bak
 web_version_admin/__pycache__/
 
-# == Challenge folders (keep) ==
+# == Make challenge roots visible (contents controlled below) ==
 !/challenges/
 !/challenges_solo/
 
 ### ── Per-challenge whitelist rules ──
+# Guided
 challenges/01_Stego/*                # Ignore everything inside
 !challenges/01_Stego/README.md      # Keep the instructions
 !challenges/01_Stego/extract_flag.py # Keep the helper script
@@ -186,7 +187,7 @@ challenges/18_PcapSearch/*
 !challenges/18_PcapSearch/analyze_pcap.py
 !challenges/18_PcapSearch/traffic.pcap
 
-
+# Solo
 challenges_solo/01_Stego/*                # Ignore everything inside
 !challenges_solo/01_Stego/README.md      # Keep the instructions
 !challenges_solo/01_Stego/squirrel.jpg    # Keep the challenge asset
