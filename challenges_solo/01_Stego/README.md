@@ -1,20 +1,21 @@
-# 🕵️ Stego Decode Challenge
+# Challenge 1: Steganography decode  
+---
+Steganography is the art of the concealment of information and messages inside of another file like embedding a text file inside an image or mp3 so it appears unchanged to the average person. Unlike encryption the aim is to make the data invisible but readable to the target.
 
-A suspicious image has surfaced during a Liber8 investigation. Intelligence analysts believe it contains hidden data that may expose an insider’s identity.
+---
+During the Knights investigation into the CryptKeepers a suspicious image was found among the files that appeared normal at first, but our analysts believe it contains hidden data.
 
-Your job: extract the secret message embedded within this image.
+## Objective:
+  uncover and decode squirrel.jpg to extract the embedded secret messages they concealed inside this picture. 
+
+## Investigator's Journal: 
+  Cryptkeepers operatives often hide things in plain sight... and they tend to reuse the same password across tools. Not all of these tools will reveal useful information, some may lead to dead ends. The challenge lies in experimenting and connecting the dots. Does the image contain metadata or embedded content? Are there readable strings or hidden files inside? Might a password be needed to reveal the payload?.Sometimes the best secrets are the ones hiding in plain sight.  
 
 ---
 
-## 🧠 What is Steganography?
+##  Tools & Techniques
 
-Steganography is the art of hiding messages in plain sight — like embedding a text file inside an image or song. Unlike encryption, its goal is to be invisible rather than unreadable.
-
----
-
-## 🛠 Tools & Techniques
-
-Try out some of these Linux tools — each reveals different kinds of secrets:
+Try out some of these Linux tools each reveals different kinds of secrets:
 
 | Tool      | Use Case                                              | Example Command                      |
 |-----------|--------------------------------------------------------|--------------------------------------|
@@ -28,49 +29,14 @@ Try out some of these Linux tools — each reveals different kinds of secrets:
 
 > Tip: Use `man` or `--help` with any command to learn more.
 
-Not all of these tools will reveal useful information — some may lead to dead ends. The challenge lies in experimenting and connecting the dots.
+---
+
+## Files in This Folder
+
+* `squirrel.jpg` — The suspicious image
+
+All flags follow the same format: CCRI-AAAA-1111 Replace AAAA and the numbers with the code found.Then Input the flag into the website to verify the answer.  
 
 ---
 
-## 🧩 Investigator's Journal
-
-🗒️ *“Liber8 operatives often hide things in plain sight... and they tend to reuse the same password across tools. Predictable, rebellious, and catchy — that’s their style.”*
-
----
-
-## 📝 Your Objective
-
-Analyze the image:
-
-📁 **squirrel.jpg**
-
-Ask yourself:
-- Does the image contain metadata or embedded content?
-- Are there readable strings or hidden files inside?
-- Might a password be needed to reveal the payload?
-
-If you discover the flag in output or extract a file, be sure to save it manually:
-
-```
-echo "CCRI-AAAA-1111" > flag.txt
-```
-
----
-
-## 📂 Files in This Folder
-
-* `squirrel.jpg` — The image to investigate.
-
----
-
-## 🏁 Flag Format
-
-All flags follow the same format:
-
-**CCRI-AAAA-1111**
-
-Replace `AAAA` and the numbers with the code you uncover.
-
----
-
-💡 This challenge rewards persistence and creative use of tools. Think like a cyber detective — sometimes the best secrets are the ones hiding in plain sight.
+ 

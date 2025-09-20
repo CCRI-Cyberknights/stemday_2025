@@ -1,25 +1,26 @@
-# 🔐 ROT13 Decode Challenge
-
-A scrambled message was intercepted from a compromised Liber8 communications relay. It appears to be human-readable… but twisted.
-
-Your mission is to unscramble it and identify the real CCRI flag buried inside.
-
+# Challenge 3: ROT13 Decode Challenge
 ---
 
-## 🧠 What is ROT13?
-
 ROT13 is a basic substitution cipher that rotates each letter of the alphabet 13 positions forward. After 'Z', it wraps around back to 'A'.
-
 It’s symmetrical:
 - A becomes N  
 - N becomes A  
 - Apply it twice to return to the original message
-
 This method isn't secure — but it *is* good enough to confuse casual readers.
+
+A scrambled message was intercepted from a compromised cryptkeepers communication relay. It appears to be human-readable… but twisted.
 
 ---
 
-## 🛠 Tools & Techniques
+## Objective: 
+Use one of the tools below to decode the message and search for a string matching the flag format. The transmission may contain multiple candidates only one is real. ROT13 is one of the simplest ciphers but don't let that fool you. The message might be clear once decoded, but only one flag is authentic. 
+
+## Investigator’s Journal:
+ They used that childish cipher again. At this point, it’s just a matter of habit. Run it through the rotator and see what shakes loose. 
+
+---
+
+## Tools & Techniques
 
 Here are some tools that can help you decode ROT13 manually or automatically:
 
@@ -34,42 +35,10 @@ Here are some tools that can help you decode ROT13 manually or automatically:
 
 ---
 
-## 🧩 Investigator’s Journal
-
-🗒️ *“They used that childish cipher again. At this point, it’s just a matter of habit. Run it through the rotator and see what shakes loose.”*
-
----
-
-## 📝 Your Objective
-
-Inspect this file:
-
-📁 **cipher.txt**
-
-Use one of the tools above to decode the message and search for a string matching the CCRI flag format. The transmission may contain **multiple candidates** — only one is real.
-
-If your decoding method displays output to the screen, save the result manually:
-
-```
-echo "CCRI-AAAA-1111" > decoded_output.txt
-```
-
----
-
-## 📂 Files in This Folder
+## Files in This Folder
 
 * `cipher.txt` — The scrambled transmission using ROT13.
 
----
-
-## 🏁 Flag Format
-
-Look for a flag in this format:
-
-**CCRI-AAAA-1111**
-
-Replace `AAAA` and `1111` with the real code found in the message.
+All flags follow the same format: CCRI-AAAA-1111 Replace AAAA and the numbers with the code. Then Input the flag into the website to verify the answer.  
 
 ---
-
-💡 ROT13 is one of the simplest ciphers — but don't let that fool you. The message might be clear once decoded, but only one flag is authentic.

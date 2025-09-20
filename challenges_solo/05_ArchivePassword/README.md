@@ -1,20 +1,31 @@
-# 🔐 ZIP File Crack & Decode
+# Challenge 5: ZIP File Crack & Decode
+---
 
-An encrypted ZIP archive was intercepted during a Liber8 exfiltration attempt. It’s locked with a password, but you’ve also recovered a list of possible passwords nearby — probably used by the same operative.
+Password-protected ZIP files can be brute-forced if you know (or guess) the possible passwords. If weak passwords are used or if you have a list of likely candidates cracking is just a matter of time and technique. 
 
-Inside the archive? A scrambled message, encoded in Base64. Your mission is to crack the ZIP, decode the message, and uncover the real flag.
+An encrypted ZIP archive was intercepted during a Cryptkeepers exfiltration attempt. It’s locked with a password, but you’ve also recovered a list of possible passwords most likely used by the same agent. Inside the archive is a scrambled message, encoded in Base64.
+
+## Objective: 
+Crack the ZIP, decode the message, and uncover the real flag. 
+
+   - Analyze the following files: 
+secret.zip: the encrypted archive 
+wordlist.txt: the list of possible passwords 
+
+   - Brute-force the ZIP file with the wordlist until it opens. 
+
+   -  Once extracted, decode the contents of message_encoded.txt (Base64). 
+
+   -  From the decoded message, locate the one valid flag.
+ 
+unlocking the archive is only part one. The extracted file contains Base64-encoded content you'll need to decode it before the flag becomes readable.
+
+## Investigator’s Journal:
+They always used the same weak password list lazy opsec. If you find that list, you’ve already got the key. Just try them until something opens. This challenge is about exploiting weak password practices and layered obfuscation. Think like an analyst work the outer shell before you reach the core. 
 
 ---
 
-## 🧠 What’s Going On?
-
-Password-protected ZIP files can be brute-forced if you know (or guess) the possible passwords. If weak passwords are used — or if you have a list of likely candidates — cracking is just a matter of time and technique.
-
-But unlocking the archive is only part one. The extracted file contains Base64-encoded content — you'll need to decode it before the flag becomes readable.
-
----
-
-## 🛠 Tools & Techniques
+## Tools & Techniques
 
 Try using a combination of these tools for different phases of this challenge:
 
@@ -31,47 +42,15 @@ Try using a combination of these tools for different phases of this challenge:
 
 ---
 
-## 🧩 Investigator’s Journal
-
-🗒️ *“They always used the same weak password list — lazy opsec. If you find that list, you’ve already got the key. Just try them until something opens.”*
 
 ---
 
-## 📝 Your Objective
-
-1. Analyze the following files:
-   - `secret.zip`: the encrypted archive
-   - `wordlist.txt`: the list of possible passwords
-
-2. Brute-force the ZIP file with the wordlist until it opens.
-
-3. Once extracted, decode the contents of `message_encoded.txt` (Base64).
-
-4. From the decoded message, locate the **one valid CCRI flag**.
-
-> If your decoder prints the flag on screen, you can save it like this:
-
-```
-echo "CCRI-AAAA-1111" > decoded_output.txt
-```
-
----
-
-## 📂 Files in This Folder
+##  Files in This Folder
 
 * `secret.zip` — The password-protected archive
 * `wordlist.txt` — The password list for cracking
 
----
-
-## 🏁 Flag Format
-
-When you find the flag, it will follow this format:
-
-**CCRI-AAAA-1111**
-
-Replace `AAAA` and `1111` with the real code you uncover in the decoded message.
+All flags follow the same format: CCRI-AAAA-1111 Replace AAAA and the numbers with the code you uncover Input the flag into the website to verify the answer. 
 
 ---
 
-💡 This challenge is about exploiting weak password practices and layered obfuscation. Think like an analyst — work the outer shell before you reach the core.
