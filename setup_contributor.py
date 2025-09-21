@@ -4,6 +4,8 @@ import sys
 import subprocess
 import argparse
 import shlex
+import shutil
+import stat
 
 STEGO_DEB_URL = "https://raw.githubusercontent.com/CCRI-Cyberknights/stemday_2025/main/debs/steghide_0.6.0-1_amd64.deb"
 
@@ -39,7 +41,7 @@ def apt_install_packages(packages):
     ]
     run(base_cmd + packages)
 
-# --- NEW: OS detection helpers ---
+# ---------- OS helpers ----------
 def read_os_release():
     info = {}
     try:
@@ -63,20 +65,82 @@ def is_parrot():
 
 def arch():
     try:
-        out = subprocess.check_output(["dpkg", "--print-architecture"], text=True).strip()
-        return out
+        return subprocess.check_output(["dpkg", "--print-architecture"], text=True).strip()
     except Exception:
         return None
 
-# --- Existing helpers (unmodified) ---
+# ---------- Wireshark / dumpcap (parity with live-CD script) ----------
+def ensure_group(name):
+    rc = run(["getent", "group", name], check=False)
+    if rc != 0:
+        run(["sudo", "groupadd", "--system", name], check=False)
+
+def add_users_to_group(group, users):
+    for u in users:
+        if not u:
+            continue
+        rc = run(["id", u], check=False)
+        if rc == 0:
+            run(["sudo", "usermod", "-aG", group, u], check=False)
+
+def is_setuid(path):
+    try:
+        st = os.stat(path)
+        return bool(st.st_mode & stat.S_ISUID)
+    except FileNotFoundError:
+        return False
+
+def getcap(path):
+    try:
+        out = subprocess.check_output(["getcap", path], text=True).strip()
+        return out
+    except Exception:
+        return ""
+
+def ensure_dumpcap_nonroot():
+    dumpcap = shutil.which("dumpcap")
+    if not dumpcap:
+        print("ℹ️ dumpcap not found; skipping perms setup.")
+        return
+
+    # Prefer capabilities
+    run(["sudo", "setcap", "cap_net_raw,cap_net_admin+eip", dumpcap], check=False)
+    caps = getcap(dumpcap)
+    if "cap_net_admin,cap_net_raw" in caps and "eip" in caps:
+        print(f"✅ dumpcap caps OK: {caps}")
+        return
+
+    # Maintainer setuid path
+    run("echo 'wireshark-common wireshark-common/install-setuid boolean true' | sudo debconf-set-selections", check=False)
+    run(["sudo", "dpkg-reconfigure", "-f", "noninteractive", "wireshark-common"], check=False)
+    if is_setuid(dumpcap):
+        print(f"✅ dumpcap setuid OK: {dumpcap}")
+        return
+
+    # Final fallback: local copy in /usr/local/bin (first in PATH)
+    local_dump = "/usr/local/bin/dumpcap"
+    run(["sudo", "install", "-o", "root", "-g", "wireshark", "-m", "0750", dumpcap, local_dump], check=False)
+    run(["sudo", "chmod", "u+s", local_dump], check=False)
+    # Verify
+    use_path = shutil.which("dumpcap") or local_dump
+    caps2 = getcap(use_path)
+    suid2 = is_setuid(use_path)
+    print(f"🛠 Using dumpcap at: {use_path}")
+    print(f"    caps: {caps2 or 'none'}")
+    print(f"    suid: {suid2}")
+
 def preseed_wireshark_and_install():
     print("🧪 Preseeding Wireshark (allow non-root capture) and installing non-interactively...")
     preseed = 'wireshark-common wireshark-common/install-setuid boolean true'
     run(f"echo '{preseed}' | sudo debconf-set-selections")
-    apt_install_packages(["wireshark-common", "tshark"])
-    run(["sudo", "dpkg-reconfigure", "-f", "noninteractive", "wireshark-common"])
-    run(["sudo", "usermod", "-aG", "wireshark", os.environ.get("SUDO_USER") or os.environ.get("USER") or ""])
+    # Install GUI+CLI & caps tooling (parity with bash installer)
+    apt_install_packages(["wireshark", "wireshark-common", "tshark", "libcap2-bin"])
+    # Create group and add plausible users
+    ensure_group("wireshark")
+    env_user = os.environ.get("SUDO_USER") or os.environ.get("USER") or ""
+    add_users_to_group("wireshark", [env_user, "user", "parrot"])
 
+# ---------- Python / pip(x) ----------
 def pip_install():
     print("🐍 Installing Python CLI tools via pipx...")
     apt_install_packages(["pipx"])
@@ -85,12 +149,32 @@ def pip_install():
     print("📚 Installing Flask and MarkupSafe via pip (for Python imports)...")
     run(["python3", "-m", "pip", "install", "--break-system-packages", "flask", "markupsafe"])
 
+# ---------- zsteg ----------
 def install_zsteg():
     print("💎 Installing Ruby and zsteg...")
     apt_install_packages(["ruby", "ruby-dev", "libmagic-dev"])
     run(["sudo", "gem", "install", "zsteg", "--no-document"])
 
-# --- Old function kept (used by auto when on Parrot) ---
+# ---------- CyberChef (offline) ----------
+def install_cyberchef_offline():
+    print("🧁 Installing offline CyberChef + desktop entry...")
+    apt_install_packages(["curl", "xdg-utils", "desktop-file-utils"])
+    CYBER_DIR = "/opt/cyberchef"
+    run(["sudo", "mkdir", "-p", CYBER_DIR])
+    if not os.path.exists(f"{CYBER_DIR}/index.html") or os.path.getsize(f"{CYBER_DIR}/index.html") == 0:
+        run(["sudo", "curl", "-fsSL", "https://gchq.github.io/CyberChef/", "-o", f"{CYBER_DIR}/index.html"], check=False)
+    desktop_entry = """[Desktop Entry]
+Type=Application
+Name=CyberChef (Offline)
+Exec=xdg-open file:///opt/cyberchef/index.html
+Icon=utilities-terminal
+Terminal=false
+Categories=Utility;Education;Development;
+"""
+    run(["bash", "-lc", f"printf %s {shlex.quote(desktop_entry)} | sudo tee /usr/share/applications/cyberchef.desktop >/dev/null"])
+    run(["bash", "-lc", "command -v update-desktop-database >/dev/null && sudo update-desktop-database || true"], check=False)
+
+# ---------- Steghide (same logic as before) ----------
 def install_steghide_deb():
     print("🕵️ Checking Steghide version...")
     try:
@@ -118,7 +202,6 @@ def install_steghide_deb():
              "-o", 'Dpkg::Options::=--force-confold'])
     run("rm -f /tmp/steghide.deb")
 
-    # Only pin on Parrot to avoid fighting with other distros’ repos
     if is_parrot():
         print("📌 Pinning Steghide 0.6.0 on Parrot to prevent downgrade...")
         pin_file = "/etc/apt/preferences.d/steghide"
@@ -130,7 +213,6 @@ Pin-Priority: 1001
             f.write(pin_contents)
         run(["sudo", "mv", "/tmp/steghide-pin", pin_file])
 
-# --- NEW: unified, OS-aware installer ---
 def install_steghide_auto(mode: str = "auto"):
     """
     mode: 'auto' (default), 'deb', or 'apt'
@@ -152,10 +234,42 @@ def install_steghide_auto(mode: str = "auto"):
         apt_install_packages(["steghide"])
         return
 
-    # mode == 'deb' OR (auto and Parrot)
     print("🧩 Installing Steghide via patched .deb...")
     install_steghide_deb()
 
+# ---------- Helpers for john/*2john parity ----------
+def ensure_john_and_helpers_on_path():
+    print("🧰 Ensuring john/*2john helpers are in PATH...")
+    # john symlink
+    for cand in ("/usr/sbin/john", "/usr/bin/john"):
+        if os.path.exists(cand) and os.access(cand, os.X_OK):
+            run(["sudo", "ln", "-sf", cand, "/usr/local/bin/john"], check=False)
+            break
+    # /usr/sbin/*2john
+    for root in ("/usr/sbin",):
+        if os.path.isdir(root):
+            for name in os.listdir(root):
+                if name.endswith("2john"):
+                    src = os.path.join(root, name)
+                    if os.access(src, os.X_OK):
+                        run(["sudo", "ln", "-sf", src, f"/usr/local/bin/{name}"], check=False)
+    # /usr/share/john/*2john + *2john.py (wrap if non-executable)
+    share = "/usr/share/john"
+    if os.path.isdir(share):
+        for name in os.listdir(share):
+            if name.endswith("2john") or name.endswith("2john.py"):
+                src = os.path.join(share, name)
+                dst = f"/usr/local/bin/{name}"
+                if os.access(src, os.X_OK):
+                    run(["sudo", "ln", "-sf", src, dst], check=False)
+                else:
+                    wrapper = f"""#!/usr/bin/env bash
+exec python3 "{src}" "$@"
+"""
+                    run(["bash", "-lc", f"printf %s {shlex.quote(wrapper)} | sudo tee {shlex.quote(dst)} >/dev/null"])
+                    run(["sudo", "chmod", "+x", dst], check=False)
+
+# ---------- Git ----------
 def get_git_config(key):
     res = subprocess.run(["git", "config", "--global", key],
                          capture_output=True, text=True)
@@ -193,7 +307,7 @@ def configure_git(git_name=None, git_email=None):
     if git_name and git_email:
         run(["git", "config", "--global", "user.name", git_name])
         run(["git", "config", "--global", "user.email", git_email])
-        run(["git", "config", "--global", "credential.helper", "store"])
+        run(["git", "config", "—global", "credential.helper", "store"])
         print("✅ Git configuration saved.")
     else:
         print("⚠️  Skipping Git prompts (non-interactive).")
@@ -201,15 +315,15 @@ def configure_git(git_name=None, git_email=None):
         print("    - Flags: --git-name 'Your Name' --git-email 'you@example.com'")
         print("    - Or env: GIT_NAME='Your Name' GIT_EMAIL='you@example.com'")
 
-# --- UPDATED: add CLI for steghide mode ---
+# ---------- CLI ----------
 def parse_args():
     p = argparse.ArgumentParser(description="CCRI CyberKnights environment setup")
     p.add_argument("--git-name", help="Git user.name (non-interactive)")
     p.add_argument("--git-email", help="Git user.email (non-interactive)")
     p.add_argument("--steghide-mode",
-                   choices=["auto", "deb", "apt"],
+                   choices=["auto", "deb"],
                    default="auto",
-                   help="Install Steghide using patched deb, repo apt, or auto (default)")
+                   help="Install Steghide using patched deb or auto (Parrot=deb, others=apt)")
     return p.parse_args()
 
 def main():
@@ -219,6 +333,7 @@ def main():
     print("=" * 60 + "\n")
 
     preseed_wireshark_and_install()
+    ensure_dumpcap_nonroot()
 
     apt_packages = [
         "git", "python3", "python3-pip", "python3-venv", "gcc", "build-essential",
@@ -228,15 +343,25 @@ def main():
         "gnome-terminal",
         "exiftool", "zbar-tools", "hashcat", "unzip", "libmcrypt4",
         "nmap", "qrencode", "vim-common", "util-linux",
-        "binwalk", "fcrackzip", "john", "radare2", "imagemagick", "hexedit", "feh",
+        "binwalk", "fcrackzip", "john", "radare2", "imagemagick", "hexedit", "feh", "eog",
+        "p7zip-full", "ncat",
     ]
     apt_install_packages(apt_packages)
 
-    # ⬇️ OS-aware Steghide install
+    # Steghide (OS-aware)
     install_steghide_auto(args.steghide_mode)
 
+    # PATH fixes & helpers
+    ensure_john_and_helpers_on_path()
+
+    # Optional extras to match live-CD UX
+    install_cyberchef_offline()
+
+    # Python tooling
     pip_install()
     install_zsteg()
+
+    # Git config
     configure_git(args.git_name, args.git_email)
 
     print("\n✅ Base environment ready.")
