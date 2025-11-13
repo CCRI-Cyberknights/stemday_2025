@@ -1,77 +1,60 @@
-# 🛰️ Challenge 17: Nmap Scan Puzzle
+# 📡 Challenge 17: Nmap Scan Puzzle
 
-Several suspicious services are running on the local system.  
-Your job is to **scan**, **probe**, and **identify** the real agency flag hiding in plain sight.
-
----
-
-## 🎯 Your Mission
-
-1. Scan for open TCP ports on localhost in the 9000–9100 range.  
-2. Investigate the responses from any open ports you find.  
-3. Identify the **real** flag from among decoys and noise.  
-4. Save it to a file named `flag.txt`.
+Several suspicious services are running on the local system.
+Your mission: **scan, probe, and identify the real agency flag hiding in plain sight.**
 
 ---
 
-## ⚠️ Important Clues
+## 🧩 Your Objective
 
-- Some ports respond with nonsense (junk output or developer messages).  
-- Four ports will return **plausible-looking fake flags**.  
-- Only **one port** contains the real flag that matches the agency's expected format.  
-
-✅ The correct flag follows this format:  
-**CCRI-AAAA-1111**
+1. Scan for open **TCP ports on localhost** in the **9000–9100** range.
+2. Investigate the responses from any open ports.
+3. Identify the *real* flag among decoys and noise.
+4. Save the correct flag into a file named `flag.txt`.
 
 ---
 
-## 🧰 Suggested Tools & Commands
+## 🛠 Investigation Steps
 
-| Tool / Command                                  | Purpose                                             |
-|-------------------------------------------------|-----------------------------------------------------|
-| `nmap -p9000-9100 localhost`                    | Discover open ports in the specified range          |
-| `nmap -sV --version-light -p9000-9100 localhost`| Identify possible service versions (optional)       |
-| `curl http://localhost:PORT`                    | Retrieve response data from a specific service      |
-| `nc localhost PORT`                             | Manually connect to a service for raw interaction   |
-| `grep "CCRI-"` or regex                         | Help spot flag-like strings in output               |
+* Begin with an **Nmap scan** of the port range.
+* For each open port, use `curl` or `nc` to retrieve the service’s response.
+* Look carefully for flag-like strings — even minor differences matter.
+* Compare responses across ports.
+* Four ports will return **plausible fake flags**.
+* Other ports may return nonsense or developer notes.
+* Only **one** port contains a flag matching the agency’s official format.
 
----
+You may find it helpful to record each port’s response in a separate notes file.
 
-## 📝 Investigation Strategy
-
-1. Begin with an **nmap** scan to find open ports in the 8000–8100 range.
-2. For each open port, use **curl** or **nc** to retrieve the service’s response.
-3. Look for flag-like strings — be alert to small differences that distinguish the real one.
-4. Compare responses. Not all that looks like a flag truly is one.
-
-You may wish to jot down what each port returns in a separate file.
+> 🔎 **Tip:**
+> This simulates a real-world pentest scenario — services often return unexpected data.
+> Train your eye to spot anomalies and subtle clues.
 
 ---
 
-## 📂 Files in this Folder
+## 🛠 Tools & Techniques
 
-- *(None — everything happens in the terminal)*
+| Tool / Command                                   | Purpose                                         |
+| ------------------------------------------------ | ----------------------------------------------- |
+| `nmap -p9000-9100 localhost`                     | Discover open ports in the specified range      |
+| `nmap -sV --version-light -p9000-9100 localhost` | Optionally identify service versions            |
+| `curl http://localhost:PORT`                     | Retrieve response data from a specific port     |
+| `nc localhost PORT`                              | Manually interact with a service for raw output |
+| `grep "CCRI-"` or regex filters                  | Spot flag-like strings in output                |
+
+---
+
+## 📂 Files in This Folder
+
+*(None — all work occurs directly in the terminal.)*
 
 ---
 
 ## 🏁 Flag Format
 
-The real flag will look like:
+All flags follow the official format:
 
-**CCRI-AAAA-1111**
+**`CCRI-AAAA-1111`**
 
-When you find it, submit it by running:
-
-```
-echo "CCRI-AAAA-1111" > flag.txt
-```
-
-(Replace `AAAA-1111` with the correct code.)
-
----
-
-## 🧠 Analyst's Tip
-
-This simulates a real-world pentest scenario:
-Services often respond with unexpected data — some of it useful, some of it noise.
-Train your eye to spot anomalies and patterns that reveal the truth.
+Replace `AAAA` and the digits with the correct values you uncover.
+Enter the flag into the website to verify your answer.

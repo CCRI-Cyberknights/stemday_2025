@@ -1,42 +1,66 @@
-# Challenge 1: Steganography decode  
----
-Steganography is the art of the concealment of information and messages inside of another file like embedding a text file inside an image or mp3 so it appears unchanged to the average person. Unlike encryption the aim is to make the data invisible but readable to the target.
+# 🐿️ Challenge 01: Steganography Decode
 
----
-During the Knights investigation into the CryptKeepers a suspicious image was found among the files that appeared normal at first, but our analysts believe it contains hidden data.
-
-## Objective:
-  uncover and decode squirrel.jpg to extract the embedded secret messages they concealed inside this picture. 
-
-## Investigator's Journal: 
-  Cryptkeepers operatives often hide things in plain sight... and they tend to reuse the same password across tools. Not all of these tools will reveal useful information, some may lead to dead ends. The challenge lies in experimenting and connecting the dots. Does the image contain metadata or embedded content? Are there readable strings or hidden files inside? Might a password be needed to reveal the payload?.Sometimes the best secrets are the ones hiding in plain sight.  
+Steganography is the art of hiding information inside another file — embedding messages within images, audio, or other media so that the original file appears unchanged to the average person.
+Unlike encryption, which makes data unreadable, steganography aims to make data **invisible**.
 
 ---
 
-##  Tools & Techniques
-
-Try out some of these Linux tools each reveals different kinds of secrets:
-
-| Tool      | Use Case                                              | Example Command                      |
-|-----------|--------------------------------------------------------|--------------------------------------|
-| `strings` | View readable text inside binary files                | `strings squirrel.jpg | less`       |
-| `exiftool`| Inspect metadata (camera info, author, hidden tags)   | `exiftool squirrel.jpg`              |
-| `binwalk` | Detect and extract embedded files                     | `binwalk -e squirrel.jpg`            |
-| `zsteg`   | Analyze LSB steganography in PNGs (JPG support limited)| `zsteg squirrel.jpg *(may not work here)*` |
-| `steghide`| Embed/extract files using a passphrase                | `steghide extract -sf squirrel.jpg`  |
-| `file`    | Check file type and structure                         | `file squirrel.jpg`                  |
-| `xxd`     | View raw hex data                                     | `xxd squirrel.jpg | less`           |
-
-> Tip: Use `man` or `--help` with any command to learn more.
+During the Knights’ investigation into the CryptKeepers, a suspicious image was discovered.
+It appears normal at first glance, but analysts believe it contains **hidden data**.
 
 ---
 
-## Files in This Folder
+## 🧩 Objective
 
-* `squirrel.jpg` — The suspicious image
-
-All flags follow the same format: CCRI-AAAA-1111 Replace AAAA and the numbers with the code found.Then Input the flag into the website to verify the answer.  
+Uncover and decode `squirrel.jpg` to extract the secret message concealed inside the image.
 
 ---
 
- 
+## 📝 Investigator’s Journal
+
+CryptKeepers operatives often hide things in plain sight — and they love reusing the same passwords across tools.
+
+Not every tool will reveal something useful; some methods will lead to dead ends.
+The real challenge is experimenting, correlating clues, and following the trail:
+
+* Does the image contain suspicious metadata?
+* Are there embedded files or readable strings?
+* Is a password protecting the payload?
+* Could the real clue be hiding in the simplest output?
+
+Sometimes the best secrets are the ones hiding exactly where you least expect them.
+
+---
+
+## 🛠 Tools & Techniques
+
+Try out the following Linux tools — each uncovers different types of hidden data:
+
+| Tool       | Use Case                                       | Example Command                       |
+| ---------- | ---------------------------------------------- | ------------------------------------- |
+| `strings`  | View readable text inside binary files         | `strings squirrel.jpg \| less`        |
+| `exiftool` | Inspect metadata (camera info, tags, comments) | `exiftool squirrel.jpg`               |
+| `binwalk`  | Detect and extract embedded files              | `binwalk -e squirrel.jpg`             |
+| `zsteg`    | Analyze LSB steganography (best for PNGs)      | `zsteg squirrel.jpg` *(may not work)* |
+| `steghide` | Extract files using a passphrase               | `steghide extract -sf squirrel.jpg`   |
+| `file`     | Check file type and structure                  | `file squirrel.jpg`                   |
+| `xxd`      | View raw hex data                              | `xxd squirrel.jpg \| less`            |
+
+> 💡 **Tip:** Use `man` or `--help` with any command to learn more.
+
+---
+
+## 📂 Files in This Folder
+
+* `squirrel.jpg` — The suspicious image.
+
+---
+
+## 🏁 Flag Format
+
+All flags follow the standard structure:
+
+**`CCRI-AAAA-1111`**
+
+Replace `AAAA` and the digits with the code you uncover,
+then submit the flag on the website to verify your answer.

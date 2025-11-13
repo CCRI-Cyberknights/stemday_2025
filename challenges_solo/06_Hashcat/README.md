@@ -1,47 +1,81 @@
-# Challenge 6: Hashcat ChainCrack Challenge
+# 🔗 Challenge 06: Hashcat ChainCrack Challenge
 
-This challenge combines multiple skills: Hash Cracking- MD5 hashes are outdated and vulnerable. Tools like Hashcat can rapidly test passwords against them. ZIP Decryption- password-protected ZIP segments must be unlocked using the cracked passwords. Base64 Decoding- Each ZIP contains Base64-encoded content. Flag Reassembly- After decoding, you'll need to piece the segments back together to identify the real flag.
+This challenge combines **four disciplines**:
 
-Cryptkeeper operatives encrypted a message and split it into parts. Each part is locked behind a password, and each password is hidden inside an MD5 hash.  
- You've recovered:
+* **Hash Cracking** — MD5 hashes are outdated and vulnerable. Tools like Hashcat can rapidly test passwords.
+* **ZIP Decryption** — Each ZIP segment is locked with a password you must recover.
+* **Base64 Decoding** — Every ZIP contains Base64-encoded content.
+* **Flag Reassembly** — Once decoded, the fragments must be stitched back together to reveal the real flag.
 
-- `hashes.txt`: 3 password hashes  
-- `wordlist.txt`: Possible passwords  
-- `segments/`: Three ZIP archives (one per password)
+CryptKeeper operatives encrypted a message and split it into three parts.
+Each part is locked behind a password — and each password is hidden inside an MD5 hash.
 
-## Objective: 
-Examine the files 
-Crack the hashes using a hash cracking tool.
-Use the recovered passwords to extract each ZIP archive. Decode each extracted file using Base64. 
-Reassemble the decoded outputs to form possible flags.  
+You’ve recovered:
 
-## Investigator’s Journal: 
-Three parts. Three locks. Three keys hidden in plain sight. They were sloppy enough to leave the hashes all you need to do is match them to the right keys. Once inside, the truth is scattered across the fragments. You’ll need to chain together several techniques crack, extract, decode, and reconstruct to reveal the hidden message. Each archive, once unlocked, contains a scrambled part of a flag. Crack the hashes, extract and decode the segments, and reassemble the true flag. 
+* `hashes.txt` — three MD5 password hashes
+* `wordlist.txt` — a list of possible passwords
+* `segments/` — three encrypted ZIP archives (one per password)
 
 ---
 
-## Tools & Techniques
+## 🧩 Objective
 
-Here’s a selection of tools that may help you complete each phase:
-
-| Phase               | Tool         | Example Use Case / Command                                          |
-|--------------------|--------------|---------------------------------------------------------------------|
-| Crack MD5 Hashes    | `hashcat`    | `hashcat -m 0 -a 0 hashes.txt wordlist.txt`                         |
-|                    | `john` + `--format=raw-md5` | Alternative cracking approach                                 |
-| Extract ZIPs       | `unzip`      | `unzip -P password segments/part1.zip`                              |
-| Base64 Decoding    | `base64`     | `base64 --decode decoded_file.txt`                                  |
-| Reassemble Segments| `cat` or script | Concatenate decoded parts and review them                           |
-
-> Tip: Order matters when reassembling the flag. The decoded parts likely correspond to different sections of the flag.
+1. Examine the provided files.
+2. Crack the MD5 hashes using a hash-cracking tool.
+3. Use the recovered passwords to extract each ZIP archive.
+4. Decode the extracted files from Base64.
+5. Reassemble the decoded outputs to form the true flag.
 
 ---
 
-##  Files in This Folder
+## 📝 Investigator’s Journal
 
-* `hashes.txt` — List of MD5 hashes to crack
+Three parts. Three locks. Three keys hidden in plain sight.
+They were sloppy enough to leave the hashes — all you need to do is match them to the right passwords.
+
+Once inside, the truth is scattered across fragments.
+You’ll need to chain several techniques together: **crack → extract → decode → assemble**.
+
+Each unlocked archive contains a scrambled segment of the final flag.
+Only by piecing them together in the correct order will the true flag emerge.
+
+---
+
+## 🛠 Tools & Techniques
+
+Use these tools to complete each phase of the challenge:
+
+| Phase                | Tool                        | Example Use Case / Command                  |
+| -------------------- | --------------------------- | ------------------------------------------- |
+| **Crack MD5 Hashes** | `hashcat`                   | `hashcat -m 0 -a 0 hashes.txt wordlist.txt` |
+|                      | `john` (`--format=raw-md5`) | Alternative cracking method                 |
+| **Extract ZIPs**     | `unzip`                     | `unzip -P password segments/part1.zip`      |
+| **Base64 Decode**    | `base64`                    | `base64 --decode decoded_file.txt`          |
+| **Reassemble Parts** | `cat` or a Python script    | Concatenate and examine decoded segments    |
+
+> 💡 **Tip:**
+> Order matters when reassembling the final flag.
+> The decoded segments represent different sections — match them carefully.
+
+---
+
+## 📂 Files in This Folder
+
+* `hashes.txt` — The MD5 hashes to crack
 * `wordlist.txt` — Potential password candidates
-* `segments/` — Folder containing 3 encrypted ZIP files (part1.zip, part2.zip, part3.zip)
+* `segments/` — Folder containing three encrypted ZIP files:
 
-All flags follow the same format: CCRI-AAAA-1111 Replace AAAA and the numbers with the code you uncover Input the flag into the website to verify the answer. 
+  * `part1.zip`
+  * `part2.zip`
+  * `part3.zip`
 
---- 
+---
+
+## 🏁 Flag Format
+
+All flags follow the official structure:
+
+**`CCRI-AAAA-1111`**
+
+Replace `AAAA` and the digits with the values you uncover.
+Then enter the flag into the website to verify your answer.

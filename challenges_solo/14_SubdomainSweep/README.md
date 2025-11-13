@@ -1,76 +1,64 @@
 # 🌐 Challenge 14: Subdomain Sweep
 
-Liber8’s internal infrastructure spans multiple subdomains, each hosting seemingly mundane content.  
+Liber8’s internal infrastructure spans multiple subdomains, each hosting seemingly mundane content.
 But one of them is hiding an authentic agency flag — buried somewhere in the HTML source.
 
 ---
 
-## 🎯 Your Mission
+## 🧩 Your Objective
 
-Your task is to sweep through the HTML files from five known subdomains and identify which one conceals the real flag.
+Sweep through the HTML files from **five known subdomains** and determine which one conceals the real flag.
 
-You're looking for:
+Only **one** subdomain contains a valid flag.
+All others include clever imitations using:
 
-**CCRI-AAAA-1111**
+* Wrong prefixes
+* Reversed formats
+* Fake agency codes
+* Incorrect or malformed structures
 
-Only one subdomain will display a valid flag in this exact format.  
-All others contain clever imitations — wrong prefixes, reversed formats, or fake agency codes.
+Inspect each `.html` file using your preferred tools. Look for any text string that resembles a flag — in `<p>` tags, `<pre>` blocks, comments, or debug-style output.
+
+Remember:
+**Flags may not be visible in the rendered page.**
+Sometimes the real payload is tucked inside `<pre>` blocks, nested tags, or hidden behind developer comments.
 
 ---
 
 ## 🛠 Tools & Techniques
 
-| Tool/Method                              | What it helps you do                                  |
-|------------------------------------------|--------------------------------------------------------|
-| `less *.html`                            | Scroll through raw HTML responses                      |
-| `grep "CCRI-" *.html`                    | Search for possible flags by prefix                    |
-| `grep -E '[A-Z]{4}-[0-9]{4}' *.html`     | Broader pattern match (might reveal fake flags)        |
-| `xdg-open alpha.liber8.local.html`       | Open HTML visually in browser for formatting clues     |
-| `Ctrl+U` in browser                      | View page source — some flags might not be visible     |
-| `Ctrl+F` then search `CCRI`              | Find embedded data quickly in large source files       |
+| Tool / Method                        | What It Helps You Do                              |
+| ------------------------------------ | ------------------------------------------------- |
+| `less *.html`                        | Scroll through raw HTML responses                 |
+| `grep "CCRI-" *.html`                | Search for possible flags by prefix               |
+| `grep -E '[A-Z]{4}-[0-9]{4}' *.html` | Broad pattern match — may reveal fakes            |
+| `xdg-open alpha.liber8.local.html`   | Open an HTML file visually in a browser for clues |
+| **Ctrl+U** (in browser)              | View page source — some flags may not be visible  |
+| **Ctrl+F** → search `CCRI`           | Quickly locate embedded data in source code       |
 
-💡 Real security analysts know: just because you see something on the page doesn’t mean that’s how it’s structured in the source.
-
----
-
-## 📝 How to Investigate
-
-1. Inspect each `.html` file with your preferred tools.
-2. Look for any text string that resembles a flag — in paragraph tags, `<pre>` blocks, or debug-style output.
-3. Ignore decoys that are malformed, use other prefixes, or break the flag structure.
-4. Once you confirm the correct flag, save it to a file using:
-
-```
-echo "CCRI-AAAA-1111" > flag.txt
-```
+> 💡 **Tip:** What you *see* in the browser isn’t always what’s actually **in the source**.
+> Flags may hide inside developer comments, debug logs, deeply nested tags, or `<pre>` blocks.
 
 ---
 
-## 🗂️ Files in This Folder
+## 📂 Files in This Folder
 
-* alpha.liber8.local.html
-* beta.liber8.local.html
-* gamma.liber8.local.html
-* delta.liber8.local.html
-* omega.liber8.local.html
+* `alpha.liber8.local.html`
+* `beta.liber8.local.html`
+* `gamma.liber8.local.html`
+* `delta.liber8.local.html`
+* `omega.liber8.local.html`
 
 Each file represents a web page hosted on its respective internal subdomain.
+Only one contains the genuine flag — the rest are red herrings.
 
 ---
 
-## 🏁 Flag Format Reminder
+## 🏁 Flag Format
 
-The only valid flag will match:
+All flags follow the official format:
 
-**CCRI-AAAA-1111**
+**`CCRI-AAAA-1111`**
 
-The rest are misleading red herrings.
-
----
-
-## 🔎 Field Tip
-
-Flags may not always be out in the open.
-Scan the source code carefully — sometimes the real payload is tucked inside `<pre>` blocks or hidden behind developer comments or debug logs.
-
-Stay sharp, agent. You're on the right track.
+Replace `AAAA` and the digits with the correct values you uncover.
+Then enter the flag into the verification website.
