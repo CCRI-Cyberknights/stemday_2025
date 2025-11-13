@@ -15,5 +15,3 @@ The picture looks completely normal, but it’s been altered using *steganograph
 - (The flag will be saved as `flag.txt` when you succeed.)
 
 🏁 Flag format: **CCRI-AAAA-1111**
-
-maria edit
