@@ -1,20 +1,17 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:48:22 GMT
-Server: Apache/2.4.54 (Ubuntu)
+Date: Sun, 30 Jun 2025 15:54:32 GMT
+Server: Go HTTP Server/1.19
 Content-Type: application/json
-Cache-Control: no-store
+Cache-Control: private, no-cache
 X-Powered-By: ASP.NET Core/7.0
-X-Flag: CCRI-QYEC-2123
+X-Flag: CCRI-EPFL-7074
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=4etzle74rz0b; HttpOnly; Secure
 
-<html>
-  <head><title>Liber8 Portal</title></head>
-  <body>
-    <h1>Welcome to Liber8</h1>
-    <p>System maintenance is underway. Some services may be unavailable.</p>
-  </body>
-</html>
+{
+  "status": "ok",
+  "message": "API version 1.2.4 is running.",
+  "notes": "No maintenance scheduled."
+}
 
-<!-- Debug: API response size 512 bytes -->
+<!-- Debug: Temporary caching enabled -->

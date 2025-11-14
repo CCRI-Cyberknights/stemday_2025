@@ -1,17 +1,15 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:52:04 GMT
-Server: Go HTTP Server/1.19
-Content-Type: application/json
-Cache-Control: private, no-cache
+Date: Sun, 30 Jun 2025 15:53:35 GMT
+Server: nginx/1.24.0
+Content-Type: text/html; charset=UTF-8
+Cache-Control: no-store
 X-Powered-By: Python/3.11.4
-X-Flag: CCRI-IYIW-1571
+X-Flag: AXEP-IAZC-2821
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
+Set-Cookie: sessionid=h9ea2q8ih5ty; HttpOnly; Secure
 
-{
-  "status": "ok",
-  "message": "API version 1.2.4 is running.",
-  "notes": "No maintenance scheduled."
-}
+Welcome to the Liber8 data endpoint.
+This endpoint returns plain text responses.
 
-<!-- Developer note: Remove X-Test headers before release -->
+<!-- To-do: Update security headers on staging -->

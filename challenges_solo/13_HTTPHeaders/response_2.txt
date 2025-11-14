@@ -1,17 +1,20 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:46:13 GMT
-Server: Go HTTP Server/1.19
+Date: Sun, 30 Jun 2025 15:59:24 GMT
+Server: Apache/2.4.54 (Ubuntu)
 Content-Type: text/plain; charset=UTF-8
-Cache-Control: public, max-age=86400
+Cache-Control: private, no-cache
 X-Powered-By: Python/3.11.4
-X-Flag: AJDC-3328-PQZJ
+X-Flag: CENL-YLZR-0901
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
+Set-Cookie: sessionid=fu7z8xe013gk; HttpOnly; Secure
 
-{
-  "status": "ok",
-  "message": "API version 1.2.4 is running.",
-  "notes": "No maintenance scheduled."
-}
+<html>
+  <head><title>Liber8 Portal</title></head>
+  <body>
+    <h1>Welcome to Liber8</h1>
+    <p>System maintenance is underway. Some services may be unavailable.</p>
+  </body>
+</html>
 
-<!-- Debug: Temporary caching enabled -->
+<!-- Developer note: Remove X-Test headers before release -->

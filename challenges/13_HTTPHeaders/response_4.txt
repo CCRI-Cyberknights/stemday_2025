@@ -1,14 +1,19 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:59:27 GMT
-Server: Apache/2.4.54 (Ubuntu)
-Content-Type: text/plain; charset=UTF-8
-Cache-Control: private, no-cache
-X-Powered-By: ASP.NET Core/7.0
-X-Flag: TKFJ-UXMO-1639
+Date: Sun, 30 Jun 2025 15:53:30 GMT
+Server: Liber8-Server/2.3.1
+Content-Type: text/html; charset=UTF-8
+Cache-Control: no-store
+X-Powered-By: PHP/8.1.12
+X-Flag: HPUO-5430-GQQG
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
 
-Welcome to the Liber8 data endpoint.
-This endpoint returns plain text responses.
+<html>
+  <head><title>Liber8 Portal</title></head>
+  <body>
+    <h1>Welcome to Liber8</h1>
+    <p>System maintenance is underway. Some services may be unavailable.</p>
+  </body>
+</html>
 
-<!-- Developer note: Remove X-Test headers before release -->
+<!-- Debug: API response size 512 bytes -->

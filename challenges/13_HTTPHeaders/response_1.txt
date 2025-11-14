@@ -1,10 +1,10 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:59:47 GMT
-Server: Apache/2.4.54 (Ubuntu)
-Content-Type: text/html; charset=UTF-8
-Cache-Control: no-store
-X-Powered-By: Node.js/18.16.0
-X-Flag: QAHQ-5388-EWHT
+Date: Sun, 30 Jun 2025 15:58:56 GMT
+Server: Liber8-Server/2.3.1
+Content-Type: application/json
+Cache-Control: public, max-age=86400
+X-Powered-By: Ruby on Rails/7.1.0
+X-Flag: CCRI-TDPC-8291
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
 
@@ -16,4 +16,4 @@ X-Content-Type-Options: nosniff
   </body>
 </html>
 
-<!-- Developer note: Remove X-Test headers before release -->
+<!-- Debug: API response size 512 bytes -->

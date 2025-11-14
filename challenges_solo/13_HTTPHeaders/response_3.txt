@@ -1,13 +1,13 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:58:07 GMT
-Server: Liber8-Server/3.0.0-beta
-Content-Type: application/json
+Date: Sun, 30 Jun 2025 15:54:11 GMT
+Server: Liber8-Server/2.3.1
+Content-Type: text/plain; charset=UTF-8
 Cache-Control: public, max-age=86400
-X-Powered-By: ASP.NET Core/7.0
-X-Flag: DSIY-5278-LWXA
+X-Powered-By: Python/3.11.4
+X-Flag: WSBP-9245-UEJK
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=84c9ulehmnld; HttpOnly; Secure
+Set-Cookie: sessionid=3emfedts9e8p; HttpOnly; Secure
 
 <html>
   <head><title>Data Service</title></head>
@@ -17,4 +17,4 @@ Set-Cookie: sessionid=84c9ulehmnld; HttpOnly; Secure
   </body>
 </html>
 
-<!-- Debug: Session created for client 10.6.112.3 -->
+<!-- To-do: Update security headers on staging -->

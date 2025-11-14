@@ -1,13 +1,12 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:48:41 GMT
-Server: Apache/2.4.54 (Ubuntu)
-Content-Type: text/plain; charset=UTF-8
-Cache-Control: no-store
-X-Powered-By: Ruby on Rails/7.1.0
-X-Flag: YWZD-1784-CBIN
+Date: Sun, 30 Jun 2025 15:50:33 GMT
+Server: Go HTTP Server/1.19
+Content-Type: text/html; charset=UTF-8
+Cache-Control: public, max-age=86400
+X-Powered-By: ASP.NET Core/7.0
+X-Flag: IZVZ-2404-VPKE
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=bo97lvz6ofxf; HttpOnly; Secure
 
 <html>
   <head><title>Data Service</title></head>
