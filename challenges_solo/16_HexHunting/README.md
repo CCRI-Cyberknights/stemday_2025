@@ -1,73 +1,54 @@
-# 🧠 Challenge 16: Hex Flag Hunter
+# 🧪 Challenge 16: Hex Flag Hunter
 
-Liber8 hackers left behind a mysterious binary: `hex_flag.bin`.
-
-It’s too small to be a legitimate executable — which means it was likely crafted for something more… covert.
-
----
-
-## 🎯 Your Mission
-
-Use binary inspection techniques to uncover a hidden flag embedded within the file.
-
-But beware: there are five possible candidates hidden inside.  
-Only ONE of them is the true agency flag.
+Cryptkeepers hackers left behind a mysterious binary: `hex_flag.bin`.
+It’s far too small to be a legitimate executable — which means it was likely crafted for something more… covert.
 
 ---
 
-## 🧰 Recommended Tools & Commands
+## 🧩 Your Objective
 
-| Tool / Command                          | Purpose                                                |
-|-----------------------------------------|--------------------------------------------------------|
-| `strings hex_flag.bin`                  | Extract readable text from the binary                 |
-| `grep "CCRI-"` or regex search patterns | Narrow down flag candidates                           |
-| `xxd hex_flag.bin | less`               | View hex and ASCII side-by-side                       |
-| `hexedit hex_flag.bin`                 | Interactively browse and search inside the file       |
-| `grep -abo CCRI-` hex_flag.bin         | Show byte offsets of embedded flags (binary-aware)    |
-| `dd` + `xxd`                            | Show hex context for any specific byte offset         |
+Use binary inspection techniques to uncover a **hidden flag** embedded within the file.
 
-💡 The correct flag will follow this format:
+But beware:
+There are **five** possible flag candidates hidden inside.
+Only **one** of them is the true Knight flag.
 
-**CCRI-AAAA-1111**
+### How to Begin
 
-Others may look convincing, but only one is real.
+* Start with `strings` to see any readable content inside.
+* Search for candidate flags using `grep`, regex, or manual scanning.
+* Validate which flags feel legitimate by reviewing their **context** — surrounding hex bytes can be very revealing.
+* Save promising candidates to a notes file if needed.
+
+Not all flags are created equal. Some are planted to mislead you.
+Think like a forensic analyst. Verify before you trust.
 
 ---
 
-## 📝 Challenge Strategy
+## 🛠 Tools & Techniques
 
-1. Start with `strings` to see what readable content is inside.
-2. Search for candidate flags using `grep`, regular expressions, or visual scanning.
-3. Validate which flags feel legitimate by reviewing their context (surrounding hex bytes help).
-4. Consider saving promising candidates to a notes file for later review.
+| Tool / Command                   | Purpose                                                   |
+| -------------------------------- | --------------------------------------------------------- |
+| `strings hex_flag.bin`           | Extract readable text from the binary                     |
+| `grep "CCRI-"` or regex patterns | Narrow down possible flag candidates                      |
+| `xxd hex_flag.bin \| less`       | View the binary’s hex and ASCII layout                    |
+| `hexedit hex_flag.bin`           | Interactively browse and search inside the file           |
+| `grep -abo CCRI- hex_flag.bin`   | Show byte offsets of embedded flags (binary-aware search) |
+| `dd` + `xxd`                     | Display hex context around specific offsets               |
 
 ---
 
 ## 📂 Files in This Folder
 
-- `hex_flag.bin` – Suspicious binary to inspect.
+* `hex_flag.bin` — Suspicious binary containing multiple embedded flags.
 
 ---
 
 ## 🏁 Flag Format
 
-The valid flag will match this structure:
+All flags follow the official structure:
 
-**CCRI-AAAA-1111**
+**`CCRI-AAAA-1111`**
 
-Once you’ve found it, submit it by running:
-
-```
-echo "CCRI-AAAA-1111" > flag.txt
-```
-
-(Replace `AAAA-1111` with the real flag string.)
-
----
-
-## 🧠 Final Advice
-
-Not all flags are created equal. Some might have been inserted to throw you off.
-Check the context. Think like a forensic analyst. Trust your instincts.
-
-Your tools are sharp. Time to dissect the binary.
+Replace `AAAA` and the digits with the correct values you uncover.
+Then input the flag into the website to verify your answer.

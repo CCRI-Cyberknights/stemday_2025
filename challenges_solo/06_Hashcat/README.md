@@ -1,89 +1,81 @@
-# 🔓 Hashcat ChainCrack Challenge
+# 🔗 Challenge 06: Hashcat ChainCrack Challenge
 
-Liber8 operatives encrypted a message and split it into parts. Each part is locked behind a password, and each password is hidden inside an MD5 hash. You've recovered:
+This challenge combines **four disciplines**:
 
-- 🔐 `hashes.txt`: 3 password hashes  
-- 🗒️ `wordlist.txt`: Possible passwords  
-- 📦 `segments/`: Three ZIP archives (one per password)
+* **Hash Cracking** — MD5 hashes are outdated and vulnerable. Tools like Hashcat can rapidly test passwords.
+* **ZIP Decryption** — Each ZIP segment is locked with a password you must recover.
+* **Base64 Decoding** — Every ZIP contains Base64-encoded content.
+* **Flag Reassembly** — Once decoded, the fragments must be stitched back together to reveal the real flag.
 
-Each archive, once unlocked, contains a scrambled part of a flag. Your job: crack the hashes, extract and decode the segments, and reassemble the true CCRI flag.
+CryptKeeper operatives encrypted a message and split it into three parts.
+Each part is locked behind a password — and each password is hidden inside an MD5 hash.
+
+You’ve recovered:
+
+* `hashes.txt` — three MD5 password hashes
+* `wordlist.txt` — a list of possible passwords
+* `segments/` — three encrypted ZIP archives (one per password)
 
 ---
 
-## 🧠 What’s Going On?
+## 🧩 Objective
 
-This challenge combines multiple skills:
+1. Examine the provided files.
+2. Crack the MD5 hashes using a hash-cracking tool.
+3. Use the recovered passwords to extract each ZIP archive.
+4. Decode the extracted files from Base64.
+5. Reassemble the decoded outputs to form the true flag.
 
-1. **Hash Cracking** — MD5 hashes are outdated and vulnerable. Tools like Hashcat can rapidly test passwords against them.
-2. **ZIP Decryption** — The password-protected ZIP segments must be unlocked using the cracked passwords.
-3. **Base64 Decoding** — Each ZIP contains Base64-encoded content.
-4. **Flag Reassembly** — After decoding, you'll need to piece the segments back together and identify the real flag.
+---
+
+## 📝 Investigator’s Journal
+
+Three parts. Three locks. Three keys hidden in plain sight.
+They were sloppy enough to leave the hashes — all you need to do is match them to the right passwords.
+
+Once inside, the truth is scattered across fragments.
+You’ll need to chain several techniques together: **crack → extract → decode → assemble**.
+
+Each unlocked archive contains a scrambled segment of the final flag.
+Only by piecing them together in the correct order will the true flag emerge.
 
 ---
 
 ## 🛠 Tools & Techniques
 
-Here’s a selection of tools that may help you complete each phase:
+Use these tools to complete each phase of the challenge:
 
-| Phase               | Tool         | Example Use Case / Command                                          |
-|--------------------|--------------|---------------------------------------------------------------------|
-| Crack MD5 Hashes    | `hashcat`    | `hashcat -m 0 -a 0 hashes.txt wordlist.txt`                         |
-|                    | `john` + `--format=raw-md5` | Alternative cracking approach                                 |
-| Extract ZIPs       | `unzip`      | `unzip -P password segments/part1.zip`                              |
-| Base64 Decoding    | `base64`     | `base64 --decode decoded_file.txt`                                  |
-| Reassemble Segments| `cat` or script | Concatenate decoded parts and review them                           |
+| Phase                | Tool                        | Example Use Case / Command                  |
+| -------------------- | --------------------------- | ------------------------------------------- |
+| **Crack MD5 Hashes** | `hashcat`                   | `hashcat -m 0 -a 0 hashes.txt wordlist.txt` |
+|                      | `john` (`--format=raw-md5`) | Alternative cracking method                 |
+| **Extract ZIPs**     | `unzip`                     | `unzip -P password segments/part1.zip`      |
+| **Base64 Decode**    | `base64`                    | `base64 --decode decoded_file.txt`          |
+| **Reassemble Parts** | `cat` or a Python script    | Concatenate and examine decoded segments    |
 
-> Tip: Order matters when reassembling the flag. The decoded parts likely correspond to different sections of the flag.
-
----
-
-## 🧩 Investigator’s Journal
-
-🗒️ *“Three parts. Three locks. Three keys hidden in plain sight. They were sloppy enough to leave the hashes — all you need to do is match them to the right keys. Once inside, the truth is scattered across the fragments.”*
-
----
-
-## 📝 Your Objective
-
-1. Examine the following files:
-   - `hashes.txt` — contains the 3 MD5 hashes.
-   - `wordlist.txt` — contains the potential passwords.
-   - `segments/` — contains the encrypted ZIPs.
-
-2. Crack the hashes using a hash cracking tool.
-
-3. Use the recovered passwords to extract each ZIP archive.
-
-4. Decode each extracted file using Base64.
-
-5. Reassemble the decoded outputs to form possible flags.
-
-6. Only one flag will follow the official CCRI format.
-
-> If your tools print the final flag on screen, don’t forget to save it:
-
-```
-echo "CCRI-AAAA-1111" > final_flag.txt
-```
+> 💡 **Tip:**
+> Order matters when reassembling the final flag.
+> The decoded segments represent different sections — match them carefully.
 
 ---
 
 ## 📂 Files in This Folder
 
-* `hashes.txt` — List of MD5 hashes to crack
+* `hashes.txt` — The MD5 hashes to crack
 * `wordlist.txt` — Potential password candidates
-* `segments/` — Folder containing 3 encrypted ZIP files (part1.zip, part2.zip, part3.zip)
+* `segments/` — Folder containing three encrypted ZIP files:
+
+  * `part1.zip`
+  * `part2.zip`
+  * `part3.zip`
 
 ---
 
 ## 🏁 Flag Format
 
-The correct flag will look like this:
+All flags follow the official structure:
 
-**CCRI-AAAA-1111**
+**`CCRI-AAAA-1111`**
 
-Replace `AAAA` and `1111` with the values you uncover.
-
----
-
-💡 This challenge rewards persistence and precision. You’ll need to chain together several techniques — crack, extract, decode, and reconstruct — to reveal the hidden message.
+Replace `AAAA` and the digits with the values you uncover.
+Then enter the flag into the website to verify your answer.

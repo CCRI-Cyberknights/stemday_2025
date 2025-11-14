@@ -1,75 +1,67 @@
-# 🔐 ROT13 Decode Challenge
+# 🔐 Challenge 03: ROT13 Decode Challenge
 
-A scrambled message was intercepted from a compromised Liber8 communications relay. It appears to be human-readable… but twisted.
+ROT13 is a simple substitution cipher that rotates each letter 13 positions forward in the alphabet.
+After `Z`, it wraps back around to `A`.
 
-Your mission is to unscramble it and identify the real CCRI flag buried inside.
+It’s symmetrical:
+
+* `A` → `N`
+* `N` → `A`
+* Apply ROT13 twice and you return to the original message.
+
+It’s not secure — but it *is* great for confusing casual readers.
+
+A scrambled message was intercepted from a compromised CryptKeepers communication relay.
+It looks human-readable… just twisted.
 
 ---
 
-## 🧠 What is ROT13?
+## 🧩 Objective
 
-ROT13 is a basic substitution cipher that rotates each letter of the alphabet 13 positions forward. After 'Z', it wraps around back to 'A'.
+Decode the message in `cipher.txt` using any of the tools below.
+The decoded output may contain **multiple flag-like candidates**, but **only one** is real.
 
-It’s symmetrical:
-- A becomes N  
-- N becomes A  
-- Apply it twice to return to the original message
+ROT13 is simple, but don’t get complacent — only one decoded flag will match the correct structure.
 
-This method isn't secure — but it *is* good enough to confuse casual readers.
+---
+
+## 📝 Investigator’s Journal
+
+They really used that childish cipher again.
+At this point it’s practically a habit for them.
+
+Run it through a rotator and see what shakes loose.
 
 ---
 
 ## 🛠 Tools & Techniques
 
-Here are some tools that can help you decode ROT13 manually or automatically:
+These tools can help decode ROT13 automatically or manually:
 
-| Tool         | Use Case                                 | Example Command                                      |
-|--------------|------------------------------------------|------------------------------------------------------|
-| `tr`         | Translate character sets in shell        | `tr 'A-Za-z' 'N-ZA-Mn-za-m' < cipher.txt`           |
-| `python3`    | Use a one-liner with `codecs`            | `python3 -c "import codecs; print(codecs.decode(open('cipher.txt').read(), 'rot_13'))"` |
-| `vim`/`emacs`| ROT13 decoding built into editors         | `:%!tr A-Za-z N-ZA-Mn-za-m` (inside Vim normal mode) |
-| Online tools | ROT13 converters (use cautiously)         | Paste into ROT13 decoder sites (for non-sensitive data) |
+| Tool            | Use Case                                       | Example Command                                                                         |
+| --------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `tr`            | Translate character sets using shell utilities | `tr 'A-Za-z' 'N-ZA-Mn-za-m' < cipher.txt`                                               |
+| `python3`       | Use a one-liner with `codecs`                  | `python3 -c "import codecs; print(codecs.decode(open('cipher.txt').read(), 'rot_13'))"` |
+| `vim` / `emacs` | ROT13 decoding built into editors              | `:%!tr A-Za-z N-ZA-Mn-za-m` *(inside Vim normal mode)*                                  |
+| Online tools    | Browser-based ROT13 converters                 | *Use cautiously — avoid pasting real flags.*                                            |
 
-> Tip: ROT13 only affects letters A–Z. Numbers, punctuation, and formatting remain unchanged.
-
----
-
-## 🧩 Investigator’s Journal
-
-🗒️ *“They used that childish cipher again. At this point, it’s just a matter of habit. Run it through the rotator and see what shakes loose.”*
-
----
-
-## 📝 Your Objective
-
-Inspect this file:
-
-📁 **cipher.txt**
-
-Use one of the tools above to decode the message and search for a string matching the CCRI flag format. The transmission may contain **multiple candidates** — only one is real.
-
-If your decoding method displays output to the screen, save the result manually:
-
-```
-echo "CCRI-AAAA-1111" > decoded_output.txt
-```
+> 💡 **Tip:**
+> ROT13 only affects alphabetic characters (`A–Z`, `a–z`).
+> Numbers, punctuation, and spacing remain unchanged.
 
 ---
 
 ## 📂 Files in This Folder
 
-* `cipher.txt` — The scrambled transmission using ROT13.
+* `cipher.txt` — The scrambled transmission encoded with ROT13.
 
 ---
 
 ## 🏁 Flag Format
 
-Look for a flag in this format:
+All flags follow the official structure:
 
-**CCRI-AAAA-1111**
+**`CCRI-AAAA-1111`**
 
-Replace `AAAA` and `1111` with the real code found in the message.
-
----
-
-💡 ROT13 is one of the simplest ciphers — but don't let that fool you. The message might be clear once decoded, but only one flag is authentic.
+Replace `AAAA` and the digits with the code you uncover.
+Then enter the flag into the website to verify your answer.

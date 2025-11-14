@@ -1,76 +1,66 @@
-# 🕵️ Stego Decode Challenge
+# 🐿️ Challenge 01: Steganography Decode
 
-A suspicious image has surfaced during a Liber8 investigation. Intelligence analysts believe it contains hidden data that may expose an insider’s identity.
-
-Your job: extract the secret message embedded within this image.
+Steganography is the art of hiding information inside another file — embedding messages within images, audio, or other media so that the original file appears unchanged to the average person.
+Unlike encryption, which makes data unreadable, steganography aims to make data **invisible**.
 
 ---
 
-## 🧠 What is Steganography?
+During the Knights’ investigation into the CryptKeepers, a suspicious image was discovered.
+It appears normal at first glance, but analysts believe it contains **hidden data**.
 
-Steganography is the art of hiding messages in plain sight — like embedding a text file inside an image or song. Unlike encryption, its goal is to be invisible rather than unreadable.
+---
+
+## 🧩 Objective
+
+Uncover and decode `squirrel.jpg` to extract the secret message concealed inside the image.
+
+---
+
+## 📝 Investigator’s Journal
+
+CryptKeepers operatives often hide things in plain sight — and they love reusing the same passwords across tools.
+
+Not every tool will reveal something useful; some methods will lead to dead ends.
+The real challenge is experimenting, correlating clues, and following the trail:
+
+* Does the image contain suspicious metadata?
+* Are there embedded files or readable strings?
+* Is a password protecting the payload?
+* Could the real clue be hiding in the simplest output?
+
+Sometimes the best secrets are the ones hiding exactly where you least expect them.
 
 ---
 
 ## 🛠 Tools & Techniques
 
-Try out some of these Linux tools — each reveals different kinds of secrets:
+Try out the following Linux tools — each uncovers different types of hidden data:
 
-| Tool      | Use Case                                              | Example Command                      |
-|-----------|--------------------------------------------------------|--------------------------------------|
-| `strings` | View readable text inside binary files                | `strings squirrel.jpg | less`       |
-| `exiftool`| Inspect metadata (camera info, author, hidden tags)   | `exiftool squirrel.jpg`              |
-| `binwalk` | Detect and extract embedded files                     | `binwalk -e squirrel.jpg`            |
-| `zsteg`   | Analyze LSB steganography in PNGs (JPG support limited)| `zsteg squirrel.jpg *(may not work here)*` |
-| `steghide`| Embed/extract files using a passphrase                | `steghide extract -sf squirrel.jpg`  |
-| `file`    | Check file type and structure                         | `file squirrel.jpg`                  |
-| `xxd`     | View raw hex data                                     | `xxd squirrel.jpg | less`           |
+| Tool       | Use Case                                       | Example Command                       |
+| ---------- | ---------------------------------------------- | ------------------------------------- |
+| `strings`  | View readable text inside binary files         | `strings squirrel.jpg \| less`        |
+| `exiftool` | Inspect metadata (camera info, tags, comments) | `exiftool squirrel.jpg`               |
+| `binwalk`  | Detect and extract embedded files              | `binwalk -e squirrel.jpg`             |
+| `zsteg`    | Analyze LSB steganography (best for PNGs)      | `zsteg squirrel.jpg` *(may not work)* |
+| `steghide` | Extract files using a passphrase               | `steghide extract -sf squirrel.jpg`   |
+| `file`     | Check file type and structure                  | `file squirrel.jpg`                   |
+| `xxd`      | View raw hex data                              | `xxd squirrel.jpg \| less`            |
 
-> Tip: Use `man` or `--help` with any command to learn more.
-
-Not all of these tools will reveal useful information — some may lead to dead ends. The challenge lies in experimenting and connecting the dots.
-
----
-
-## 🧩 Investigator's Journal
-
-🗒️ *“Liber8 operatives often hide things in plain sight... and they tend to reuse the same password across tools. Predictable, rebellious, and catchy — that’s their style.”*
-
----
-
-## 📝 Your Objective
-
-Analyze the image:
-
-📁 **squirrel.jpg**
-
-Ask yourself:
-- Does the image contain metadata or embedded content?
-- Are there readable strings or hidden files inside?
-- Might a password be needed to reveal the payload?
-
-If you discover the flag in output or extract a file, be sure to save it manually:
-
-```
-echo "CCRI-AAAA-1111" > flag.txt
-```
+> 💡 **Tip:** Use `man` or `--help` with any command to learn more.
 
 ---
 
 ## 📂 Files in This Folder
 
-* `squirrel.jpg` — The image to investigate.
+* `squirrel.jpg` — The suspicious image.
 
 ---
 
 ## 🏁 Flag Format
 
-All flags follow the same format:
+All flags follow the standard structure:
 
-**CCRI-AAAA-1111**
+**`CCRI-AAAA-1111`**
 
-Replace `AAAA` and the numbers with the code you uncover.
-
----
-
-💡 This challenge rewards persistence and creative use of tools. Think like a cyber detective — sometimes the best secrets are the ones hiding in plain sight.
+Replace `AAAA` and the digits with the code you uncover,
+then submit the flag on the website to verify your answer.

@@ -1,56 +1,50 @@
-# 🧠 Challenge 12: QR Code Decode
+# 📷 Challenge 12: QR Code Decode
 
-Agents intercepted a packet of digital images passed between suspected operatives.  
-Each one is a QR code — a potential clue or a distraction.
+Agents intercepted a packet of digital images passed between suspected operatives.
+Each one is a QR code — a potential clue… or a distraction.
 
-Only **one** hides a valid agency flag. The rest? Misdirection.
+Only **one** hides a valid knight’s flag.
+The rest? Pure misdirection.
 
 ---
 
-## 🎯 Your Mission
+## 🧩 Your Objective
 
-Search through five suspicious QR codes and uncover which one hides a real agency flag.
+Search through **five suspicious QR codes** and uncover which one contains the real flag.
 
-✅ Real flags follow this exact format:  
-**CCRI-AAAA-1111**
+Fake flags may look convincing but will use the wrong prefix, wrong order, or an invalid structure such as:
 
-❌ Fake flags may look convincing but use the wrong prefix, wrong order, or incorrect structure:  
-- QR-HINT-1234  
-- CCRI-1111-FAKE  
-- SCAN-CODE-####  
+* `QR-HINT-1234`
+* `CCRI-1111-FAKE`
+* `SCAN-CODE-####`
+
 Don’t fall for imitations.
+
+### What to Do
+
+1. Examine all five QR codes using the tools of your choice.
+2. Decode the embedded text from each image.
+3. Compare the outputs — some will be fake.
+4. Only one decoded result follows the correct flag format.
 
 ---
 
 ## 🛠 Suggested Tools
 
-Choose your approach — command-line or visual inspection.
+Choose whichever approach fits your investigative style:
 
-| Tool/Command              | Purpose                                         |
-|---------------------------|--------------------------------------------------|
-| `zbarimg qr_*.png`        | Scan QR images from the command line (fastest)   |
-| `feh` or `eog`            | Open and visually inspect the QR code images     |
-| Smartphone camera         | Scan QR codes directly off the VM screen         |
-| `cat *.txt`               | If your tools save decoded text to file, view it |
+| Tool / Command     | Purpose                                                   |
+| ------------------ | --------------------------------------------------------- |
+| `zbarimg qr_*.png` | Scan and decode QR images from the command line (fastest) |
+| `feh` or `eog`     | Visually inspect the QR codes                             |
+| Smartphone camera  | Scan QR codes directly from the VM screen                 |
+| `cat *.txt`        | View decoded text if your tools write output to files     |
 
-> 💡 Hint: Each QR code is a PNG image. You’ll need to decode the contents to reveal any embedded text.
-
----
-
-## 📝 Instructions
-
-1. Examine all five QR codes in the folder using one of the tools above.  
-2. Decode the embedded text from each image.  
-3. Look carefully — some results are fake. Only one flag has the **correct format**.  
-4. When you find the real flag, save it manually like this:
-
-```
-echo "CCRI-AAAA-1111" > flag.txt
-```
+> 💡 **Hint:** Each QR code is a PNG image. You’ll need to decode the contents to reveal any embedded text.
 
 ---
 
-## 📂 Files to Explore
+## 📂 Files in This Folder
 
 * `qr_01.png`
 * `qr_02.png`
@@ -58,16 +52,13 @@ echo "CCRI-AAAA-1111" > flag.txt
 * `qr_04.png`
 * `qr_05.png`
 
-Each file is a QR code image containing either a real flag or a convincing fake.
-
 ---
 
 ## 🏁 Flag Format
 
-Real flag = `CCRI-AAAA-1111`
+All flags follow the official format:
 
-All other formats are designed to trick you.
+**`CCRI-AAAA-1111`**
 
----
-
-Your forensic instincts and tool selection will determine how quickly you uncover the truth.
+Replace `AAAA` and the numbers with the correct values you uncover.
+Then enter the flag into the website to verify your answer.

@@ -1,77 +1,69 @@
-# 🧩 Vigenère Cipher Challenge
+# 🔑 Challenge 04: Vigenère Cipher Challenge
 
-A scrambled message was extracted from a Liber8 field communication. It’s encrypted using a centuries-old cipher — one that relies on a keyword to twist each letter unpredictably.
+The Vigenère cipher encrypts text by shifting each letter according to a repeating keyword.
+Every letter in the plaintext is moved forward in the alphabet based on the corresponding letter of the keyword.
 
-Can you recover the original message and extract the correct CCRI flag?
+For example:
+
+```
+Plaintext: ATTACK
+Keyword:   KEYKEY
+Ciphertext: KXRIGU
+```
+
+Using a different keyword produces a completely different ciphertext — making the **key** essential to successful decryption.
 
 ---
 
-## 🧠 What is the Vigenère Cipher?
+## 🧩 Objective
 
-The Vigenère cipher encrypts letters by shifting them based on a repeating keyword. Each letter of the message is moved forward in the alphabet based on the position of the corresponding letter in the keyword.
+Recover the original message and extract the correct flag.
 
-For example:  
-- Plaintext: **ATTACK**  
-- Keyword:   **KEYKEY**  
-- Ciphertext: **KXRIGU**
+1. Inspect `cipher.txt`.
+2. Decode the text using an appropriate keyword.
+3. Look for readable sentences and flag-like patterns in the decrypted result.
 
-The same message with a different keyword will produce a completely different result — making the key essential to successful decryption.
+This cipher once earned the nickname “the unbreakable cipher.”
+Now it’s your turn to reverse it.
+
+---
+
+## 📝 Investigator’s Journal
+
+The agent used a familiar word — something close to home.
+We’ve seen the CryptKeepers lean on **regional references** before.
+
+If you know where we are… you know the key.
 
 ---
 
 ## 🛠 Tools & Techniques
 
-Here are tools and methods that can help you decode a Vigenère cipher:
+Here are tools that can help decode a Vigenère cipher:
 
-| Tool        | Use Case                               | Example Command / Link                                               |
-|-------------|----------------------------------------|-----------------------------------------------------------------------|
-| `python3`   | Write a simple decoder using logic     | `codecs` or manual shift logic in a Python script                    |
-| Online tools| Test different keys quickly            | Search "Vigenère cipher decoder" — some support keyword input         |
-| `gpg`, `cryptool`, or `cyberchef` | Advanced GUI or CLI options       | May support Vigenère (GUI required in some cases)                     |
+| Tool                           | Use Case                                 | Example / Description                                            |
+| ------------------------------ | ---------------------------------------- | ---------------------------------------------------------------- |
+| `python3`                      | Write your own decoder using shift logic | Use `codecs`, string arithmetic, or a custom Python script       |
+| Online tools                   | Quickly test different keywords          | Search “Vigenère Cipher Decoder”                                 |
+| `gpg`, `cryptool`, `CyberChef` | Advanced GUI/CLI options                 | Some tools offer built-in Vigenère decoding (GUI often required) |
 
-> Tip: You’ll need the **correct keyword** to make sense of the message. The wrong key will produce garbage — but the right one reveals structure and meaning.
-
----
-
-## 🧩 Investigator’s Journal
-
-🗒️ *“The agent used a familiar word to encrypt the file — something close to home. We’ve seen them lean on regional references before. If you know where we are, you know the key.”*
-
----
-
-## 📝 Your Objective
-
-Inspect the file:
-
-📁 **cipher.txt**
-
-Then:
-1. Try to decode the text using a keyword.
-2. Look for **structured sentences** and flag-like patterns in the result.
-3. One of the candidates will match the CCRI flag format — and only one will be real.
-
-> If your decoding tool doesn’t save output to a file, you can save the correct result manually:
-
-```
-echo "CCRI-AAAA-1111" > decoded_output.txt
-```
+> 💡 **Tip:**
+> The **correct keyword** makes the message snap into clarity.
+> The wrong one produces only noise.
 
 ---
 
 ## 📂 Files in This Folder
 
-* `cipher.txt` — The encrypted message using the Vigenère cipher.
+* `cipher.txt` — The message encrypted using the Vigenère cipher.
 
 ---
 
 ## 🏁 Flag Format
 
-The correct flag will appear as:
+All flags follow the official structure:
 
-**CCRI-AAAA-1111**
+**`CCRI-AAAA-1111`**
 
-Replace `AAAA` and `1111` with the flag you uncover.
-
----
-
-💡 This cipher was once considered unbreakable — now it's your turn to reverse it. Think historically. Think locally.
+Replace `AAAA` and the digits with the code you uncover.
+Then enter the flag into the website to verify your answer.
