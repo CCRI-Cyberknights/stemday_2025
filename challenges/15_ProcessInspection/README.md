@@ -1,7 +1,7 @@
 🖥️ Challenge 15: Process Inspection
 ====================================
 
-Liber8 operatives have planted a rogue process on a compromised system to exfiltrate sensitive data.  
+CryptKeeper operatives have planted a rogue process on a compromised system to exfiltrate sensitive data.  
 You’ve obtained a snapshot of the system’s running processes. Hidden within the **command-line arguments** of five suspicious processes are “flags” — but only ONE of them is authentic. The rest are decoys.  
 
 🎯 **Your Mission:**  

@@ -47,7 +47,9 @@ class Base64FlagGenerator:
 
         try:
             if not challenge_folder.exists():
-                raise FileNotFoundError(f"❌ Challenge folder not found: {challenge_folder.relative_to(self.project_root)}")
+                raise FileNotFoundError(
+                    f"❌ Challenge folder not found: {challenge_folder.relative_to(self.project_root)}"
+                )
 
             all_flags = fake_flags + [real_flag]
             random.shuffle(all_flags)
@@ -55,13 +57,13 @@ class Base64FlagGenerator:
             message = (
                 "Transmission Start\n"
                 "------------------------\n"
-                "To: LIBER8 Command Node\n"
-                "From: Field Agent 4\n\n"
-                "Flag candidates identified during network sweep. "
-                "Message encoded for secure transit.\n\n"
-                "Candidates:\n" +
-                "\n".join(f"- {flag}" for flag in all_flags) +
-                "\n\nVerify and submit the authentic CCRI flag.\n\n"
+                "To: CryptKeepers Command Node\n"
+                "From: Field Operative 4\n\n"
+                "Flag candidates recovered from a CryptKeepers data drop during network sweep. "
+                "Message encoded to avoid casual inspection.\n\n"
+                "Candidates:\n"
+                + "\n".join(f"- {flag}" for flag in all_flags)
+                + "\n\nVerify and submit the authentic CCRI flag.\n\n"
                 "Transmission End\n"
                 "------------------------\n"
             )
@@ -75,7 +77,7 @@ class Base64FlagGenerator:
                 "real_flag": real_flag,
                 "challenge_file": str(encoded_file.relative_to(self.project_root)),
                 "unlock_method": "Base64 decode",
-                "hint": "Decode encoded.txt using base64 -d or an online tool."
+                "hint": "Decode encoded.txt using base64 -d or an online tool.",
             }
 
         except PermissionError:
@@ -93,6 +95,6 @@ class Base64FlagGenerator:
             real_flag = FlagUtils.generate_real_flag()
 
         self.embed_flags(challenge_folder, real_flag, fake_flags)
-        print('   🎭 Fake flags:', ', '.join(fake_flags))
+        print("   🎭 Fake flags:", ", ".join(fake_flags))
         print(f"✅ {self.mode.capitalize()} flag: {real_flag}")
         return real_flag

@@ -14,7 +14,7 @@ class VigenereFlagGenerator:
     """
 
     DEFAULT_KEY = "login"
-    SOLO_KEY = "Providence"
+    SOLO_KEY = "providence"
 
     def __init__(self, project_root: Path = None, mode="guided"):
         self.project_root = project_root or self.find_project_root()
@@ -74,16 +74,17 @@ class VigenereFlagGenerator:
             all_flags = fake_flags + [real_flag]
             random.shuffle(all_flags)
 
+            # 🔥 Updated only the lore text inside the message
             message = (
                 "Transmission Start\n"
                 "------------------------\n"
-                "To: LIBER8 Command Node\n"
+                "To: CryptKeepers Command Node\n"
                 "From: Field Unit 7\n\n"
-                "Status report: Flag candidates identified during operation. "
-                "Data has been encoded for secure transit.\n\n"
+                "Status update: Multiple potential flags recovered while monitoring "
+                "CryptKeepers relay traffic. Data has been encoded prior to relay transfer.\n\n"
                 "Candidates:\n"
                 + "\n".join(f"- {flag}" for flag in all_flags)
-                + "\n\nVerify the true flag before submission.\n\n"
+                + "\n\nVerify the true CCRI flag before submission.\n\n"
                 "Transmission End\n"
                 "------------------------\n"
             )

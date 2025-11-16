@@ -1,6 +1,6 @@
 # 🌐 Challenge 14: Subdomain Sweep
 
-Liber8’s internal infrastructure spans multiple subdomains, each hosting seemingly mundane content.
+CryptKeepers' internal infrastructure spans multiple subdomains, each hosting seemingly mundane content.
 But one of them is hiding an authentic agency flag — buried somewhere in the HTML source.
 
 ---
@@ -32,7 +32,7 @@ Sometimes the real payload is tucked inside `<pre>` blocks, nested tags, or hidd
 | `less *.html`                        | Scroll through raw HTML responses                 |
 | `grep "CCRI-" *.html`                | Search for possible flags by prefix               |
 | `grep -E '[A-Z]{4}-[0-9]{4}' *.html` | Broad pattern match — may reveal fakes            |
-| `xdg-open alpha.liber8.local.html`   | Open an HTML file visually in a browser for clues |
+| `xdg-open alpha.cryptkeepers.local.html`   | Open an HTML file visually in a browser for clues |
 | **Ctrl+U** (in browser)              | View page source — some flags may not be visible  |
 | **Ctrl+F** → search `CCRI`           | Quickly locate embedded data in source code       |
 
@@ -43,11 +43,11 @@ Sometimes the real payload is tucked inside `<pre>` blocks, nested tags, or hidd
 
 ## 📂 Files in This Folder
 
-* `alpha.liber8.local.html`
-* `beta.liber8.local.html`
-* `gamma.liber8.local.html`
-* `delta.liber8.local.html`
-* `omega.liber8.local.html`
+* `alpha.cryptkeepers.local.html`
+* `beta.cryptkeepers.local.html`
+* `gamma.cryptkeepers.local.html`
+* `delta.cryptkeepers.local.html`
+* `omega.cryptkeepers.local.html`
 
 Each file represents a web page hosted on its respective internal subdomain.
 Only one contains the genuine flag — the rest are red herrings.

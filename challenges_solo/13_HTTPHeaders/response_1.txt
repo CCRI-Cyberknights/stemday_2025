@@ -1,15 +1,20 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:53:09 GMT
-Server: Go HTTP Server/1.19
-Content-Type: text/html; charset=UTF-8
+Date: Sun, 30 Jun 2025 15:52:15 GMT
+Server: Apache/2.4.54 (Ubuntu)
+Content-Type: text/plain; charset=UTF-8
 Cache-Control: public, max-age=86400
-X-Powered-By: PHP/8.1.12
-X-Flag: NPPL-2215-OFEY
+X-Powered-By: Python/3.11.4
+X-Flag: JRFZ-KYWD-8077
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=57s7jwu2qp53; HttpOnly; Secure
+Set-Cookie: sessionid=uq9tur88uu92; HttpOnly; Secure
 
-Welcome to the Liber8 data endpoint.
-This endpoint returns plain text responses.
+<html>
+  <head><title>Internal Dashboard</title></head>
+  <body>
+    <h1>CryptKeepers Ops Dashboard</h1>
+    <p>Authentication successful. Redirecting...</p>
+  </body>
+</html>
 
-<!-- Debug: Session created for client 10.6.112.3 -->
+<!-- To-do: Update security headers on staging -->

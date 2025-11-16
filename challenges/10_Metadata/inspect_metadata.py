@@ -90,7 +90,7 @@ def main():
     print(f"   > {os.path.basename(output_file):<22}→ Redirect the output into a text file to review later\n")
     print("Once we have metadata_dump.txt, we can:")
     print("   ➤ Skim important fields (comments, artist, date, etc.)")
-    print("   ➤ Search for keywords with grep (like 'CCRI' or 'Liber8')\n")
+    print("   ➤ Search for keywords with grep (like 'CCRI' or 'Cryptkeepers')\n")
     pause_nonempty("Type 'run' when you're ready to extract metadata with exiftool: ")
 
     print(f"\n📂 Inspecting: {os.path.basename(target_image)}")
@@ -133,7 +133,7 @@ def main():
     print("🧰 Next, you can search the metadata for any keyword you're curious about.")
     print("   Example commands in a normal terminal might be:")
     print(f"      grep -i 'CCRI' {os.path.basename(output_file)}")
-    print(f"      grep -i 'Liber8' {os.path.basename(output_file)}\n")
+    print(f"      grep -i 'Cryptkeepers' {os.path.basename(output_file)}\n")
 
     keyword = input("🔎 Enter a keyword to search in the metadata (or press ENTER to skip): ").strip()
     if keyword:

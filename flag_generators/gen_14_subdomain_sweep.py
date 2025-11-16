@@ -14,27 +14,27 @@ class SubdomainSweepFlagGenerator:
     """
 
     SUBDOMAINS = [
-        ("alpha.liber8.local", "Alpha Service Portal", "Alpha Service", "Welcome to the Alpha team portal. All systems operational."),
-        ("beta.liber8.local", "Beta Operations Dashboard", "Beta Operations", "Restricted Access – Authorized Personnel Only"),
-        ("gamma.liber8.local", "Gamma Data API", "Gamma Data API", "Status: Maintenance Mode"),
-        ("delta.liber8.local", "Delta API Service", "Delta API", "REST API Portal for Internal Use Only"),
-        ("omega.liber8.local", "Omega Internal Tools", "Omega Tools Suite", "For Internal Testing and Deployment")
+        ("alpha.cryptkeepers.local", "Alpha Service Portal", "Alpha Service", "Welcome to the Alpha team portal. All systems operational."),
+        ("beta.cryptkeepers.local", "Beta Operations Dashboard", "Beta Operations", "Restricted Access – CryptKeepers only."),
+        ("gamma.cryptkeepers.local", "Gamma Data API", "Gamma Data API", "Status: Maintenance Mode"),
+        ("delta.cryptkeepers.local", "Delta API Service", "Delta API", "REST API Portal for Internal CryptKeepers use only."),
+        ("omega.cryptkeepers.local", "Omega Internal Tools", "Omega Tools Suite", "For internal testing, staging and deployment.")
     ]
 
     FOOTERS = [
-        "Alpha Service © 2025 Liber8 Network",
-        "Beta Dashboard – Liber8 Internal Systems",
-        "© 2025 Liber8 Network – Gamma Team",
-        "Delta Service © Liber8 DevOps",
-        "Omega Tools © Liber8 Engineering"
+        "Alpha Service © 2025 CryptKeepers Network",
+        "Beta Dashboard – CryptKeepers Internal Systems",
+        "© 2025 CryptKeepers Network – Gamma Team",
+        "Delta Service © CryptKeepers DevOps",
+        "Omega Tools © CryptKeepers Engineering"
     ]
 
     ALT_DESCRIPTIONS = [
         "System running in nominal state.",
         "All services operational.",
-        "Internal use only. Contact admin for access.",
+        "Internal use only. Contact an on-call CryptKeeper for access.",
         "REST API endpoints active and monitored.",
-        "Scheduled maintenance ongoing. Expect delays."
+        "Scheduled maintenance ongoing. Expect delays.",
     ]
 
     ALT_PRE_LINES = [
@@ -80,7 +80,7 @@ class SubdomainSweepFlagGenerator:
 
     def clean_old_subdomain_html(self, challenge_folder: Path):
         if challenge_folder.exists():
-            for file in challenge_folder.glob("*.liber8.local.html"):
+            for file in challenge_folder.glob("*.cryptkeepers.local.html"):
                 try:
                     file.unlink()
                     print(f"🗑️ Removed old file: {file.name}")
@@ -115,7 +115,7 @@ class SubdomainSweepFlagGenerator:
             "real_flag": real_flag,
             "challenge_folder": str(challenge_folder.relative_to(self.project_root)),
             "unlock_method": "Inspect HTML files for subdomains to locate the flag",
-            "hint": "Search *.liber8.local.html for the flag string using grep or a browser"
+            "hint": "Search *.cryptkeepers.local.html for the flag string using grep or a browser"
         }
 
     def create_html(self, subdomain: str, title: str, header_title: str, header_desc: str, footer: str, flag: str) -> str:

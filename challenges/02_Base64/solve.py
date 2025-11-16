@@ -68,7 +68,7 @@ def main():
     clear_screen()
     print("🛠️ Analysis Tools")
     print("---------------------------")
-    print("We intercepted a suspicious message from a compromised Liber8 system.\n")
+    print("We intercepted a suspicious message from a compromised CryptKeepers system.\n")
     print("To decode it, we use the Linux `base64` command.\n")
     print("Here’s what the command looks like:\n")
     print("   base64 --decode encoded.txt\n")

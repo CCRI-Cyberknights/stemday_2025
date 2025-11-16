@@ -1,20 +1,17 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:59:24 GMT
-Server: Apache/2.4.54 (Ubuntu)
-Content-Type: text/plain; charset=UTF-8
+Date: Sun, 30 Jun 2025 15:51:02 GMT
+Server: CryptKeepers-Gateway/2.3.1
+Content-Type: text/html; charset=UTF-8
 Cache-Control: private, no-cache
-X-Powered-By: Python/3.11.4
-X-Flag: CENL-YLZR-0901
+X-Powered-By: PHP/8.1.12
+X-Flag: CCRI-HHOR-0118
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=fu7z8xe013gk; HttpOnly; Secure
 
-<html>
-  <head><title>Liber8 Portal</title></head>
-  <body>
-    <h1>Welcome to Liber8</h1>
-    <p>System maintenance is underway. Some services may be unavailable.</p>
-  </body>
-</html>
+{
+  "status": "ok",
+  "message": "API version 1.2.4 is running.",
+  "notes": "No maintenance scheduled."
+}
 
-<!-- Developer note: Remove X-Test headers before release -->
+<!-- Debug: Session created for client 10.6.112.3 -->

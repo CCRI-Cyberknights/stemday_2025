@@ -13,7 +13,18 @@ class ProcessInspectionFlagGenerator:
     Collects metadata into self.metadata for use by master script.
     """
 
-    USERS = ["root", "user1", "user2", "user3", "daemon", "syslog", "mysql", "postfix", "nobody", "liber8"]
+    USERS = [
+        "root",
+        "user1",
+        "user2",
+        "user3",
+        "daemon",
+        "syslog",
+        "mysql",
+        "postfix",
+        "nobody",
+        "ckeepers"
+    ]
 
     COMMANDS = [
         "/usr/sbin/apache2 -k start",
@@ -34,7 +45,7 @@ class ProcessInspectionFlagGenerator:
         "/usr/sbin/irqbalance",
         "/usr/local/bin/tunneler --mode passive --ttl 128",
         "/usr/bin/harvest --scan --output /tmp/result.log",
-        "/opt/liber8/bin/siphon --threads 8 --proxy 127.0.0.1:8080"
+        "/opt/cryptkeepers/bin/siphon --threads 8 --proxy 127.0.0.1:8080"
     ]
 
     def __init__(self, project_root: Path = None, mode="guided"):
@@ -76,7 +87,7 @@ class ProcessInspectionFlagGenerator:
     def embed_flags(self, lines, real_flag, fake_flags):
         flag_processes = [
             "/usr/bin/harvest --target 10.6.42.18 --flag={} --interval 15 --verbose",
-            "/opt/liber8/bin/siphon --upload --flag={} --threads 4",
+            "/opt/cryptkeepers/bin/siphon --upload --flag={} --threads 4",
             "/usr/local/bin/tunneler --flag={} --mode aggressive --ttl 64",
             "/usr/bin/stealth --flag={} --timeout 90",
             "/usr/sbin/backdoor --flag={} --listen --port 4444"
@@ -84,7 +95,8 @@ class ProcessInspectionFlagGenerator:
         flags = [real_flag] + fake_flags
         random.shuffle(flag_processes)
         for proc, flag in zip(flag_processes, flags):
-            lines.append(self.random_process("liber8", proc.format(flag)))
+            # make the “bad” processes run as the CryptKeepers user
+            lines.append(self.random_process("ckeepers", proc.format(flag)))
 
     def generate_ps_dump(self, challenge_folder: Path, real_flag: str, fake_flags: list):
         challenge_folder.mkdir(parents=True, exist_ok=True)

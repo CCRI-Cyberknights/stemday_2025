@@ -1,6 +1,6 @@
 # 🛰️ **Challenge 18: Pcap Search**
 
-Liber8 operatives have been transmitting data across their internal network. You’ve intercepted a packet capture file (`traffic.pcap`) that may contain a hidden agency flag.
+CryptKeeper operatives have been transmitting data across their internal network. You’ve intercepted a packet capture file (`traffic.pcap`) that may contain a hidden agency flag.
 
 🎯 **Your Mission:**
 1️⃣ Run the provided helper script to analyze the network capture.

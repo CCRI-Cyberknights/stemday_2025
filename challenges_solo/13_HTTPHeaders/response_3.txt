@@ -1,20 +1,15 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:54:11 GMT
-Server: Liber8-Server/2.3.1
-Content-Type: text/plain; charset=UTF-8
-Cache-Control: public, max-age=86400
+Date: Sun, 30 Jun 2025 15:52:57 GMT
+Server: Apache/2.4.54 (Ubuntu)
+Content-Type: application/json
+Cache-Control: private, no-cache
 X-Powered-By: Python/3.11.4
-X-Flag: WSBP-9245-UEJK
+X-Flag: NRBT-PZNM-7086
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=3emfedts9e8p; HttpOnly; Secure
+Set-Cookie: sessionid=i1ih5qn06q05; HttpOnly; Secure
 
-<html>
-  <head><title>Data Service</title></head>
-  <body>
-    <h1>Data Service Ready</h1>
-    <p>Connect your client application to begin.</p>
-  </body>
-</html>
+Welcome to the CryptKeepers data endpoint.
+This endpoint returns plain text responses.
 
-<!-- To-do: Update security headers on staging -->
+<!-- Debug: Session created for client 10.6.112.3 -->

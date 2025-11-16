@@ -46,7 +46,7 @@ def check_html_files(domains, script_dir):
     """
     missing = []
     for domain in domains:
-        html_file = os.path.join(script_dir, f"{domain}.liber8.local.html")
+        html_file = os.path.join(script_dir, f"{domain}.cryptkeepers.local.html")
         if not os.path.isfile(html_file):
             print(f"❌ ERROR: Missing file '{os.path.basename(html_file)}'")
             missing.append(html_file)
@@ -118,10 +118,10 @@ def main():
     print("🛠️ Behind the Scenes")
     print("----------------------------")
     print("To inspect each subdomain locally, we open the HTML file in your browser as if you had visited:")
-    print("   alpha.liber8.local  → alpha.liber8.local.html")
+    print("   alpha.cryptkeepers.local  → alpha.cryptkeeeprs.local.html")
     print("\nExample commands you might use on your own:\n")
-    print("   xdg-open alpha.liber8.local.html   # open in browser")
-    print("   xdg-open beta.liber8.local.html")
+    print("   xdg-open alpha.cryptkeepers.local.html   # open in browser")
+    print("   xdg-open beta.cryptkeepers.local.html")
     print("\nTo search all pages for flags at once, you could run:\n")
     print("   grep -E 'CCRI-[A-Z]{4}-[0-9]{4}' *.html\n")
     print("🔍 grep breakdown:")
@@ -134,7 +134,7 @@ def main():
     while True:
         print("\n📂 Available subdomains:")
         for i, domain in enumerate(domains, 1):
-            print(f"{i}. {domain}.liber8.local")
+            print(f"{i}. {domain}.cryptkeepers.local")
         print("6. 🔎 Auto-scan all subdomains for flag patterns")
         print("7. ❌ Exit\n")
 
@@ -142,7 +142,7 @@ def main():
 
         if choice in {"1", "2", "3", "4", "5"}:
             idx = int(choice) - 1
-            html_file = os.path.join(script_dir, f"{domains[idx]}.liber8.local.html")
+            html_file = os.path.join(script_dir, f"{domains[idx]}.cryptkeepers.local.html")
             print(f"\n🌐 Opening {os.path.basename(html_file)} in your browser...")
             open_in_browser(html_file)
             print("\n💻 Tip: Also view the page source (Ctrl+U) for hidden data.")

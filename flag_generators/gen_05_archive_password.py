@@ -51,9 +51,9 @@ class ArchivePasswordFlagGenerator:
         Select a password for the ZIP file depending on mode.
         """
         if self.mode == "guided":
-            return random.choice(all_passwords[:len(all_passwords)//2])
+            return random.choice(all_passwords[: len(all_passwords) // 2])
         else:
-            return random.choice(all_passwords[len(all_passwords)//2:])
+            return random.choice(all_passwords[len(all_passwords) // 2 :])
 
     def embed_flags(self, challenge_folder: Path, real_flag: str, fake_flags: list):
         """
@@ -89,11 +89,11 @@ class ArchivePasswordFlagGenerator:
             random.shuffle(all_flags)
             message = (
                 "Mission Debrief:\n\n"
-                "Encrypted transmission recovered from target machine.\n"
-                "Analysis reveals five potential keys, but only one fits agency format.\n\n"
-                "Decoded entries:\n" +
-                "\n".join(f"- {flag}" for flag in all_flags) +
-                "\n\nProceed with caution."
+                "Encrypted archive recovered from a CryptKeepers staging machine.\n"
+                "Analysis reveals five potential flags, but only one matches the CCRI format.\n\n"
+                "Decoded entries:\n"
+                + "\n".join(f"- {flag}" for flag in all_flags)
+                + "\n\nProceed with caution."
             )
             message_encoded = base64.b64encode(message.encode("utf-8")).decode("utf-8")
 
@@ -106,14 +106,17 @@ class ArchivePasswordFlagGenerator:
                 ["zip", "-j", "-P", correct_password, str(zip_file), str(encoded_file.name)],
                 cwd=challenge_folder,
                 capture_output=True,
-                text=True
+                text=True,
             )
             if result.returncode != 0:
                 raise RuntimeError(f"❌ Zip failed: {result.stderr.strip()}")
 
             # Clean up plaintext file
             encoded_file.unlink()
-            print(f"🗝️ {wordlist_file.relative_to(self.project_root)} and 🔒 {zip_file.relative_to(self.project_root)} created with correct password: {correct_password}")
+            print(
+                f"🗝️ {wordlist_file.relative_to(self.project_root)} and 🔒 {zip_file.relative_to(self.project_root)} "
+                f"created with correct password: {correct_password}"
+            )
 
             # Save metadata for master validation step
             self.metadata = {
@@ -122,7 +125,7 @@ class ArchivePasswordFlagGenerator:
                 "challenge_file": str(zip_file.relative_to(self.project_root)),
                 "wordlist_file": str(wordlist_file.relative_to(self.project_root)),
                 "unlock_method": "Brute-force ZIP password using provided wordlist",
-                "hint": "Use wordlist.txt with zip2john + hashcat or fcrackzip."
+                "hint": "Use wordlist.txt with zip2john + hashcat or fcrackzip.",
             }
 
         except Exception as e:
@@ -141,6 +144,6 @@ class ArchivePasswordFlagGenerator:
             real_flag = FlagUtils.generate_real_flag()
 
         self.embed_flags(challenge_folder, real_flag, fake_flags)
-        print('   🎭 Fake flags:', ', '.join(fake_flags))
+        print("   🎭 Fake flags:", ", ".join(fake_flags))
         print(f"✅ {self.mode.capitalize()} flag: {real_flag}")
         return real_flag

@@ -57,7 +57,7 @@ def main():
     print("======================================\n")
     print("🎯 Goal: Crack the password, extract the archive, and decode the hidden flag.\n")
     print("💡 Scenario:")
-    print("   ➤ Liber8 has locked important data inside an encrypted ZIP archive.")
+    print("   ➤ CryptKeepers has locked important data inside an encrypted ZIP archive.")
     print("   ➤ You recovered a wordlist of possible passwords.")
     print("   ➤ Your mission: try each password until the archive opens, then decode the contents.\n")
     pause_nonempty("Type 'ready' when you're ready to see how this works behind the scenes: ")

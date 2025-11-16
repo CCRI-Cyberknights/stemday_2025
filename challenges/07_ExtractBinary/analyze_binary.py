@@ -117,7 +117,7 @@ def main():
 
     # 🔍 KEYWORD SEARCH FIRST
     pause_nonempty("Type anything, then press ENTER to search for a specific keyword...")
-    print("You might start by searching for words related to the story, like 'CCRI' or 'Liber8'.")
+    print("You might start by searching for words related to the story, like 'CCRI' or 'Cryptkeepers'.")
     keyword = input("🔍 Enter a keyword to search (or hit ENTER to skip): ").strip()
     if keyword:
         print(f"\n🔎 Searching for '{keyword}' in {outfile}...\n")
