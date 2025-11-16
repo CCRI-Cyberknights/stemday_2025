@@ -428,3 +428,43 @@ a:visited {
 	max-width: 250px;
 	width: 70%;
 }
+
+/* ===========================
+   Mode intro panels (Guided / Solo)
+   =========================== */
+
+.mode-intro {
+	max-width: 960px;
+	margin: 20px auto 25px auto;
+	padding: 20px 24px;
+	background: rgba(0, 0, 0, 0.8);
+	border-radius: 10px;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	box-shadow: 0 0 18px rgba(0, 0, 0, 0.7);
+	line-height: 1.55;
+	color: #f5f5f5;
+	text-align: left;
+}
+
+.mode-intro h2 {
+	margin-top: 0;
+	margin-bottom: 10px;
+	font-size: 1.5rem;
+}
+
+.mode-intro p {
+	margin: 0 0 0.7em;
+}
+
+.mode-intro strong {
+	font-weight: 700;
+}
+
+/* Variants */
+.mode-intro-guided {
+	border-left: 6px solid #4b8bf4;
+}
+
+.mode-intro-solo {
+	border-left: 6px solid #ff5c5c;
+}

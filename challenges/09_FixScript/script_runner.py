@@ -5,12 +5,41 @@ import subprocess
 import time
 import re
 
+# === Terminal Utilities ===
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
 
+def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+    """
+    Pause, but DO NOT allow empty input.
+    This keeps students from just mashing ENTER through explanations.
+    """
+    while True:
+        answer = input(prompt)
+        if answer.strip():
+            return answer
+        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+
+def spinner(message="Working", duration=1.5, interval=0.12):
+    """
+    Simple text spinner to give the feeling of work being done.
+    """
+    frames = ["|", "/", "-", "\\"]
+    end_time = time.time() + duration
+    i = 0
+    while time.time() < end_time:
+        frame = frames[i % len(frames)]
+        sys.stdout.write(f"\r{message}... {frame}")
+        sys.stdout.flush()
+        time.sleep(interval)
+        i += 1
+    sys.stdout.write("\r" + " " * (len(message) + 10) + "\r")
+    sys.stdout.flush()
+
+# === File Helpers ===
 def flatten_broken_script_dir(script_dir, script_name):
     for root, dirs, files in os.walk(script_dir):
         for f in files:
@@ -40,9 +69,9 @@ def run_python_script(script_path):
 
 def patch_operator_in_script(script_path, new_operator):
     try:
-        with open(script_path, "r") as f:
+        with open(script_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
-        with open(script_path, "w") as f:
+        with open(script_path, "w", encoding="utf-8") as f:
             for line in lines:
                 if line.strip().startswith("code = part1"):
                     f.write(f"code = part1 {new_operator} part2  # <- fixed math\n")
@@ -52,6 +81,7 @@ def patch_operator_in_script(script_path, new_operator):
         print(f"❌ ERROR patching script: {e}")
         sys.exit(1)
 
+# === Main Flow ===
 def main():
     script_dir = os.path.abspath(os.path.dirname(__file__))
     broken_script = os.path.join(script_dir, "broken_flag.py")
@@ -64,7 +94,22 @@ def main():
     print("===============================================\n")
     print(f"📄 Broken script located: {broken_script}\n")
     print("⚠️ This script calculates part of the flag incorrectly.")
-    print("💡 Your goal: try different math operations to fix it.\n")
+    print("💡 Your job is to change the math operator until the flag looks correct.\n")
+    print("In a normal terminal, you might do something like:\n")
+    print("   python broken_flag.py")
+    print("   nano broken_flag.py    # edit the line that combines part1 and part2")
+    print("   python broken_flag.py  # run again and check the result\n")
+    print("This helper automates the edit-run-check cycle so you can focus on the logic:\n")
+    print("   ➤ It runs the script and shows you the output.")
+    print("   ➤ You choose which operator to try: +  -  *  /")
+    print("   ➤ It patches the line   code = part1 ? part2")
+    print("      and runs the script again until a valid flag appears.\n")
+    pause_nonempty("Type 'ready' when you're ready to run the broken script for the first time: ")
+
+    if not os.path.isfile(broken_script):
+        print(f"\n❌ ERROR: broken_flag.py not found in {script_dir}.")
+        pause("Press ENTER to close this terminal...")
+        sys.exit(1)
 
     pause("Press ENTER to attempt running the broken script...")
 
@@ -84,7 +129,7 @@ def main():
                 print("----------------------------------------------")
                 print(flag_line)
                 print("----------------------------------------------")
-                with open(flag_output_file, "w") as f:
+                with open(flag_output_file, "w", encoding="utf-8") as f:
                     f.write(flag_line + "\n")
                 print(f"📄 Flag saved to: {flag_output_file}\n")
                 pause("🎯 Copy the flag and enter it in the scoreboard when ready. Press ENTER to finish...")
@@ -92,16 +137,22 @@ def main():
             else:
                 print("⚠️ That flag isn't 4 digits long. Try a different operator.")
         else:
-            print("⚠️ No flag found. Double-check the script.")
+            print("⚠️ No flag found. Double-check the script output.\n")
 
         print("\n🛠️ Try a different operator to fix the math.")
+        print("   Options: +  (addition)   → add part1 and part2")
+        print("            -  (subtraction)→ subtract part2 from part1")
+        print("            *  (multiply)   → multiply the values")
+        print("            /  (divide)     → divide part1 by part2 (integer behavior may matter)\n")
+
         op = input("Enter operator to use (+, -, *, /): ").strip()
         if op not in ["+", "-", "*", "/"]:
             print("❌ Invalid operator. Please enter one of: +  -  *  /")
             continue
 
         patch_operator_in_script(broken_script, op)
-        time.sleep(0.5)
+        print("\n✏️ Patching broken_flag.py with new operator...")
+        spinner("Updating script")
         clear_screen()
 
 if __name__ == "__main__":

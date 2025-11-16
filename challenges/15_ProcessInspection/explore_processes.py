@@ -11,6 +11,17 @@ def clear_screen():
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
 
+def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+    """
+    Pause, but DO NOT allow empty input.
+    Prevents students from just mashing ENTER through explanations.
+    """
+    while True:
+        answer = input(prompt)
+        if answer.strip():
+            return
+        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+
 def relaunch_in_bigger_terminal(script_path):
     """Re-executes the script in a larger MATE Terminal window for visibility."""
     if os.environ.get("BIGGER_TERMINAL") == "1":
@@ -66,6 +77,7 @@ def inspect_process(binary, ps_dump_path):
         if not result.stdout.strip():
             print("⚠️ No matching process found.")
         else:
+            # Visual formatting to make long argument lists easier to read
             formatted = result.stdout.replace("--", "\n    --")
             print(formatted)
             print("=================================")
@@ -93,14 +105,32 @@ def main():
     print("=================================\n")
     print("You've obtained a snapshot of running processes (ps_dump.txt).\n")
     print("🎯 Your goal: Find the rogue process hiding a flag in a --flag= argument!\n")
-    print("💡 Tip: The real flag starts with CCRI-AAAA-1111.")
-    print("   You'll inspect processes one by one to uncover hidden details.\n")
-    pause()
+    print("🧠 Flag format: CCRI-AAAA-1111")
+    print("   Somewhere in the command line of a process, a --flag= argument hides the real CCRI flag.\n")
+    pause_nonempty("Type 'ready' when you're ready to learn how we're inspecting these processes: ")
 
     if not os.path.isfile(ps_dump_path):
         print(f"❌ ERROR: {os.path.basename(ps_dump_path)} not found in this folder!")
         pause("Press ENTER to exit...")
         sys.exit(1)
+
+    clear_screen()
+    print("🛠️ Behind the Scenes")
+    print("=================================\n")
+    print("This challenge is based on the output of a Linux process listing command like:\n")
+    print("   ps aux")
+    print("\nThat output was saved into ps_dump.txt for offline analysis.")
+    print("Each line typically contains:")
+    print("   USER  PID  CPU%  MEM%  VSZ  RSS  TTY  STAT  START  TIME  COMMAND")
+    print("   ...and the COMMAND column includes the full command line.\n")
+    print("In a normal investigation, you might do things like:\n")
+    print("   grep 'python' ps_dump.txt       # find all python processes")
+    print("   grep '--flag=' ps_dump.txt      # find any process with a --flag argument\n")
+    print("This helper script:")
+    print("   ➤ Builds a list of unique binaries from ps_dump.txt")
+    print("   ➤ Lets you choose one by name")
+    print("   ➤ Shows you the full command line so you can spot suspicious arguments\n")
+    pause_nonempty("Type 'start' when you're ready to view the process list: ")
 
     proc_map = load_process_map(ps_dump_path)
     display_names = sorted(proc_map.keys())

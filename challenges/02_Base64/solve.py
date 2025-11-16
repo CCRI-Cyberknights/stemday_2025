@@ -1,13 +1,39 @@
 #!/usr/bin/env python3
 import os
 import subprocess
+import sys
+import time
 
 # === Utilities ===
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
 
-def pause(prompt="Press ENTER to continue..."):
-    input(prompt)
+def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+    """
+    Pause, but do NOT allow empty input.
+    This prevents 'enter enter enter' mashing through the whole script.
+    """
+    while True:
+        answer = input(prompt)
+        if answer.strip():
+            return answer
+        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+
+def spinner(message="Working", duration=2.5, interval=0.15):
+    """
+    Simple text spinner to fake 'work' being done.
+    """
+    frames = ["|", "/", "-", "\\"]
+    end_time = time.time() + duration
+    i = 0
+    while time.time() < end_time:
+        frame = frames[i % len(frames)]
+        sys.stdout.write(f"\r{message}... {frame}")
+        sys.stdout.flush()
+        time.sleep(interval)
+        i += 1
+    sys.stdout.write("\r" + " " * (len(message) + 10) + "\r")
+    sys.stdout.flush()
 
 def decode_base64(input_file, output_file):
     """Decode a Base64-encoded file and save the result."""
@@ -36,61 +62,70 @@ def main():
     print("💡 What is Base64?")
     print("   ➤ A text-based encoding scheme used to represent binary data as text.")
     print("   ➤ Common in email, HTTP, and digital certificates.\n")
-    pause()
+
+    pause_nonempty("Type 'ready' when you're ready to begin: ")
 
     clear_screen()
-    print("🛠️ Behind the Scenes")
+    print("🛠️ Analysis Tools")
     print("---------------------------")
-    print("This message was intercepted from a compromised Liber8 system.\n")
-    print("We’ll use the built-in `base64` tool to decode it:\n")
+    print("We intercepted a suspicious message from a compromised Liber8 system.\n")
+    print("To decode it, we use the Linux `base64` command.\n")
+    print("Here’s what the command looks like:\n")
     print("   base64 --decode encoded.txt\n")
     print("🔍 Command breakdown:")
-    print("   base64         → Launch the decoder")
-    print("   --decode       → Convert encoded text back to original form")
-    print("   encoded.txt    → The file we captured\n")
-    pause()
+    print("   base64         → The Base64 encoder/decoder tool")
+    print("   --decode       → Converts encoded text back to the original data")
+    print("   encoded.txt    → The file we recovered\n")
+
+    pause_nonempty("Type 'continue' to inspect the encoded message: ")
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
     input_file = os.path.join(script_dir, "encoded.txt")
     output_file = os.path.join(script_dir, "decoded_output.txt")
 
     clear_screen()
-    print("🔍 Scanning for Base64 structure...")
-    pause("Press ENTER to continue...\n")
+    print("🔍 Inspecting intercepted data...\n")
+    spinner("Reading file")
 
-    print("📄 Intercepted Base64 Message (encoded.txt):")
+    print("📄 Intercepted Message (encoded.txt):")
     print("---------------------------------------------")
     try:
         with open(input_file, "r", errors="replace") as f:
             print(f.read().strip())
     except FileNotFoundError:
         print("❌ ERROR: encoded.txt not found!")
-        pause("Press ENTER to close this terminal...")
+        pause_nonempty("Type anything, then press ENTER to exit...")
         return
     print("---------------------------------------------\n")
-    print("🧠 This may look like nonsense, but it's a Base64-encoded message.")
-    print("Let's decode it and reveal the original data!\n")
-    pause("Press ENTER to decode the message...")
+    print("🧠 At first glance, this looks like random characters.")
+    print("But this structure strongly indicates Base64-encoded text.\n")
+    print("Next step: decoding the message back into its original form using the Base64 tool.\n")
+    print("Command to be executed:\n")
+    print("   base64 --decode encoded.txt\n")
 
-    print("⏳ Decoding intercepted transmission...\n")
+    pause_nonempty("Type 'decode' to begin processing the transmission: ")
+
+    print("\n⏳ Processing intercepted transmission...")
+    spinner("Decoding")
+
     decoded = decode_base64(input_file, output_file)
 
     if not decoded:
-        print("❌ Decoding failed!")
+        print("\n❌ Decoding failed!")
         print("📛 'encoded.txt' may be missing or corrupted.")
-        print("💡 Double-check the file contents. They should look like random A-Z, a-z, 0-9, +, and / characters.\n")
-        pause("Press ENTER to close this terminal...")
+        pause_nonempty("Type anything, then press ENTER to exit...")
         return
 
-    print("✅ Decoding complete!\n")
-    print("📡 Decoded Transmission:")
+    print("\n✅ Transmission successfully decoded!\n")
+    print("📄 Decoded Output:")
     print("-----------------------------")
     print(decoded)
     print("-----------------------------\n")
-    print(f"📁 Decoded message saved to: {output_file}")
+    print(f"📁 Output saved to: {output_file}")
     print("🔎 Look for a flag in this format: CCRI-AAAA-1111")
-    print("🧠 Copy the flag into the scoreboard to complete this challenge.\n")
-    pause("Press ENTER to close this terminal...")
+    print("🎯 Submit your flag in the scoreboard to complete this challenge.\n")
+
+    input("Press ENTER to close this terminal...")
 
 # === Entry Point ===
 if __name__ == "__main__":

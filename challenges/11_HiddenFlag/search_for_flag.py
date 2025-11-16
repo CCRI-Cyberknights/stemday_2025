@@ -9,6 +9,17 @@ def clear_screen():
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
 
+def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+    """
+    Pause, but DO NOT allow empty input.
+    Prevents students from just mashing ENTER through the briefing.
+    """
+    while True:
+        answer = input(prompt)
+        if answer.strip():
+            return answer
+        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+
 def list_directory(path):
     try:
         return sorted(os.listdir(path))
@@ -29,16 +40,19 @@ def main():
     print(f"🎯 You’ve gained access to a suspicious folder: {os.path.basename(root_dir)}")
     print("🔍 Somewhere inside is a *hidden file* containing the **real flag**.")
     print("⚠️ Beware: Some files contain fake flags. Only one matches this format: CCRI-AAAA-1111\n")
-    print("🛠️ You’ll use simulated Linux commands to explore:")
+    print("🛠️ You’ll use common Linux-style actions to explore:")
     print("   - 'ls -a' to list all files (even hidden ones)")
     print("   - 'cat' to view file contents")
     print("   - 'cd' to move between directories\n")
-    print("💡 Don’t worry! You don’t have to type commands — just choose from the menu.\n")
+    print("💡 Instead of typing commands, you’ll pick actions from a menu —")
+    print("   but watch the prompts: they show you what the real commands look like.\n")
 
     if not os.path.isdir(root_dir):
         print(f"❌ ERROR: Folder '{root_dir}' not found!")
         pause()
         sys.exit(1)
+
+    pause_nonempty("Type 'start' when you're ready to begin exploring the directory tree: ")
 
     while True:
         clear_screen()

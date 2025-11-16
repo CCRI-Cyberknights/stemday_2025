@@ -3,12 +3,39 @@ import os
 import subprocess
 import time
 
+# === Terminal Utilities ===
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
 
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
 
+def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+    """
+    Pause, but DO NOT allow empty input.
+    Prevents students from just mashing ENTER through the briefing.
+    """
+    while True:
+        answer = input(prompt)
+        if answer.strip():
+            return answer
+        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+
+def spinner(message="Working", duration=1.8, interval=0.12):
+    """
+    Simple text spinner to give the feeling of work being done.
+    """
+    frames = ["|", "/", "-", "\\"]
+    end_time = time.time() + duration
+    i = 0
+    while time.time() < end_time:
+        frame = frames[i % len(frames)]
+        print(f"\r{message}... {frame}", end="", flush=True)
+        time.sleep(interval)
+        i += 1
+    print("\r" + " " * (len(message) + 10) + "\r", end="", flush=True)
+
+# === QR Helpers ===
 def open_image(file_path, duration=20):
     """Open an image for a limited duration using the default viewer."""
     try:
@@ -37,6 +64,7 @@ def decode_qr(file_path):
         print("❌ ERROR: zbarimg is not installed.")
         return ""
 
+# === Main Flow ===
 def main():
     script_dir = os.path.abspath(os.path.dirname(__file__))
     qr_codes = [os.path.join(script_dir, f"qr_0{i}.png") for i in range(1, 6)]
@@ -54,9 +82,13 @@ def main():
     print("🛠️ Your options:")
     print("  • Scan with your phone’s QR scanner")
     print("  • OR use this tool to open and auto-decode them\n")
-    print("📖 Behind the scenes: This script runs: zbarimg qr_XX.png")
-    print("⏳ Each QR opens for 20 seconds, then decodes + saves the result.\n")
-    pause("Press ENTER to begin exploring.")
+    print("📖 Behind the scenes, this script will use a command like:")
+    print("     zbarimg qr_01.png")
+    print("   to read the QR code and print its contents.\n")
+    print("⏳ Each QR opens for 20 seconds so you can inspect it,")
+    print("   then the script decodes the QR and saves the result to a .txt file.\n")
+
+    pause_nonempty("Type 'start' when you're ready to explore the QR codes: ")
     clear_screen()
 
     while True:
@@ -88,17 +120,18 @@ def main():
             print(f"\n🔎 Scanning {os.path.basename(file_path)}...")
             print(f"💻 Running: zbarimg \"{os.path.basename(file_path)}\"\n")
 
+            spinner("Decoding QR")
             result = decode_qr(file_path)
 
             if not result:
-                print("❌ No QR code found.")
+                print("❌ No QR code found or could not decode.")
             else:
                 print("✅ Decoded Result:")
                 print("----------------------------")
                 print(result)
                 print("----------------------------")
                 try:
-                    with open(txt_file, "w") as f:
+                    with open(txt_file, "w", encoding="utf-8") as f:
                         f.write(result + "\n")
                     print(f"💾 Saved to: {os.path.basename(txt_file)}")
                 except Exception as e:

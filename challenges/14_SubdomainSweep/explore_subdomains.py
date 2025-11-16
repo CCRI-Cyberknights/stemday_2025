@@ -4,12 +4,25 @@ import sys
 import subprocess
 import glob
 
+# === Terminal Utilities ===
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
 
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
 
+def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+    """
+    Pause, but DO NOT allow empty input.
+    Prevents students from just mashing ENTER through the briefing.
+    """
+    while True:
+        answer = input(prompt)
+        if answer.strip():
+            return answer
+        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+
+# === Helpers ===
 def flatten_html_files(script_dir):
     """
     Move nested .html files to script directory and remove empty folders.
@@ -44,9 +57,11 @@ def open_in_browser(file_path):
     Open given file in system's default browser.
     """
     try:
-        subprocess.Popen(["xdg-open", file_path],
-                         stdout=subprocess.DEVNULL,
-                         stderr=subprocess.DEVNULL)
+        subprocess.Popen(
+            ["xdg-open", file_path],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
     except FileNotFoundError:
         print("❌ ERROR: 'xdg-open' not found. Cannot open browser.")
 
@@ -70,6 +85,7 @@ def auto_scan_for_flags(script_dir):
     except Exception as e:
         print(f"❌ ERROR during auto-scan: {e}")
 
+# === Main Flow ===
 def main():
     script_dir = os.path.abspath(os.path.dirname(__file__))
     domains = ["alpha", "beta", "gamma", "delta", "omega"]
@@ -83,11 +99,37 @@ def main():
     print("You've discovered five subdomains hosted by the target organization.")
     print("Each one has an HTML page that *might* hide a secret flag.\n")
     print("🧠 Flag format: CCRI-AAAA-1111")
-    print("💡 Tip: Use browser tools or auto-scan to search for clues.\n")
+    print("💡 Tip: Web flags are often hidden in:")
+    print("   ➤ HTML comments")
+    print("   ➤ Custom HTTP headers")
+    print("   ➤ Odd-looking elements in the page source\n")
+    print("In a real investigation, you might:")
+    print("   • Visit each page in your browser")
+    print("   • View the page source (Ctrl+U)")
+    print("   • Use search (Ctrl+F) for 'CCRI' or 'flag'")
+    print("   • Or grep through saved HTML files for the flag pattern\n")
+    pause_nonempty("Type 'start' when you're ready to begin the subdomain sweep: ")
 
     if check_html_files(domains, script_dir):
         pause("\n⚠️ One or more HTML files are missing. Press ENTER to exit.")
         sys.exit(1)
+
+    clear_screen()
+    print("🛠️ Behind the Scenes")
+    print("----------------------------")
+    print("To inspect each subdomain locally, we open the HTML file in your browser as if you had visited:")
+    print("   alpha.liber8.local  → alpha.liber8.local.html")
+    print("\nExample commands you might use on your own:\n")
+    print("   xdg-open alpha.liber8.local.html   # open in browser")
+    print("   xdg-open beta.liber8.local.html")
+    print("\nTo search all pages for flags at once, you could run:\n")
+    print("   grep -E 'CCRI-[A-Z]{4}-[0-9]{4}' *.html\n")
+    print("🔍 grep breakdown:")
+    print("   grep            → Search inside files")
+    print("   -E              → Use extended regular expressions")
+    print("   'CCRI-[A-Z]{4}-[0-9]{4}' → Our flag format pattern")
+    print("   *.html          → Search across all subdomain pages\n")
+    pause_nonempty("Type 'go' when you're ready to open the menu and start exploring: ")
 
     while True:
         print("\n📂 Available subdomains:")
@@ -104,6 +146,7 @@ def main():
             print(f"\n🌐 Opening {os.path.basename(html_file)} in your browser...")
             open_in_browser(html_file)
             print("\n💻 Tip: Also view the page source (Ctrl+U) for hidden data.")
+            print("   Try searching for 'CCRI' or 'flag' in the source.")
             pause("Press ENTER to return to the menu.")
             clear_screen()
 

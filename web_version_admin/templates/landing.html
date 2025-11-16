@@ -84,6 +84,14 @@
     </div>
     {% endif %}
 
+    <div style="margin-top: 30px;">
+      <a href="{{ url_for('linux_basics') }}">
+        <button class="view-btn" style="background:#3c8dff; margin-top:10px;">
+          🐧 Linux Basics &amp; Command Guide
+        </button>
+      </a>
+    </div>
+
     <div class="info-section">
       {{ welcome_html|safe }}
       <img src="{{ url_for('static', filename='assets/CyberKnights_2.png') }}" alt="CyberKnights Logo"

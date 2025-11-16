@@ -17,6 +17,17 @@ def clear_screen():
 def pause(prompt="🔸 Press ENTER to continue..."):
     input(prompt)
 
+def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+    """
+    Pause, but DO NOT allow empty input.
+    Prevents students from just mashing ENTER through the briefing.
+    """
+    while True:
+        answer = input(prompt)
+        if answer.strip():
+            return
+        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+
 # === Nmap Scan ===
 def run_nmap_scan():
     print(f"\n📡 Running: nmap -sV --version-light -p{BINARY_PORT_RANGE} {BINARY_HOST}\n")
@@ -65,7 +76,17 @@ def main():
     print("Several simulated services are running locally.")
     print("🎯 Your goal: Find the REAL flag by scanning ports 8000–8100.")
     print("⚠️  Beware! Many ports return fake or junk data.\n")
-    pause()
+    print("🧠 Flag format to watch for: CCRI-AAAA-1111\n")
+    print("In a real terminal, you might do something like:\n")
+    print(f"   nmap -sV --version-light -p{BINARY_PORT_RANGE} {BINARY_HOST}")
+    print("   curl http://localhost:8000")
+    print("   curl http://localhost:8001")
+    print("   ...and so on, until you find something interesting.\n")
+    print("This helper script automates that workflow by:")
+    print("   ➤ Running the nmap scan for you")
+    print("   ➤ Listing only the open ports")
+    print("   ➤ Letting you query each port with curl and inspect the response\n")
+    pause_nonempty("Type 'scan' when you're ready to run the nmap scan: ")
 
     scan_output = run_nmap_scan()
     clear_screen()
@@ -74,7 +95,7 @@ def main():
     print(scan_output)
     print("\n✅ Scan complete.\n")
 
-    pause("📖 Review the above results. Press ENTER to interactively explore each open port...")
+    pause_nonempty("📖 Look over the open ports above, then type anything and press ENTER to explore them interactively: ")
 
     open_ports = extract_open_ports(scan_output)
 
@@ -103,6 +124,7 @@ def main():
             clear_screen()
             print(f"🔎 Connecting to {BINARY_URL}:{port}")
             print("======================================")
+            print(f"(Under the hood this is running: curl -s {BINARY_URL}:{port})\n")
             response = fetch_port_response(port)
             print(response if response else f"⚠️ No response received from port {port}.")
             print("======================================\n")
@@ -110,13 +132,13 @@ def main():
             while True:
                 print("Options:")
                 print("  [1] 🔁 Return to port list")
-                print("  [2] 💾 Save this response to file")
+                print("  [2] 💾 Save this response to file\n")
                 sub_choice = input("Choose an action (1-2): ").strip()
 
                 if sub_choice == "1":
                     break
                 elif sub_choice == "2":
-                    with open(SAVE_FILE, "a") as f:
+                    with open(SAVE_FILE, "a", encoding="utf-8") as f:
                         f.write(f"Port: {port}\nResponse:\n{response}\n")
                         f.write("======================================\n")
                     print(f"✅ Response saved to {SAVE_FILE}")

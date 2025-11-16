@@ -466,6 +466,10 @@ def get_challenge_file(challenge_id, filename):
     print(f"📂 Serving file '{filename}' for challenge {challenge_id}.")
     return send_from_directory(folder, filename)
 
+@app.route("/linux-basics")
+def linux_basics():
+    return render_template("linux_basics.html")
+
 @app.route('/healthz')
 def healthz():
     return jsonify({
