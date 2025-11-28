@@ -161,12 +161,12 @@ challenges/13_HTTPHeaders/*
 challenges/14_SubdomainSweep/*
 !challenges/14_SubdomainSweep/README.md
 !challenges/14_SubdomainSweep/explore_subdomains.py
-!challenges/14_SubdomainSweep/alpha.liber8.local.html
-!challenges/14_SubdomainSweep/beta.liber8.local.html
-!challenges/14_SubdomainSweep/delta.liber8.local.html
+!challenges/14_SubdomainSweep/alpha.cryptkeepers.local.html
+!challenges/14_SubdomainSweep/beta.cryptkeepers.local.html
+!challenges/14_SubdomainSweep/delta.cryptkeepers.local.html
 !challenges/14_SubdomainSweep/domains.txt
-!challenges/14_SubdomainSweep/gamma.liber8.local.html
-!challenges/14_SubdomainSweep/omega.liber8.local.html
+!challenges/14_SubdomainSweep/gamma.cryptkeepers.local.html
+!challenges/14_SubdomainSweep/omega.cryptkeepers.local.html
 
 challenges/15_ProcessInspection/*
 !challenges/15_ProcessInspection/README.md
@@ -270,12 +270,12 @@ challenges_solo/13_HTTPHeaders/*
 
 challenges_solo/14_SubdomainSweep/*
 !challenges_solo/14_SubdomainSweep/README.md
-!challenges_solo/14_SubdomainSweep/alpha.liber8.local.html
-!challenges_solo/14_SubdomainSweep/beta.liber8.local.html
-!challenges_solo/14_SubdomainSweep/delta.liber8.local.html
+!challenges_solo/14_SubdomainSweep/alpha.cryptkeepers.local.html
+!challenges_solo/14_SubdomainSweep/beta.cryptkeepers.local.html
+!challenges_solo/14_SubdomainSweep/delta.cryptkeepers.local.html
 !challenges_solo/14_SubdomainSweep/domains.txt
-!challenges_solo/14_SubdomainSweep/gamma.liber8.local.html
-!challenges_solo/14_SubdomainSweep/omega.liber8.local.html
+!challenges_solo/14_SubdomainSweep/gamma.cryptkeepers.local.html
+!challenges_solo/14_SubdomainSweep/omega.cryptkeepers.local.html
 
 challenges_solo/15_ProcessInspection/*
 !challenges_solo/15_ProcessInspection/README.md

@@ -8,7 +8,7 @@ CHALLENGE_ID = "14_SubdomainSweep"
 
 def validate_subdomains(domains, challenge_dir: Path, expected_flag: str) -> bool:
     for domain in domains:
-        file_path = challenge_dir / f"{domain}.liber8.local.html"
+        file_path = challenge_dir / f"{domain}.cryptkeepers.local.html"
         if not file_path.is_file():
             print(f"❌ Missing file: {file_path}", file=sys.stderr)
             continue

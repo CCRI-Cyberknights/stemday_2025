@@ -1,10 +1,10 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:54:32 GMT
+Date: Sun, 30 Jun 2025 15:47:45 GMT
 Server: Go HTTP Server/1.19
-Content-Type: application/json
-Cache-Control: private, no-cache
-X-Powered-By: ASP.NET Core/7.0
-X-Flag: CCRI-EPFL-7074
+Content-Type: text/html; charset=UTF-8
+Cache-Control: public, max-age=86400
+X-Powered-By: Node.js/18.16.0
+X-Flag: PSBJ-9356-KFQO
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
 
@@ -14,4 +14,4 @@ X-Content-Type-Options: nosniff
   "notes": "No maintenance scheduled."
 }
 
-<!-- Debug: Temporary caching enabled -->
+<!-- Debug: API response size 512 bytes -->

@@ -1,7 +1,7 @@
 🧠 Challenge 16: Hex Flag Hunter
 =================================
 
-Liber8 hackers left behind a suspicious binary file: `hex_flag.bin`.  
+CryptKeeper hackers left behind a suspicious binary file: `hex_flag.bin`.  
 It’s too small to be a real program, but something about it feels… hidden.  
 
 🎯 **Your Mission:**  

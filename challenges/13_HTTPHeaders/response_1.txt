@@ -1,19 +1,14 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:58:56 GMT
-Server: Liber8-Server/2.3.1
-Content-Type: application/json
-Cache-Control: public, max-age=86400
-X-Powered-By: Ruby on Rails/7.1.0
-X-Flag: CCRI-TDPC-8291
+Date: Sun, 30 Jun 2025 15:51:55 GMT
+Server: Go HTTP Server/1.19
+Content-Type: text/plain; charset=UTF-8
+Cache-Control: private, no-cache
+X-Powered-By: PHP/8.1.12
+X-Flag: ANYP-JIKT-4669
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
 
-<html>
-  <head><title>Internal Dashboard</title></head>
-  <body>
-    <h1>Liber8 Ops Dashboard</h1>
-    <p>Authentication successful. Redirecting...</p>
-  </body>
-</html>
+Welcome to the CryptKeepers data endpoint.
+This endpoint returns plain text responses.
 
-<!-- Debug: API response size 512 bytes -->
+<!-- Debug: Temporary caching enabled -->

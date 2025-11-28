@@ -4,31 +4,55 @@ import sys
 import subprocess
 import time
 import re
+from pathlib import Path
 
 # === Configuration ===
-PCAP_FILE = "traffic.pcap"
-NOTES_FILE = "pcap_notes.txt"
-FLAG_REGEX = re.compile(r"(CCRI-[A-Z]{4}-\d{4}|[A-Z]{4}-[A-Z]{4}-\d{4}|[A-Z]{4}-\d{4}-[A-Z]{4})")
+NOTES_FILENAME = "pcap_notes.txt"
+# Matches variants: CCRI-AAAA-1111, AAAA-AAAA-1111, AAAA-1111-AAAA
+FLAG_REGEX = re.compile(
+    r"(CCRI-[A-Z]{4}-\d{4}|[A-Z]{4}-[A-Z]{4}-\d{4}|[A-Z]{4}-\d{4}-[A-Z]{4})"
+)
 
 # === Helpers ===
+def resize_terminal(rows=35, cols=90):
+    """Force terminal resize for better visibility."""
+    sys.stdout.write(f"\x1b[8;{rows};{cols}t")
+    sys.stdout.flush()
+    time.sleep(0.2)
+
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
 
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
 
+def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+    while True:
+        answer = input(prompt)
+        if answer.strip():
+            return
+        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+
 def check_tshark():
     try:
-        subprocess.run(["tshark", "-v"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(
+            ["tshark", "-v"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
     except FileNotFoundError:
         print("❌ ERROR: tshark is not installed.")
+        print("   On Debian/Parrot: sudo apt install tshark")
         pause()
         sys.exit(1)
 
 # === Flag Extraction Phase ===
-def extract_flag_candidates(pcap):
+def extract_flag_candidates(pcap_path):
     print("🔍 Scanning entire PCAP for flag-like patterns...\n")
-    cmd = f"tshark -r {pcap} -Y tcp -T fields -e tcp.payload | xxd -r -p | strings"
+    print("Running command:")
+    print("  tshark -r traffic.pcap -Y tcp -T fields -e tcp.payload | xxd -r -p | strings\n")
+    
+    cmd = f"tshark -r '{str(pcap_path)}' -Y tcp -T fields -e tcp.payload | xxd -r -p | strings"
     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, text=True)
 
     found = set()
@@ -40,32 +64,37 @@ def extract_flag_candidates(pcap):
     return list(found)
 
 # === Flag-to-Stream Mapping ===
-def map_flags_to_streams(pcap, flags):
-    print("🔗 Mapping detected flags to their TCP stream IDs...\n")
-    stream_map = {}
+def map_flags_to_streams(pcap_path, flags):
+    print("\n🔗 Mapping detected flags to their TCP stream IDs...\n")
+    print("Running command:")
+    print("  tshark -r traffic.pcap -Y tcp -T fields -e tcp.stream -e tcp.payload\n")
 
+    stream_map = {}
+    
+    # We need to find which stream contains which flag
     result = subprocess.run(
-        ["tshark", "-r", pcap, "-Y", "tcp", "-T", "fields", "-e", "tcp.stream", "-e", "tcp.payload"],
-        stdout=subprocess.PIPE, text=True
+        ["tshark", "-r", str(pcap_path), "-Y", "tcp", "-T", "fields", "-e", "tcp.stream", "-e", "tcp.payload"],
+        stdout=subprocess.PIPE,
+        text=True
     )
 
     stream_data = {}
     for line in result.stdout.strip().splitlines():
         parts = line.split('\t')
-        if len(parts) != 2:
-            continue
+        if len(parts) != 2: continue
         stream_id, hex_payload = parts
-        if not stream_id or not hex_payload:
-            continue
         try:
             stream_id = int(stream_id)
+            stream_data.setdefault(stream_id, []).append(hex_payload)
         except ValueError:
             continue
-        stream_data.setdefault(stream_id, []).append(hex_payload)
 
+    # Check payloads
     for stream_id, chunks in stream_data.items():
         full_data = '\n'.join(chunks)
+        # Convert hex back to bytes for checking
         try:
+            # We use xxd to reverse the hex so we can search for the plain text flag
             payload = subprocess.run(
                 ["xxd", "-r", "-p"],
                 input=full_data,
@@ -83,91 +112,132 @@ def map_flags_to_streams(pcap, flags):
     return stream_map
 
 # === Display & Interaction ===
-def show_stream_summary(pcap, sid):
+def show_stream_summary(pcap_path, sid):
     print(f"\n🔗 Stream ID: {sid}")
-    subprocess.run(["tshark", "-r", pcap, "-qz", f"follow,tcp,ascii,{sid}"])
+    print("--------------------------------------")
+    print("Using tshark to reconstruct the full TCP conversation:")
+    print(f"  tshark -r traffic.pcap -qz follow,tcp,ascii,{sid}\n")
+    
+    # This is the "Big Reveal" - we show the real output here
+    subprocess.run(["tshark", "-r", str(pcap_path), "-qz", f"follow,tcp,ascii,{sid}"])
 
-def save_summary(pcap, sid):
-    with open(NOTES_FILE, "a") as f:
+def save_summary(pcap_path, sid, notes_path):
+    with open(notes_path, "a", encoding="utf-8") as f:
         f.write(f"🔗 Stream ID: {sid}\n")
-        subprocess.run(["tshark", "-r", pcap, "-qz", f"follow,tcp,ascii,{sid}"], stdout=f)
+        subprocess.run(
+            ["tshark", "-r", str(pcap_path), "-qz", f"follow,tcp,ascii,{sid}"],
+            stdout=f
+        )
         f.write("--------------------------------------\n")
-    print(f"✅ Saved to {NOTES_FILE}")
+    print(f"✅ Saved to {notes_path.name}")
     time.sleep(1)
 
 # === Main Driver ===
 def main():
+    resize_terminal(35, 90)
     clear_screen()
+
+    script_dir = Path(__file__).resolve().parent
+    pcap_path = script_dir / "traffic.pcap"
+    notes_path = script_dir / NOTES_FILENAME
+
     print("📡 PCAP Investigation Tool")
     print("==============================\n")
-    print(f"Analyzing: {PCAP_FILE}\n")
+    print(f"Analyzing: {pcap_path.name}")
     print("🎯 Goal: Discover the real flag (CCRI-AAAA-1111).")
-    print("🧪 Some streams contain fakes. Only one is correct!\n")
-    pause()
-
-    if not os.path.isfile(PCAP_FILE):
-        print(f"❌ Missing file: {PCAP_FILE}")
-        pause()
+    print("🧪 Some TCP streams contain fake flags; only one is correct.\n")
+    print("What’s happening behind the scenes?")
+    print("  ➤ We read packet data from the PCAP with tshark.")
+    print("  ➤ We scan for flag patterns, but we will REDACT them initially.")
+    print("  ➤ You must inspect the TCP stream to see the full content and context.\n")
+    
+    if not pcap_path.is_file():
+        print(f"\n❌ CRITICAL ERROR: Missing file '{pcap_path.name}'")
+        pause("Press ENTER to exit...")
         sys.exit(1)
 
     check_tshark()
 
-    if os.path.exists(NOTES_FILE):
-        os.remove(NOTES_FILE)
+    if notes_path.exists():
+        os.remove(notes_path)
 
-    # Phase 1: Find flag-like values
-    flags_found = extract_flag_candidates(PCAP_FILE)
+    pause_nonempty("Type 'scan' when you're ready to begin scanning the PCAP: ")
+
+    # Phase 1: Find flag-like values (REDACTED OUTPUT)
+    flags_found = extract_flag_candidates(pcap_path)
     if not flags_found:
-        print("❌ No flag-like patterns found.")
-        pause()
+        print("\n❌ No flag-like patterns found.")
+        pause("Press ENTER to exit...")
         sys.exit(0)
 
+    print(f"\n✅ Scan complete. Detected {len(flags_found)} potential flag patterns.")
+    print("   (Content hidden to prevent spoilers - map to streams to view)\n")
+    
+    for f in sorted(flags_found):
+        # Redaction Logic: Show first 5 chars, hide the rest
+        # e.g., CCRI-****-****
+        redacted = f[:5] + "****-****"
+        print(f"   ➡️  {redacted}")
+        
+    print()
+    pause_nonempty("Type anything, then press ENTER to map these patterns to TCP streams: ")
+
     # Phase 2: Map flags to streams
-    stream_map = map_flags_to_streams(PCAP_FILE, flags_found)
+    stream_map = map_flags_to_streams(pcap_path, flags_found)
     if not stream_map:
         print("❌ No streams matched the candidate flags.")
         pause()
         sys.exit(0)
 
     candidates = sorted(stream_map.keys())
-    print(f"✅ {len(candidates)} stream(s) contain flag-like data.")
-    pause()
+    print(f"\n✅ {len(candidates)} TCP stream(s) contain suspect data.")
+    pause_nonempty("Type anything, then press ENTER to investigate the streams: ")
 
-    # Phase 3: Exploration UI
+    # Phase 3: Exploration UI (REDACTED MENU)
     while True:
         clear_screen()
         print("📜 Candidate Streams:")
         print("---------------------------")
         for idx, sid in enumerate(candidates, 1):
-            print(f"{idx}. Stream ID: {sid} (flag-like content detected)")
+            # Don't show the flags here either!
+            count = len(stream_map[sid])
+            print(f"{idx}. Stream ID: {sid} (Contains {count} hidden candidate(s))")
         print(f"{len(candidates)+1}. Exit\n")
 
         try:
-            choice = int(input(f"Choose stream to view (1-{len(candidates)+1}): "))
+            choice_str = input(f"Choose stream to inspect (1-{len(candidates)+1}): ").strip()
+            if not choice_str.isdigit(): continue
+            choice = int(choice_str)
         except ValueError:
             continue
 
         if 1 <= choice <= len(candidates):
             sid = candidates[choice - 1]
             clear_screen()
-            show_stream_summary(PCAP_FILE, sid)
+            
+            # THE REVEAL happens inside this function
+            show_stream_summary(pcap_path, sid)
 
             while True:
                 print("\nOptions:")
                 print("1) 🔁 Back to list")
-                print("2) 💾 Save summary")
+                print("2) 💾 Save stream summary (with flags)")
                 print("3) 🚪 Exit")
                 opt = input("Choose (1-3): ").strip()
                 if opt == "1":
                     break
                 elif opt == "2":
-                    save_summary(PCAP_FILE, sid)
+                    save_summary(pcap_path, sid, notes_path)
                 elif opt == "3":
+                    print(f"\n✅ Done. Notes saved in {notes_path.name}")
+                    pause()
                     sys.exit(0)
+                else:
+                    print("❌ Invalid option. Please choose 1–3.")
         elif choice == len(candidates)+1:
             break
 
-    print(f"\n✅ Done. Notes saved in {NOTES_FILE}")
+    print(f"\n✅ Done. Notes saved in {notes_path.name}")
     pause()
 
 if __name__ == "__main__":

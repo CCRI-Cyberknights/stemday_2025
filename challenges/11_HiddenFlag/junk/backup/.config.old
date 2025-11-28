@@ -1,8 +1,7 @@
+HXFP-SCZS-8358
 # Legacy configuration file
-last_modified=2019-08-12
+# Legacy configuration file
+user=guest
 enable_logging=true
-user=guest
-user=guest
-# [No sensitive data found here]
-# Legacy configuration file
+last_modified=2019-08-12
 user=guest

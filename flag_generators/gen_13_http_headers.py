@@ -14,8 +14,8 @@ class HTTPHeaderFlagGenerator:
     """
 
     SERVERS = [
-        "Liber8-Server/2.3.1",
-        "Liber8-Server/3.0.0-beta",
+        "CryptKeepers-Gateway/2.3.1",
+        "CryptKeepers-Node/3.0.0-beta",
         "Apache/2.4.54 (Ubuntu)",
         "nginx/1.24.0",
         "Go HTTP Server/1.19"
@@ -43,16 +43,16 @@ class HTTPHeaderFlagGenerator:
 
     HTML_BODIES = [
         """<html>
-  <head><title>Liber8 Portal</title></head>
+  <head><title>CryptKeepers Portal</title></head>
   <body>
-    <h1>Welcome to Liber8</h1>
+    <h1>Welcome to the CryptKeepers hub</h1>
     <p>System maintenance is underway. Some services may be unavailable.</p>
   </body>
 </html>""",
         """<html>
   <head><title>Internal Dashboard</title></head>
   <body>
-    <h1>Liber8 Ops Dashboard</h1>
+    <h1>CryptKeepers Ops Dashboard</h1>
     <p>Authentication successful. Redirecting...</p>
   </body>
 </html>""",
@@ -68,7 +68,7 @@ class HTTPHeaderFlagGenerator:
   "message": "API version 1.2.4 is running.",
   "notes": "No maintenance scheduled."
 }""",
-        """Welcome to the Liber8 data endpoint.
+        """Welcome to the CryptKeepers data endpoint.
 This endpoint returns plain text responses."""
     ]
 
@@ -111,7 +111,8 @@ This endpoint returns plain text responses."""
             session_id = ''.join(random.choices("abcdefghijklmnopqrstuvwxyz0123456789", k=12))
             headers.append(f"Set-Cookie: sessionid={session_id}; HttpOnly; Secure")
 
-        random.shuffle(headers[5:])  # Shuffle optional headers
+        # Shuffle optional headers (everything after the first 5)
+        random.shuffle(headers[5:])
 
         body = random.choice(self.HTML_BODIES)
         comment = random.choice(self.HTML_COMMENTS)
@@ -139,6 +140,8 @@ This endpoint returns plain text responses."""
             random.shuffle(all_flags)
 
             print(f"🎭 Fake flags: {', '.join(fake_flags)}")
+
+            real_response_file = None
 
             for i, flag in enumerate(all_flags, start=1):
                 file_path = challenge_folder / f"response_{i}.txt"

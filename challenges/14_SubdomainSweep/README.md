@@ -1,7 +1,7 @@
 🌐 Challenge 14: Subdomain Sweep
 =================================
 
-The Liber8 network relies on multiple subdomains for internal operations.  
+The CryptKeeper network relies on multiple subdomains for internal operations.  
 You’ve intercepted DNS data revealing **five subdomains**, each hosting a web page that displays a “flag.” But only ONE of these flags is authentic — the others are clever decoys.  
 
 🎯 **Your Mission:**  
@@ -10,11 +10,11 @@ You’ve intercepted DNS data revealing **five subdomains**, each hosting a web 
 3. Identify which flag is real using the agency’s format.  
 
 🗂️ **Files in this folder:**  
-• alpha.liber8.local.html – Subdomain page #1  
-• beta.liber8.local.html – Subdomain page #2  
-• gamma.liber8.local.html – Subdomain page #3  
-• delta.liber8.local.html – Subdomain page #4  
-• omega.liber8.local.html – Subdomain page #5  
+• alpha.cryptkeepers.local.html – Subdomain page #1  
+• beta.cryptkeepers.local.html – Subdomain page #2  
+• gamma.cryptkeepers.local.html – Subdomain page #3  
+• delta.cryptkeepers.local.html – Subdomain page #4  
+• omega.cryptkeepers.local.html – Subdomain page #5  
 • explore_subdomains.sh – Interactive helper script  
 
 💡 **Hint:** The real agency flag follows this format:  

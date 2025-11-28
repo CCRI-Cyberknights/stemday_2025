@@ -1,7 +1,7 @@
 # 🧩 Base64 Decode Challenge
 
 📡 **Intercepted Transmission**  
-An encoded message has been intercepted from a compromised Liber8 system.  
+An encoded message has been intercepted from a compromised CryptKeeper system.  
 
 The file `encoded.txt` contains an entire transmission that has been obfuscated using **Base64**, a common encoding scheme designed to safely transport data across text-only channels.  
 

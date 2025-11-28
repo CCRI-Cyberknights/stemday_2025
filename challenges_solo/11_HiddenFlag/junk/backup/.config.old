@@ -1,8 +1,6 @@
-# Legacy configuration file
-# Legacy configuration file
-# [No sensitive data found here]
+last_modified=2019-08-12
 user=guest
 enable_logging=true
+DREY-TLXI-7237
 last_modified=2019-08-12
-enable_logging=true
-# Legacy configuration file
+user=guest

@@ -53,6 +53,8 @@ complex1
 complex2
 complex3
 complexpassword
+ckeepers
+cryptkeepers
 database
 davox
 dbps
@@ -77,7 +79,6 @@ jstwo
 kn1TG7psLu
 letacla
 letmein
-liber8
 login
 march2011
 master

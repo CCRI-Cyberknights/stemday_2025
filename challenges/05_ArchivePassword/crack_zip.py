@@ -5,11 +5,27 @@ import subprocess
 import time
 
 # === Terminal Utilities ===
+def resize_terminal(rows=35, cols=90):
+    sys.stdout.write(f"\x1b[8;{rows};{cols}t")
+    sys.stdout.flush()
+    time.sleep(0.2)
+
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
 
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
+
+def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+    """
+    Pause, but DO NOT allow empty input.
+    This keeps students from just mashing ENTER through explanations.
+    """
+    while True:
+        answer = input(prompt)
+        if answer.strip():
+            return answer
+        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
 
 def progress_bar(length=30, delay=0.03):
     for _ in range(length):
@@ -17,8 +33,25 @@ def progress_bar(length=30, delay=0.03):
         time.sleep(delay)
     print()
 
+def spinner(message="Working", duration=2.0, interval=0.15):
+    """
+    Simple text spinner to give the feeling of work being done.
+    """
+    frames = ["|", "/", "-", "\\"]
+    end_time = time.time() + duration
+    i = 0
+    while time.time() < end_time:
+        frame = frames[i % len(frames)]
+        sys.stdout.write(f"\r{message}... {frame}")
+        sys.stdout.flush()
+        time.sleep(interval)
+        i += 1
+    sys.stdout.write("\r" + " " * (len(message) + 10) + "\r")
+    sys.stdout.flush()
+
 # === Main Flow ===
 def main():
+    resize_terminal(35, 90)
     script_dir = os.path.abspath(os.path.dirname(__file__))
     zip_file = os.path.join(script_dir, "secret.zip")
     wordlist = os.path.join(script_dir, "wordlist.txt")
@@ -29,20 +62,56 @@ def main():
     print("🔓 ZIP Password Cracking Challenge")
     print("======================================\n")
     print("🎯 Goal: Crack the password, extract the archive, and decode the hidden flag.\n")
-    pause()
+    print("💡 Scenario:")
+    print("   ➤ CryptKeepers has locked important data inside an encrypted ZIP archive.")
+    print("   ➤ You recovered a wordlist of possible passwords.")
+    print("   ➤ Your mission: try each password until the archive opens, then decode the contents.\n")
+    pause_nonempty("Type 'ready' when you're ready to see how this works behind the scenes: ")
 
     if not os.path.isfile(zip_file) or not os.path.isfile(wordlist):
         print("❌ ERROR: Missing zip file or wordlist.")
-        pause()
+        pause("Press ENTER to close this terminal...")
         sys.exit(1)
 
+    clear_screen()
+    print("🛠️ Behind the Scenes")
+    print("---------------------------")
+    print("Step 1: Dictionary attack against a protected ZIP file.\n")
+    print("For each candidate password in wordlist.txt, we run a command like:\n")
+    print(f"   unzip -P [password] -t {os.path.basename(zip_file)}\n")
+    print("🔍 Command breakdown:")
+    print("   unzip                → Tool for working with ZIP archives")
+    print("   -P [password]        → Use this password to try to unlock the archive")
+    print("   -t                   → 'Test' the ZIP file without fully extracting it")
+    print(f"   {os.path.basename(zip_file):<21}→ The encrypted archive we captured\n")
+    print("If the test reports 'OK', we know we found the correct password.\n")
+    print("Step 2: Once we have the password, we extract the archive.\n")
+    print(f"   unzip -o -P [password] {os.path.basename(zip_file)} -d .\n")
+    print("   -o    → Overwrite any existing files without asking")
+    print("   -d .  → Extract into the current directory\n")
+    print("Step 3: Inside the archive is a Base64-encoded message.\n")
+    print("   base64 --decode message_encoded.txt > decoded_output.txt\n")
+    print("   base64         → Base64 encoder/decoder tool")
+    print("   --decode       → Convert encoded text back to original")
+    print("   message_encoded.txt → Encoded message from the ZIP")
+    print("   > decoded_output.txt → Save the decoded message to a file\n")
+    pause_nonempty("Type 'start' when you're ready to begin the cracking process: ")
+
+    clear_screen()
     print("🔍 Beginning password cracking...\n")
+    print("📁 Wordlist:", os.path.basename(wordlist))
+    print("📦 Target ZIP:", os.path.basename(zip_file), "\n")
+    print("⏳ Launching dictionary attack...\n")
+    progress_bar(length=20, delay=0.04)
+
     found = False
     password = None
 
-    with open(wordlist, "r") as f:
+    with open(wordlist, "r", encoding="utf-8", errors="replace") as f:
         for line in f:
             pw = line.strip()
+            if not pw:
+                continue
             print(f"\r[🔐] Trying password: {pw:<20}", end="", flush=True)
             time.sleep(0.05)
 
@@ -61,7 +130,7 @@ def main():
 
     if not found:
         print("\n❌ Password not found in wordlist.")
-        pause()
+        pause("Press ENTER to close this terminal...")
         sys.exit(1)
 
     # === Extraction Prompt ===
@@ -69,24 +138,30 @@ def main():
     if proceed == "n":
         return
 
+    print("\n📦 Extracting archive contents...\n")
+    spinner("Extracting files")
+
     subprocess.run(["unzip", "-o", "-P", password, zip_file, "-d", script_dir],
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     if not os.path.isfile(b64_file):
         print("❌ ERROR: Extraction failed — missing Base64 message.")
-        pause()
+        pause("Press ENTER to close this terminal...")
         sys.exit(1)
 
     clear_screen()
     print("📄 Extracted Base64 Message:")
     print("-------------------------------")
-    with open(b64_file, "r") as f:
+    with open(b64_file, "r", encoding="utf-8", errors="replace") as f:
         print(f.read())
     print("-------------------------------\n")
 
     decode = input("🔎 Decode the message now? [Y/n]: ").strip().lower()
     if decode == "n":
         return
+
+    print("\n⏳ Decoding message with Base64...\n")
+    progress_bar(length=25, delay=0.03)
 
     # === Decode Base64 ===
     result = subprocess.run(["base64", "--decode", b64_file],
@@ -96,11 +171,11 @@ def main():
 
     if result.returncode != 0:
         print("❌ Decoding failed.")
-        pause()
+        pause("Press ENTER to close this terminal...")
         sys.exit(1)
 
     decoded = result.stdout.strip()
-    with open(output_file, "w") as f:
+    with open(output_file, "w", encoding="utf-8") as f:
         f.write(decoded + "\n")
 
     print("\n🧾 Decoded Message:")

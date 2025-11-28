@@ -58,10 +58,10 @@
     <div class="grid">
       {% if 'regular' in available_modes %}
       <div class="challenge-card">
-        <h3>🛠 Guided Mode</h3>
+        <h3>🔭 Exploration Mode</h3>
         <p>Includes helper scripts and walkthroughs for each challenge.</p>
         <a href="{{ url_for('set_mode', mode='regular') }}">
-          <button class="view-btn">🚀 Start Guided Challenge List</button>
+          <button class="view-btn">🚀 Start Exploration Challenge List</button>
         </a>
       </div>
       {% endif %}
@@ -83,6 +83,12 @@
       <p>This build doesn’t include <code>challenges/</code> or <code>challenges_solo/</code>.</p>
     </div>
     {% endif %}
+
+    <div style="margin-top: 30px;">
+      <a href="{{ url_for('linux_basics') }}" class="nav-btn">
+        🐧 Linux Basics &amp; Command Guide
+      </a>
+    </div>
 
     <div class="info-section">
       {{ welcome_html|safe }}

@@ -47,7 +47,9 @@ class ROT13FlagGenerator:
 
         try:
             if not challenge_folder.exists():
-                raise FileNotFoundError(f"❌ Challenge folder not found: {challenge_folder.relative_to(self.project_root)}")
+                raise FileNotFoundError(
+                    f"❌ Challenge folder not found: {challenge_folder.relative_to(self.project_root)}"
+                )
 
             all_flags = fake_flags + [real_flag]
             random.shuffle(all_flags)
@@ -55,10 +57,10 @@ class ROT13FlagGenerator:
             message = (
                 "Transmission Start\n"
                 "------------------------\n"
-                "To: LIBER8 Command Node\n"
+                "To: CryptKeepers Command Node\n"
                 "From: Recon Unit 5\n\n"
-                "Flag candidates from intercepted communications. "
-                "Message scrambled with a simple cipher for transit security.\n\n"
+                "Flag candidates pulled from intercepted CryptKeepers chatter. "
+                "Message scrambled with a simple cipher to slip past basic filters.\n\n"
                 "Candidates:\n"
                 + "\n".join(f"- {flag}" for flag in all_flags)
                 + "\n\nValidate and extract the correct CCRI flag.\n\n"
@@ -74,7 +76,7 @@ class ROT13FlagGenerator:
                 "real_flag": real_flag,
                 "challenge_file": str(cipher_file.relative_to(self.project_root)),
                 "unlock_method": "ROT13 decode",
-                "hint": "Apply ROT13 to cipher.txt to recover plaintext."
+                "hint": "Apply ROT13 to cipher.txt to recover plaintext.",
             }
 
         except PermissionError:

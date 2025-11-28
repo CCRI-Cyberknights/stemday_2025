@@ -41,7 +41,7 @@ Decoys may look convincing, but only **one** string uses the correct **CCRI flag
 | `less ps_dump.txt`                        | Page through the entire process snapshot       |
 | `grep "CCRI-" ps_dump.txt"`               | Narrow down potential flags by prefix          |
 | `grep -E "[A-Z]{4}-[0-9]{4}" ps_dump.txt` | Broader match for any flag-like patterns       |
-| `grep "tunneler" ps_dump.txt"`            | Investigate suspicious binaries used by Liber8 |
+| `grep "tunneler" ps_dump.txt"`            | Investigate suspicious binaries used by Cryptkeepers |
 | `awk '{print $11,$12,$13,...}'`           | Extract command-line fields                    |
 | `cut -d" " -f11-`                         | Slice off the command portion of each line     |
 

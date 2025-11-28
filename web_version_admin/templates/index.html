@@ -1,110 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>{{ list_title }}</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}"
-    />
-    <!-- Prevent back/forward cache issues -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-    <script>
-      // Force reload when navigating with browser back/forward buttons
-      window.addEventListener("pageshow", function (event) {
-        if (event.persisted) {
-          console.log("⏪ Back/Forward cache detected: Reloading index...");
-          window.location.reload();
+
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ list_title }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <!-- Prevent back/forward cache issues -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <script>
+    // Force reload when navigating with browser back/forward buttons
+    window.addEventListener("pageshow", function (event) {
+      if (event.persisted) {
+        console.log("⏪ Back/Forward cache detected: Reloading index...");
+        window.location.reload();
+      }
+    });
+  </script>
+</head>
+
+<body data-total-challenges="{{ challenges.challenges | length }}"
+  data-challenge-ids='{{ challenges.get_list_of_ids() | tojson }}' data-challenge-base-url="{{ url_for('index') }}"
+  data-mode="{{ mode }}" data-base-mode="{{ base_mode }}">
+  <!-- 🆕 Top-right Back to Hub Button -->
+  <div class="top-right">
+    <button onclick="goToLanding();" class="home-btn">🏠 Back to Hub</button>
+  </div>
+
+  <h1>🚀 {{ list_title }}</h1>
+
+  <!-- Mode-specific intro block -->
+  {% if mode == 'regular' %}
+  <div class="mode-intro guided-intro" style="
+        background: #222;
+        padding: 15px 20px;
+        border-left: 5px solid #4b8bf4;
+        border-radius: 4px;
+        margin: 20px 0 25px 0;
+        max-width: 900px;
+      ">
+    <h2>🔭 Exploration Mode Overview</h2>
+    <p>
+      Exploration Mode is a hands-on demo track. Each challenge has a helper script that
+      runs real Linux commands on real files in the challenge folder — nothing is faked.
+    </p>
+    <p>
+      The script walks you through the key steps and shows you the results, often side by
+      side with a few fake flags. Your job is to spot the <strong>one real flag</strong>
+      that matches our standard format:
+      <strong>CCRI-AAAA-1111</strong>.
+    </p>
+    <p>
+      When you think you’ve found it, copy the full flag and paste it into the
+      <strong>Submit Flag</strong> box on the challenge page. Once you’re comfortable
+      with the tools and process, you can switch over to <strong>Solo Mode</strong> for
+      the same challenges without the walkthroughs.
+    </p>
+  </div>
+  {% elif mode == 'solo' %}
+  <div class="mode-intro solo-intro" style="
+        background: #222;
+        padding: 15px 20px;
+        border-left: 5px solid #d44f4f;
+        border-radius: 4px;
+        margin: 20px 0 25px 0;
+        max-width: 900px;
+      ">
+    <h2>🔥 Solo Mode Overview</h2>
+    <p>
+      Solo Mode is the full investigation experience. There are no helper scripts here —
+      <strong>you</strong> choose the tools, run the commands, and dig through the data
+      to uncover the flag.
+    </p>
+    <p>
+      Each challenge folder contains the same core artifacts used in Exploration Mode, but how
+      you work with them is entirely up to you: Linux commands, custom scripts, or any
+      other approach you like.
+    </p>
+    <p>
+      Your mission is simple: find the hidden flag in the challenge files and submit it
+      in our standard flag format:
+      <strong>CCRI-AAAA-1111</strong>.
+    </p>
+  </div>
+  {% endif %}
+
+
+  <h2 id="progress-counter" class="progress">
+    {{ challenges.completed_challenges | length }} of {{ challenges.challenges | length }} challenges completed
+  </h2>
+
+  <div class="grid">
+    {% for challenge in challenges.challenges %}
+    <div class="challenge-card{% if challenge.complete %} completed{% endif %}" id="{{ challenge.id }}">
+      <h3>{{ challenge.ch_number }}. {{ challenge.name }}</h3>
+      {% if challenge.complete %}
+      <p class="challenge-status">✅ Completed</p>
+      {% else %}
+      <button class="view-btn" type="button" data-challenge-url="/challenge/{{ challenge.id }}"
+        onclick="startChallenge(this);">
+        🚀 Start Challenge
+      </button>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  <script>
+    function goToLanding() {
+      window.location.href = "/";
+    }
+
+    function startChallenge(button) {
+      const url = button.dataset.challengeUrl;
+      window.location.href = url;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const body = document.body;
+      const total = parseInt(body.dataset.totalChallenges);
+      const challengeIDs = JSON.parse(body.dataset.challengeIds);
+
+      // Use a mode-specific key for progress tracking
+      const storagePrefix = `${body.dataset.baseMode}-${body.dataset.mode}`;
+      let completed = 0;
+
+      challengeIDs.forEach((challengeId) => {
+        const savedFlag = localStorage.getItem(`${storagePrefix}-${challengeId}`);
+        if (savedFlag) {
+          const card = document.getElementById(challengeId);
+          card.classList.add("completed");
+          completed++;
+
+          // Remove the button if it exists
+          const button = card.querySelector("button.view-btn");
+          if (button) {
+            button.remove();
+
+            // Add ✅ Completed label in its place
+            const status = document.createElement("p");
+            status.className = "challenge-status";
+            status.textContent = "✅ Completed";
+            card.appendChild(status);
+          }
         }
       });
-    </script>
-  </head>
-  <body 
-    data-total-challenges="{{ challenges.challenges | length }}"
-    data-challenge-ids='{{ challenges.get_list_of_ids() | tojson }}'
-    data-challenge-base-url="{{ url_for('index') }}"
-    data-mode="{{ mode }}"
-    data-base-mode="{{ base_mode }}"
-  >
-    <!-- 🆕 Top-right Back to Hub Button -->
-    <div class="top-right">
-      <button onclick="goToLanding();" class="home-btn">🏠 Back to Hub</button>
-    </div>
 
-    <h1>🚀 {{ list_title }}</h1>
-    <p>Welcome to the web hub for solving CTF challenges.</p>
-    <p><strong>Flag Format:</strong> CCRI-AAAA-1111</p>
+      // Update progress counter
+      document.getElementById("progress-counter").textContent =
+        `${completed} of ${total} challenges completed`;
+    });
+  </script>
+</body>
 
-    <h2 id="progress-counter" class="progress">
-      {{ challenges.completed_challenges | length }} of {{ challenges.challenges | length }} challenges completed
-    </h2>
-
-    <div class="grid">
-      {% for challenge in challenges.challenges %}
-      <div class="challenge-card{% if challenge.complete %} completed{% endif %}" id="{{ challenge.id }}">
-        <h3>{{ challenge.ch_number }}. {{ challenge.name }}</h3>
-        {% if challenge.complete %}
-        <p class="challenge-status">✅ Completed</p>
-        {% else %}
-        <button
-          class="view-btn"
-          type="button"
-          data-challenge-url="/challenge/{{ challenge.id }}"
-          onclick="startChallenge(this);"
-        >
-          🚀 Start Challenge
-        </button>
-        {% endif %}
-      </div>
-      {% endfor %}
-    </div>
-
-    <script>
-      function goToLanding() {
-        window.location.href = "/";
-      }
-
-      function startChallenge(button) {
-        const url = button.dataset.challengeUrl;
-        window.location.href = url;
-      }
-
-      document.addEventListener("DOMContentLoaded", () => {
-        const body = document.body;
-        const total = parseInt(body.dataset.totalChallenges);
-        const challengeIDs = JSON.parse(body.dataset.challengeIds);
-
-        // Use a mode-specific key for progress tracking
-        const storagePrefix = `${body.dataset.baseMode}-${body.dataset.mode}`;
-        let completed = 0;
-
-        challengeIDs.forEach((challengeId) => {
-          const savedFlag = localStorage.getItem(`${storagePrefix}-${challengeId}`);
-          if (savedFlag) {
-            const card = document.getElementById(challengeId);
-            card.classList.add("completed");
-            completed++;
-
-            // Remove the button if it exists
-            const button = card.querySelector("button.view-btn");
-            if (button) {
-              button.remove();
-
-              // Add ✅ Completed label in its place
-              const status = document.createElement("p");
-              status.className = "challenge-status";
-              status.textContent = "✅ Completed";
-              card.appendChild(status);
-            }
-          }
-        });
-
-        // Update progress counter
-        document.getElementById("progress-counter").textContent =
-          `${completed} of ${total} challenges completed`;
-      });
-    </script>
-  </body>
 </html>
