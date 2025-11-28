@@ -217,7 +217,7 @@ def load_challenges(mode=None):
 
     try:
         challenge_list = ChallengeList(challenges_file=challenges_path)
-        list_type = "Guided" if mode == "regular" else "Solo"
+        list_type = "Exploration" if mode == "regular" else "Solo"
         user_type = "Admin" if base_mode == "admin" else "Student"
         print(f"✅ {user_type} {list_type} Challenge List loaded ({challenge_list.numOfChallenges} challenges).")
         return challenge_list, challenges_folder
@@ -288,9 +288,9 @@ def index():
         ), 404
 
     if base_mode == "admin":
-        list_title = f"Admin {'Guided' if mode == 'regular' else 'Solo'} Challenge List"
+        list_title = f"Admin {'Exploration' if mode == 'regular' else 'Solo'} Challenge List"
     else:
-        list_title = f"Student {'Guided' if mode == 'regular' else 'Solo'} Challenge List"
+        list_title = f"Student {'Exploration' if mode == 'regular' else 'Solo'} Challenge List"
 
     print(f"📄 Opening {list_title}...")
     return render_template('index.html',

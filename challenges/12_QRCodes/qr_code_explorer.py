@@ -2,6 +2,7 @@
 import os
 import subprocess
 import time
+import shutil
 
 # === Terminal Utilities ===
 def clear_screen():
@@ -36,19 +37,46 @@ def spinner(message="Working", duration=1.8, interval=0.12):
     print("\r" + " " * (len(message) + 10) + "\r", end="", flush=True)
 
 # === QR Helpers ===
-def open_image(file_path, duration=20):
-    """Open an image for a limited duration using the default viewer."""
+def open_image(file_path, duration=10):
+    """Open an image using a specific viewer to ensure we can close it."""
+    # List of viewers to try (Parrot OS usually uses eom or eog)
+    viewers = ["eom", "eog", "feh", "display", "ristretto"]
+    
+    viewer_cmd = "xdg-open" # Fallback
+    
+    # Find the first available viewer from our list
+    for v in viewers:
+        if shutil.which(v):
+            viewer_cmd = v
+            break
+
     try:
+        # Popen keeps a handle on the specific process (e.g., eom)
         viewer = subprocess.Popen(
-            ["xdg-open", file_path],
+            [viewer_cmd, file_path],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL
         )
-        time.sleep(duration)
-        viewer.terminate()
-        print("⏳ Time’s up! Closing the viewer...")
+        
+        # Show a countdown timer while waiting
+        for i in range(duration, 0, -1):
+            print(f"\r⏳ Closing in {i} seconds... ", end="", flush=True)
+            time.sleep(1)
+            # If the student closes it early, stop counting
+            if viewer.poll() is not None:
+                print("\r✅ Image closed.             ", end="", flush=True)
+                break
+        else:
+            print("\r⏳ Time’s up! Closing viewer.", end="", flush=True)
+
+        # Force close if it's still running
+        if viewer.poll() is None:
+            viewer.terminate()
+            
+        print() # New Line
+
     except Exception as e:
-        print(f"❌ Could not open image: {e}")
+        print(f"\n❌ Could not open image: {e}")
 
 def decode_qr(file_path):
     """Run zbarimg to extract QR content."""
@@ -85,7 +113,7 @@ def main():
     print("📖 Behind the scenes, this script will use a command like:")
     print("     zbarimg qr_01.png")
     print("   to read the QR code and print its contents.\n")
-    print("⏳ Each QR opens for 20 seconds so you can inspect it,")
+    print("⏳ Each QR opens for 10 seconds so you can inspect it,")
     print("   then the script decodes the QR and saves the result to a .txt file.\n")
 
     pause_nonempty("Type 'start' when you're ready to explore the QR codes: ")
