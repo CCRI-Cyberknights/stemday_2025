@@ -5,6 +5,11 @@ import sys
 import time
 
 # === Utilities ===
+def resize_terminal(rows=35, cols=90):
+    sys.stdout.write(f"\x1b[8;{rows};{cols}t")
+    sys.stdout.flush()
+    time.sleep(0.2)
+
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
 
@@ -54,6 +59,7 @@ def decode_base64(input_file, output_file):
 
 # === Main Flow ===
 def main():
+    resize_terminal(35, 90)
     clear_screen()
     print("📡 Intercepted Transmission Decoder")
     print("=====================================\n")

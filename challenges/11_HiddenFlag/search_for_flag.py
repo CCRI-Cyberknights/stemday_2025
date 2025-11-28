@@ -3,6 +3,11 @@ import os
 import sys
 import time
 
+def resize_terminal(rows=35, cols=90):
+    sys.stdout.write(f"\x1b[8;{rows};{cols}t")
+    sys.stdout.flush()
+    time.sleep(0.2)
+
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
 
@@ -27,6 +32,7 @@ def list_directory(path):
         return []
 
 def main():
+    resize_terminal(35, 90)
     script_dir = os.path.abspath(os.path.dirname(__file__))
     root_dir = os.path.join(script_dir, "junk")
     results_file = os.path.join(script_dir, "results.txt")

@@ -5,6 +5,11 @@ import subprocess
 import time
 
 # === Terminal Utilities ===
+def resize_terminal(rows=35, cols=90):
+    sys.stdout.write(f"\x1b[8;{rows};{cols}t")
+    sys.stdout.flush()
+    time.sleep(0.2)
+
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
 
@@ -46,6 +51,7 @@ def spinner(message="Working", duration=2.0, interval=0.15):
 
 # === Main Flow ===
 def main():
+    resize_terminal(35, 90)
     script_dir = os.path.abspath(os.path.dirname(__file__))
     zip_file = os.path.join(script_dir, "secret.zip")
     wordlist = os.path.join(script_dir, "wordlist.txt")

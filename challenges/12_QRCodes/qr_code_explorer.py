@@ -2,9 +2,15 @@
 import os
 import subprocess
 import time
+import sys
 import shutil
 
 # === Terminal Utilities ===
+def resize_terminal(rows=35, cols=90):
+    sys.stdout.write(f"\x1b[8;{rows};{cols}t")
+    sys.stdout.flush()
+    time.sleep(0.2)
+
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
 
@@ -94,6 +100,7 @@ def decode_qr(file_path):
 
 # === Main Flow ===
 def main():
+    resize_terminal(35, 90)
     script_dir = os.path.abspath(os.path.dirname(__file__))
     qr_codes = [os.path.join(script_dir, f"qr_0{i}.png") for i in range(1, 6)]
 

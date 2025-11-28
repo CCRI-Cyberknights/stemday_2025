@@ -3,8 +3,14 @@ import os
 import sys
 import subprocess
 import time
+import shutil
 
 # === Terminal Utilities ===
+def resize_terminal(rows=35, cols=90):
+    sys.stdout.write(f"\x1b[8;{rows};{cols}t")
+    sys.stdout.flush()
+    time.sleep(0.2)
+
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
 
@@ -167,6 +173,7 @@ def run_hashcat(hashes_file, wordlist_file, potfile):
 
 # === Main Student Flow ===
 def student_interactive(script_dir):
+    resize_terminal(35, 90)
     hashes_file = os.path.join(script_dir, "hashes.txt")
     wordlist_file = os.path.join(script_dir, "wordlist.txt")
     potfile = os.path.join(script_dir, "hashcat.potfile")

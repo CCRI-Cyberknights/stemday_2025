@@ -6,8 +6,13 @@ import time
 import re
 
 # === Terminal Utilities ===
+def resize_terminal(rows=35, cols=90):
+    sys.stdout.write(f"\x1b[8;{rows};{cols}t")
+    sys.stdout.flush()
+    time.sleep(0.2)
+
 def clear_screen():
-    os.system('cls' if os.name == 'nt' else 'clear')
+    os.system('clear' if os.name == 'posix' else 'cls')
 
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
@@ -83,6 +88,7 @@ def patch_operator_in_script(script_path, new_operator):
 
 # === Main Flow ===
 def main():
+    resize_terminal(35, 90)
     script_dir = os.path.abspath(os.path.dirname(__file__))
     broken_script = os.path.join(script_dir, "broken_flag.py")
     flag_output_file = os.path.join(script_dir, "flag.txt")

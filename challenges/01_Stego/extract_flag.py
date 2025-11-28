@@ -9,8 +9,20 @@ IMAGE_FILE = "squirrel.jpg"
 OUTPUT_FILE = "decoded_message.txt"
 
 # === Utilities ===
+def resize_terminal(rows=35, cols=90):
+    sys.stdout.write(f"\x1b[8;{rows};{cols}t")
+    sys.stdout.flush()
+    time.sleep(0.2)
+
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
+
+def type_writer(text, delay=0.03):
+    for char in text:
+        sys.stdout.write(char)
+        sys.stdout.flush()
+        time.sleep(delay)
+    print()
 
 def pause(msg="Press ENTER to continue..."):
     input(msg)
@@ -60,6 +72,7 @@ def run_steghide(password, image_path, output_path):
 
 # === Main Interactive Loop ===
 def main():
+    resize_terminal(35, 90)
     clear_screen()
     print("🕵️ Stego Decode Helper")
     print("==========================\n")

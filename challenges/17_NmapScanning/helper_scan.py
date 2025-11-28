@@ -11,6 +11,11 @@ BINARY_URL = f"http://{BINARY_HOST}"
 SAVE_FILE = "nmap_flag_response.txt"
 
 # === Utilities ===
+def resize_terminal(rows=35, cols=90):
+    sys.stdout.write(f"\x1b[8;{rows};{cols}t")
+    sys.stdout.flush()
+    time.sleep(0.2)
+
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
 
@@ -70,6 +75,7 @@ def fetch_port_response(port):
 
 # === Main Program ===
 def main():
+    resize_terminal(35, 90)
     clear_screen()
     print("🛰️  Nmap Scan Puzzle")
     print("======================================\n")

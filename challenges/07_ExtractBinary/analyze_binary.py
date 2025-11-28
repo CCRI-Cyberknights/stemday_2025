@@ -8,6 +8,11 @@ import re
 regex_pattern = r'\b([A-Z0-9]{4}-){2}[A-Z0-9]{4}\b'
 
 # === Terminal Utilities ===
+def resize_terminal(rows=35, cols=90):
+    sys.stdout.write(f"\x1b[8;{rows};{cols}t")
+    sys.stdout.flush()
+    time.sleep(0.2)
+
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
 
@@ -64,6 +69,7 @@ def search_for_flags(file_path, regex):
 
 # === Main Flow ===
 def main():
+    resize_terminal(35, 90)
     script_dir = os.path.abspath(os.path.dirname(__file__))
     target_binary = os.path.join(script_dir, "hidden_flag")
     outfile = os.path.join(script_dir, "extracted_strings.txt")

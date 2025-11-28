@@ -5,6 +5,11 @@ import subprocess
 import time
 import shlex
 
+def resize_terminal(rows=35, cols=90):
+    sys.stdout.write(f"\x1b[8;{rows};{cols}t")
+    sys.stdout.flush()
+    time.sleep(0.2)
+
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
 
@@ -95,6 +100,7 @@ def save_output(text, path):
         print(f"❌ Failed to save output: {e}")
 
 def main():
+    resize_terminal(35, 90)
     script_dir = os.path.abspath(os.path.dirname(__file__))
     ps_dump_path = os.path.join(script_dir, "ps_dump.txt")
 

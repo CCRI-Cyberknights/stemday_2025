@@ -2,12 +2,18 @@
 import os
 import subprocess
 import sys
+import time
 import glob
 
 # === Terminal Utilities ===
+def resize_terminal(rows=35, cols=90):
+    sys.stdout.write(f"\x1b[8;{rows};{cols}t")
+    sys.stdout.flush()
+    time.sleep(0.2)
+
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
-
+    
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
 
@@ -63,6 +69,7 @@ def bulk_scan(script_dir):
 
 # === Main Flow ===
 def main():
+    resize_terminal(35, 90)
     script_dir = os.path.abspath(os.path.dirname(__file__))
     responses = [os.path.join(script_dir, f"response_{i}.txt") for i in range(1, 6)]
 
