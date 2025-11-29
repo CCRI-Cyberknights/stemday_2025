@@ -1,10 +1,10 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:55:41 GMT
-Server: CryptKeepers-Gateway/2.3.1
-Content-Type: text/html; charset=UTF-8
+Date: Sun, 30 Jun 2025 15:53:05 GMT
+Server: CryptKeepers-Node/3.0.0-beta
+Content-Type: application/json
 Cache-Control: private, no-cache
-X-Powered-By: Node.js/18.16.0
-X-Flag: AWLO-QQKP-6901
+X-Powered-By: Python/3.11.4
+X-Flag: CCRI-IVAB-7689
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
 
@@ -14,4 +14,4 @@ X-Content-Type-Options: nosniff
   "notes": "No maintenance scheduled."
 }
 
-<!-- Debug: Temporary caching enabled -->
+<!-- Developer note: Remove X-Test headers before release -->

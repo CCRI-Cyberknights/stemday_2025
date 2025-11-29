@@ -1,19 +1,15 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:55:55 GMT
-Server: nginx/1.24.0
-Content-Type: application/json
+Date: Sun, 30 Jun 2025 15:48:12 GMT
+Server: CryptKeepers-Node/3.0.0-beta
+Content-Type: text/html; charset=UTF-8
 Cache-Control: private, no-cache
-X-Powered-By: Ruby on Rails/7.1.0
-X-Flag: CCRI-LFDH-7587
+X-Powered-By: Node.js/18.16.0
+X-Flag: CCAP-RPVZ-5912
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
+Set-Cookie: sessionid=dwg007h6msqp; HttpOnly; Secure
 
-<html>
-  <head><title>CryptKeepers Portal</title></head>
-  <body>
-    <h1>Welcome to the CryptKeepers hub</h1>
-    <p>System maintenance is underway. Some services may be unavailable.</p>
-  </body>
-</html>
+Welcome to the CryptKeepers data endpoint.
+This endpoint returns plain text responses.
 
-<!-- Developer note: Remove X-Test headers before release -->
+<!-- Debug: API response size 512 bytes -->

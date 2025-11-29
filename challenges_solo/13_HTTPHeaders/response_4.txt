@@ -1,20 +1,15 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:55:54 GMT
-Server: Apache/2.4.54 (Ubuntu)
-Content-Type: text/plain; charset=UTF-8
-Cache-Control: private, no-cache
-X-Powered-By: Ruby on Rails/7.1.0
-X-Flag: DERK-QZJU-2465
+Date: Sun, 30 Jun 2025 15:50:10 GMT
+Server: CryptKeepers-Node/3.0.0-beta
+Content-Type: application/json
+Cache-Control: public, max-age=86400
+X-Powered-By: ASP.NET Core/7.0
+X-Flag: KOGQ-8083-CQLQ
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=w4pb8mnqhv5l; HttpOnly; Secure
+Set-Cookie: sessionid=0k0wpt10mnn9; HttpOnly; Secure
 
-<html>
-  <head><title>CryptKeepers Portal</title></head>
-  <body>
-    <h1>Welcome to the CryptKeepers hub</h1>
-    <p>System maintenance is underway. Some services may be unavailable.</p>
-  </body>
-</html>
+Welcome to the CryptKeepers data endpoint.
+This endpoint returns plain text responses.
 
-<!-- Developer note: Remove X-Test headers before release -->
+<!-- Debug: Temporary caching enabled -->

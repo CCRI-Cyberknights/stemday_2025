@@ -1,10 +1,10 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:47:45 GMT
-Server: Go HTTP Server/1.19
+Date: Sun, 30 Jun 2025 15:59:28 GMT
+Server: nginx/1.24.0
 Content-Type: text/html; charset=UTF-8
-Cache-Control: public, max-age=86400
-X-Powered-By: Node.js/18.16.0
-X-Flag: PSBJ-9356-KFQO
+Cache-Control: private, no-cache
+X-Powered-By: Python/3.11.4
+X-Flag: ITZZ-3730-YOHC
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
 

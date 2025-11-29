@@ -1,14 +1,20 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:51:55 GMT
-Server: Go HTTP Server/1.19
-Content-Type: text/plain; charset=UTF-8
-Cache-Control: private, no-cache
-X-Powered-By: PHP/8.1.12
-X-Flag: ANYP-JIKT-4669
+Date: Sun, 30 Jun 2025 15:58:57 GMT
+Server: CryptKeepers-Node/3.0.0-beta
+Content-Type: application/json
+Cache-Control: no-store
+X-Powered-By: Python/3.11.4
+X-Flag: MIIA-2399-STFE
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
+Set-Cookie: sessionid=lxpwqfd1hlan; HttpOnly; Secure
 
-Welcome to the CryptKeepers data endpoint.
-This endpoint returns plain text responses.
+<html>
+  <head><title>CryptKeepers Portal</title></head>
+  <body>
+    <h1>Welcome to the CryptKeepers hub</h1>
+    <p>System maintenance is underway. Some services may be unavailable.</p>
+  </body>
+</html>
 
-<!-- Debug: Temporary caching enabled -->
+<!-- Debug: Session created for client 10.6.112.3 -->

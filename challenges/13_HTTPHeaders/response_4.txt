@@ -1,20 +1,19 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:56:22 GMT
-Server: Apache/2.4.54 (Ubuntu)
-Content-Type: application/json
+Date: Sun, 30 Jun 2025 15:48:37 GMT
+Server: CryptKeepers-Node/3.0.0-beta
+Content-Type: text/plain; charset=UTF-8
 Cache-Control: no-store
-X-Powered-By: Node.js/18.16.0
-X-Flag: BIFO-0424-UCAN
+X-Powered-By: Python/3.11.4
+X-Flag: RIUS-LVPM-1725
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=5qydb6ojrkcc; HttpOnly; Secure
 
 <html>
-  <head><title>Internal Dashboard</title></head>
+  <head><title>Data Service</title></head>
   <body>
-    <h1>CryptKeepers Ops Dashboard</h1>
-    <p>Authentication successful. Redirecting...</p>
+    <h1>Data Service Ready</h1>
+    <p>Connect your client application to begin.</p>
   </body>
 </html>
 
-<!-- Debug: Session created for client 10.6.112.3 -->
+<!-- To-do: Update security headers on staging -->

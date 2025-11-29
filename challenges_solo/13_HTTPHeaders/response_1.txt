@@ -1,20 +1,15 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:52:15 GMT
-Server: Apache/2.4.54 (Ubuntu)
+Date: Sun, 30 Jun 2025 15:46:49 GMT
+Server: nginx/1.24.0
 Content-Type: text/plain; charset=UTF-8
-Cache-Control: public, max-age=86400
-X-Powered-By: Python/3.11.4
-X-Flag: JRFZ-KYWD-8077
+Cache-Control: no-store
+X-Powered-By: Node.js/18.16.0
+X-Flag: AOYN-6954-HNUT
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-Set-Cookie: sessionid=uq9tur88uu92; HttpOnly; Secure
+Set-Cookie: sessionid=hfjrccxv8z3u; HttpOnly; Secure
 
-<html>
-  <head><title>Internal Dashboard</title></head>
-  <body>
-    <h1>CryptKeepers Ops Dashboard</h1>
-    <p>Authentication successful. Redirecting...</p>
-  </body>
-</html>
+Welcome to the CryptKeepers data endpoint.
+This endpoint returns plain text responses.
 
-<!-- To-do: Update security headers on staging -->
+<!-- Debug: API response size 512 bytes -->

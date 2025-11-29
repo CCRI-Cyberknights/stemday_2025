@@ -1,10 +1,10 @@
 HTTP/1.1 200 OK
-Date: Sun, 30 Jun 2025 15:51:02 GMT
-Server: CryptKeepers-Gateway/2.3.1
-Content-Type: text/html; charset=UTF-8
-Cache-Control: private, no-cache
-X-Powered-By: PHP/8.1.12
-X-Flag: CCRI-HHOR-0118
+Date: Sun, 30 Jun 2025 15:47:15 GMT
+Server: CryptKeepers-Node/3.0.0-beta
+Content-Type: application/json
+Cache-Control: no-store
+X-Powered-By: Python/3.11.4
+X-Flag: GYYP-ZKDY-7731
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
 
@@ -14,4 +14,4 @@ X-Content-Type-Options: nosniff
   "notes": "No maintenance scheduled."
 }
 
-<!-- Debug: Session created for client 10.6.112.3 -->
+<!-- Debug: Temporary caching enabled -->
