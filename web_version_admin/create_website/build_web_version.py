@@ -5,9 +5,9 @@ import os
 import shutil
 import stat
 import sys
-import zipapp  # NEW
+import zipapp
 
-# === CCRI Web Version Builder (Dual Setup Edition) ===
+# === CCRI Web Version Builder (Modular Edition) ===
 
 ENCODE_KEY = "CTF4EVER"
 
@@ -63,17 +63,30 @@ def _looks_base64(s: str) -> bool:
 def prepare_web_version(base_dir):
     admin_dir = os.path.join(base_dir, "web_version_admin")
     student_dir = os.path.join(base_dir, "web_version")  # assets live here on disk
+    
+    # === Core Data Files ===
     admin_json = os.path.join(admin_dir, "challenges.json")
     solo_json = os.path.join(admin_dir, "challenges_solo.json")
     templates_folder = os.path.join(admin_dir, "templates")
     static_folder = os.path.join(admin_dir, "static")
+
+    # === Modular Python Source Files ===
     server_source = os.path.join(admin_dir, "server.py")
+    config_py = os.path.join(admin_dir, "config.py")
+    fake_services_py = os.path.join(admin_dir, "fake_services.py")
+    routes_py = os.path.join(admin_dir, "routes.py")
+    utils_py = os.path.join(admin_dir, "utils.py")
     challenge_py = os.path.join(admin_dir, "Challenge.py")
     challenge_list_py = os.path.join(admin_dir, "ChallengeList.py")
 
+    required_modules = [
+        server_source, config_py, fake_services_py, 
+        routes_py, utils_py, challenge_py, challenge_list_py
+    ]
+
     # === Validate admin folder contents ===
     print(f"📂 Using BASE_DIR: {base_dir}")
-    for p in (admin_json, solo_json, server_source, challenge_py, challenge_list_py):
+    for p in [admin_json, solo_json] + required_modules:
         if not os.path.isfile(p):
             abort(f"Missing required file: {p}")
     for d in (templates_folder, static_folder):
@@ -160,11 +173,12 @@ def prepare_web_version(base_dir):
     os.makedirs(pyz_src, exist_ok=True)
 
     # Copy backend modules that the zipapp imports
-    shutil.copy2(server_source,      os.path.join(pyz_src, "server.py"))
-    shutil.copy2(challenge_py,       os.path.join(pyz_src, "Challenge.py"))
-    shutil.copy2(challenge_list_py,  os.path.join(pyz_src, "ChallengeList.py"))
+    for module_path in required_modules:
+        dest_name = os.path.basename(module_path)
+        shutil.copy2(module_path, os.path.join(pyz_src, dest_name))
+        print(f"   - Included {dest_name}")
 
-    # __main__.py: detect assets at runtime next to the .pyz (or honor env override)
+    # __main__.py: Entry point for the Zipapp
     main_code = r"""\
 import os, sys
 
@@ -178,10 +192,18 @@ def main():
 
     os.environ.setdefault("CCRI_CTF_MODE", "student")
 
-    import server  # picks up CCRI_ASSETS_DIR
+    import config
+    import fake_services
+    import server
+
+    # Start the fake services (background threads)
+    # We must call this explicitly because we are importing server, not running it as __main__
+    fake_services.start_all_services(config.AVAILABLE_MODES)
+
     print(f"📖 Using template folder at: {server.app.template_folder}")
     print(f"🧰 Static folder at: {server.app.static_folder}")
     print(f"🚀 {os.environ['CCRI_CTF_MODE'].capitalize()} Hub running on http://127.0.0.1:5000")
+    
     server.app.run(host='127.0.0.1', port=5000, debug=False, threaded=True)
 
 if __name__ == "__main__":
@@ -201,7 +223,7 @@ if __name__ == "__main__":
     print("\n🎉 Student web_version build completed successfully!\n")
 
 def main():
-    print("🚀 Starting Web Version Build Process...")
+    print("🚀 Starting Web Version Build Process (Modular)...")
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
     prepare_web_version(base_dir)
     print("✅ Build process finished successfully.")

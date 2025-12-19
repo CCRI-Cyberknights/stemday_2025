@@ -5,49 +5,7 @@
   <meta charset="UTF-8" />
   <title>🚀 CCRI CTF {{ base_mode|capitalize }} Hub</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-  <style>
-    /* Center content and add spacing */
-    .landing-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      margin-top: 30px;
-    }
-
-    .grid {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    .challenge-card {
-      width: 300px;
-      background: transparent;
-      border: 2px solid #ccc;
-      color: #f3e600;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-      text-align: center;
-    }
-
-    .landing-logo {
-      margin-top: 40px;
-      max-width: 400px;
-      width: 80%;
-      height: auto;
-    }
-
-    .empty-state {
-      color: #fff;
-      border: 1px dashed #666;
-      padding: 16px;
-      border-radius: 8px;
-      max-width: 520px;
-    }
-  </style>
+  <link rel="icon" href="{{ url_for('static', filename='assets/outerspace-64.gif') }}" type="image/gif">
 </head>
 
 <body>
@@ -60,7 +18,7 @@
       <div class="challenge-card">
         <h3>🔭 Exploration Mode</h3>
         <p>Includes helper scripts and walkthroughs for each challenge.</p>
-        <a href="{{ url_for('set_mode', mode='regular') }}">
+        <a href="{{ url_for('main.set_mode', mode='regular') }}">
           <button class="view-btn">🚀 Start Exploration Challenge List</button>
         </a>
       </div>
@@ -70,7 +28,7 @@
       <div class="challenge-card">
         <h3>🔥 Solo Mode</h3>
         <p>No helpers. Solve challenges manually for the full experience.</p>
-        <a href="{{ url_for('set_mode', mode='solo') }}">
+        <a href="{{ url_for('main.set_mode', mode='solo') }}">
           <button class="view-btn">🚀 Start Solo Challenge List</button>
         </a>
       </div>
@@ -85,7 +43,7 @@
     {% endif %}
 
     <div style="margin-top: 30px;">
-      <a href="{{ url_for('linux_basics') }}" class="nav-btn">
+      <a href="{{ url_for('main.linux_basics') }}" class="nav-btn">
         🐧 Linux Basics &amp; Command Guide
       </a>
     </div>

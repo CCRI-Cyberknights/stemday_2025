@@ -1,118 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>{{ challenge.name }} - CCRI CTF Admin Exploration</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-  </head>
-  <body
-    data-challenge-id="{{ challenge.id }}"
-    data-url-index="{{ url_for('index') }}"
-    data-url-open-folder="/open_folder/{{ challenge.id }}"
-    data-url-run-script="/run_script/{{ challenge.id }}"
-    data-url-submit-flag="/submit_flag/{{ challenge.id }}"
-    data-base-mode="{{ base_mode }}"
-    data-mode="{{ mode }}"
-  >
-    <h1>{{ challenge.name }} - 🔭 Exploration Mode</h1>
-    
 
-    <!-- Top Buttons -->
-    <div class="actions">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ challenge.name }} - CCRI CTF Admin Exploration</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+
+<body data-challenge-id="{{ challenge.id }}" data-url-index="{{ url_for('main.index') }}"
+  data-url-open-folder="{{ url_for('main.open_folder', challenge_id=challenge.id) }}"
+  data-url-run-script="{{ url_for('main.run_script', challenge_id=challenge.id) }}"
+  data-url-submit-flag="{{ url_for('main.submit_flag', challenge_id=challenge.id) }}" data-base-mode="{{ base_mode }}"
+  data-mode="{{ mode }}">
+  <h1>{{ challenge.name }} - 🔭 Exploration Mode</h1>
+
+  <div class="actions">
+    <button type="button" onclick="goBackToIndex();">⬅ Back to Challenges</button>
+    <button type="button" onclick="runHelper('open');">📂 Open Folder</button>
+    <button type="button" onclick="runHelper('run');">🖥 Run Helper Script</button>
+  </div>
+
+  <hr />
+  <div id="challenge-wrapper">
+    <div class="challenge-wrapper-section">
+      <h2 class="text-center">📖 Challenge Details</h2>
+      {% if readme %}
+      <div class="readme">{{ readme }}</div>
+      {% else %}
+      <p><em>No README.md found in this folder.</em></p>
+      {% endif %}
+    </div>
+
+    <div class="challenge-wrapper-section">
+      <h2>📂 Attached Files</h2>
+      {% if files %}
+      <ul>
+        {% for file in files %}
+        <li>
+          <a href="{{ url_for('main.get_challenge_file', challenge_id=challenge.id, filename=file) }}"
+            target="_blank">{{ file }}</a>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p><em>No additional files in this folder.</em></p>
+      {% endif %}
+    </div>
+
+    <div class="challenge-wrapper-footer">
+      <div>
+        <h2>🏁 Submit Flag</h2>
+      </div>
+      <div class="input-wrapper">
+        <input type="text" id="flagInput" name="flagInput" class="input" placeholder="Enter flag (CCRI-AAAA-1111)" />
+        <button type="button" class="Subscribe-btn" onclick="submitFlag();">
+          Submit
+        </button>
+        <p id="flagStatus"></p>
+      </div>
+    </div>
+
+    <hr />
+    <div class="actions bottom-buttons">
       <button type="button" onclick="goBackToIndex();">⬅ Back to Challenges</button>
       <button type="button" onclick="runHelper('open');">📂 Open Folder</button>
       <button type="button" onclick="runHelper('run');">🖥 Run Helper Script</button>
     </div>
+  </div>
 
-    <hr />
-    <div id="challenge-wrapper">
-      <div class="challenge-wrapper-section">
-        <h2 style="width: 100%; text-align: center">📖 Challenge Details</h2>
-        {% if readme %}
-        <div class="readme">{{ readme|safe }}</div>
-        {% else %}
-        <p><em>No README.md found in this folder.</em></p>
-        {% endif %}
-      </div>
+  <script>
+    const challengeId = document.body.dataset.challengeId;
+    const baseMode = document.body.dataset.baseMode;
+    const mode = document.body.dataset.mode;
+    const storageKey = `${baseMode}-${mode}-${challengeId}`;
+    const urlIndex = document.body.dataset.urlIndex;
+    const urlOpenFolder = document.body.dataset.urlOpenFolder;
+    const urlRunScript = document.body.dataset.urlRunScript;
+    const urlSubmitFlag = document.body.dataset.urlSubmitFlag;
 
-      <div class="challenge-wrapper-section">
-        <h2>📂 Attached Files</h2>
-        {% if files %}
-        <ul>
-          {% for file in files %}
-          <li>
-            <a
-              href="{{ url_for('get_challenge_file', challenge_id=challenge.id, filename=file) }}"
-              target="_blank"
-            >{{ file }}</a>
-          </li>
-          {% endfor %}
-        </ul>
-        {% else %}
-        <p><em>No additional files in this folder.</em></p>
-        {% endif %}
-      </div>
+    function goBackToIndex() { window.location.href = urlIndex; }
 
-      <div class="challenge-wrapper-footer">
-        <div>
-          <h2>🏁 Submit Flag</h2>
-        </div>
-        <div class="input-wrapper">
-          <input
-            type="text"
-            id="flagInput"
-            name="flagInput"
-            class="input"
-            placeholder="Enter flag (CCRI-AAAA-1111)"
-          />
-          <button type="button" class="Subscribe-btn" onclick="submitFlag();">
-            Submit
-          </button>
-          <p id="flagStatus"></p>
-        </div>
-      </div>
+    function runHelper(action) {
+      const url = action === 'open' ? urlOpenFolder : urlRunScript;
+      fetch(url, { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status !== 'success') console.error('Failed:', data.message);
+        });
+    }
 
-      <!-- Bottom Buttons -->
-      <hr />
-      <div class="actions bottom-buttons">
-        <button type="button" onclick="goBackToIndex();">⬅ Back to Challenges</button>
-        <button type="button" onclick="runHelper('open');">📂 Open Folder</button>
-        <button type="button" onclick="runHelper('run');">🖥 Run Helper Script</button>
-      </div>
-    </div>
-
-    <script>
-      const challengeId = document.body.dataset.challengeId;
-      const baseMode = document.body.dataset.baseMode;
-      const mode = document.body.dataset.mode;
-      const storageKey = `${baseMode}-${mode}-${challengeId}`;
-      const urlIndex = document.body.dataset.urlIndex;
-      const urlOpenFolder = document.body.dataset.urlOpenFolder;
-      const urlRunScript = document.body.dataset.urlRunScript;
-      const urlSubmitFlag = document.body.dataset.urlSubmitFlag;
-
-      function goBackToIndex() {
-        window.location.href = urlIndex;
-      }
-
-      function runHelper(action) {
-        const url = action === 'open' ? urlOpenFolder : urlRunScript;
-        fetch(url, { method: 'POST' })
-          .then(res => res.json())
-          .then(data => {
-            if (data.status !== 'success') {
-              console.error('Failed:', data.message);
-            }
-          });
-      }
-
-      function submitFlag() {
-        const flag = document.getElementById('flagInput').value.trim();
-        fetch(urlSubmitFlag, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ flag: flag })
-        })
+    function submitFlag() {
+      const flag = document.getElementById('flagInput').value.trim();
+      fetch(urlSubmitFlag, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ flag: flag })
+      })
         .then(res => res.json())
         .then(data => {
           const status = document.getElementById('flagStatus');
@@ -128,17 +111,16 @@
             status.style.color = 'orange';
           }
         });
-      }
+    }
 
-      // Pre-fill saved flag
-      const savedFlag = localStorage.getItem(storageKey);
-      if (savedFlag) {
-        const flagInput = document.getElementById("flagInput");
-        flagInput.value = savedFlag;
-        const status = document.getElementById("flagStatus");
-        status.textContent = "🎉 Correct flag!";
-        status.style.color = "green";
-      }
-    </script>
-  </body>
+    const savedFlag = localStorage.getItem(storageKey);
+    if (savedFlag) {
+      document.getElementById("flagInput").value = savedFlag;
+      const status = document.getElementById("flagStatus");
+      status.textContent = "🎉 Correct flag!";
+      status.style.color = "green";
+    }
+  </script>
+</body>
+
 </html>

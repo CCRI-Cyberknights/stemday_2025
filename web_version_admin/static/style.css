@@ -31,7 +31,21 @@ a:visited {
 }
 
 /* ===========================
-   Challenges grid
+   Global Utilities
+   =========================== */
+.text-center {
+	width: 100%;
+	text-align: center;
+}
+
+.top-right {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+}
+
+/* ===========================
+   Challenges grid (Main Index)
    =========================== */
 
 #challenges-grid {
@@ -99,31 +113,10 @@ a:visited {
 }
 
 /* ===========================
-   Dark action buttons (Start / Back to Hub)
+   Buttons (Actions & Navigation)
    =========================== */
 
-.view-btn {
-	margin: 8px;
-	padding: 10px 16px;
-	border: none;
-	border-radius: 6px;
-	background: #1e1e1e;
-	color: #fff;
-	font-size: 1em;
-	cursor: pointer;
-	transition: background 0.3s ease;
-}
-
-.view-btn:hover {
-	background: linear-gradient(135deg, #6a009b, #48006a);
-}
-
-.top-right {
-	position: absolute;
-	top: 20px;
-	right: 20px;
-}
-
+.view-btn,
 .home-btn {
 	margin: 8px;
 	padding: 10px 16px;
@@ -136,19 +129,15 @@ a:visited {
 	transition: background 0.3s ease;
 }
 
+.view-btn:hover,
 .home-btn:hover {
 	background: linear-gradient(135deg, #6a009b, #48006a);
 }
-
-/* ===========================
-   White pill buttons (Back / Open / Run / Submit)
-   =========================== */
 
 .actions {
 	margin: 15px 0;
 }
 
-/* Top & bottom white pill buttons */
 .actions button {
 	margin-right: 10px;
 	padding: 0 16px;
@@ -166,7 +155,6 @@ a:visited {
 	transition: background 0.2s ease, color 0.2s ease, transform 0.08s ease;
 }
 
-/* Slightly smaller for the bottom row */
 .actions.bottom-buttons {
 	margin-top: 30px;
 }
@@ -177,7 +165,6 @@ a:visited {
 	padding: 0 12px;
 }
 
-/* Submit button shares the same look */
 .Subscribe-btn {
 	height: 100%;
 	padding: 0 16px;
@@ -195,32 +182,19 @@ a:visited {
 	transition: background 0.2s ease, color 0.2s ease, transform 0.08s ease;
 }
 
-/* Hover for all white pill buttons */
 .actions button:hover,
 .Subscribe-btn:hover {
 	background-color: #e6e6e6;
 	color: #000000;
 }
 
-/* Tiny press animation */
 .actions button:active,
 .Subscribe-btn:active {
 	transform: scale(0.97);
 }
 
-/* Optional arrow animation support (harmless even if unused) */
-.arrow {
-	position: absolute;
-	margin-right: 150px;
-	transition: all 0.3s;
-}
-
-.input-wrapper:active .icon {
-	transform: scale(1.3);
-}
-
 /* ===========================
-   Challenge wrapper layout
+   Challenge Wrapper Layout
    =========================== */
 
 #challenge-wrapper {
@@ -250,12 +224,8 @@ a:visited {
 	align-items: center;
 }
 
-.challenge-wrapper-footer>* {
-	margin: 0;
-}
-
 /* ===========================
-   Flag input layout
+   Input Fields
    =========================== */
 
 #flagInput {
@@ -268,7 +238,6 @@ a:visited {
 	font-weight: bold;
 }
 
-/* From Uiverse.io by vinodjangid07 */
 .input-wrapper {
 	width: fit-content;
 	height: 45px;
@@ -280,13 +249,6 @@ a:visited {
 	background-color: #292524;
 }
 
-.icon {
-	width: 30px;
-	fill: rgb(255, 255, 255);
-	margin-left: 8px;
-	transition: all 0.3s;
-}
-
 .input {
 	max-width: 225px;
 	height: 100%;
@@ -296,42 +258,6 @@ a:visited {
 	background-color: #292524;
 	color: #50ff16ff;
 	font-size: 1em;
-}
-
-.input:-webkit-autofill {
-	-webkit-box-shadow: 0 0 0px 1000px #292524 inset;
-	-webkit-text-fill-color: #ffffff;
-}
-
-/* jello keyframes kept in case you restore arrow animation */
-@keyframes jello-vertical {
-	0% {
-		transform: scale3d(1, 1, 1);
-	}
-
-	30% {
-		transform: scale3d(0.75, 1.25, 1);
-	}
-
-	40% {
-		transform: scale3d(1.25, 0.75, 1);
-	}
-
-	50% {
-		transform: scale3d(0.85, 1.15, 1);
-	}
-
-	65% {
-		transform: scale3d(1.05, 0.95, 1);
-	}
-
-	75% {
-		transform: scale3d(0.95, 1.05, 1);
-	}
-
-	100% {
-		transform: scale3d(1, 1, 1);
-	}
 }
 
 /* ===========================
@@ -359,10 +285,6 @@ a:visited {
 	color: #eaeaea;
 }
 
-.readme p {
-	margin: 0.5em 0;
-}
-
 .readme code {
 	background: #eaeaea;
 	color: #272822;
@@ -379,16 +301,6 @@ a:visited {
 	overflow-x: auto;
 }
 
-.readme ul {
-	margin: 10px 0;
-	padding-left: 20px;
-}
-
-.readme strong {
-	font-weight: bold;
-}
-
-/* README tables */
 .readme table {
 	width: 100%;
 	border-collapse: collapse;
@@ -413,17 +325,73 @@ a:visited {
 	font-weight: bold;
 }
 
-.readme td code {
-	background: #2e2e2e;
-	color: #ffd700;
-	padding: 2px 4px;
+/* ===========================
+   Mode Intro Panels
+   =========================== */
+
+.mode-intro {
+	max-width: 900px;
+	margin: 20px 0 25px 0;
+	padding: 15px 20px;
+	background: #222;
 	border-radius: 4px;
-	font-family: monospace;
+	color: #f5f5f5;
+	text-align: left;
+}
+
+.guided-intro {
+	border-left: 5px solid #4b8bf4;
+}
+
+.solo-intro {
+	border-left: 5px solid #d44f4f;
 }
 
 /* ===========================
-   Info section on landing
+   Landing Page Specifics
    =========================== */
+
+.landing-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	margin-top: 30px;
+}
+
+/* Override default grid to be flex for landing page */
+.landing-container .grid {
+	display: flex;
+	justify-content: center;
+	gap: 20px;
+	flex-wrap: wrap;
+}
+
+.landing-container .challenge-card {
+	width: 300px;
+	background: transparent;
+	border: 2px solid #ccc;
+	color: #f3e600;
+	padding: 15px;
+	border-radius: 8px;
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+	text-align: center;
+}
+
+.landing-logo {
+	margin-top: 40px;
+	max-width: 400px;
+	width: 80%;
+	height: auto;
+}
+
+.empty-state {
+	color: #fff;
+	border: 1px dashed #666;
+	padding: 16px;
+	border-radius: 8px;
+	max-width: 520px;
+}
 
 .info-section {
 	max-width: 700px;
@@ -435,93 +403,68 @@ a:visited {
 	text-align: left;
 }
 
-.info-section h1,
-.info-section h2 {
+/* ===========================
+   Linux Basics Page Specifics
+   =========================== */
+
+.linux-content {
+	max-width: 900px;
+	margin: 30px auto;
+	color: #fff;
+	line-height: 1.6;
+	font-size: 16px;
+}
+
+.linux-content h1,
+.linux-content h2 {
 	color: #f3e600;
+	margin-bottom: 10px;
 }
 
-.info-section ul {
-	padding-left: 20px;
+.linux-content ul {
+	margin-left: 20px;
 }
 
-.info-section pre {
-	background: rgba(0, 0, 0, 0.5);
-	border-radius: 8px;
-	padding: 12px;
-	overflow-x: auto;
-	margin: 10px 0;
+.tip-box {
+	background: #1b1b1b;
+	border-left: 4px solid #4b8bf4;
+	padding: 10px 16px;
+	border-radius: 6px;
+	margin: 10px 0 18px 0;
 }
 
-.info-section code {
-	background: rgba(0, 0, 0, 0.4);
+.command {
+	font-family: monospace;
+	background: #222;
 	padding: 2px 6px;
 	border-radius: 4px;
-	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-	font-size: 0.95em;
 }
 
-/* tightened logo spacing */
-.landing-logo {
-	display: block;
-	margin: 20px auto 0;
-	max-width: 250px;
-	width: 70%;
+.back-btn {
+	display: inline-block;
+	background: #ffffff;
+	color: #000000;
+	padding: 8px 16px;
+	border-radius: 6px;
+	border: 2px solid #ddd;
+	font-weight: bold;
+	text-decoration: none;
+	transition: 0.2s;
 }
 
-/* ===========================
-   Mode intro panels (Guided / Solo)
-   =========================== */
-
-.mode-intro {
-	max-width: 960px;
-	margin: 20px auto 25px auto;
-	padding: 20px 24px;
-	background: rgba(0, 0, 0, 0.8);
-	border-radius: 10px;
-	border: 1px solid rgba(255, 255, 255, 0.08);
-	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
-	line-height: 1.55;
-	color: #f5f5f5;
-	text-align: left;
+.back-btn:hover {
+	background: #e6e6e6;
+	border-color: #ccc;
 }
-
-.mode-intro h2 {
-	margin-top: 0;
-	margin-bottom: 10px;
-	font-size: 1.5rem;
-}
-
-.mode-intro p {
-	margin: 0 0 0.7em;
-}
-
-.mode-intro strong {
-	font-weight: 700;
-}
-
-/* Variants */
-.guided-intro {
-	border-left: 6px solid #4b8bf4;
-}
-
-.solo-intro {
-	border-left: 6px solid #ff5c5c;
-}
-
-/* ===========================
-   Linux basics nav pill
-   =========================== */
 
 a.nav-btn {
 	display: inline-block;
 	margin-top: 10px;
 	padding: 8px 18px;
 	border-radius: 999px;
-	/* pill shape */
 	background: transparent;
 	border: 1px solid #555;
 	color: #f2f2f2;
-	/* override link color */
 	text-decoration: none;
 	font-weight: 600;
 	font-size: 0.95rem;

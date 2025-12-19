@@ -5,70 +5,11 @@
     <meta charset="UTF-8" />
     <title>🐧 Linux Navigation Basics – CCRI CTF</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-    <style>
-        .content {
-            max-width: 900px;
-            margin: 30px auto;
-            color: #fff;
-            line-height: 1.6;
-            font-size: 16px;
-        }
-
-        h1,
-        h2 {
-            color: #f3e600;
-            margin-bottom: 10px;
-        }
-
-        ul {
-            margin-left: 20px;
-        }
-
-        .tip-box {
-            background: #1b1b1b;
-            border-left: 4px solid #4b8bf4;
-            padding: 10px 16px;
-            border-radius: 6px;
-            margin: 10px 0 18px 0;
-        }
-
-        .command {
-            font-family: monospace;
-            background: #222;
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-
-        a.back-link {
-            color: #4b8bf4;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        
-        .back-btn {
-            display: inline-block;
-            background: #ffffff;
-            color: #000000;
-            padding: 8px 16px;
-            border-radius: 6px;
-            border: 2px solid #ddd;
-            font-weight: bold;
-            text-decoration: none;
-            transition: 0.2s;
-        }
-
-        .back-btn:hover {
-            background: #e6e6e6;
-            border-color: #ccc;
-        }
-
-    </style>
 </head>
 
 <body>
-    <div class="content">
-        <!-- Replace 'landing_page' with whatever your landing route is called -->
-        <a class="back-btn" href="{{ url_for('landing_page') }}">← Back to CTF Hub</a>
+    <div class="linux-content">
+        <a class="back-btn" href="{{ url_for('main.landing_page') }}">← Back to CTF Hub</a>
 
         <h1>🐧 Linux Navigation Basics</h1>
         <p>
@@ -83,7 +24,8 @@
             <li>Double-click folders to open them.</li>
             <li>Use the <strong>Back</strong> and <strong>Up</strong> arrows in the file manager to move around.</li>
             <li>Look at the <strong>path bar</strong> (near the top) to see where you are: e.g.
-                <code>Home ▸ Desktop ▸ challenges</code>.</li>
+                <code>Home ▸ Desktop ▸ challenges</code>.
+            </li>
         </ul>
 
         <div class="tip-box">
@@ -157,7 +99,8 @@
             <li>Run <span class="command">pwd</span> to see where you are.</li>
             <li>Run <span class="command">ls</span> to see what’s around you.</li>
             <li>Use <span class="command">cd ..</span> a couple of times to back up to somewhere familiar (like
-                <code>/home/student</code>).</li>
+                <code>/home/student</code>).
+            </li>
             <li>Or just go back to the Desktop in the GUI and use “Open Terminal Here” again.</li>
         </ul>
 
@@ -171,143 +114,143 @@
             These aren't full tutorials — just the quick, practical commands you’ll need
             to solve most challenges. Every one of these shows up somewhere in Guided and Solo mode.
         </p>
-        
+
         <h2>📄 Reading & Inspecting Files</h2>
-        
+
         <div class="tip-box">
             <strong>cat file.txt</strong><br>
             Print the full contents of a file.
         </div>
-        
+
         <div class="tip-box">
             <strong>less file.txt</strong><br>
             Scroll through a long file. Press <strong>q</strong> to exit.
         </div>
-        
+
         <div class="tip-box">
             <strong>head file.txt</strong><br>
             Show the first few lines (you can use <span class="command">head -n 20</span>).
         </div>
-        
+
         <div class="tip-box">
             <strong>tail file.txt</strong><br>
             Show the last 10 lines (or use <span class="command">tail -f</span> to follow updates).
         </div>
-        
+
         <h2>🔍 Searching Through Files</h2>
-        
+
         <div class="tip-box">
             <strong>grep "keyword" file.txt</strong><br>
             Find lines that contain a specific word.
         </div>
-        
+
         <div class="tip-box">
             <strong>grep -R "word" .</strong><br>
             Search inside every file in this folder and its subfolders.
         </div>
-        
+
         <div class="tip-box">
             <strong>grep -ni "text" file.txt</strong><br>
             Search ignoring case (<strong>-i</strong>) and show line numbers (<strong>-n</strong>).
         </div>
-        
+
         <h2>🗂 Working With Compressed Files</h2>
-        
+
         <div class="tip-box">
             <strong>gzip -d file.gz</strong><br>
             Decompress a <code>.gz</code> file.
         </div>
-        
+
         <div class="tip-box">
             <strong>gunzip file.gz</strong><br>
             Same thing as above — decompress.
         </div>
-        
+
         <div class="tip-box">
             <strong>tar -xvf archive.tar</strong><br>
             Extract a <code>.tar</code> archive.
         </div>
-        
+
         <div class="tip-box">
             <strong>tar -xzvf archive.tar.gz</strong><br>
             Extract a <code>.tar.gz</code> file (very common in CTFs).
         </div>
-        
+
         <h2>🔎 Inspecting Binary Files</h2>
-        
+
         <div class="tip-box">
             <strong>strings binary.bin</strong><br>
             Extract readable text from a binary. Used in Stego, Hex-Hunt, and Forensics challenges.
         </div>
-        
+
         <div class="tip-box">
             <strong>xxd binary.bin</strong><br>
             View a file in hex + ASCII.
         </div>
-        
+
         <div class="tip-box">
             <strong>file something</strong><br>
             Ask Linux what type of file it thinks this is.
         </div>
-        
+
         <h2>🔐 Encoding & Decoding</h2>
-        
+
         <div class="tip-box">
             <strong>base64 -d encoded.txt</strong><br>
             Decode Base64 text (used in multiple challenges).
         </div>
-        
+
         <div class="tip-box">
             <strong>base64 file.txt</strong><br>
             Encode a file into Base64.
         </div>
-        
+
         <h2>📜 Running Scripts</h2>
-        
+
         <div class="tip-box">
             <strong>python3 script.py</strong><br>
             Run a Python script.
         </div>
-        
+
         <div class="tip-box">
             <strong>chmod +x script.sh</strong><br>
             Make a shell script executable.
         </div>
-        
+
         <div class="tip-box">
             <strong>./script.sh</strong><br>
             Run a shell script in the current directory.
         </div>
-        
+
         <h2>🧼 Cleaning Up & Organizing</h2>
-        
+
         <div class="tip-box">
             <strong>rm filename</strong><br>
             Delete a file (careful — no recycle bin!).
         </div>
-        
+
         <div class="tip-box">
             <strong>mkdir newfolder</strong><br>
             Create a folder.
         </div>
-        
+
         <div class="tip-box">
             <strong>mv oldname newname</strong><br>
             Rename a file or move it.
         </div>
-        
+
         <div class="tip-box">
             <strong>cp source target</strong><br>
             Copy a file.
         </div>
-        
+
         <p style="margin-top:20px;">
             These are the tools you’ll use constantly in both Guided and Solo Mode.
             Every one of them works together with the navigation skills above to keep you oriented and effective.
         </p>
 
         <div style="margin-top: 40px; text-align: center;">
-            <a class="back-btn" href="{{ url_for('landing_page') }}">← Back to CTF Hub</a>
+            <a class="back-btn" href="{{ url_for('main.landing_page') }}">← Back to CTF Hub</a>
         </div>
     </div>
 </body>
