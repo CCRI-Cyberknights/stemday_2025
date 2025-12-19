@@ -1,9 +1,6 @@
 import os
 import base64
-
-# When running from the .pyz, __main__ sets this to the on-disk web_version path
-ASSETS_DIR_OVERRIDE = os.environ.get("CCRI_ASSETS_DIR")
-
+import config  # Now imports path logic from your new config module
 
 class Challenge:
     """Represents a single CTF challenge."""
@@ -14,18 +11,11 @@ class Challenge:
         self.name = name                  # Human-readable name
         self.complete = False             # Default: not completed
 
-        # === Determine base path for challenge folders ===
-        # JSON/templates/static live in .../web_version (ASSETS_DIR_OVERRIDE)
-        # The real folders live one level up: .../(challenges|challenges_solo)
-        if ASSETS_DIR_OVERRIDE:
-            project_root = os.path.abspath(os.path.join(ASSETS_DIR_OVERRIDE, ".."))
-        else:
-            # Admin/dev fallback: relative to this file on disk
-            project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-
-        challenges_root = os.path.join(
-            project_root, "challenges_solo" if solo_mode else "challenges"
-        )
+        # === Determine base path via Config ===
+        # We rely on config.py to tell us where the SOLO and REGULAR (Guided) folders are.
+        challenges_root = config.SOLO_DIR if solo_mode else config.GUIDED_DIR
+        
+        # Normalize the full path
         self.folder = os.path.normpath(os.path.join(challenges_root, folder))
 
         # Scripts are only in Guided mode
@@ -34,6 +24,8 @@ class Challenge:
         )
 
         # === Student/Admin mode determines flag decoding ===
+        # We check the environment variable directly to allow runtime switching if needed,
+        # although config.base_mode generally mirrors this.
         mode = os.environ.get("CCRI_CTF_MODE", "student").lower()
         self.flag = self.decode_flag(flag) if mode == "student" else flag
 

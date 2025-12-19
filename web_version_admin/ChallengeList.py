@@ -1,24 +1,13 @@
 import json
 import os
 import re
+import config  # Import path configuration
 from Challenge import Challenge
-
-# When running from the .pyz, __main__ sets this to the on-disk web_version path
-ASSETS_DIR_OVERRIDE = os.environ.get("CCRI_ASSETS_DIR")
-
 
 class ChallengeList:
     """
-    Manages a list of challenges loaded from a JSON mapping:
-      {
-        "01_Stego": {
-          "name": "...",
-          "folder": "01_Stego",
-          "flag": "...",          # encoded in student builds; plaintext in admin
-          "script": "helper.py"   # optional; guided only
-        },
-        ...
-      }
+    Manages a list of challenges loaded from a JSON mapping.
+    Uses config.py for path resolution.
     """
 
     _num_prefix = re.compile(r"^(\d+)")
@@ -26,45 +15,32 @@ class ChallengeList:
     def __init__(self, challenges_file: str = "challenges.json"):
         """
         Initializes the ChallengeList by loading challenges from a JSON file.
-        Supports absolute or relative paths (relative resolved under assets dir).
         """
         self.challenges = []
         self.completed_challenges = []
         self.numOfChallenges = 0
         self._encoded_flags = {}  # id -> encoded flag exactly as read from JSON
 
-        # === Where JSON/templates/static live ===
-        assets_dir = (
-            os.path.abspath(ASSETS_DIR_OVERRIDE)
-            if ASSETS_DIR_OVERRIDE
-            else os.path.dirname(os.path.abspath(__file__))
-        )
-
-        # Absolute paths stay absolute; relative resolves under assets_dir
-        self.challenges_path = (
-            challenges_file
-            if os.path.isabs(challenges_file)
-            else os.path.join(assets_dir, challenges_file)
-        )
+        # === Path Resolution via Config ===
+        # If the path is absolute, use it. Otherwise, assume it's inside server_dir.
+        if os.path.isabs(challenges_file):
+            self.challenges_path = challenges_file
+        else:
+            self.challenges_path = os.path.join(config.server_dir, challenges_file)
 
         # === Determine Solo vs Guided based on filename ===
         if os.path.basename(self.challenges_path) == "challenges_solo.json":
             self.solo_mode = True
-            challenges_folder_name = "challenges_solo"
         else:
             self.solo_mode = False
-            challenges_folder_name = "challenges"
 
         # === Environment mode (student/admin) for persistence behavior ===
         self.mode = os.environ.get("CCRI_CTF_MODE", "student").lower()
         print(f"🔍 Environment mode detected: {self.mode}")
 
-        # === Where the real challenge folders live ===
-        # parent of the assets dir (project root): .../(challenges|challenges_solo)
-        project_root = os.path.abspath(os.path.join(assets_dir, ".."))
-        self.challenges_root = os.path.normpath(
-            os.path.join(project_root, challenges_folder_name)
-        )
+        # Note: self.challenges_root isn't strictly needed for loading since Challenge()
+        # uses config.SOLO_DIR/GUIDED_DIR directly, but we can set it for reference.
+        self.challenges_root = config.SOLO_DIR if self.solo_mode else config.GUIDED_DIR
 
         print(f"📖 Checking for challenges file at: {self.challenges_path}")
         self.load_challenges()
@@ -130,7 +106,7 @@ class ChallengeList:
                 id=key,
                 ch_number=order,
                 name=entry["name"],
-                folder=entry["folder"],   # Challenge resolves full path itself
+                folder=entry["folder"],   # Challenge resolves full path itself via config
                 flag=entry["flag"],       # Challenge decodes at runtime in student mode
                 script=entry.get("script"),
                 solo_mode=self.solo_mode,
