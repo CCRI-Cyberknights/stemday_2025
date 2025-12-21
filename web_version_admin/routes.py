@@ -131,12 +131,19 @@ def challenge_view(challenge_id):
         except Exception as e:
             readme_html = f"<p><strong>Error loading README.md:</strong> {e}</p>"
 
+    # === MODIFICATION START ===
+    # Scripts that should be visible to students for debugging/fixing
+    visible_scripts = ["broken_flag.py"]
+
     file_list = [
         f for f in os.listdir(folder)
         if os.path.isfile(os.path.join(folder, f))
         and f != "README.md"
         and not f.startswith(".")
+        # Allow files that are NOT python scripts OR are in the visible_scripts list
+        and (not f.endswith(".py") or f in visible_scripts)
     ]
+    # === MODIFICATION END ===
 
     template = "challenge_solo.html" if mode == "solo" else "challenge.html"
     print(f"➡️ Opening {selectedChallenge.getName()} in {mode.upper()} mode.")

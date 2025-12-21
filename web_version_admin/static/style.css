@@ -476,3 +476,61 @@ a.nav-btn:hover {
 	border-color: #777;
 	color: #ffffff;
 }
+
+/* ... existing styles ... */
+
+/* === Exploration Station (Helper Script) === */
+.exploration-station {
+	background-color: #e3f2fd;
+	/* Light blue background */
+	border-left: 6px solid #2196f3;
+	/* Strong blue accent on the left */
+	padding: 20px;
+	margin: 25px 0;
+	border-radius: 4px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.exploration-station h3 {
+	margin-top: 0;
+	color: #1565c0;
+	/* Darker blue for the header */
+	font-size: 1.4em;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.exploration-station p {
+	color: #37474f;
+	font-size: 1em;
+	margin-bottom: 20px;
+}
+
+/* Specific style for the runner button */
+.run-script-btn {
+	width: 100%;
+	padding: 12px 20px;
+	font-size: 1.1rem;
+	font-weight: bold;
+	color: #ffffff;
+	background-color: #2196f3;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: background-color 0.2s ease, transform 0.1s ease;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.run-script-btn:hover {
+	background-color: #1976d2;
+	/* Darker blue on hover */
+	transform: translateY(-1px);
+	/* Slight lift effect */
+}
+
+.run-script-btn:active {
+	transform: translateY(1px);
+	/* Press effect */
+}

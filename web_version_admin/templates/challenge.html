@@ -12,12 +12,12 @@
   data-url-run-script="{{ url_for('main.run_script', challenge_id=challenge.id) }}"
   data-url-submit-flag="{{ url_for('main.submit_flag', challenge_id=challenge.id) }}" data-base-mode="{{ base_mode }}"
   data-mode="{{ mode }}">
+
   <h1>{{ challenge.name }} - 🔭 Exploration Mode</h1>
 
   <div class="actions">
     <button type="button" onclick="goBackToIndex();">⬅ Back to Challenges</button>
     <button type="button" onclick="runHelper('open');">📂 Open Folder</button>
-    <button type="button" onclick="runHelper('run');">🖥 Run Helper Script</button>
   </div>
 
   <hr />
@@ -47,15 +47,20 @@
       {% endif %}
     </div>
 
+    <div class="challenge-wrapper-section"
+      style="text-align: center; border: none; background: none; padding-top: 10px;">
+      <button type="button" onclick="runHelper('run');" style="font-size: 1.1em; padding: 10px 20px;">
+        🖥 Run Helper Script
+      </button>
+    </div>
+
     <div class="challenge-wrapper-footer">
       <div>
         <h2>🏁 Submit Flag</h2>
       </div>
       <div class="input-wrapper">
         <input type="text" id="flagInput" name="flagInput" class="input" placeholder="Enter flag (CCRI-AAAA-1111)" />
-        <button type="button" class="Subscribe-btn" onclick="submitFlag();">
-          Submit
-        </button>
+        <button type="button" class="Subscribe-btn" onclick="submitFlag();">Submit</button>
         <p id="flagStatus"></p>
       </div>
     </div>
@@ -64,7 +69,6 @@
     <div class="actions bottom-buttons">
       <button type="button" onclick="goBackToIndex();">⬅ Back to Challenges</button>
       <button type="button" onclick="runHelper('open');">📂 Open Folder</button>
-      <button type="button" onclick="runHelper('run');">🖥 Run Helper Script</button>
     </div>
   </div>
 
