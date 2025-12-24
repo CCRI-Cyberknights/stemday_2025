@@ -13,16 +13,15 @@ def resize_terminal(rows=35, cols=90):
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
 
-def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+def require_input(prompt, expected):
     """
-    Pause, but do NOT allow empty input.
-    This prevents 'enter enter enter' mashing through the whole script.
+    Pauses and requires the user to type a specific word (case-insensitive) to continue.
     """
     while True:
-        answer = input(prompt)
-        if answer.strip():
-            return answer
-        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+        answer = input(prompt).strip().lower()
+        if answer == expected.lower():
+            return
+        print(f"↪  Please type '{expected}' to continue!\n")
 
 def spinner(message="Working", duration=2.5, interval=0.15):
     """
@@ -69,7 +68,7 @@ def main():
     print("   ➤ A text-based encoding scheme used to represent binary data as text.")
     print("   ➤ Common in email, HTTP, and digital certificates.\n")
 
-    pause_nonempty("Type 'ready' when you're ready to begin: ")
+    require_input("Type 'ready' when you're ready to begin: ", "ready")
 
     clear_screen()
     print("🛠️ Analysis Tools")
@@ -83,7 +82,7 @@ def main():
     print("   --decode       → Converts encoded text back to the original data")
     print("   encoded.txt    → The file we recovered\n")
 
-    pause_nonempty("Type 'continue' to inspect the encoded message: ")
+    require_input("Type 'view' to inspect the encoded message: ", "view")
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
     input_file = os.path.join(script_dir, "encoded.txt")
@@ -100,7 +99,7 @@ def main():
             print(f.read().strip())
     except FileNotFoundError:
         print("❌ ERROR: encoded.txt not found!")
-        pause_nonempty("Type anything, then press ENTER to exit...")
+        input("Press ENTER to exit...")
         return
     print("---------------------------------------------\n")
     print("🧠 At first glance, this looks like random characters.")
@@ -109,7 +108,7 @@ def main():
     print("Command to be executed:\n")
     print("   base64 --decode encoded.txt\n")
 
-    pause_nonempty("Type 'decode' to begin processing the transmission: ")
+    require_input("Type 'decode' to begin processing the transmission: ", "decode")
 
     print("\n⏳ Processing intercepted transmission...")
     spinner("Decoding")
@@ -119,7 +118,7 @@ def main():
     if not decoded:
         print("\n❌ Decoding failed!")
         print("📛 'encoded.txt' may be missing or corrupted.")
-        pause_nonempty("Type anything, then press ENTER to exit...")
+        input("Press ENTER to exit...")
         return
 
     print("\n✅ Transmission successfully decoded!\n")

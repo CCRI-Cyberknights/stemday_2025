@@ -19,16 +19,15 @@ def clear_screen():
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
 
-def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+def require_input(prompt, expected):
     """
-    Pause, but DO NOT allow empty input.
-    This keeps students from just mashing ENTER through explanations.
+    Pauses and requires the user to type a specific word (case-insensitive) to continue.
     """
     while True:
-        answer = input(prompt)
-        if answer.strip():
-            return answer
-        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+        answer = input(prompt).strip().lower()
+        if answer == expected.lower():
+            return
+        print(f"↪  Please type '{expected}' to continue!\n")
 
 def spinner(message="Working", duration=2.0, interval=0.15):
     """
@@ -84,7 +83,8 @@ def main():
     print("   ➤ Compiled programs contain a mix of binary data and human-readable text.")
     print("   ➤ The 'strings' tool scans the file and pulls out the readable text segments.")
     print("   ➤ This is a common first step in binary forensics and malware analysis.\n")
-    pause_nonempty("Type 'ready' when you're ready to see the command we'll run: ")
+    
+    require_input("Type 'ready' when you're ready to see the command we'll run: ", "ready")
 
     if not os.path.isfile(target_binary):
         print(f"\n❌ ERROR: The file 'hidden_flag' was not found in {script_dir}.")
@@ -100,7 +100,8 @@ def main():
     print("   strings hidden_flag   → Scan the binary for printable text")
     print(f"   > {os.path.basename(outfile):<20}→ Redirect all found strings into a text file")
     print("\nAfter that, we can search inside the text file using tools like 'grep'.\n")
-    pause_nonempty("Type 'run' when you're ready to extract strings from the binary: ")
+    
+    require_input("Type 'run' when you're ready to extract strings from the binary: ", "run")
 
     print(f"\n🔍 Running: strings \"{target_binary}\" > \"{outfile}\"")
     spinner("Extracting strings")
@@ -122,9 +123,11 @@ def main():
     print("--------------------------------------------------\n")
 
     # 🔍 KEYWORD SEARCH FIRST
-    pause_nonempty("Type anything, then press ENTER to search for a specific keyword...")
+    require_input("Type 'search' to enter a keyword search mode: ", "search")
+    
     print("You might start by searching for words related to the story, like 'CCRI' or 'Cryptkeepers'.")
-    keyword = input("🔍 Enter a keyword to search (or hit ENTER to skip): ").strip()
+    keyword = input("🔍 Enter a keyword to search (or hit ENTER to skip): ").strip().lower()
+    
     if keyword:
         print(f"\n🔎 Searching for '{keyword}' in {outfile}...\n")
         print("   Command being used under the hood:")
@@ -141,7 +144,8 @@ def main():
         print("⏭️  Skipping keyword search.\n")
 
     # 🔎 FLAG PATTERN SEARCH
-    pause_nonempty("Type anything, then press ENTER to scan for potential flags...")
+    require_input("Type 'scan' to scan for potential flags: ", "scan")
+    
     print("🔎 Scanning for flag-like patterns (format: XXXX-YYYY-ZZZZ)...")
     time.sleep(0.5)
     matches = search_for_flags(outfile, regex_pattern)

@@ -17,16 +17,15 @@ def clear_screen():
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
 
-def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+def require_input(prompt, expected):
     """
-    Pause, but DO NOT allow empty input.
-    Prevents students from just mashing ENTER through the briefing.
+    Pauses and requires the user to type a specific word (case-insensitive) to continue.
     """
     while True:
-        answer = input(prompt)
-        if answer.strip():
-            return answer
-        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+        answer = input(prompt).strip().lower()
+        if answer == expected.lower():
+            return
+        print(f"↪  Please type '{expected}' to continue!\n")
 
 # === Helpers ===
 def flatten_html_files(script_dir):
@@ -115,7 +114,8 @@ def main():
     print("   • View the page source (Ctrl+U)")
     print("   • Use search (Ctrl+F) for 'CCRI' or 'flag'")
     print("   • Or grep through saved HTML files for the flag pattern\n")
-    pause_nonempty("Type 'start' when you're ready to begin the subdomain sweep: ")
+    
+    require_input("Type 'start' when you're ready to begin the subdomain sweep: ", "start")
 
     if check_html_files(domains, script_dir):
         pause("\n⚠️ One or more HTML files are missing. Press ENTER to exit.")
@@ -136,7 +136,8 @@ def main():
     print("   -E              → Use extended regular expressions")
     print("   'CCRI-[A-Z]{4}-[0-9]{4}' → Our flag format pattern")
     print("   *.html          → Search across all subdomain pages\n")
-    pause_nonempty("Type 'go' when you're ready to open the menu and start exploring: ")
+    
+    require_input("Type 'go' when you're ready to open the menu and start exploring: ", "go")
 
     while True:
         print("\n📂 Available subdomains:")
@@ -145,7 +146,7 @@ def main():
         print("6. 🔎 Auto-scan all subdomains for flag patterns")
         print("7. ❌ Exit\n")
 
-        choice = input("Select an option (1–7): ").strip()
+        choice = input("Select an option (1–7): ").strip().lower()
 
         if choice in {"1", "2", "3", "4", "5"}:
             idx = int(choice) - 1

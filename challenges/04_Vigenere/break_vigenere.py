@@ -19,15 +19,15 @@ def clear_screen():
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
 
-def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+def require_input(prompt, expected):
     """
-    Pause, but DO NOT allow empty input.
+    Pauses and requires the user to type a specific word (case-insensitive) to continue.
     """
     while True:
-        answer = input(prompt)
-        if answer.strip():
-            return answer
-        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+        answer = input(prompt).strip().lower()
+        if answer == expected.lower():
+            return
+        print(f"↪  Please type '{expected}' to continue!\n")
 
 def spinner(message="Working", duration=2.0, interval=0.15):
     frames = ["|", "/", "-", "\\"]
@@ -97,7 +97,7 @@ def main():
     with open(cipher_file, "r", encoding="utf-8") as f:
         ciphertext = f.read()
 
-    pause_nonempty("Type 'ready' to load the decryption tool: ")
+    require_input("Type 'ready' to load the decryption tool: ", "ready")
 
     clear_screen()
     print("🛠️ Behind the Scenes")
@@ -108,7 +108,7 @@ def main():
     print("   python3 vigenere_helper.py cipher.txt SECRETKEY > decoded_output.txt\n")
     print("In this challenge, you'll test different keywords to uncover the hidden CCRI flag.\n")
     
-    pause_nonempty("Type 'start' to see the encrypted message: ")
+    require_input("Type 'start' to see the encrypted message: ", "start")
 
     # 2. Main Decryption Loop
     while True:
@@ -127,9 +127,9 @@ def main():
             print("> ... [remaining text hidden] ...")
         print("-------------------------------------\n")
 
-        key = input("🔑 Enter a keyword to try (or type 'exit' to quit): ").strip()
+        key = input("🔑 Enter a keyword to try (or type 'exit' to quit): ").strip().lower()
 
-        if key.lower() == "exit":
+        if key == "exit":
             print("\n👋 Exiting. Stay sharp, Agent.")
             break
 
@@ -162,9 +162,17 @@ def main():
             print("   The text still looks like garbage. That was the wrong key.")
             print("   (Hint: The key relates to the user 'ccri_stem' credentials...)\n")
             
-            again = input("🔁 Try another keyword? (Y/n): ").strip().lower()
-            if again == "n":
-                break
+            # Strict loop for Yes/No validation
+            while True:
+                again = input("🔁 Do you want to try another keyword? (yes/no): ").strip().lower()
+                if again == "yes":
+                    break # Break this loop to continue the main outer loop
+                elif again == "no":
+                    print("\n👋 Exiting.")
+                    pause("Press ENTER to close this terminal...")
+                    sys.exit(0)
+                else:
+                    print("   ❌ Please type 'yes' or 'no'.\n")
 
     pause("Press ENTER to close this terminal...")
 

@@ -14,16 +14,15 @@ def clear_screen():
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
 
-def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+def require_input(prompt, expected):
     """
-    Pause, but DO NOT allow empty input.
-    Prevents students from just mashing ENTER through the briefing.
+    Pauses and requires the user to type a specific word (case-insensitive) to continue.
     """
     while True:
-        answer = input(prompt)
-        if answer.strip():
-            return answer
-        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+        answer = input(prompt).strip().lower()
+        if answer == expected.lower():
+            return
+        print(f"↪  Please type '{expected}' to continue!\n")
 
 def list_directory(path):
     try:
@@ -58,7 +57,7 @@ def main():
         pause()
         sys.exit(1)
 
-    pause_nonempty("Type 'start' when you're ready to begin exploring the directory tree: ")
+    require_input("Type 'start' when you're ready to begin exploring the directory tree: ", "start")
 
     while True:
         clear_screen()
@@ -134,21 +133,27 @@ def main():
                     clear_screen()
                     print(f"📄 Running: cat \"{os.path.relpath(filepath, script_dir)}\"")
                     print("--------------------------------------")
+                    content = ""
                     try:
                         with open(filepath, "r") as f:
                             content = f.read()
                             print(content)
                     except Exception as e:
                         print(f"❌ Could not read file: {e}")
-                        content = ""
                     print("--------------------------------------\n")
 
-                    save_choice = input(f"Would you like to save this output to {os.path.basename(results_file)}? (y/n): ").strip().lower()
-                    if save_choice == "y":
-                        with open(results_file, "a") as rf:
-                            rf.write(f"\n----- {os.path.relpath(filepath, script_dir)} -----\n")
-                            rf.write(content)
-                        print(f"✅ Saved to: {os.path.basename(results_file)}")
+                    while True:
+                        save_choice = input(f"Would you like to save this output to {os.path.basename(results_file)}? (yes/no): ").strip().lower()
+                        if save_choice == "yes":
+                            with open(results_file, "a") as rf:
+                                rf.write(f"\n----- {os.path.relpath(filepath, script_dir)} -----\n")
+                                rf.write(content)
+                            print(f"✅ Saved to: {os.path.basename(results_file)}")
+                            break
+                        elif save_choice == "no":
+                            break
+                        else:
+                            print("   ❌ Please type 'yes' or 'no'.")
                     pause()
                 else:
                     print("❌ Invalid selection.")

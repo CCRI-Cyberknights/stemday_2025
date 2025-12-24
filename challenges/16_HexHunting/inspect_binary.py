@@ -19,15 +19,15 @@ def clear_screen():
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
 
-def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+def require_input(prompt, expected):
     """
-    Pause, but DO NOT allow empty input.
+    Pauses and requires the user to type a specific word (case-insensitive) to continue.
     """
     while True:
-        answer = input(prompt)
-        if answer.strip():
+        answer = input(prompt).strip().lower()
+        if answer == expected.lower():
             return
-        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+        print(f"↪  Please type '{expected}' to continue!\n")
 
 def scanning_animation():
     print("\n🔎 Scanning binary for flag-like patterns", end="", flush=True)
@@ -112,7 +112,7 @@ def main():
     if notes_path.exists():
         os.remove(notes_path)
 
-    pause_nonempty("Type 'scan' when you're ready to begin scanning the binary: ")
+    require_input("Type 'scan' when you're ready to begin scanning the binary: ", "scan")
     scanning_animation()
     
     flags = extract_flag_candidates(binary_path)
@@ -125,7 +125,8 @@ def main():
     print(f"\n✅ Detected {len(flags)} flag-like pattern(s)!")
     print("🧪 You'll now investigate each one by reviewing its raw hex context.")
     print("   Use what you know about the story + placement to decide what's real.")
-    pause_nonempty("🔬 Type anything, then press ENTER to begin reviewing candidates: ")
+    
+    require_input("🔬 Type 'view' to begin reviewing candidates: ", "view")
 
     for i, (offset, flag) in enumerate(flags):
         clear_screen()

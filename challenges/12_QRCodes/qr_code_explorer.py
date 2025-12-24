@@ -17,16 +17,15 @@ def clear_screen():
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
 
-def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+def require_input(prompt, expected):
     """
-    Pause, but DO NOT allow empty input.
-    Prevents students from just mashing ENTER through the briefing.
+    Pauses and requires the user to type a specific word (case-insensitive) to continue.
     """
     while True:
-        answer = input(prompt)
-        if answer.strip():
-            return answer
-        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+        answer = input(prompt).strip().lower()
+        if answer == expected.lower():
+            return
+        print(f"↪  Please type '{expected}' to continue!\n")
 
 def spinner(message="Working", duration=1.8, interval=0.12):
     """
@@ -123,7 +122,7 @@ def main():
     print("⏳ Each QR opens for 10 seconds so you can inspect it,")
     print("   then the script decodes the QR and saves the result to a .txt file.\n")
 
-    pause_nonempty("Type 'start' when you're ready to explore the QR codes: ")
+    require_input("Type 'start' when you're ready to explore the QR codes: ", "start")
     clear_screen()
 
     while True:
@@ -132,7 +131,7 @@ def main():
             print(f"{i}. {os.path.basename(qr)}")
         print("6. Exit Explorer\n")
 
-        choice = input("Select a QR code (1-5) or 6 to exit: ").strip()
+        choice = input("Select a QR code (1-5) or 6 to exit: ").strip().lower()
 
         if choice == "6":
             print("👋 Exiting QR Explorer.")

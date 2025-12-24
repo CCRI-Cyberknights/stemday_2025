@@ -17,16 +17,15 @@ def clear_screen():
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
 
-def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+def require_input(prompt, expected):
     """
-    Pause, but DO NOT allow empty input.
-    This keeps students from just mashing ENTER through explanations.
+    Pauses and requires the user to type a specific word (case-insensitive) to continue.
     """
     while True:
-        answer = input(prompt)
-        if answer.strip():
-            return answer
-        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+        answer = input(prompt).strip().lower()
+        if answer == expected.lower():
+            return
+        print(f"↪  Please type '{expected}' to continue!\n")
 
 def spinner(message="Working", duration=1.5, interval=0.12):
     """
@@ -107,17 +106,18 @@ def main():
     print("   python broken_flag.py  # run again and check the result\n")
     print("This helper automates the edit-run-check cycle so you can focus on the logic:\n")
     print("   ➤ It runs the script and shows you the output.")
-    print("   ➤ You choose which operator to try: +  -  *  /")
+    print("   ➤ You choose which operator to try: +  -  * /")
     print("   ➤ It patches the line   code = part1 ? part2")
     print("      and runs the script again until a valid flag appears.\n")
-    pause_nonempty("Type 'ready' when you're ready to run the broken script for the first time: ")
+    
+    require_input("Type 'ready' when you're ready to check the files: ", "ready")
 
     if not os.path.isfile(broken_script):
         print(f"\n❌ ERROR: broken_flag.py not found in {script_dir}.")
         pause("Press ENTER to close this terminal...")
         sys.exit(1)
 
-    pause("Press ENTER to attempt running the broken script...")
+    require_input("Type 'run' to execute the broken script: ", "run")
 
     while True:
         print("\n💻 Running: python broken_flag.py")
@@ -148,13 +148,14 @@ def main():
         print("\n🛠️ Try a different operator to fix the math.")
         print("   Options: +  (addition)   → add part1 and part2")
         print("            -  (subtraction)→ subtract part2 from part1")
-        print("            *  (multiply)   → multiply the values")
+        print("            * (multiply)   → multiply the values")
         print("            /  (divide)     → divide part1 by part2 (integer behavior may matter)\n")
 
-        op = input("Enter operator to use (+, -, *, /): ").strip()
-        if op not in ["+", "-", "*", "/"]:
-            print("❌ Invalid operator. Please enter one of: +  -  *  /")
-            continue
+        while True:
+            op = input("Enter operator to use (+, -, *, /): ").strip()
+            if op in ["+", "-", "*", "/"]:
+                break
+            print("❌ Invalid operator. Please enter one of: +  -  * /")
 
         patch_operator_in_script(broken_script, op)
         print("\n✏️ Patching broken_flag.py with new operator...")

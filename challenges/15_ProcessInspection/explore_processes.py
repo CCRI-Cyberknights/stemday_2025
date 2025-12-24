@@ -16,16 +16,15 @@ def clear_screen():
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
 
-def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+def require_input(prompt, expected):
     """
-    Pause, but DO NOT allow empty input.
-    Prevents students from just mashing ENTER through explanations.
+    Pauses and requires the user to type a specific word (case-insensitive) to continue.
     """
     while True:
-        answer = input(prompt)
-        if answer.strip():
+        answer = input(prompt).strip().lower()
+        if answer == expected.lower():
             return
-        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+        print(f"↪  Please type '{expected}' to continue!\n")
 
 def relaunch_in_bigger_terminal(script_path):
     """Re-executes the script in a larger MATE Terminal window for visibility."""
@@ -113,7 +112,8 @@ def main():
     print("🎯 Your goal: Find the rogue process hiding a flag in a --flag= argument!\n")
     print("🧠 Flag format: CCRI-AAAA-1111")
     print("   Somewhere in the command line of a process, a --flag= argument hides the real CCRI flag.\n")
-    pause_nonempty("Type 'ready' when you're ready to learn how we're inspecting these processes: ")
+    
+    require_input("Type 'ready' when you're ready to learn how we're inspecting these processes: ", "ready")
 
     if not os.path.isfile(ps_dump_path):
         print(f"❌ ERROR: {os.path.basename(ps_dump_path)} not found in this folder!")
@@ -127,7 +127,7 @@ def main():
     print("   ps aux")
     print("\nThat output was saved into ps_dump.txt for offline analysis.")
     print("Each line typically contains:")
-    print("   USER  PID  CPU%  MEM%  VSZ  RSS  TTY  STAT  START  TIME  COMMAND")
+    print("   USER  PID  CPU%  MEM%  VSZ  RSS  TTY  STAT  TIME  COMMAND")
     print("   ...and the COMMAND column includes the full command line.\n")
     print("In a normal investigation, you might do things like:\n")
     print("   grep 'python' ps_dump.txt       # find all python processes")
@@ -136,7 +136,8 @@ def main():
     print("   ➤ Builds a list of unique binaries from ps_dump.txt")
     print("   ➤ Lets you choose one by name")
     print("   ➤ Shows you the full command line so you can spot suspicious arguments\n")
-    pause_nonempty("Type 'start' when you're ready to view the process list: ")
+    
+    require_input("Type 'start' when you're ready to view the process list: ", "start")
 
     proc_map = load_process_map(ps_dump_path)
     display_names = sorted(proc_map.keys())

@@ -27,16 +27,15 @@ def type_writer(text, delay=0.03):
 def pause(msg="Press ENTER to continue..."):
     input(msg)
 
-def pause_nonempty(msg="Type anything, then press ENTER to continue: "):
+def require_input(prompt, expected):
     """
-    Pause, but DO NOT allow empty input.
-    This stops students from just mashing ENTER through everything.
+    Pauses and requires the user to type a specific word (case-insensitive) to continue.
     """
     while True:
-        answer = input(msg)
-        if answer.strip():
-            return answer
-        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+        answer = input(prompt).strip().lower()
+        if answer == expected.lower():
+            return
+        print(f"↪  Please type '{expected}' to continue!\n")
 
 def get_path(filename):
     return os.path.join(os.path.dirname(__file__), filename)
@@ -80,7 +79,8 @@ def main():
     print("🔍 Tool: steghide\n")
     print("💡 steghide can hide or extract secret data from files like images.")
     print("   Attackers use it to smuggle data; defenders use it to uncover it.\n")
-    pause_nonempty("Type 'ready' when you're ready to see how we'll use steghide: ")
+    
+    require_input("Type 'ready' when you're ready to see how we'll use steghide: ", "ready")
 
     clear_screen()
     print("🛠️ Behind the Scenes")
@@ -94,7 +94,8 @@ def main():
     print("   -xf decoded_message.txt → Where to save any recovered secret message")
     print("   -p [your password]→ The password used to lock/unlock the hidden data")
     print("   -f                → Overwrite any existing output file without asking\n")
-    pause_nonempty("Type 'go' when you're ready to start trying passwords: ")
+    
+    require_input("Type 'go' when you're ready to start trying passwords: ", "go")
 
     image_path = get_path(IMAGE_FILE)
     output_path = get_path(OUTPUT_FILE)

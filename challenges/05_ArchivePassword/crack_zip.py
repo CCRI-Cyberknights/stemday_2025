@@ -16,16 +16,15 @@ def clear_screen():
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
 
-def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+def require_input(prompt, expected):
     """
-    Pause, but DO NOT allow empty input.
-    This keeps students from just mashing ENTER through explanations.
+    Pauses and requires the user to type a specific word (case-insensitive) to continue.
     """
     while True:
-        answer = input(prompt)
-        if answer.strip():
-            return answer
-        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+        answer = input(prompt).strip().lower()
+        if answer == expected.lower():
+            return
+        print(f"↪  Please type '{expected}' to continue!\n")
 
 def progress_bar(length=30, delay=0.03):
     for _ in range(length):
@@ -66,7 +65,8 @@ def main():
     print("   ➤ CryptKeepers has locked important data inside an encrypted ZIP archive.")
     print("   ➤ You recovered a wordlist of possible passwords.")
     print("   ➤ Your mission: try each password until the archive opens, then decode the contents.\n")
-    pause_nonempty("Type 'ready' when you're ready to see how this works behind the scenes: ")
+    
+    require_input("Type 'ready' when you're ready to see how this works behind the scenes: ", "ready")
 
     if not os.path.isfile(zip_file) or not os.path.isfile(wordlist):
         print("❌ ERROR: Missing zip file or wordlist.")
@@ -95,7 +95,8 @@ def main():
     print("   --decode       → Convert encoded text back to original")
     print("   message_encoded.txt → Encoded message from the ZIP")
     print("   > decoded_output.txt → Save the decoded message to a file\n")
-    pause_nonempty("Type 'start' when you're ready to begin the cracking process: ")
+    
+    require_input("Type 'start' when you're ready to begin the cracking process: ", "start")
 
     clear_screen()
     print("🔍 Beginning password cracking...\n")
@@ -134,9 +135,16 @@ def main():
         sys.exit(1)
 
     # === Extraction Prompt ===
-    proceed = input("\n📦 Extract and decode the message now? [Y/n]: ").strip().lower()
-    if proceed == "n":
-        return
+    while True:
+        proceed = input("\n📦 Extract and decode the message now? (yes/no): ").strip().lower()
+        if proceed == "yes":
+            break
+        elif proceed == "no":
+            print("\n👋 Exiting without extracting.")
+            pause("Press ENTER to close this terminal...")
+            return
+        else:
+            print("   ❌ Please type 'yes' or 'no'.")
 
     print("\n📦 Extracting archive contents...\n")
     spinner("Extracting files")
@@ -156,9 +164,17 @@ def main():
         print(f.read())
     print("-------------------------------\n")
 
-    decode = input("🔎 Decode the message now? [Y/n]: ").strip().lower()
-    if decode == "n":
-        return
+    # === Decode Prompt ===
+    while True:
+        decode = input("🔎 Decode the message now? (yes/no): ").strip().lower()
+        if decode == "yes":
+            break
+        elif decode == "no":
+            print("\n👋 Exiting without decoding.")
+            pause("Press ENTER to close this terminal...")
+            return
+        else:
+            print("   ❌ Please type 'yes' or 'no'.\n")
 
     print("\n⏳ Decoding message with Base64...\n")
     progress_bar(length=25, delay=0.03)

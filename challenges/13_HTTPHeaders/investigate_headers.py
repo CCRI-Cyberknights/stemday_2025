@@ -17,16 +17,15 @@ def clear_screen():
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
 
-def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+def require_input(prompt, expected):
     """
-    Pause, but DO NOT allow empty input.
-    Prevents students from just mashing ENTER through the briefing.
+    Pauses and requires the user to type a specific word (case-insensitive) to continue.
     """
     while True:
-        answer = input(prompt)
-        if answer.strip():
-            return answer
-        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+        answer = input(prompt).strip().lower()
+        if answer == expected.lower():
+            return
+        print(f"↪  Please type '{expected}' to continue!\n")
 
 # === File / Scan Helpers ===
 def check_response_files(files):
@@ -86,7 +85,8 @@ def main():
     print("      followed by a series of headers like `Server:`, `Content-Type:`, etc.")
     print("   ➤ CTF challenges sometimes hide data inside unusual or custom headers.")
     print("   ➤ Here, one header contains the real CCRI flag; others may be decoys.\n")
-    pause_nonempty("Type 'ready' when you're ready to see how we'll inspect these responses: ")
+    
+    require_input("Type 'ready' when you're ready to see how we'll inspect these responses: ", "ready")
 
     clear_screen()
     print("🛠️ Behind the Scenes")
@@ -103,7 +103,8 @@ def main():
     print("   -E            → Use extended regular expressions")
     print("   'CCRI-[A-Z]{4}-[0-9]{4}' → Our flag format pattern")
     print("   response_*.txt→ Search across all response files at once\n")
-    pause_nonempty("Type 'start' when you're ready to analyze the HTTP responses: ")
+    
+    require_input("Type 'start' when you're ready to analyze the HTTP responses: ", "start")
 
     if check_response_files(responses):
         pause("\n⚠️ Missing files. Press ENTER to exit.")
@@ -116,7 +117,7 @@ def main():
         print("6. Bulk scan all files for flag patterns")
         print("7. Exit\n")
 
-        choice = input("Select an option (1–7): ").strip()
+        choice = input("Select an option (1–7): ").strip().lower()
 
         if choice in {"1", "2", "3", "4", "5"}:
             file = responses[int(choice) - 1]

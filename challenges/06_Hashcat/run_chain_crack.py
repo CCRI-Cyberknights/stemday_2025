@@ -17,16 +17,15 @@ def clear_screen():
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
 
-def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+def require_input(prompt, expected):
     """
-    Pause, but DO NOT allow empty input.
-    This keeps students from just mashing ENTER through explanations.
+    Pauses and requires the user to type a specific word (case-insensitive) to continue.
     """
     while True:
-        answer = input(prompt)
-        if answer.strip():
-            return answer
-        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+        answer = input(prompt).strip().lower()
+        if answer == expected.lower():
+            return
+        print(f"↪  Please type '{expected}' to continue!\n")
 
 def print_progress_bar(length=30, delay=0.02):
     for _ in range(length):
@@ -134,7 +133,7 @@ def extract_zip_files_with_passwords(passwords, segments_dir, extracted_dir, dec
                 else:
                     print("❌ Failed to decode base64 content.")
 
-        pause_nonempty("Type anything, then press ENTER to continue to the next ZIP...")
+        require_input("Type 'next' to continue to the next ZIP: ", "next")
 
 def reassemble_flags(decoded_dir, assembled_file):
     decoded_files = sorted(
@@ -195,7 +194,8 @@ def student_interactive(script_dir):
         print("   ➤ Each ZIP contains a Base64-encoded text segment.")
         print("   ➤ When all segments are decoded and combined, they form multiple candidate flags.")
         print("   ➤ Only ONE of those flags is the true CCRI-AAAA-1111 flag.\n")
-        pause_nonempty("Type 'ready' when you're ready to see the commands behind this challenge: ")
+        
+        require_input("Type 'ready' when you're ready to see the commands behind this challenge: ", "ready")
 
         if not os.path.isfile(hashes_file) or not os.path.isfile(wordlist_file):
             print("❌ ERROR: Required files hashes.txt or wordlist.txt are missing.")
@@ -229,7 +229,8 @@ def student_interactive(script_dir):
         print("Step 4: Reassemble the decoded pieces into candidate flags.")
         print("   Each decoded file contributes one part of each candidate flag,")
         print("   and we join the pieces together with '-' separators.\n")
-        pause_nonempty("Type 'start' when you're ready to begin the chain-cracking process: ")
+        
+        require_input("Type 'start' when you're ready to begin the chain-cracking process: ", "start")
 
         print("\n[🧹] Cleaning previous results...")
         for path in [potfile, assembled_file]:
@@ -257,7 +258,7 @@ def student_interactive(script_dir):
                         cracked_passwords_by_hash[hash_val] = password
                         print(f"🔓 {hash_val} : {password}")
 
-        pause_nonempty("\nType anything, then press ENTER to map cracked passwords to ZIP segments...")
+        require_input("\nType 'map' to map cracked passwords to ZIP segments: ", "map")
 
         ordered_passwords = []
         with open(hashes_file, "r", encoding="utf-8", errors="replace") as hf:

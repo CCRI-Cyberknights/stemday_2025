@@ -18,16 +18,15 @@ def clear_screen():
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
 
-def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+def require_input(prompt, expected):
     """
-    Pause, but DO NOT allow empty input.
-    Prevents students from just mashing ENTER through explanations.
+    Pauses and requires the user to type a specific word (case-insensitive) to continue.
     """
     while True:
-        answer = input(prompt)
-        if answer.strip():
-            return answer
-        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+        answer = input(prompt).strip().lower()
+        if answer == expected.lower():
+            return
+        print(f"↪  Please type '{expected}' to continue!\n")
 
 def spinner(message="Working", duration=1.8, interval=0.12):
     """
@@ -79,7 +78,8 @@ def main():
     print("💡 Why exiftool?")
     print("   ➡️ Images often carry *hidden metadata* like camera info, GPS tags, or embedded comments.")
     print("   ➡️ This data can hide secrets — including CTF flags!\n")
-    pause_nonempty("Type 'ready' when you're ready to inspect the image metadata: ")
+    
+    require_input("Type 'ready' when you're ready to inspect the image metadata: ", "ready")
 
     if not os.path.isfile(target_image):
         print(f"❌ ERROR: {os.path.basename(target_image)} not found in this folder!")
@@ -97,7 +97,8 @@ def main():
     print("Once we have metadata_dump.txt, we can:")
     print("   ➤ Skim important fields (comments, artist, date, etc.)")
     print("   ➤ Search for keywords with grep (like 'CCRI' or 'Cryptkeepers')\n")
-    pause_nonempty("Type 'run' when you're ready to extract metadata with exiftool: ")
+    
+    require_input("Type 'run' when you're ready to extract metadata with exiftool: ", "run")
 
     print(f"\n📂 Inspecting: {os.path.basename(target_image)}")
     print(f"📄 Saving metadata to: {os.path.basename(output_file)}\n")
@@ -141,7 +142,7 @@ def main():
     print(f"      grep -i 'CCRI' {os.path.basename(output_file)}")
     print(f"      grep -i 'Cryptkeepers' {os.path.basename(output_file)}\n")
 
-    keyword = input("🔎 Enter a keyword to search in the metadata (or press ENTER to skip): ").strip()
+    keyword = input("🔎 Enter a keyword to search in the metadata (or press ENTER to skip): ").strip().lower()
     if keyword:
         print(f"\n🔎 Searching for '{keyword}' in {os.path.basename(output_file)}...\n")
         print("   Command being used under the hood:")

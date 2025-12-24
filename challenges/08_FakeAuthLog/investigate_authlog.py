@@ -19,16 +19,15 @@ def clear_screen():
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
 
-def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+def require_input(prompt, expected):
     """
-    Pause, but DO NOT allow empty input.
-    This keeps students from just mashing ENTER through explanations.
+    Pauses and requires the user to type a specific word (case-insensitive) to continue.
     """
     while True:
-        answer = input(prompt)
-        if answer.strip():
-            return answer
-        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+        answer = input(prompt).strip().lower()
+        if answer == expected.lower():
+            return
+        print(f"↪  Please type '{expected}' to continue!\n")
 
 def spinner(message="Working", duration=1.8, interval=0.12):
     """
@@ -93,7 +92,8 @@ def main():
     print("   ➤ Real systems keep authentication history in files like /var/log/auth.log.")
     print("   ➤ Analysts review these logs to spot brute-force attempts, odd PIDs, or weird usernames.")
     print("   ➤ We'll use pattern matching to hunt for values that look like flags.\n")
-    pause_nonempty("Type 'ready' when you're ready to review the log and search strategy: ")
+    
+    require_input("Type 'ready' when you're ready to review the log and search strategy: ", "ready")
 
     if not os.path.isfile(log_file):
         print(f"\n❌ ERROR: auth.log not found in {script_dir}.")
@@ -113,7 +113,8 @@ def main():
     print("   ➤ 4 characters, dash, 4 characters, dash, 4 characters (letters or digits)")
     print("   ➤ This catches ANYID-1234-ABCD-style strings, including fake flags.\n")
     print("Step 3: Narrow things down by also searching with grep for usernames/IPs.\n")
-    pause_nonempty("Type 'view' when you're ready to preview the log: ")
+    
+    require_input("Type 'view' when you're ready to preview the log: ", "view")
 
     print("\n📄 Preview: First 10 lines from auth.log")
     print("-------------------------------------------")
@@ -127,7 +128,8 @@ def main():
         print("❌ ERROR: Could not open auth.log.")
         sys.exit(1)
     print("-------------------------------------------\n")
-    pause_nonempty("Type anything, then press ENTER to scan for suspicious entries...")
+    
+    require_input("Type 'scan' to scan for suspicious entries: ", "scan")
 
     print("🔎 Scanning for flag-like patterns (format similar to CCRI-AAAA-1111)...")
     spinner("Analyzing log")
@@ -142,7 +144,8 @@ def main():
         print(f"\n📌 Found {len(matches)} potential flag-like strings.")
         print(f"💾 Saved to: {candidates_file}\n")
 
-        pause_nonempty("Type anything, then press ENTER to preview flagged lines...")
+        require_input("Type 'next' to preview flagged lines: ", "next")
+        
         print("🧾 Sample of suspicious entries:")
         print("-------------------------------------------")
         for i, line in enumerate(matches):
@@ -162,7 +165,7 @@ def main():
     print("      grep 'Accepted password' auth.log")
     print("      grep '192.168.' auth.log\n")
 
-    pattern = input("🔎 Enter a username, IP, or keyword to search the full log (or press ENTER to skip): ").strip()
+    pattern = input("🔎 Enter a username, IP, or keyword to search the full log (or press ENTER to skip): ").strip().lower()
     if pattern:
         print(f"\n🔎 Searching for '{pattern}' in auth.log...\n")
         print("   Command being used under the hood:")

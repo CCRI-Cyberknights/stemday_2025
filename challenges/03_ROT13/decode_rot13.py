@@ -20,12 +20,15 @@ def clear_screen():
 def pause(msg="Press ENTER to continue..."):
     input(msg)
 
-def pause_nonempty(msg="Type anything, then press ENTER to continue: "):
+def require_input(prompt, expected):
+    """
+    Pauses and requires the user to type a specific word (case-insensitive) to continue.
+    """
     while True:
-        answer = input(msg)
-        if answer.strip():
-            return answer
-        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+        answer = input(prompt).strip().lower()
+        if answer == expected.lower():
+            return
+        print(f"↪  Please type '{expected}' to continue!\n")
 
 def spinner(message="Working", duration=2.0, interval=0.15):
     frames = ["|", "/", "-", "\\"]
@@ -122,7 +125,7 @@ def main():
         pause("Press ENTER to close this terminal...")
         sys.exit(1)
 
-    pause_nonempty("Type 'ready' to load the file: ")
+    require_input("Type 'ready' to load the file: ", "ready")
 
     # Load content
     lines = input_path.read_text(encoding="utf-8").splitlines()
@@ -130,7 +133,7 @@ def main():
     # Show initial state
     render_frame(lines, ["🔒 Status: Encrypted (ROT13)", "\nType 'crack' to brute-force the rotation."])
     
-    pause_nonempty("Command > ")
+    require_input("Command > ", "crack")
 
     decoded_lines = animate_decryption_wipe(lines, output_path)
     

@@ -22,16 +22,15 @@ def clear_screen():
 def pause(prompt="🔸 Press ENTER to continue..."):
     input(prompt)
 
-def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+def require_input(prompt, expected):
     """
-    Pause, but DO NOT allow empty input.
-    Prevents students from just mashing ENTER through the briefing.
+    Pauses and requires the user to type a specific word (case-insensitive) to continue.
     """
     while True:
-        answer = input(prompt)
-        if answer.strip():
+        answer = input(prompt).strip().lower()
+        if answer == expected.lower():
             return
-        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+        print(f"↪  Please type '{expected}' to continue!\n")
 
 # === Nmap Scan ===
 def run_nmap_scan():
@@ -92,7 +91,8 @@ def main():
     print("   ➤ Running the nmap scan for you")
     print("   ➤ Listing only the open ports")
     print("   ➤ Letting you query each port with curl and inspect the response\n")
-    pause_nonempty("Type 'scan' when you're ready to run the nmap scan: ")
+    
+    require_input("Type 'scan' when you're ready to run the nmap scan: ", "scan")
 
     scan_output = run_nmap_scan()
     clear_screen()
@@ -101,7 +101,7 @@ def main():
     print(scan_output)
     print("\n✅ Scan complete.\n")
 
-    pause_nonempty("📖 Look over the open ports above, then type anything and press ENTER to explore them interactively: ")
+    require_input("📖 Look over the open ports above, then type 'explore' to check them interactively: ", "explore")
 
     open_ports = extract_open_ports(scan_output)
 

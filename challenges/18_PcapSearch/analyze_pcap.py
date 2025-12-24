@@ -26,12 +26,15 @@ def clear_screen():
 def pause(prompt="Press ENTER to continue..."):
     input(prompt)
 
-def pause_nonempty(prompt="Type anything, then press ENTER to continue: "):
+def require_input(prompt, expected):
+    """
+    Pauses and requires the user to type a specific word (case-insensitive) to continue.
+    """
     while True:
-        answer = input(prompt)
-        if answer.strip():
+        answer = input(prompt).strip().lower()
+        if answer == expected.lower():
             return
-        print("↪  Don't just hit ENTER — type something so we know you're following along!\n")
+        print(f"↪  Please type '{expected}' to continue!\n")
 
 def check_tshark():
     try:
@@ -161,7 +164,7 @@ def main():
     if notes_path.exists():
         os.remove(notes_path)
 
-    pause_nonempty("Type 'scan' when you're ready to begin scanning the PCAP: ")
+    require_input("Type 'scan' when you're ready to begin scanning the PCAP: ", "scan")
 
     # Phase 1: Find flag-like values (REDACTED OUTPUT)
     flags_found = extract_flag_candidates(pcap_path)
@@ -180,7 +183,7 @@ def main():
         print(f"   ➡️  {redacted}")
         
     print()
-    pause_nonempty("Type anything, then press ENTER to map these patterns to TCP streams: ")
+    require_input("Type 'map' to map these patterns to TCP streams: ", "map")
 
     # Phase 2: Map flags to streams
     stream_map = map_flags_to_streams(pcap_path, flags_found)
@@ -191,7 +194,8 @@ def main():
 
     candidates = sorted(stream_map.keys())
     print(f"\n✅ {len(candidates)} TCP stream(s) contain suspect data.")
-    pause_nonempty("Type anything, then press ENTER to investigate the streams: ")
+    
+    require_input("Type 'investigate' to explore the streams: ", "investigate")
 
     # Phase 3: Exploration UI (REDACTED MENU)
     while True:
@@ -206,9 +210,14 @@ def main():
 
         try:
             choice_str = input(f"Choose stream to inspect (1-{len(candidates)+1}): ").strip()
-            if not choice_str.isdigit(): continue
+            if not choice_str.isdigit():
+                print("❌ Invalid input. Please enter a number.")
+                pause()
+                continue
             choice = int(choice_str)
         except ValueError:
+            print("❌ Invalid input. Please enter a number.")
+            pause()
             continue
 
         if 1 <= choice <= len(candidates):
@@ -236,6 +245,9 @@ def main():
                     print("❌ Invalid option. Please choose 1–3.")
         elif choice == len(candidates)+1:
             break
+        else:
+            print("❌ Invalid selection.")
+            pause()
 
     print(f"\n✅ Done. Notes saved in {notes_path.name}")
     pause()
