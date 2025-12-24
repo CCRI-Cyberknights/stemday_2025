@@ -65,6 +65,7 @@ def auto_scan_network():
             for line in result.stdout.splitlines():
                 if "CCRI-" in line:
                     print(f"✅ FOUND in {dom.upper()} Portal:")
+                    # This will print the <span> line
                     print(f"   {line.strip()}")
                     found_any = True
                     
@@ -73,7 +74,7 @@ def auto_scan_network():
 
     if not found_any:
         print("⚠️ No flag patterns found in the visible HTML.")
-        print("   (Did you check HTML comments manually?)")
+        print("   (Did you check the Page Source for hidden tags?)")
 
 # === Main Flow ===
 def main():
@@ -87,9 +88,9 @@ def main():
     print("One of these portals has a secret flag hardcoded in its HTML source.\n")
     print("🧠 Flag format: CCRI-AAAA-1111")
     print("💡 Web Hacking Tip:")
-    print("   Developers often leave secrets in HTML Comments.")
-    print("   These comments are invisible on the page but visible in the **Source Code**.\n")
-    print("   ➤ Format: \n")
+    print("   Developers often hide system info in hidden DOM elements.")
+    print("   These are invisible on the rendered page but visible in the **Source Code**.\n")
+    print("   ➤ Look for tags with: style='display:none' or \n")
     
     require_input("Type 'start' when you're ready to begin the audit: ", "start")
 
@@ -129,7 +130,7 @@ def main():
             print("\n👉 ACTION REQUIRED:")
             print(f"   1. Switch to your browser window.")
             print(f"   2. Press **Ctrl+U** to view the source code.")
-            print(f"   3. Look for hidden comments!")
+            print(f"   3. Look for hidden spans or system tags!")
             pause()
             clear_screen()
 

@@ -57,6 +57,7 @@ validation_helpers/**/__pycache__/
 !/web_version_admin/**
 web_version_admin/server.bak
 web_version_admin/challenges.json.bak
+web_version_admin/fake_services.bak
 web_version_admin/__pycache__/
 
 # == Make challenge roots visible (contents controlled below) ==

@@ -128,7 +128,7 @@ class HTTPHeaderFlagGenerator:
 
             self.metadata = {
                 "real_flag": real_flag,
-                ""challenge_file": str(target_file.relative_to(self.project_root)),
+                "challenge_file": str(target_file.relative_to(self.project_root)),
                 "unlock_method": "Use curl -I to check headers of /mystery/endpoint_X",
                 "hint": "Check X-Flag header"
             }
