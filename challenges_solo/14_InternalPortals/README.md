@@ -24,7 +24,7 @@ It may be tucked inside hidden tags, metadata blocks, or developer-only spans th
 | ------------------------------------ | ------------------------------------------------- |
 | **Ctrl+U** (in browser)              | View Page Source — reveals hidden tags            |
 | **F12** or **Inspect Element** | Open DevTools to explore the DOM tree             |
-| `grep "CCRI-"`                       | Search the source code for the flag prefix        |
+| `curl <URL> | grep "CCRI-"`         | Search the source code via command line           |
 | **Ctrl+F** → search `CCRI`           | Quickly locate embedded data in the source        |
 
 > 💡 **Tip:** Just because the page looks empty doesn't mean it is. 
@@ -34,13 +34,13 @@ It may be tucked inside hidden tags, metadata blocks, or developer-only spans th
 
 ## 📂 Portals to Inspect
 
-When the local web server is running, you can access these via the challenge dashboard:
+When the local web server is running, you can access the portals at these local URLs:
 
-* **Alpha Portal** (alpha.cryptkeepers.local)
-* **Beta Portal** (beta.cryptkeepers.local)
-* **Gamma Portal** (gamma.cryptkeepers.local)
-* **Delta Portal** (delta.cryptkeepers.local)
-* **Omega Portal** (omega.cryptkeepers.local)
+* **Alpha Portal**: `http://localhost:5000/internal/alpha`
+* **Beta Portal**: `http://localhost:5000/internal/beta`
+* **Gamma Portal**: `http://localhost:5000/internal/gamma`
+* **Delta Portal**: `http://localhost:5000/internal/delta`
+* **Omega Portal**: `http://localhost:5000/internal/omega`
 
 Only one contains the genuine flag. The rest are red herrings designed to waste your time.
 
