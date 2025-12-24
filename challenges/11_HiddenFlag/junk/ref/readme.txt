@@ -1,4 +1,4 @@
+This folder contains assorted documentation.
 Welcome to the reference directory.
-Welcome to the reference directory.
-Welcome to the reference directory.
-EPHQ-ZWHY-7990
+This folder contains assorted documentation.
+# [No sensitive data found here]

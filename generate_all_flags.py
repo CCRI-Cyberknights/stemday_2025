@@ -26,7 +26,7 @@ from flag_generators.gen_10_metadata import MetadataFlagGenerator
 from flag_generators.gen_11_hidden_flag import HiddenFlagGenerator
 from flag_generators.gen_12_qr_codes import QRCodeFlagGenerator
 from flag_generators.gen_13_http_headers import HTTPHeaderFlagGenerator
-from flag_generators.gen_14_subdomain_sweep import SubdomainSweepFlagGenerator
+from flag_generators.gen_14_internal_portals import InternalPortalFlagGenerator
 from flag_generators.gen_15_process_inspection import ProcessInspectionFlagGenerator
 from flag_generators.gen_16_hex_hunting import HexHuntingFlagGenerator
 from flag_generators.gen_17_nmap_scanning import NmapScanFlagGenerator
@@ -47,7 +47,7 @@ GENERATOR_CLASSES = {
     "11_HiddenFlag": HiddenFlagGenerator,
     "12_QRCodes": QRCodeFlagGenerator,
     "13_HTTPHeaders": HTTPHeaderFlagGenerator,
-    "14_SubdomainSweep": SubdomainSweepFlagGenerator,
+    "14_InternalPortals": InternalPortalFlagGenerator,
     "15_ProcessInspection": ProcessInspectionFlagGenerator,
     "16_HexHunting": HexHuntingFlagGenerator,
     "17_NmapScanning": NmapScanFlagGenerator,

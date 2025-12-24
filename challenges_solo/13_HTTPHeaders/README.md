@@ -1,62 +1,62 @@
-# 🌐 Challenge 13: HTTP Headers Mystery
+# 📡 Challenge 13: HTTP Headers Mystery
 
-Cryptkeepers agents have been quietly passing secret messages through web servers.
-You’ve intercepted **five raw HTTP responses**, but only **one** contains the real flag.
+CryptKeepers operatives have been quietly passing secret messages through internal web servers.
+You have discovered **five active API endpoints** on the local network, but only **one** contains the real flag.
 
-This challenge sharpens your ability to extract intel from network traffic — a critical skill for both threat analysts and penetration testers.
+This challenge sharpens your ability to interact with live network services and extract intel from HTTP headers — a critical skill for penetration testers.
 
 ---
 
 ## 🧩 Your Objective
 
-Explore the HTTP response files and uncover the secret hidden in the headers.
+Query the active HTTP endpoints and uncover the secret hidden in the server headers.
 
-You are looking for a header that starts with:
+You are looking for a custom header that looks like:
 
 **`X-Flag: CCRI-....`**
 
-What to do:
+**What to do:**
+1.  Manually query each endpoint using command-line tools.
+2.  Inspect the **HTTP Headers** returned by the server.
+3.  Ignore the body content (HTML/JSON) and focus on the metadata.
+4.  Identify the flag that matches the official format.
 
-1. Review each `response_*.txt` file using your preferred tools.
-2. Identify any lines beginning with `X-Flag:`.
-3. Validate whether the value follows the official flag structure.
-4. Ignore decoys that mimic the pattern but use the wrong format.
+---
 
-Decoy flags may attempt to mislead using:
+## 🌐 Target Endpoints
 
-* **Invalid prefixes**
+The intercepted services are running locally on your machine:
 
-  * `X-Code:`
-  * `X-Flag: SCAN-1234-FAKE`
-* **Incorrect flag formats**
-
-  * `CCRI-1111-AAAA`
-  * non-matching patterns
+1.  `http://localhost:5000/mystery/endpoint_1`
+2.  `http://localhost:5000/mystery/endpoint_2`
+3.  `http://localhost:5000/mystery/endpoint_3`
+4.  `http://localhost:5000/mystery/endpoint_4`
+5.  `http://localhost:5000/mystery/endpoint_5`
 
 ---
 
 ## 🛠 Useful Tools & Techniques
 
-| Tool / Command                  | What It Does                                |
-| ------------------------------- | ------------------------------------------- |
-| `less response_1.txt`           | Scroll and read a response interactively    |
-| `/CCRI` *(inside `less`)*       | Search for flag-like patterns               |
-| `grep "X-Flag:" response_*.txt` | Quickly scan for any `X-Flag:` headers      |
-| `grep "CCRI-" response_*.txt`   | Scan for values using the known flag prefix |
-| `cat`, `head`, `tail`           | Quickly peek into text files                |
+Since these are live web addresses, standard file tools like `cat` or `less` won't work. You need a tool that speaks HTTP.
 
-> 💡 **Tip:** HTTP headers appear near the *top* of each response.
-> The rest is just page content or noise.
+| Command | Description |
+| :--- | :--- |
+| **`curl -I <URL>`** | Fetches **Headers Only**. Perfect for this challenge. |
+| `curl -v <URL>` | Verbose mode. Shows request AND response headers. |
+| `curl <URL>` | Fetches the body (HTML/JSON). Useful, but the flag isn't there! |
 
----
+**Example Usage:**
+To inspect the headers of the first endpoint, run:
 
-## 📂 Files in This Folder
+    curl -I http://localhost:5000/mystery/endpoint_1
 
-* `response_1.txt`
-* `response_2.txt`
-* `response_3.txt`
-* `response_4.txt`
-* `response_5.txt`
+**What to look for in the output:**
+
+    HTTP/1.1 200 OK
+    Server: CryptKeepers-Gateway/2.3.1
+    Date: Mon, 25 Dec 2025 12:00:00 GMT
+    Content-Type: text/html; charset=utf-8
+    X-Flag: CCRI-????-????  <-- LOOK FOR THIS
 
 ---
 

@@ -13,60 +13,56 @@ This repository contains **all admin tools, source challenges, and packaging scr
 **Admin repo (this one):**
 
 ```
-
-stemday\_2025/
-├── challenges/              # Guided challenges
-├── challenges\_solo/         # Solo challenges
-├── web\_version/             # Student-facing portal
-├── web\_version\_admin/       # Admin-only validation + templates
-├── copy\_ccri\_ctf\*.py        # Bundling scripts
-├── generate\_all\_flags.py    # Flag + metadata generator
-├── validate\_all\_flags.py    # Admin validator
-├── ccri\_ctf.pyz             # (⚠️ Generated only — don’t commit)
+stemday_2025/
+├── challenges/              # Exploration challenges
+├── challenges_solo/         # Solo challenges
+├── web_version/             # Student-facing portal
+├── web_version_admin/       # Admin-only validation + templates
+├── copy_ccri_ctf*.py        # Bundling scripts
+├── generate_all_flags.py    # Flag + metadata generator
+├── validate_all_flags.py    # Admin validator
+├── ccri_ctf.pyz             # (⚠️ Generated only — don’t commit)
 └── README.md / CONTRIBUTING.md
-
 ```
 
 **Student VM (after bundling):**
 
 ```
-
-Desktop/stemday\_2025/
+Desktop/stemday_2025/
 ├── challenges/
-├── challenges\_solo/
-├── web\_version/
-├── start\_web\_hub.py
-├── stop\_web\_hub.py
-├── Launch\_CCRI\_CTF\_Hub.desktop
-├── ccri\_ctf.pyz   # 🔒 only runtime path
-└── .ccri\_ctf\_root
-
-````
+├── challenges_solo/
+├── web_version/
+├── start_web_hub.py
+├── stop_web_hub.py
+├── Launch_CCRI_CTF_Hub.desktop
+├── ccri_ctf.pyz   # 🔒 only runtime path
+└── .ccri_ctf_root
+```
 
 ---
 
 ## 🚀 Contributor Setup
 
-1. Install contributor environment:
+1. **Install contributor environment:**
 
    ```bash
-   curl -fsSL https://raw.githubusercontent.com/CCRI-Cyberknights/stemday_2025/main/setup_contributor.py | python3 -
-   ````
+   curl -fsSL [https://raw.githubusercontent.com/CCRI-Cyberknights/stemday_2025/main/setup_contributor.py](https://raw.githubusercontent.com/CCRI-Cyberknights/stemday_2025/main/setup_contributor.py) | python3 -
+   ```
 
-2. Clone repo:
+2. **Clone repo:**
 
    ```bash
-   git clone https://github.com/CCRI-Cyberknights/stemday_2025.git
+   git clone [https://github.com/CCRI-Cyberknights/stemday_2025.git](https://github.com/CCRI-Cyberknights/stemday_2025.git)
    cd stemday_2025
    ```
 
-3. Create a branch for your work:
+3. **Create a branch for your work:**
 
    ```bash
    git checkout -b feature/my-change
    ```
 
-   ✅ For **CyberKnights org members**: branch directly inside this repo.
+   ✅ For **CyberKnights org members**: branch directly inside this repo.  
    ❌ For **external contributors**: fork the repo first, then create your branch on the fork and open a PR back.
 
 ---
@@ -81,8 +77,8 @@ Desktop/stemday\_2025/
 
 2. **Test locally**:
 
-   * In **guided mode**: run `./copy_ccri_ctf.py` and launch hub.
-   * In **solo mode**: run `./copy_ccri_ctf_solo.py` and launch hub.
+   * In **Exploration mode**: run `./copy_ccri_ctf.py` and launch hub.
+   * In **Solo mode**: run `./copy_ccri_ctf_solo.py` and launch hub.
    * Validate with:
 
      ```bash
@@ -97,29 +93,27 @@ Desktop/stemday\_2025/
    git push origin feature/my-change
    ```
 
-4. **Open a Pull Request (PR)** → submit for review.
+4. **Open a Pull Request (PR)** → submit for review.  
    (Branches are preferred. Forks only if you lack write access.)
 
 ---
 
-I've included a markdown cheatsheet here [Markdown Cheatsheet](https://github.com/CCRI-Cyberknights/stemday_2025/blob/main/markdown-cheat-sheet.md). See it on the github webpage for the examples, and open it as a text file to see the formatting code. To test out edits to the various README.md, start the webserver in admin mode, load the page with said readme and see how it renders. The readmes will change on a page refresh, but if you edit any actual html files, stop the server first and then restart it just to be sure the edits came over.
+I've included a markdown cheatsheet here: [Markdown Cheatsheet](./markdown-cheat-sheet.md). See it on the GitHub webpage for examples, and open it as a text file to see the formatting code. To test out edits to the various README.md files, start the webserver in admin mode, load the page with the specific readme, and see how it renders. The readmes will change on a page refresh, but if you edit any actual HTML files, stop the server first and restart it to ensure the edits carry over.
 
 ---
 
 ## 🛡️ Rules & Best Practices
 
-✅ **.pyz is the only runtime path for students** — no `.pyc` or raw source leaks
-✅ Never commit:
-
+✅ **.pyz is the only runtime path for students** — no `.pyc` or raw source leaks  
+✅ **Never commit:**
 * `ccri_ctf.pyz`
 * `validation_unlocks*.json`
 * Take-home bundles or packaged folders
 
-✅ Keep **admin-only** scripts inside `web_version_admin/`
-✅ Test both **guided + solo** build flows before merging
-✅ Use **relative paths** (no `/home/username/...`) for portability
-✅ PRs should explain:
-
+✅ Keep **admin-only** scripts inside `web_version_admin/`  
+✅ Test both **Exploration + Solo** build flows before merging  
+✅ Use **relative paths** (no `/home/username/...`) for portability  
+✅ **PRs should explain:**
 * Which challenges/scripts changed
 * Whether flags were regenerated
 

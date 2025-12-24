@@ -3,75 +3,74 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 # === Simulated Open Ports ===
 GUIDED_FAKE_FLAGS = {
-    8078: "CCRI-RUMD-7387",       # ✅ REAL FLAG
-    8081: "LGQR-9085-OBZQ",       # fake
-    8030: "RCKB-9463-NHYY",       # fake
-    8045: "LXBA-8980-YRJE",       # fake
-    8093: "EQKN-LLMG-7856",       # fake
+    8061: "CCRI-ZUEZ-3786",       # ✅ REAL FLAG
+    8044: "ZAJA-7753-AKJX",       # fake
+    8020: "DEMM-3965-YPBC",       # fake
+    8035: "UDJV-LOSD-8248",       # fake
+    8047: "YFAT-UOYZ-0754",       # fake
 }
 GUIDED_JUNK_RESPONSES = {
-    8014: "Server under maintenance.\nPlease retry later.",
-    8042: "<html><body><h1>It works!</h1><p>Apache2 default page.</p></body></html>",
-    8049: "503 Service Unavailable\nTry again later.",
-    8059: "🔒 Unauthorized: API key required.",
-    8064: "Hello World!\nTest endpoint active.",
-    8083: "💡 Tip: Scan only the ports you really need.",
-    8090: "Python HTTP Server: directory listing not allowed.",
-    8097: "💻 Dev API v0.1 — POST requests only."
+    8002: "💻 Dev API v0.1 — POST requests only.",
+    8023: "503 Service Unavailable\nTry again later.",
+    8030: "Error 418: I’m a teapot.",
+    8038: "503 Service Unavailable\nTry again later.",
+    8042: "Python HTTP Server: directory listing not allowed.",
+    8045: "💻 Dev API v0.1 — POST requests only.",
+    8046: "ERROR 400: Bad request syntax.",
+    8049: "System maintenance in progress.",
+    8062: "🔒 Unauthorized: API key required.",
+    8064: "Python HTTP Server: directory listing not allowed.",
+    8078: "Error 418: I’m a teapot."
 }
 GUIDED_SERVICE_NAMES = {
-    8014: "omega-stream",
-    8030: "metricsd",
-    8042: "delta-proxy",
-    8045: "epsilon-sync",
-    8049: "auth-service",
-    8059: "gamma-relay",
-    8064: "configd",
-    8078: "sysmon-api",
-    8081: "update-agent",
-    8083: "lambda-api",
-    8090: "theta-daemon",
-    8093: "alpha-core",
-    8097: "kappa-node"
+    8002: "beta-hub",
+    8020: "auth-service",
+    8023: "alpha-core",
+    8030: "lambda-api",
+    8035: "gamma-relay",
+    8038: "delta-sync",
+    8042: "update-agent",
+    8044: "metricsd",
+    8045: "kappa-node",
+    8046: "delta-proxy",
+    8047: "sysmon-api",
+    8049: "omega-stream",
+    8061: "theta-daemon",
+    8062: "configd",
+    8064: "zeta-cache",
+    8078: "epsilon-sync"
 }
 SOLO_FAKE_FLAGS = {
-    9070: "CCRI-MOZI-1661",       # ✅ REAL FLAG
-    9029: "IJIG-WEDW-2842",       # fake
-    9006: "HZOM-5036-OWVM",       # fake
-    9077: "OFVK-7278-GQBM",       # fake
-    9054: "XQOD-ZPGW-6121",       # fake
+    9073: "CCRI-GQZB-4817",       # ✅ REAL FLAG
+    9048: "GFMR-PRFX-7389",       # fake
+    9036: "ZFAU-3624-YDOA",       # fake
+    9046: "MQVP-ULXK-7722",       # fake
+    9025: "ITOK-5144-JDNW",       # fake
 }
 SOLO_JUNK_RESPONSES = {
-    9000: "💻 Dev API v0.1 — POST requests only.",
-    9004: "403 Forbidden: You don’t have permission to access this resource.",
-    9005: "Python HTTP Server: directory listing not allowed.",
-    9020: "503 Service Unavailable\nTry again later.",
-    9025: "System maintenance in progress.",
-    9027: "Python HTTP Server: directory listing not allowed.",
-    9029: "omega-stream", # (Key moved to flags but name kept here for mapping)
-    9033: "Welcome to Dev HTTP Server v1.3\nPlease login to continue.",
-    9057: "💻 Dev API v0.1 — POST requests only.",
-    9078: "💡 Tip: Scan only the ports you really need.",
-    9088: "System maintenance in progress.",
-    9097: "503 Service Unavailable\nTry again later."
+    9005: "<html><body><h1>It works!</h1><p>Apache2 default page.</p></body></html>",
+    9014: "🔒 Unauthorized: API key required.",
+    9040: "💡 Tip: Scan only the ports you really need.",
+    9055: "Server under maintenance.\nPlease retry later.",
+    9068: "Hello World!\nTest endpoint active.",
+    9080: "System maintenance in progress.",
+    9085: "System maintenance in progress.",
+    9098: "403 Forbidden: You don’t have permission to access this resource."
 }
 SOLO_SERVICE_NAMES = {
-    9000: "kappa-node",
-    9004: "alpha-core",
-    9005: "delta-proxy",
-    9006: "delta-sync",
-    9020: "zeta-cache",
-    9025: "beta-hub",
-    9027: "configd",
-    9029: "omega-stream",
-    9033: "metricsd",
-    9054: "epsilon-sync",
-    9057: "gamma-relay",
-    9070: "auth-service",
-    9077: "update-agent",
-    9078: "theta-daemon",
-    9088: "lambda-api",
-    9097: "sysmon-api"
+    9005: "alpha-core",
+    9014: "metricsd",
+    9025: "delta-proxy",
+    9036: "omega-stream",
+    9040: "zeta-cache",
+    9046: "lambda-api",
+    9048: "epsilon-sync",
+    9055: "delta-sync",
+    9068: "update-agent",
+    9073: "theta-daemon",
+    9080: "sysmon-api",
+    9085: "configd",
+    9098: "kappa-node"
 }
 
 GUIDED_ALL_PORTS = {**GUIDED_JUNK_RESPONSES, **GUIDED_FAKE_FLAGS}

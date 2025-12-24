@@ -1,294 +1,170 @@
-# Ignore everything
+# 1. Global Ignore
 *
 
-# == Repo-root metadata ==
+# 2. Whitelist Directory Structure (Required to look inside)
+!/**/
+
+# 3. Whitelist Repo-root Metadata
 !/.gitignore
 !/README.md
 !/CONTRIBUTING.md
 !/LICENSE
 !/.ccri_ctf_root
 !/markdown-cheat-sheet.md
-
-# == Top-level scripts ==
-!/setup_contributor.py
-!/start_web_hub.py
-!/stop_web_hub.py
-
-# == Admin tools ==
-!/generate_all_flags.py
-!/validate_all_flags.py
-!/copy_ccri_ctf.py
-!/copy_takehome_ccri_ctf.py
-!/copy_ccri_ctf_solo.py
-
-# == Deb packages ==
-!/debs/
-!/debs/**
-
-# == Desktop shortcut ==
 !/Launch_CCRI_CTF_HUB.desktop
 
-# == Source dirs to include ==
+# 4. Whitelist Top-level Scripts
+!/*.py
+
+# 5. Whitelist Infrastructure Directories
+!/debs/
 !/flag_generators/
-!/flag_generators/**
 !/validation_helpers/
-!/validation_helpers/**
-
-# Re-ignore Python caches (allowed because last rule wins)
-flag_generators/__pycache__/
-flag_generators/**/__pycache__/
-validation_helpers/__pycache__/
-validation_helpers/**/__pycache__/
-
-# == Validation sandbox (ignore) ==
-.validation_sandbox/
-.validation_sandbox/**
-
-# == Dry-run output (ignore) ==
-/dryrun_output/
-/dryrun_output/**
-
-# == Generated web_version (ignore) ==
-/web_version/
-/web_version/**
-
-# == Website admin: include, but ignore a few inside ==
 !/web_version_admin/
-!/web_version_admin/**
-web_version_admin/server.bak
-web_version_admin/challenges.json.bak
-web_version_admin/__pycache__/
-
-# == Make challenge roots visible (contents controlled below) ==
 !/challenges/
 !/challenges_solo/
 
-### ── Per-challenge whitelist rules ──
-# Guided
-challenges/01_Stego/*                # Ignore everything inside
-!challenges/01_Stego/README.md      # Keep the instructions
-!challenges/01_Stego/extract_flag.py # Keep the helper script
-!challenges/01_Stego/squirrel.jpg    # Keep the challenge asset
+# 6. Global Blacklist (Override directories we don't want)
+**/__pycache__/
+.validation_sandbox/
+/dryrun_output/
+/web_version/
+*.bak
+*.tmp
 
-challenges/02_Base64/* 
+# 7. Specific Challenge Whitelists
+# We use !filename to keep files. Because we whitelisted directories above, 
+# any file NOT explicitly whitelisted here will stay ignored by the '*' rule.
+
+# --- Guided Challenges ---
+!challenges/01_Stego/README.md
+!challenges/01_Stego/extract_flag.py
+!challenges/01_Stego/squirrel.jpg
+
 !challenges/02_Base64/README.md
 !challenges/02_Base64/solve.py
 !challenges/02_Base64/encoded.txt
 
-challenges/03_ROT13/*
 !challenges/03_ROT13/README.md
 !challenges/03_ROT13/decode_rot13.py
 !challenges/03_ROT13/cipher.txt
 
-challenges/04_Vigenere/*
 !challenges/04_Vigenere/README.md
 !challenges/04_Vigenere/break_vigenere.py
 !challenges/04_Vigenere/cipher.txt
 
-challenges/05_ArchivePassword/*
 !challenges/05_ArchivePassword/README.md
 !challenges/05_ArchivePassword/crack_zip.py
 !challenges/05_ArchivePassword/secret.zip
 !challenges/05_ArchivePassword/wordlist.txt
 
-challenges/06_Hashcat/*
 !challenges/06_Hashcat/README.md
 !challenges/06_Hashcat/hashes.txt
 !challenges/06_Hashcat/run_chain_crack.py
 !challenges/06_Hashcat/wordlist.txt
-!challenges/06_Hashcat/segments/
-!challenges/06_Hashcat/segments/part1.zip
-!challenges/06_Hashcat/segments/part2.zip
-!challenges/06_Hashcat/segments/part3.zip
+!challenges/06_Hashcat/segments/part*.zip
 
-challenges/07_ExtractBinary/*
 !challenges/07_ExtractBinary/README.md
 !challenges/07_ExtractBinary/analyze_binary.py
 !challenges/07_ExtractBinary/hidden_flag
 
-challenges/08_FakeAuthLog/*
 !challenges/08_FakeAuthLog/README.md
 !challenges/08_FakeAuthLog/auth.log
 !challenges/08_FakeAuthLog/investigate_authlog.py
 
-challenges/09_FixScript/*
 !challenges/09_FixScript/README.md
 !challenges/09_FixScript/broken_flag.py
 !challenges/09_FixScript/script_runner.py
 
-challenges/10_Metadata/*
 !challenges/10_Metadata/README.md
 !challenges/10_Metadata/inspect_metadata.py
 !challenges/10_Metadata/capybara.jpg
 
-challenges/11_HiddenFlag/*
 !challenges/11_HiddenFlag/README.md
 !challenges/11_HiddenFlag/search_for_flag.py
-!challenges/11_HiddenFlag/junk/
-!challenges/11_HiddenFlag/junk/backup/
-!challenges/11_HiddenFlag/junk/data/
-!challenges/11_HiddenFlag/junk/logs/
-!challenges/11_HiddenFlag/junk/ref/
-!challenges/11_HiddenFlag/junk/backup/sysdump.bak
-!challenges/11_HiddenFlag/junk/backup/.config.old
-!challenges/11_HiddenFlag/junk/data/info.tmp
-!challenges/11_HiddenFlag/junk/data/.hint_file
-!challenges/11_HiddenFlag/junk/data/.summary
-!challenges/11_HiddenFlag/junk/logs/old.log
-!challenges/11_HiddenFlag/junk/logs/.keep.tmp
-!challenges/11_HiddenFlag/junk/logs/.notes
-!challenges/11_HiddenFlag/junk/ref/readme.txt
-!challenges/11_HiddenFlag/junk/ref/.archive
+!challenges/11_HiddenFlag/junk/**
 
-challenges/12_QRCodes/*
 !challenges/12_QRCodes/README.md
 !challenges/12_QRCodes/qr_code_explorer.py
-!challenges/12_QRCodes/qr_01.png
-!challenges/12_QRCodes/qr_02.png
-!challenges/12_QRCodes/qr_03.png
-!challenges/12_QRCodes/qr_04.png
-!challenges/12_QRCodes/qr_05.png
+!challenges/12_QRCodes/qr_*.png
 
-challenges/13_HTTPHeaders/*
 !challenges/13_HTTPHeaders/README.md
 !challenges/13_HTTPHeaders/investigate_headers.py
-!challenges/13_HTTPHeaders/response_1.txt
-!challenges/13_HTTPHeaders/response_2.txt
-!challenges/13_HTTPHeaders/response_3.txt
-!challenges/13_HTTPHeaders/response_4.txt
-!challenges/13_HTTPHeaders/response_5.txt
+!challenges/13_HTTPHeaders/.server_data
 
-challenges/14_SubdomainSweep/*
-!challenges/14_SubdomainSweep/README.md
-!challenges/14_SubdomainSweep/explore_subdomains.py
-!challenges/14_SubdomainSweep/alpha.cryptkeepers.local.html
-!challenges/14_SubdomainSweep/beta.cryptkeepers.local.html
-!challenges/14_SubdomainSweep/delta.cryptkeepers.local.html
-!challenges/14_SubdomainSweep/domains.txt
-!challenges/14_SubdomainSweep/gamma.cryptkeepers.local.html
-!challenges/14_SubdomainSweep/omega.cryptkeepers.local.html
+!challenges/14_InternalPortals/README.md
+!challenges/14_InternalPortals/explore_portals.py
+!challenges/14_InternalPortals/.server_data
 
-challenges/15_ProcessInspection/*
 !challenges/15_ProcessInspection/README.md
 !challenges/15_ProcessInspection/explore_processes.py
 !challenges/15_ProcessInspection/ps_dump.txt
 
-challenges/16_HexHunting/*
 !challenges/16_HexHunting/README.md
 !challenges/16_HexHunting/inspect_binary.py
 !challenges/16_HexHunting/hex_flag.bin
 
-challenges/17_NmapScanning/*
 !challenges/17_NmapScanning/README.md
 !challenges/17_NmapScanning/helper_scan.py
 
-challenges/18_PcapSearch/*
 !challenges/18_PcapSearch/README.md
 !challenges/18_PcapSearch/analyze_pcap.py
 !challenges/18_PcapSearch/traffic.pcap
 
-# Solo
-challenges_solo/01_Stego/*                # Ignore everything inside
-!challenges_solo/01_Stego/README.md      # Keep the instructions
-!challenges_solo/01_Stego/squirrel.jpg    # Keep the challenge asset
+# --- Solo Challenges ---
+!challenges_solo/01_Stego/README.md
+!challenges_solo/01_Stego/squirrel.jpg
 
-challenges_solo/02_Base64/* 
 !challenges_solo/02_Base64/README.md
 !challenges_solo/02_Base64/encoded.txt
+!challenges_solo/02_Base64/.key_hidden
 
-challenges_solo/03_ROT13/*
 !challenges_solo/03_ROT13/README.md
 !challenges_solo/03_ROT13/cipher.txt
 
-challenges_solo/04_Vigenere/*
 !challenges_solo/04_Vigenere/README.md
 !challenges_solo/04_Vigenere/cipher.txt
 
-challenges_solo/05_ArchivePassword/*
 !challenges_solo/05_ArchivePassword/README.md
 !challenges_solo/05_ArchivePassword/secret.zip
 !challenges_solo/05_ArchivePassword/wordlist.txt
 
-challenges_solo/06_Hashcat/*
 !challenges_solo/06_Hashcat/README.md
 !challenges_solo/06_Hashcat/hashes.txt
 !challenges_solo/06_Hashcat/wordlist.txt
-!challenges_solo/06_Hashcat/segments/
-!challenges_solo/06_Hashcat/segments/part1.zip
-!challenges_solo/06_Hashcat/segments/part2.zip
-!challenges_solo/06_Hashcat/segments/part3.zip
+!challenges_solo/06_Hashcat/segments/part*.zip
 
-challenges_solo/07_ExtractBinary/*
 !challenges_solo/07_ExtractBinary/README.md
 !challenges_solo/07_ExtractBinary/hidden_flag
 
-challenges_solo/08_FakeAuthLog/*
 !challenges_solo/08_FakeAuthLog/README.md
 !challenges_solo/08_FakeAuthLog/auth.log
 
-challenges_solo/09_FixScript/*
 !challenges_solo/09_FixScript/README.md
 !challenges_solo/09_FixScript/broken_flag.py
 
-challenges_solo/10_Metadata/*
 !challenges_solo/10_Metadata/README.md
 !challenges_solo/10_Metadata/capybara.jpg
 
-challenges_solo/11_HiddenFlag/*
 !challenges_solo/11_HiddenFlag/README.md
-!challenges_solo/11_HiddenFlag/junk/
-!challenges_solo/11_HiddenFlag/junk/backup/
-!challenges_solo/11_HiddenFlag/junk/data/
-!challenges_solo/11_HiddenFlag/junk/logs/
-!challenges_solo/11_HiddenFlag/junk/ref/
-!challenges_solo/11_HiddenFlag/junk/backup/sysdump.bak
-!challenges_solo/11_HiddenFlag/junk/backup/.config.old
-!challenges_solo/11_HiddenFlag/junk/data/info.tmp
-!challenges_solo/11_HiddenFlag/junk/data/.hint_file
-!challenges_solo/11_HiddenFlag/junk/data/.summary
-!challenges_solo/11_HiddenFlag/junk/logs/old.log
-!challenges_solo/11_HiddenFlag/junk/logs/.keep.tmp
-!challenges_solo/11_HiddenFlag/junk/logs/.notes
-!challenges_solo/11_HiddenFlag/junk/ref/readme.txt
-!challenges_solo/11_HiddenFlag/junk/ref/.archive
+!challenges_solo/11_HiddenFlag/junk/**
 
-challenges_solo/12_QRCodes/*
 !challenges_solo/12_QRCodes/README.md
-!challenges_solo/12_QRCodes/qr_01.png
-!challenges_solo/12_QRCodes/qr_02.png
-!challenges_solo/12_QRCodes/qr_03.png
-!challenges_solo/12_QRCodes/qr_04.png
-!challenges_solo/12_QRCodes/qr_05.png
+!challenges_solo/12_QRCodes/qr_*.png
 
-challenges_solo/13_HTTPHeaders/*
 !challenges_solo/13_HTTPHeaders/README.md
-!challenges_solo/13_HTTPHeaders/response_1.txt
-!challenges_solo/13_HTTPHeaders/response_2.txt
-!challenges_solo/13_HTTPHeaders/response_3.txt
-!challenges_solo/13_HTTPHeaders/response_4.txt
-!challenges_solo/13_HTTPHeaders/response_5.txt
+!challenges_solo/13_HTTPHeaders/.server_data
 
-challenges_solo/14_SubdomainSweep/*
-!challenges_solo/14_SubdomainSweep/README.md
-!challenges_solo/14_SubdomainSweep/alpha.cryptkeepers.local.html
-!challenges_solo/14_SubdomainSweep/beta.cryptkeepers.local.html
-!challenges_solo/14_SubdomainSweep/delta.cryptkeepers.local.html
-!challenges_solo/14_SubdomainSweep/domains.txt
-!challenges_solo/14_SubdomainSweep/gamma.cryptkeepers.local.html
-!challenges_solo/14_SubdomainSweep/omega.cryptkeepers.local.html
+!challenges_solo/14_InternalPortals/README.md
+!challenges_solo/14_InternalPortals/.server_data
 
-challenges_solo/15_ProcessInspection/*
 !challenges_solo/15_ProcessInspection/README.md
 !challenges_solo/15_ProcessInspection/ps_dump.txt
 
-challenges_solo/16_HexHunting/*
 !challenges_solo/16_HexHunting/README.md
 !challenges_solo/16_HexHunting/hex_flag.bin
 
-challenges_solo/17_NmapScanning/*
 !challenges_solo/17_NmapScanning/README.md
 
-challenges_solo/18_PcapSearch/*
 !challenges_solo/18_PcapSearch/README.md
 !challenges_solo/18_PcapSearch/traffic.pcap
-

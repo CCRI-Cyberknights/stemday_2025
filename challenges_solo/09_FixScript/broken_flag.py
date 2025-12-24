@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
-# This script should print: CCRI-SCRP-1811
+# This script should print: CCRI-SCRP-9881
 # But someone broke the math!
 
-part1 = 204
-part2 = 1607
+part1 = 10819
+part2 = 938
 
 # MATH ERROR!
 code = part1 * part2  # <- wrong math
