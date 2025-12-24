@@ -77,11 +77,11 @@
     "flag": "CCRI-IVAB-7689",
     "script": "investigate_headers.py"
   },
-  "14_SubdomainSweep": {
-    "name": "Subdomain Sweep",
-    "folder": "14_SubdomainSweep",
+  "14_InternalPortals": {
+    "name": "Internal Portals",
+    "folder": "14_InternalPortals",
     "flag": "CCRI-YIOF-8903",
-    "script": "explore_subdomains.py"
+    "script": "explore_portals.py"
   },
   "15_ProcessInspection": {
     "name": "Process Inspection",

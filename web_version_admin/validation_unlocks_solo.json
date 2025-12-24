@@ -104,15 +104,15 @@
   },
   "13_HTTPHeaders": {
     "real_flag": "CCRI-IJOS-7268",
-    "challenge_file": "challenges_solo/13_HTTPHeaders/response_3.txt",
-    "unlock_method": "Inspect HTTP headers in response_*.txt to locate the X-Flag header with the real flag",
-    "hint": "Look for custom HTTP headers like X-Flag in the responses"
+    "challenge_file": "challenges_solo/13_HTTPHeaders/.server_data",
+    "unlock_method": "Inspect HTTP headers of localhost endpoints (curl -I) to find X-Flag.",
+    "hint": "Use curl -I http://localhost:5000/mystery/endpoint_... to view headers."
   },
-  "14_SubdomainSweep": {
+  "14_InternalPortals": {
     "real_flag": "CCRI-WTFA-3468",
-    "challenge_folder": "challenges_solo/14_SubdomainSweep",
-    "unlock_method": "Inspect HTML files for subdomains to locate the flag",
-    "hint": "Search *.cryptkeepers.local.html for the flag string using grep or a browser"
+    "challenge_folder": "challenges_solo/14_InternalPortals",
+    "unlock_method": "Inspect HTML Source Code of internal portals for hidden comments.",
+    "hint": "View Page Source (Ctrl+U) or use curl to find the flag in HTML comments."
   },
   "15_ProcessInspection": {
     "real_flag": "CCRI-YYTV-1420",

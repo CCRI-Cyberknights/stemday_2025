@@ -3,81 +3,47 @@
 from pathlib import Path
 import random
 import sys
+import json
+import base64
 from flag_generators.flag_helpers import FlagUtils
-
 
 class HTTPHeaderFlagGenerator:
     """
     Generator for the HTTP Headers challenge.
-    Produces 5 response_*.txt files in the challenge folder
-    with 1 real flag and 4 decoys. Metadata is returned via self.metadata.
+    Produces a hidden .server_data file containing configuration for 5 endpoints.
+    Web server reads this to serve responses.
     """
 
     SERVERS = [
-        "CryptKeepers-Gateway/2.3.1",
-        "CryptKeepers-Node/3.0.0-beta",
-        "Apache/2.4.54 (Ubuntu)",
-        "nginx/1.24.0",
-        "Go HTTP Server/1.19"
+        "CryptKeepers-Gateway/2.3.1", "CryptKeepers-Node/3.0.0-beta",
+        "Apache/2.4.54 (Ubuntu)", "nginx/1.24.0", "Go HTTP Server/1.19"
     ]
 
     POWERED_BY = [
-        "PHP/8.1.12",
-        "Python/3.11.4",
-        "Node.js/18.16.0",
-        "ASP.NET Core/7.0",
-        "Ruby on Rails/7.1.0"
+        "PHP/8.1.12", "Python/3.11.4", "Node.js/18.16.0", 
+        "ASP.NET Core/7.0", "Ruby on Rails/7.1.0"
     ]
 
     CONTENT_TYPES = [
-        "text/html; charset=UTF-8",
-        "application/json",
-        "text/plain; charset=UTF-8",
+        "text/html; charset=UTF-8", "application/json", "text/plain; charset=UTF-8",
     ]
 
     CACHE_CONTROLS = [
-        "no-store",
-        "public, max-age=86400",
-        "private, no-cache"
+        "no-store", "public, max-age=86400", "private, no-cache"
     ]
 
     HTML_BODIES = [
-        """<html>
-  <head><title>CryptKeepers Portal</title></head>
-  <body>
-    <h1>Welcome to the CryptKeepers hub</h1>
-    <p>System maintenance is underway. Some services may be unavailable.</p>
-  </body>
-</html>""",
-        """<html>
-  <head><title>Internal Dashboard</title></head>
-  <body>
-    <h1>CryptKeepers Ops Dashboard</h1>
-    <p>Authentication successful. Redirecting...</p>
-  </body>
-</html>""",
-        """<html>
-  <head><title>Data Service</title></head>
-  <body>
-    <h1>Data Service Ready</h1>
-    <p>Connect your client application to begin.</p>
-  </body>
-</html>""",
-        """{
-  "status": "ok",
-  "message": "API version 1.2.4 is running.",
-  "notes": "No maintenance scheduled."
-}""",
-        """Welcome to the CryptKeepers data endpoint.
-This endpoint returns plain text responses."""
+        "<html><head><title>Portal</title></head><body><h1>CryptKeepers Hub</h1><p>System maintenance active.</p></body></html>",
+        "<html><head><title>Dashboard</title></head><body><h1>Ops Dashboard</h1><p>Redirecting...</p></body></html>",
+        "<html><head><title>Data</title></head><body><h1>Data Service</h1><p>Ready.</p></body></html>",
+        "{\"status\": \"ok\", \"message\": \"API v1.2.4\", \"notes\": \"Nominal\"}",
+        "CryptKeepers plain text endpoint. Status: OK"
     ]
 
     HTML_COMMENTS = [
-        "<!-- Debug: Temporary caching enabled -->",
-        "<!-- Developer note: Remove X-Test headers before release -->",
-        "<!-- Debug: API response size 512 bytes -->",
-        "<!-- Debug: Session created for client 10.6.112.3 -->",
-        "<!-- To-do: Update security headers on staging -->"
+        "", "",
+        "", "",
+        ""
     ]
 
     def __init__(self, project_root: Path = None, mode="guided"):
@@ -91,87 +57,92 @@ This endpoint returns plain text responses."""
         for parent in [dir_path] + list(dir_path.parents):
             if (parent / ".ccri_ctf_root").exists():
                 return parent.resolve()
-        print("❌ ERROR: Could not find .ccri_ctf_root marker.", file=sys.stderr)
-        sys.exit(1)
+        # Fallback if marker not found
+        return Path.cwd()
 
-    def generate_http_response(self, flag: str) -> str:
-        headers = [
-            "HTTP/1.1 200 OK",
-            f"Date: Sun, 30 Jun 2025 15:{random.randint(45, 59)}:{random.randint(0,59):02} GMT",
-            f"Server: {random.choice(self.SERVERS)}",
-            f"Content-Type: {random.choice(self.CONTENT_TYPES)}",
-            f"Cache-Control: {random.choice(self.CACHE_CONTROLS)}",
-            f"X-Powered-By: {random.choice(self.POWERED_BY)}",
-            f"X-Flag: {flag}",
-            "X-Frame-Options: SAMEORIGIN",
-            "X-Content-Type-Options: nosniff"
-        ]
+    def generate_endpoint_data(self, flag: str) -> dict:
+        """Creates the headers and body for a single endpoint."""
+        headers = {
+            "Server": random.choice(self.SERVERS),
+            "Content-Type": random.choice(self.CONTENT_TYPES),
+            "Cache-Control": random.choice(self.CACHE_CONTROLS),
+            "X-Powered-By": random.choice(self.POWERED_BY),
+            "X-Frame-Options": "SAMEORIGIN",
+            "X-Content-Type-Options": "nosniff"
+        }
+        
+        # Add the flag header
+        headers["X-Flag"] = flag
 
         if random.random() < 0.6:
-            session_id = ''.join(random.choices("abcdefghijklmnopqrstuvwxyz0123456789", k=12))
-            headers.append(f"Set-Cookie: sessionid={session_id}; HttpOnly; Secure")
+            session_id = ''.join(random.choices("abcdef0123456789", k=16))
+            headers["Set-Cookie"] = f"sessionid={session_id}; HttpOnly; Secure"
 
-        # Shuffle optional headers (everything after the first 5)
-        random.shuffle(headers[5:])
+        body = random.choice(self.HTML_BODIES) + "\n" + random.choice(self.HTML_COMMENTS)
+        
+        return {
+            "headers": headers,
+            "body": body,
+            "status_code": 200
+        }
 
-        body = random.choice(self.HTML_BODIES)
-        comment = random.choice(self.HTML_COMMENTS)
+    def clean_previous_data(self, challenge_folder: Path):
+        """Removes old artifacts to ensure a clean generation."""
+        server_data_file = challenge_folder / ".server_data"
+        if server_data_file.exists():
+            try:
+                server_data_file.unlink()
+                # print(f"🗑️ Removed old server configuration.") 
+            except Exception as e:
+                print(f"⚠️ Could not delete {server_data_file.name}: {e}", file=sys.stderr)
 
-        return "\n".join(headers) + "\n\n" + body + "\n\n" + comment
-
-    def clean_old_responses(self, challenge_folder: Path):
-        if challenge_folder.exists():
-            for old_file in challenge_folder.glob("response_*.txt"):
-                try:
-                    old_file.unlink()
-                    print(f"🗑️ Removed old file: {old_file.name}")
-                except Exception as e:
-                    print(f"⚠️ Could not delete {old_file.name}: {e}", file=sys.stderr)
-        else:
-            print(f"📁 Creating challenge folder: {challenge_folder.relative_to(self.project_root)}")
-            challenge_folder.mkdir(parents=True, exist_ok=True)
-
-    def embed_http_responses(self, challenge_folder: Path, real_flag: str, fake_flags: list):
+    def embed_data(self, challenge_folder: Path, real_flag: str, fake_flags: list):
         try:
             challenge_folder.mkdir(parents=True, exist_ok=True)
-            self.clean_old_responses(challenge_folder)
+            
+            # clean up both .server_data
+            self.clean_previous_data(challenge_folder)
 
             all_flags = fake_flags + [real_flag]
             random.shuffle(all_flags)
 
-            print(f"🎭 Fake flags: {', '.join(fake_flags)}")
+            server_data = {}
 
-            real_response_file = None
-
+            # Generate data for 5 endpoints
             for i, flag in enumerate(all_flags, start=1):
-                file_path = challenge_folder / f"response_{i}.txt"
-                response_content = self.generate_http_response(flag)
-                file_path.write_text(response_content)
-
+                endpoint_key = f"endpoint_{i}"
+                data = self.generate_endpoint_data(flag)
+                server_data[endpoint_key] = data
+                
                 if flag == real_flag:
-                    print(f"✅ {file_path.name} (REAL flag)")
-                    real_response_file = file_path
-                else:
-                    print(f"➖ {file_path.name} (decoy)")
+                    print(f"✅ Flag hidden in {endpoint_key}")
+
+            # Obfuscate / Encode data so it's not readable in plain text
+            json_str = json.dumps(server_data)
+            b64_data = base64.b64encode(json_str.encode("utf-8")).decode("utf-8")
+
+            # Save to hidden file
+            target_file = challenge_folder / ".server_data"
+            target_file.write_text(b64_data)
+            print(f"💾 Saved web server configuration to {target_file.relative_to(self.project_root)}")
 
             self.metadata = {
                 "real_flag": real_flag,
-                "challenge_file": str(real_response_file.relative_to(self.project_root)),
-                "unlock_method": "Inspect HTTP headers in response_*.txt to locate the X-Flag header with the real flag",
-                "hint": "Look for custom HTTP headers like X-Flag in the responses"
+                ""challenge_file": str(target_file.relative_to(self.project_root)),
+                "unlock_method": "Use curl -I to check headers of /mystery/endpoint_X",
+                "hint": "Check X-Flag header"
             }
 
         except Exception as e:
-            print(f"❌ Failed during HTTP response embedding: {e}", file=sys.stderr)
+            print(f"❌ Failed during HTTP response generation: {e}", file=sys.stderr)
             sys.exit(1)
 
     def generate_flag(self, challenge_folder: Path) -> str:
         real_flag = FlagUtils.generate_real_flag()
         fake_flags = list({FlagUtils.generate_fake_flag() for _ in range(4)})
-
         while real_flag in fake_flags:
             real_flag = FlagUtils.generate_real_flag()
 
-        self.embed_http_responses(challenge_folder, real_flag, fake_flags)
+        self.embed_data(challenge_folder, real_flag, fake_flags)
         print(f"✅ {self.mode.capitalize()} flag: {real_flag}")
         return real_flag

@@ -65,13 +65,12 @@ web_version_admin/__pycache__/
 
 ### ── Per-challenge whitelist rules ──
 # Guided
-challenges/01_Stego/*                # Ignore everything inside
+challenges/01_Stego/* # Ignore everything inside
 !challenges/01_Stego/README.md      # Keep the instructions
 !challenges/01_Stego/extract_flag.py # Keep the helper script
 !challenges/01_Stego/squirrel.jpg    # Keep the challenge asset
 
-challenges/02_Base64/* 
-!challenges/02_Base64/README.md
+challenges/02_Base64/* !challenges/02_Base64/README.md
 !challenges/02_Base64/solve.py
 !challenges/02_Base64/encoded.txt
 
@@ -150,23 +149,14 @@ challenges/12_QRCodes/*
 !challenges/12_QRCodes/qr_05.png
 
 challenges/13_HTTPHeaders/*
-!challenges/13_HTTPHeaders/README.md
 !challenges/13_HTTPHeaders/investigate_headers.py
-!challenges/13_HTTPHeaders/response_1.txt
-!challenges/13_HTTPHeaders/response_2.txt
-!challenges/13_HTTPHeaders/response_3.txt
-!challenges/13_HTTPHeaders/response_4.txt
-!challenges/13_HTTPHeaders/response_5.txt
+!challenges/13_HTTPHeaders/README.md
+!challenges/13_HTTPHeaders/.server_data
 
-challenges/14_SubdomainSweep/*
-!challenges/14_SubdomainSweep/README.md
-!challenges/14_SubdomainSweep/explore_subdomains.py
-!challenges/14_SubdomainSweep/alpha.cryptkeepers.local.html
-!challenges/14_SubdomainSweep/beta.cryptkeepers.local.html
-!challenges/14_SubdomainSweep/delta.cryptkeepers.local.html
-!challenges/14_SubdomainSweep/domains.txt
-!challenges/14_SubdomainSweep/gamma.cryptkeepers.local.html
-!challenges/14_SubdomainSweep/omega.cryptkeepers.local.html
+challenges/14_InternalPortals/*
+!challenges/14_InternalPortals/explore_portals.py
+!challenges/14_InternalPortals/README.md
+!challenges/14_InternalPortals/.server_data
 
 challenges/15_ProcessInspection/*
 !challenges/15_ProcessInspection/README.md
@@ -188,7 +178,7 @@ challenges/18_PcapSearch/*
 !challenges/18_PcapSearch/traffic.pcap
 
 # Solo
-challenges_solo/01_Stego/*                # Ignore everything inside
+challenges_solo/01_Stego/* # Ignore everything inside
 !challenges_solo/01_Stego/README.md      # Keep the instructions
 !challenges_solo/01_Stego/squirrel.jpg    # Keep the challenge asset
 
@@ -262,20 +252,11 @@ challenges_solo/12_QRCodes/*
 
 challenges_solo/13_HTTPHeaders/*
 !challenges_solo/13_HTTPHeaders/README.md
-!challenges_solo/13_HTTPHeaders/response_1.txt
-!challenges_solo/13_HTTPHeaders/response_2.txt
-!challenges_solo/13_HTTPHeaders/response_3.txt
-!challenges_solo/13_HTTPHeaders/response_4.txt
-!challenges_solo/13_HTTPHeaders/response_5.txt
+!challenges_solo/13_HTTPHeaders/.server_data
 
-challenges_solo/14_SubdomainSweep/*
-!challenges_solo/14_SubdomainSweep/README.md
-!challenges_solo/14_SubdomainSweep/alpha.cryptkeepers.local.html
-!challenges_solo/14_SubdomainSweep/beta.cryptkeepers.local.html
-!challenges_solo/14_SubdomainSweep/delta.cryptkeepers.local.html
-!challenges_solo/14_SubdomainSweep/domains.txt
-!challenges_solo/14_SubdomainSweep/gamma.cryptkeepers.local.html
-!challenges_solo/14_SubdomainSweep/omega.cryptkeepers.local.html
+challenges_solo/14_InternalPortals/*
+!challenges_solo/14_InternalPortals/README.md
+!challenges_solo/14_InternalPortals/.server_data
 
 challenges_solo/15_ProcessInspection/*
 !challenges_solo/15_ProcessInspection/README.md
@@ -291,4 +272,3 @@ challenges_solo/17_NmapScanning/*
 challenges_solo/18_PcapSearch/*
 !challenges_solo/18_PcapSearch/README.md
 !challenges_solo/18_PcapSearch/traffic.pcap
-

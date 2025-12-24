@@ -64,9 +64,9 @@
     "folder": "13_HTTPHeaders",
     "flag": "CCRI-IJOS-7268"
   },
-  "14_SubdomainSweep": {
-    "name": "Subdomain Sweep",
-    "folder": "14_SubdomainSweep",
+  "14_InternalPortals": {
+    "name": "Internal Portals",
+    "folder": "14_InternalPortals",
     "flag": "CCRI-WTFA-3468"
   },
   "15_ProcessInspection": {

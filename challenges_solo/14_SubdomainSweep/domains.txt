@@ -1,5 +1,0 @@
-alpha.cryptkeepers.local
-beta.cryptkeepers.local
-gamma.cryptkeepers.local
-delta.cryptkeepers.local
-omega.cryptkeepers.local

@@ -31,7 +31,7 @@ CHALLENGE_TO_MODULE = {
     "11_HiddenFlag": "val_11_hidden_flag",
     "12_QRCodes": "val_12_qr_codes",
     "13_HTTPHeaders": "val_13_http_headers",
-    "14_SubdomainSweep": "val_14_subdomain_sweep",
+    "14_InternalPortals": "val_14_internal_portals",
     "15_ProcessInspection": "val_15_process_inspection",
     "16_HexHunting": "val_16_hex_hunting",
     "17_NmapScanning": "val_17_nmap_scanning",

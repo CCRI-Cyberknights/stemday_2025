@@ -4,6 +4,7 @@ import sys
 import json
 import base64
 from pathlib import Path
+
 try:
     from validation_helpers.common import find_project_root, load_unlock_data, get_ctf_mode
 except ImportError:
@@ -11,7 +12,7 @@ except ImportError:
     sys.path.append(str(Path(__file__).resolve().parent.parent))
     from validation_helpers.common import find_project_root, load_unlock_data, get_ctf_mode
 
-CHALLENGE_ID = "13_HTTPHeaders"
+CHALLENGE_ID = "14_SubdomainSweep"
 
 def validate_server_data(challenge_dir: Path, expected_flag: str) -> bool:
     data_file = challenge_dir / ".server_data"
@@ -27,18 +28,14 @@ def validate_server_data(challenge_dir: Path, expected_flag: str) -> bool:
         decoded_json = base64.b64decode(encoded_content).decode('utf-8')
         data_map = json.loads(decoded_json)
 
-        # Iterate through all generated endpoints (endpoint_1, endpoint_2, etc.)
-        for endpoint_name, endpoint_data in data_map.items():
-            headers = endpoint_data.get("headers", {})
-            
-            # Check the specific header where we hide the flag
-            x_flag = headers.get("X-Flag")
-            
-            if x_flag == expected_flag:
-                print(f"✅ Found correct flag in {endpoint_name} headers.")
+        # Iterate through all generated sites (alpha, beta, etc.)
+        for site_name, html_content in data_map.items():
+            # Check if the flag is embedded in the HTML string
+            if expected_flag in html_content:
+                print(f"✅ Found correct flag in subdomain '{site_name}' HTML.")
                 return True
 
-        print(f"❌ Flag {expected_flag} not found in any endpoint configuration.", file=sys.stderr)
+        print(f"❌ Flag {expected_flag} not found in any subdomain HTML content.", file=sys.stderr)
         return False
 
     except Exception as e:
@@ -52,7 +49,7 @@ def validate(mode="guided", challenge_id=CHALLENGE_ID) -> bool:
     if not data:
         print(f"❌ Could not load unlock data for {challenge_id}")
         return False
-        
+
     flag = data.get("real_flag")
 
     sandbox_override = os.environ.get("CCRI_SANDBOX")
