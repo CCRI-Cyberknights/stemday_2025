@@ -26,21 +26,7 @@ Developers often hide secrets in **hidden elements** or internal system tags.
 * The real flag starts with `CCRI-`.
 
 ## 👩‍💻 Tips & Tools
-**Option 1: Use the Helper Script**
-The included script allows you to open portals and scan them:
 
     python3 explore_portals.py
 
-**Option 2: Browser (Manual)**
-1.  Open the URL in your browser.
-2.  Right-click and select **"View Page Source"** (or press `Ctrl+U`).
-3.  Alternatively, use **Inspect Element** (F12) to see hidden parts of the page.
-4.  Search (`Ctrl+F`) for "CCRI".
-
-**Option 3: Command Line**
-Use `curl` to fetch the source code and print it to the terminal:
-
-    curl -s http://localhost:5000/internal/alpha | grep "CCRI-"
-
----
-🚀 *Begin your sweep and uncover the real flag!*
+🚀 *Investigate the portals and uncover the authentic flag!*
