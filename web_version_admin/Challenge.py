@@ -5,11 +5,12 @@ import config  # Now imports path logic from your new config module
 class Challenge:
     """Represents a single CTF challenge."""
 
-    def __init__(self, id, ch_number, name, folder, flag, script=None, solo_mode=False):
+    def __init__(self, id, ch_number, name, folder, flag, script=None, solo_mode=False, has_coach=False):
         self.id = id                      # Unique identifier
         self.ch_number = ch_number        # Challenge number for display
         self.name = name                  # Human-readable name
         self.complete = False             # Default: not completed
+        self.has_coach = has_coach        # NEW: Flag for Coach Mode support
 
         # === Determine base path via Config ===
         # We rely on config.py to tell us where the SOLO and REGULAR (Guided) folders are.
@@ -56,9 +57,12 @@ class Challenge:
 
     def getFlag(self):
         return self.flag
+    
+    def getHasCoach(self):
+        return self.has_coach
 
     def __repr__(self):
         return (
             f"#{self.ch_number} {self.name} | ID={self.id} | "
-            f"Folder={self.folder} | Script={self.script} | Flag={self.flag}"
+            f"Folder={self.folder} | Script={self.script} | Flag={self.flag} | Coach={self.has_coach}"
         )

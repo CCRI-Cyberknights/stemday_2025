@@ -10,6 +10,7 @@
 <body data-challenge-id="{{ challenge.id }}" data-url-index="{{ url_for('main.index') }}"
   data-url-open-folder="{{ url_for('main.open_folder', challenge_id=challenge.id) }}"
   data-url-run-script="{{ url_for('main.run_script', challenge_id=challenge.id) }}"
+  data-url-run-coach="{{ url_for('main.run_coach', challenge_id=challenge.id) }}"
   data-url-submit-flag="{{ url_for('main.submit_flag', challenge_id=challenge.id) }}" data-base-mode="{{ base_mode }}"
   data-mode="{{ mode }}">
 
@@ -49,9 +50,18 @@
 
     <div class="challenge-wrapper-section"
       style="text-align: center; border: none; background: none; padding-top: 10px;">
+
       <button type="button" onclick="runHelper('run');" style="font-size: 1.1em; padding: 10px 20px;">
         🖥 Run Helper Script
       </button>
+
+      {% if challenge.has_coach %}
+      <button id="run-coach-btn" type="button" onclick="runCoach();" class="coach-btn"
+        style="font-size: 1.1em; padding: 10px 20px; margin-left: 15px;">
+        🎓 Launch Coach Mode
+      </button>
+      {% endif %}
+
     </div>
 
     <div class="challenge-wrapper-footer">
@@ -80,6 +90,7 @@
     const urlIndex = document.body.dataset.urlIndex;
     const urlOpenFolder = document.body.dataset.urlOpenFolder;
     const urlRunScript = document.body.dataset.urlRunScript;
+    const urlRunCoach = document.body.dataset.urlRunCoach; // New URL
     const urlSubmitFlag = document.body.dataset.urlSubmitFlag;
 
     function goBackToIndex() { window.location.href = urlIndex; }
@@ -90,6 +101,35 @@
         .then(res => res.json())
         .then(data => {
           if (data.status !== 'success') console.error('Failed:', data.message);
+        });
+    }
+
+    // New Function to handle Coach Mode
+    function runCoach() {
+      const btn = document.getElementById('run-coach-btn');
+      const originalText = btn.innerText;
+
+      btn.innerText = "Launching...";
+      btn.disabled = true;
+
+      fetch(urlRunCoach, { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'success') {
+            console.log("Coach terminal launched.");
+          } else {
+            alert("Error launching coach: " + data.message);
+          }
+          // Reset button after short delay so they don't spam it
+          setTimeout(() => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+          }, 2000);
+        })
+        .catch(err => {
+          console.error("Error:", err);
+          btn.innerText = "Error";
+          btn.disabled = false;
         });
     }
 

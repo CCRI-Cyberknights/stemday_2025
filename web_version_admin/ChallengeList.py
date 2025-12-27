@@ -110,6 +110,7 @@ class ChallengeList:
                 flag=entry["flag"],       # Challenge decodes at runtime in student mode
                 script=entry.get("script"),
                 solo_mode=self.solo_mode,
+                has_coach=entry.get("has_coach", False)  # <--- PASS TO CONSTRUCTOR
             )
 
             print(f"➡️  Challenge #{order}: {challenge.getName()} (ID={key})")
@@ -157,6 +158,10 @@ class ChallengeList:
             # Only persist script for guided (regular) sets, normalize to basename
             if not self.solo_mode and c.getScript():
                 entry["script"] = os.path.basename(c.getScript())
+
+            # Persist the coach setting
+            if c.getHasCoach():
+                entry["has_coach"] = True
 
             data[c.getId()] = entry
 

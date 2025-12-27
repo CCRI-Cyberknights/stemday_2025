@@ -48,6 +48,8 @@ include = [
     "start_web_hub.py",
     "stop_web_hub.py",
     ".ccri_ctf_root",
+    "coach_core.py",       # ⬅️ NEW: Coach Mode Backend
+    "worker_node.py",      # ⬅️ NEW: Coach Mode Worker
 ]
 
 def copy_and_fix(src: Path, dst: Path, uid: int, gid: int):

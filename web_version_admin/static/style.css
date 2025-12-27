@@ -534,3 +534,38 @@ a.nav-btn:hover {
 	transform: translateY(1px);
 	/* Press effect */
 }
+/* =========================================
+   Coach Mode Styles
+   ========================================= */
+
+/* The Coach Button - Distinct from the standard Action Button */
+.coach-btn {
+	background-color: #5e35b1;
+	/* Deep Purple */
+	border: 1px solid #4527a0;
+	color: #ffffff;
+	transition: all 0.3s ease;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.coach-btn:hover {
+	background-color: #7e57c2;
+	/* Lighter Purple */
+	transform: translateY(-2px);
+	box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+	cursor: pointer;
+}
+
+.coach-btn:active {
+	background-color: #4527a0;
+	transform: translateY(0);
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.coach-btn:disabled {
+	background-color: #9575cd;
+	cursor: not-allowed;
+	transform: none;
+	box-shadow: none;
+	opacity: 0.7;
+}

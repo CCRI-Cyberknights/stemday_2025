@@ -249,6 +249,52 @@ def run_script(challenge_id):
     except Exception as e:
         return jsonify({"status": "error", "message": f"Failed to run script: {e}"}), 500
 
+# NEW: Coach Mode Route
+@bp.route('/run_coach/<challenge_id>', methods=['POST'])
+def run_coach(challenge_id):
+    mode = session.get("mode", config.DEFAULT_MODE if config.DEFAULT_MODE else "regular")
+    
+    try:
+        challenge_list, _ = load_challenges(mode)
+    except Exception:
+        return jsonify({"status": "error", "message": "No challenges available"}), 404
+
+    selectedChallenge = challenge_list.get_challenge_by_id(challenge_id)
+    if selectedChallenge is None:
+        return jsonify({"status": "error", "message": "Challenge not found"}), 404
+
+    # Coach script is expected to be named 'coach.py' inside the challenge folder
+    script_path = os.path.join(selectedChallenge.getFolder(), 'coach.py')
+    
+    if not os.path.exists(script_path):
+        return jsonify({"status": "error", "message": "Coach script not found for this challenge."}), 404
+
+    print(f"🎓 Launching Coach Mode: {script_path}")
+
+    try:
+        # Launch mate-terminal (Parrot OS default) with GEOMETRY (Size + Left Position)
+        subprocess.Popen([
+            "mate-terminal",
+            "--geometry=90x35+50+100",  # <--- WINDOW POSITIONING
+            "--title=Coach Mode: " + selectedChallenge.getName(),
+            "--",
+            "python3", script_path
+        ])
+        return jsonify({"status": "success", "message": "Coach terminal launched"})
+    except FileNotFoundError:
+        # Fallback to x-terminal-emulator if mate-terminal is missing
+        try:
+             subprocess.Popen([
+                "x-terminal-emulator",
+                "-e", f"python3 {script_path}"
+            ])
+             return jsonify({"status": "success", "message": "Coach terminal launched (fallback)"})
+        except Exception as e:
+             return jsonify({"status": "error", "message": f"Terminal not found: {e}"}), 500
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"Failed to run coach: {e}"}), 500
+
+
 @bp.route('/challenge/<challenge_id>/file/<path:filename>')
 def get_challenge_file(challenge_id, filename):
     mode = session.get("mode", config.DEFAULT_MODE if config.DEFAULT_MODE else "regular")

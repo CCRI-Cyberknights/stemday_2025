@@ -16,6 +16,10 @@
 # 4. Whitelist Top-level Scripts
 !/*.py
 
+# 4.1 Whitelist Coach Mode Engine
+!/coach_core.py
+!/worker_node.py
+
 # 5. Whitelist Infrastructure Directories
 !/debs/
 !/flag_generators/
@@ -35,6 +39,9 @@
 # 7. Specific Challenge Whitelists
 # We use !filename to keep files. Because we whitelisted directories above, 
 # any file NOT explicitly whitelisted here will stay ignored by the '*' rule.
+
+# --- Coach Mode Scripts (Global Whitelist for all challenges) ---
+!challenges/*/coach.py
 
 # --- Guided Challenges ---
 !challenges/01_Stego/README.md

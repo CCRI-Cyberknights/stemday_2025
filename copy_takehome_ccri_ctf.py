@@ -29,6 +29,8 @@ include = [
     "Launch_CCRI_CTF_HUB.desktop",
     ".mode",
     ".ccri_ctf_root",
+    "coach_core.py",    # ⬅️ NEW: Coach Mode Backend
+    "worker_node.py",   # ⬅️ NEW: Coach Mode Worker
 ]
 
 def copy_and_fix(src: Path, dst: Path, uid: int, gid: int):
@@ -79,7 +81,7 @@ def copy_and_fix(src: Path, dst: Path, uid: int, gid: int):
         return fname.endswith((".py", ".sh", ".desktop", ".pyz"))
 
     def is_plain_text(fname: str) -> bool:
-        return fname.endswith((".txt", ".md", ".json"))
+        return fname.endswith((".txt", ".md", ".json", ".gitignore"))
 
     if dst.is_dir():
         for dirpath, _, filenames in os.walk(dst):
