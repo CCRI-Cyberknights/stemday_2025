@@ -263,8 +263,8 @@ def run_coach(challenge_id):
     if selectedChallenge is None:
         return jsonify({"status": "error", "message": "Challenge not found"}), 404
 
-    # Coach script is expected to be named 'coach.py' inside the challenge folder
-    script_path = os.path.join(selectedChallenge.getFolder(), 'coach.py')
+    # ⬇️ CHANGE IS HERE: Look for .coach.py instead of coach.py
+    script_path = os.path.join(selectedChallenge.getFolder(), '.coach.py')
     
     if not os.path.exists(script_path):
         return jsonify({"status": "error", "message": "Coach script not found for this challenge."}), 404

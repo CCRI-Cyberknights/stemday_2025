@@ -18,6 +18,12 @@ def main():
             ),
             command_to_display="cd challenges/01_Stego"
         )
+        
+        # === CRITICAL: SYNC COACH DIRECTORY ===
+        # Now that the student has CD'd in the worker, we move the Coach there too.
+        # This allows Tab Completion to find 'squirrel.jpg' in the next steps.
+        os.chdir(os.path.join(os.path.dirname(__file__))) 
+        # ======================================
 
         # STEP 2: Discovery
         bot.teach_step(
@@ -27,7 +33,7 @@ def main():
             command_to_display="ls -l"
         )
 
-        # STEP 3: The Guessing Game (CLEAN & NO -f)
+        # STEP 3: The Guessing Game
         bot.teach_loop(
             instruction=(
                 "We see 'squirrel.jpg'. We need to extract the data using 'steghide'.\n"
