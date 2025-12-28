@@ -1,12 +1,33 @@
 #!/usr/bin/env python3
 import sys
 import os
+import socket
 
 # Add root to path to find coach_core
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 from coach_core import Coach
 
+def check_web_server():
+    """Checks if the CTF web server is running on port 5000."""
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(1)
+        # Check port 5000 (main web challenges)
+        result = sock.connect_ex(('127.0.0.1', 5000))
+        sock.close()
+        
+        if result != 0:
+            print("\n\033[91m❌ ERROR: The Web Server is not running!\033[0m")
+            print("This challenge requires the background web services.")
+            print("👉 Please open a new terminal tab and run: \033[1;93mpython3 start_web_hub.py\033[0m\n")
+            sys.exit(1)
+    except Exception:
+        pass
+
 def main():
+    # 1. Pre-flight Check: Ensure the target is actually up
+    check_web_server()
+
     bot = Coach("HTTP Header Detective (curl)")
     bot.start()
 
@@ -47,7 +68,6 @@ def main():
         )
 
         # STEP 4: Automation (Brace Expansion)
-        # 
         bot.teach_step(
             instruction=(
                 "Bash allows us to generate a list of numbers using `{1..5}`.\n"

@@ -126,7 +126,7 @@ def main():
                 "Now, let's run the solver.\n"
                 "You pass the keyword directly to it as an argument.\n\n"
                 "🔐 **Hint:** What is the opposite of 'logout'?\n"
-                "👉 Try that word as your key (in lowercase)."
+                "👉 Try that word (or 'providence' if using Solo Mode)."
             ),
             # Template showing how to use the tool
             command_template="python3 .solver.py [KEY]",
@@ -134,8 +134,8 @@ def main():
             # Prefix for validation
             command_prefix="python3 .solver.py ",
             
-            # The winning keyword
-            correct_password="login",
+            # UPDATE: We use regex to accept EITHER the Guided key (login) OR Solo key (providence)
+            command_regex=r"python3 \.solver\.py (login|providence)",
             
             # Clean up the output file between attempts so the student doesn't see old data
             clean_files=["decoded_output.txt"]
