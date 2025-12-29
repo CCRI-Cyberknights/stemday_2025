@@ -122,22 +122,11 @@ def main():
         # STEP 5: The Ephemeral Tool
         # We guide them to use the tool we just silently created (.solver.py)
         bot.teach_loop(
-            instruction=(
-                "Now, let's run the solver.\n"
-                "You pass the keyword directly to it as an argument.\n\n"
-                "🔐 **Hint:** What is the opposite of 'logout'?\n"
-                "👉 Try that word (or 'providence' if using Solo Mode)."
-            ),
-            # Template showing how to use the tool
+            instruction="...",
             command_template="python3 .solver.py [KEY]",
-            
-            # Prefix for validation
             command_prefix="python3 .solver.py ",
-            
-            # UPDATE: We use regex to accept EITHER the Guided key (login) OR Solo key (providence)
-            command_regex=r"python3 \.solver\.py (login|providence)",
-            
-            # Clean up the output file between attempts so the student doesn't see old data
+            # ANCHORED REGEX
+            command_regex=r"^python3 \.solver\.py (login)$", 
             clean_files=["decoded_output.txt"]
         )
 

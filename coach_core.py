@@ -118,7 +118,6 @@ class Coach:
     def teach_loop(self, instruction, command_template, command_prefix, correct_password=None, command_regex=None, clean_files=None):
         """
         Loops until the user runs a command that matches specific criteria.
-        Supports checking a suffix (password) OR matching a regex pattern.
         """
         print(f"\n\033[96m{instruction}\033[0m")
         print(f"\n👉 Use this format:\n   \033[1;93m{command_template}\033[0m")
@@ -126,21 +125,22 @@ class Coach:
         while True:
             user_input = self._get_input()
 
+            # 1. Strict Prefix Check (Exact Match for the start)
             if not user_input.startswith(command_prefix):
                  print(f"❌ Syntax Error. The command must start exactly like this:\n   \033[1;93m{command_prefix}...\033[0m")
                  continue
             
             if clean_files: self._clean_files(clean_files)
 
-            # 1. Execute the command in the worker
             print("⏳ Executing...")
             self.conn.sendall(user_input.encode('utf-8'))
             _ = self.conn.recv(1024) 
 
             # 2. Validation Logic
             
-            # OPTION A: Regex Validation (For dynamic arguments like filenames/ports)
+            # OPTION A: Regex Validation (For dynamic args)
             if command_regex:
+                # We use re.search, but the regex provided MUST have ^ and $ to be exact
                 if re.search(command_regex, user_input):
                     print("✅ Good command usage.")
                     return
@@ -148,17 +148,17 @@ class Coach:
                     print("⚠️  Command ran, but it didn't match the expected format. Try again!")
                     continue
 
-            # OPTION B: Password Suffix Validation (For flag submission or specific args)
+            # OPTION B: Password Suffix Validation (For flags/exact keys)
             if correct_password is not None:
                 user_args = user_input[len(command_prefix):].strip()
+                # EXACT match for the variable part
                 if user_args == correct_password:
                     print("✅ Excellent! Correct argument/password.")
                     return
                 else:
-                    print(f"⚠️  Command ran, but '{user_args}' is not what we are looking for. Try again!")
+                    print(f"⚠️  Command ran, but '{user_args}' is not the correct password. Try again!")
                     continue
             
-            # Fallback if neither check is provided (shouldn't happen in good design)
             return
 
     def finish(self):
