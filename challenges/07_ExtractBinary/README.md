@@ -17,7 +17,6 @@ Only **one** of the embedded strings matches the official format: `CCRI-AAAA-111
 
 📂 **Files in this folder:**  
 - `hidden_flag` → The binary containing hidden data  
-- `analyze_binary.sh` → Your guided forensic assistant  
 
 💡 **Tip:** Pay attention to patterns and don’t assume the first candidate is correct.  
 

@@ -27,8 +27,4 @@ Only one flag starts with `CCRI-`. All others use fake prefixes.
 ## 👩‍💻 Tips & Tools
 Since these are live network services, you cannot use file tools like `cat` or `less`.
 
-The included script provides a menu to scan the endpoints:
-
-    python3 investigate_headers.py
-
 🚀 *Ready to uncover the hidden flag?*

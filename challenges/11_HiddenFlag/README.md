@@ -15,9 +15,6 @@ Explore the directory tree, uncover hidden files, and locate the *one* valid fla
    - etc.  
 
 🛠️ **Tools at your disposal:**  
-- `find`, `ls -a`, `cat` — search for hidden files manually  
-- Or use the interactive helper script:  
-  `./search_for_flag.sh`  
 
 📂 **Folder to explore:** `junk/`  
 

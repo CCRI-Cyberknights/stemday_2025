@@ -11,7 +11,6 @@ The picture looks completely normal, but it’s been altered using *steganograph
 
 📂 Files in this folder:
 - `squirrel.jpg` – The suspicious image.
-- `extract_flag.sh` – A helper script that guides you through the process.
 - (The flag will be saved as `flag.txt` when you succeed.)
 
 🏁 Flag format: **CCRI-AAAA-1111**

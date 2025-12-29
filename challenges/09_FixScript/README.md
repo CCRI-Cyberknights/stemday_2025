@@ -12,8 +12,7 @@ Right now it only prints a **two-digit number** at the end instead of a full fla
 4. Reveal and save the real flag.  
 
 📂 **Files in this folder:**  
-- `broken_flag.sh` → The buggy Bash script  
-- `fix_flag.sh` → Your guided code-fixing assistant  
+- `broken_flag.py` → The buggy Bash script  
 
 🚩 **Flag format:** `CCRI-AAAA-1111`
 

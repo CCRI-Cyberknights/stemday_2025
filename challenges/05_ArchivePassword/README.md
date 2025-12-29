@@ -17,8 +17,7 @@ Inside the archive lies a **Base64-encoded** message. It contains several flag-l
 
 📂 Files in this folder:  
 - `secret.zip` – The password-protected archive.  
-- `wordlist.txt` – Potential passwords.  
-- `crack_zip.sh` – The guided script to help you crack and decode.  
+- `wordlist.txt` – Potential passwords.    
 
 🏁 **Flag format:** CCRI-AAAA-1111
 

@@ -10,16 +10,12 @@ You’ve obtained a snapshot of the system’s running processes. Hidden within 
 3. Identify which one matches the official agency flag format.  
 
 🗂️ **Files in this folder:**  
-• ps_dump.txt – Snapshot of running processes  
-• explore_processes.sh – Interactive helper script  
+• ps_dump.txt – Snapshot of running processes   
 
 💡 **Hint:**  
 The real flag follows the agency format:  
    `CCRI-AAAA-1111`  
-Fake flags use other prefixes or slightly altered structures.  
-
-👩‍💻 **Tip:** Use the guided helper script to filter, search, and explore process details.  
-It will highlight arguments and save interesting results for later review.  
+Fake flags use other prefixes or slightly altered structures.   
 
 ---
 

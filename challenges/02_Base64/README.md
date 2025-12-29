@@ -16,7 +16,6 @@ It’s just a way of encoding data. Anyone with the right tool can reverse it.
 
 ## 📂 Files in this folder:
 - `encoded.txt` – The intercepted Base64-encoded transmission.
-- `decode_base64.sh` – A helper script to guide you through decoding.
 - (The decoded result will be saved as `decoded_output.txt`.)  
 
 ---

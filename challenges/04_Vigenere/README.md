@@ -11,7 +11,6 @@ What’s the opposite of logout?
 
 📂 Files in this folder:
 - `cipher.txt` – The encrypted message.
-- `break_vigenere.sh` – A helper script that guides you through decoding.  
 
 🚨 **Note:** Not every decoded result will be valid.  
 Only one flag fits the official format: **CCRI-AAAA-1111**.  

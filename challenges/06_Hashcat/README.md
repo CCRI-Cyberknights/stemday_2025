@@ -22,7 +22,6 @@ Only **one** of the 5 matches the official format: `CCRI-AAAA-1111`
 - `hashes.txt` – 3 MD5 hashes to crack  
 - `wordlist.txt` – Possible passwords  
 - `segments/` – Folder with 3 encrypted ZIP files  
-- `run_chain_crack.sh` – Your interactive cracking assistant  
 
 💡 **Tip:** Watch how each successful crack gets you closer to the goal. Cracking alone doesn’t solve the case — decoding and assembling are just as critical!  
 

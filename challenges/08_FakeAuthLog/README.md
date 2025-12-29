@@ -17,8 +17,7 @@ It’s packed with fake SSH login records — but buried in the noise is **one h
 4. Identify the **real flag** in the format: `CCRI-AAAA-1111`  
 
 📂 **Files in this folder:**  
-- `auth.log` → Fake system log to investigate  
-- `investigate_authlog.sh` → Your guided log analysis assistant  
+- `auth.log` → Fake system log to investigate    
 
 💡 **Tip:** Not every strange PID hides a flag. Look for the **agency’s exact format** and don’t get distracted by decoys.  
 

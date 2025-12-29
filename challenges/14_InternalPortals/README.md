@@ -17,7 +17,6 @@ The internal sites are mapped to these local URLs:
 * `http://localhost:5000/internal/omega`
 
 ## 🗂️ Files in this folder
-* `explore_portals.py` — A guided Python script to help you interact with the portals.
 * *(Note: The pages are hosted live on the web server)*
 
 ## 💡 Hint
@@ -25,8 +24,5 @@ Developers often hide secrets in **hidden elements** or internal system tags.
 * Look for elements that aren't visible on the main screen (like tags with `display: none`).
 * The real flag starts with `CCRI-`.
 
-## 👩‍💻 Tips & Tools
-
-    python3 explore_portals.py
 
 🚀 *Investigate the portals and uncover the authentic flag!*

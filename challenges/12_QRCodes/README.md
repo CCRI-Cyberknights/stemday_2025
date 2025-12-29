@@ -9,16 +9,7 @@ Only ONE of them hides the real agency flag.
 2. Examine the decoded results carefully.  
 3. Identify the *one* valid flag in this format:  
    `CCRI-AAAA-1111`  
-4. Submit it to the scoreboard.  
-
-🛠️ **How to Begin:**  
-• Run the interactive script:  
-  `./explore_qr.sh`  
-
-• The script will:  
-  - Open each QR code image for 20 seconds.  
-  - Allow you to scan it with your phone (optional).  
-  - Automatically decode the QR content and save results to `qr_results.txt`.  
+4. Submit it to the scoreboard.   
 
 ⚠️ **Watch out:**  
 The other QR codes contain distractions. Only one result follows the official format.  

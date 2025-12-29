@@ -19,8 +19,7 @@ Analyze the binary and uncover the **real agency flag** embedded in its data.
 • `hexedit` → Opens the binary in an interactive hex editor for scrolling/searching.  
 
 📂 **Files Provided:**  
-• `hex_flag.bin` – Suspicious binary to investigate  
-• `inspect_binary.sh` – Interactive helper script to guide you  
+• `hex_flag.bin` – Suspicious binary to investigate    
 
 ---
 

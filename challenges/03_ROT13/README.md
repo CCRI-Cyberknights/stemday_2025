@@ -9,7 +9,6 @@ This challenge introduces **ROT13**, a simple substitution cipher that shifts ea
 
 📂 Files in this folder:
 - `cipher.txt` – The scrambled message.
-- `decode_rot13.sh` – A helper script that guides you through decoding.  
 - (The decoded result will be saved as `decoded_output.txt`.)  
 
 💡 **Hint:** The flag will stand out in the format **CCRI-AAAA-1111**.  
