@@ -1,28 +1,19 @@
-# 🌐 Challenge 14: Internal Portals
+# 🌐 Internal Portal Audit
 
-The CryptKeeper network relies on multiple internal portals for operations. You have identified **five internal web portals**, but only ONE of them contains the real agency flag hidden within its source code. The others are decoys.
+The network relies on multiple internal portals. You have identified **five internal web pages**, but only ONE contains the flag.
 
-## 🎯 Your Mission
-1.  Access each internal portal via the local web server.
-2.  Inspect the **HTML Source Code** or **DOM structure** of the pages.
-3.  Find the hidden flag in the format:
-    `CCRI-AAAA-1111`
+**The Concept:**
+What you see in a browser is just the rendered view. Developers often hide secrets, comments, or disabled elements in the **HTML Source Code**.
+
+**Your Mission:** Inspect the Source.
+1.  Access the internal portals via the local web server.
+2.  Retrieve the raw HTML code (using `curl` or by viewing source).
+3.  Search the code for hidden tags or comments containing the flag.
 
 ## 🌐 Target Portals
-The internal sites are mapped to these local URLs:
 * `http://localhost:5000/internal/alpha`
 * `http://localhost:5000/internal/beta`
-* `http://localhost:5000/internal/gamma`
-* `http://localhost:5000/internal/delta`
-* `http://localhost:5000/internal/omega`
+* ...and so on (gamma, delta, omega).
 
-## 🗂️ Files in this folder
-* *(Note: The pages are hosted live on the web server)*
-
-## 💡 Hint
-Developers often hide secrets in **hidden elements** or internal system tags.
-* Look for elements that aren't visible on the main screen (like tags with `display: none`).
-* The real flag starts with `CCRI-`.
-
-
-🚀 *Investigate the portals and uncover the authentic flag!*
+---
+**🏁 Flag format:** `CCRI-AAAA-1111`

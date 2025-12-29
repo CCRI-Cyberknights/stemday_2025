@@ -1,17 +1,15 @@
-🔐 ROT13 Decode Challenge
---------------------------
+# 🔐 ROT13 Decode Challenge
 
-An intercepted note was found in the logs of a compromised account. It’s readable… sort of. But every letter seems slightly off — like the alphabet has been twisted.  
+An intercepted note was found in the logs of a compromised account. It is readable… sort of. Every letter seems shifted, as if the alphabet has been rotated.
 
-This challenge introduces **ROT13**, a simple substitution cipher that shifts each letter 13 places.  
-- 🔄 It’s symmetrical: applying ROT13 twice restores the original message.  
-- 🕵️‍♂️ While not secure by today’s standards, it’s still used to obscure text from casual readers.  
+This is **ROT13**, a classic substitution cipher that shifts every letter exactly 13 places in the alphabet.
+* 🔄 **Symmetrical:** Applying ROT13 twice restores the original text.
+* 🕵️‍♂️ **Obfuscation:** It is not secure encryption, but it is often used to hide spoilers or text from a casual glance.
 
-📂 Files in this folder:
-- `cipher.txt` – The scrambled message.
-- (The decoded result will be saved as `decoded_output.txt`.)  
+**Your Goal:** Use the provided tools to "rotate" the text back to its original state and find the flag.
 
-💡 **Hint:** The flag will stand out in the format **CCRI-AAAA-1111**.  
+## 📂 Files in this folder
+* `cipher.txt` – The scrambled message.
 
-🏁 Flag format: **CCRI-AAAA-1111**
-
+---
+**🏁 Flag format:** `CCRI-AAAA-1111`

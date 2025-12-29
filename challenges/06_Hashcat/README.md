@@ -1,29 +1,16 @@
-🔓 Hashcat ChainCrack
-----------------------
+# 🔓 Hashcat ChainCrack
 
-You’ve intercepted 3 encrypted archive segments — each one locked behind a password. Alongside them, you found:  
+You have intercepted **3 encrypted archive segments**. Each segment is locked, but we found a list of **MD5 hashes** (`hashes.txt`) that correspond to the passwords.
 
-- `hashes.txt` – A list of MD5 hashes hiding the passwords.  
-- `wordlist.txt` – Likely password candidates.  
+To solve this, you must chain together several techniques:
+1.  **Crack:** Use the provided tools (like Hashcat) and the `wordlist.txt` to reverse the hashes and reveal the passwords.
+2.  **Unlock:** Use those passwords to open the ZIP segments.
+3.  **Assemble:** Combine the data found in the segments to reveal the final flag.
 
-Your task is to crack the hashes, extract the segments, decode them, and assemble the final flag.  
+## 📂 Files in this folder
+* `hashes.txt` – 3 MD5 hashes hiding the passwords.
+* `wordlist.txt` – A list of candidate passwords.
+* `segments/` – A folder containing the encrypted ZIP files.
 
-🧠 **Your mission:**  
-1. Run the helper script: `run_chain_crack.sh`  
-2. The script will:  
-   • Use **Hashcat** to crack all 3 hashes using the provided wordlist.  
-   • Unlock each ZIP segment with its cracked password.  
-   • Decode the base64-encoded data in each segment.  
-   • Reassemble all decoded parts into **5 possible flags**.  
-
-Only **one** of the 5 matches the official format: `CCRI-AAAA-1111`  
-
-📂 **Files in this folder:**  
-- `hashes.txt` – 3 MD5 hashes to crack  
-- `wordlist.txt` – Possible passwords  
-- `segments/` – Folder with 3 encrypted ZIP files  
-
-💡 **Tip:** Watch how each successful crack gets you closer to the goal. Cracking alone doesn’t solve the case — decoding and assembling are just as critical!  
-
-🏁 **Flag format:** CCRI-AAAA-1111
-
+---
+**🏁 Flag format:** `CCRI-AAAA-1111`

@@ -1,23 +1,18 @@
-🖥️ Challenge 15: Process Inspection
-====================================
+# 🖥️ Process Inspection
 
-CryptKeeper operatives have planted a rogue process on a compromised system to exfiltrate sensitive data.  
-You’ve obtained a snapshot of the system’s running processes. Hidden within the **command-line arguments** of five suspicious processes are “flags” — but only ONE of them is authentic. The rest are decoys.  
+Operatives have planted a rogue process on the system to exfiltrate data.
+You have obtained a snapshot (`ps_dump.txt`) of the system’s running processes at the time of the incident.
 
-🎯 **Your Mission:**  
-1. Investigate each process in the snapshot.  
-2. Examine their command-line arguments for embedded flags.  
-3. Identify which one matches the official agency flag format.  
+**The Concept:**
+Every program running on a computer is a "process." Processes often accept **Command Line Arguments** (flags) when they start. Malware often gives itself away via these arguments.
 
-🗂️ **Files in this folder:**  
-• ps_dump.txt – Snapshot of running processes   
+**Your Mission:** Audit the process list.
+1.  Analyze the process snapshot.
+2.  Look at the command arguments for every running service.
+3.  Identify the suspicious process carrying the agency flag.
 
-💡 **Hint:**  
-The real flag follows the agency format:  
-   `CCRI-AAAA-1111`  
-Fake flags use other prefixes or slightly altered structures.   
+## 📂 Files in this folder
+* `ps_dump.txt` – A snapshot of running processes and their arguments.
 
 ---
-
-🚀 *Start your investigation and uncover the rogue process now!*
-
+**🏁 Flag format:** `CCRI-AAAA-1111`

@@ -1,24 +1,17 @@
-🧠 Challenge 11: Hidden File Hunt
-=================================
+# 🕵️ Hidden File Hunt
 
-Somewhere in this folder structure lies a **hidden file** containing the real agency flag.  
+The flag is hidden somewhere inside the `junk/` directory.
+However, the directory is filled with decoy folders, fake archives, and system backups.
 
-But beware — four **fake flags** have been planted to confuse intruders. Only one follows the official format.  
+Furthermore, the file might be a **Hidden File** (a file starting with a `.`, which is invisible to normal `ls` commands).
 
-🎯 **Your Mission:**  
-Explore the directory tree, uncover hidden files, and locate the *one* valid flag.  
+**Your Mission:** Master the terminal.
+1.  Navigate through the `junk` directory structure.
+2.  Use commands that reveal hidden files (like `ls -a`).
+3.  Alternatively, use recursive search tools (like `grep -r`) to find the text of the flag inside the files without opening them one by one.
 
-✅ Official flag format: `CCRI-AAAA-1111`  
-❌ Fake flags may look similar but use the wrong prefix or order:  
-   - `FLAG-HIDE-####`  
-   - `HIDE-####-CODE`  
-   - etc.  
-
-🛠️ **Tools at your disposal:**  
-
-📂 **Folder to explore:** `junk/`  
+## 📂 Files in this folder
+* `junk/` – A messy directory structure containing the hidden flag.
 
 ---
-
-👀 Look carefully. The real flag isn’t always in the obvious place.
-
+**🏁 Flag format:** `CCRI-AAAA-1111`

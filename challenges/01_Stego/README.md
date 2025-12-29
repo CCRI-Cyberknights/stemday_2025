@@ -1,16 +1,18 @@
-🕵️ Stego Decode Challenge
---------------------------
+# 🕵️ Stego Decode Challenge
 
-Your mission: extract a secret flag hidden inside an image file.  
+**Your mission:** Extract a secret flag hidden inside an image file.
 
-The picture looks completely normal, but it’s been altered using *steganography* — a technique for hiding data inside files.  
+The picture `squirrel.jpg` looks completely normal, but it has been altered using **Steganography** — a technique for hiding secret data inside ordinary files to avoid detection.
 
-🔧 You’ll use `steghide`, a tool that extracts hidden content (if you supply the correct password).  
+## 🔧 The Tools
+We have provided tools in this environment (like `steghide`) to help you extract the hidden content.
 
-💡 **Hint:** The password is the most common one in the world.  
+## 💡 Hint
+Steganography often requires a passphrase to unlock the hidden data.
+* **Hint:** The password is the most common password in the world.
 
-📂 Files in this folder:
-- `squirrel.jpg` – The suspicious image.
-- (The flag will be saved as `flag.txt` when you succeed.)
+## 📂 Files in this folder
+* `squirrel.jpg` – The suspicious image containing the hidden flag.
 
-🏁 Flag format: **CCRI-AAAA-1111**
+---
+**🏁 Flag format:** `CCRI-AAAA-1111`

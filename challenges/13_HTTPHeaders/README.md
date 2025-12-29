@@ -1,30 +1,18 @@
-# 📡 Challenge 13: HTTP Headers Mystery
+# 📡 HTTP Header Analysis
 
 CryptKeeper operatives have been exchanging secret messages through internal HTTP servers.
-You’ve discovered **five active API endpoints** on the local network, but only ONE contains the real agency flag. The others are decoys designed to mislead intruders.
+You have discovered **five active API endpoints**, but only ONE contains the real agency flag.
 
-## 🎯 Your Mission
-1.  Interrogate each HTTP endpoint running on your local server.
-2.  Look for a hidden `X-Flag:` header in the response.
-3.  Identify the correct flag in this format:
-    `CCRI-AAAA-1111`
+**The Concept:**
+Web servers send invisible data called **HTTP Headers** before sending the actual page content. Headers often contain technical info, cookies, or in this case, hidden secrets.
+
+**Your Mission:** Interrogate the server.
+1.  The flag is hidden in a custom header (e.g., `X-Flag`).
+2.  Standard web browsers often hide these headers.
+3.  Use command-line tools (like `curl -I`) or the provided scripts to inspect the headers of the endpoints below.
 
 ## 🌐 Target Endpoints
-The intercepted services are accessible at:
-* `http://localhost:5000/mystery/endpoint_1`
-* `http://localhost:5000/mystery/endpoint_2`
-* `http://localhost:5000/mystery/endpoint_3`
-* `http://localhost:5000/mystery/endpoint_4`
-* `http://localhost:5000/mystery/endpoint_5`
+* `http://localhost:5000/mystery/endpoint_1` through `endpoint_5`
 
-## 🗂️ Files in this folder
-* `investigate_headers.py` – A guided Python script to help you interact with the endpoints.
-* *(Note: The endpoints are hosted live on the web server, they are not text files)*
-
-## 💡 Hint
-Only one flag starts with `CCRI-`. All others use fake prefixes.
-
-## 👩‍💻 Tips & Tools
-Since these are live network services, you cannot use file tools like `cat` or `less`.
-
-🚀 *Ready to uncover the hidden flag?*
+---
+**🏁 Flag format:** `CCRI-AAAA-1111`

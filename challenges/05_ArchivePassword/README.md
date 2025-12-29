@@ -1,23 +1,16 @@
-🔐 ZIP File Crack & Decode
----------------------------
+# 🔐 ZIP File Crack & Decode
 
-You’ve recovered a mysterious ZIP archive: `secret.zip`.  
+You have recovered a mysterious ZIP archive: `secret.zip`.
 
-It’s password-protected — and the password isn’t obvious. Luckily, a wordlist of possible passwords (`wordlist.txt`) was also found. Only one of them works.  
+It is password-protected, and we don't have the key. However, we also found a `wordlist.txt` file containing thousands of potential passwords.
 
-Inside the archive lies a **Base64-encoded** message. It contains several flag-like strings, but only one matches the official agency format.  
+**Your Mission:** Perform a **Dictionary Attack**.
+1.  Use the provided tools to automatically try every password in the wordlist against the ZIP file.
+2.  Once cracked, examine the contents of the archive to find the flag.
 
-🧠 **Your mission:**  
-1. Run the helper script: `crack_zip.sh`  
-2. The script will automatically try each password in the wordlist.  
-3. Once cracked, it will extract and decode the hidden message.  
-4. Review the results and identify the **real flag**.  
+## 📂 Files in this folder
+* `secret.zip` – The password-protected archive.
+* `wordlist.txt` – A list of common passwords to attempt.
 
-💡 **Tip:** Watch as the wordlist scrolls — this shows how brute-force tools work in practice!  
-
-📂 Files in this folder:  
-- `secret.zip` – The password-protected archive.  
-- `wordlist.txt` – Potential passwords.    
-
-🏁 **Flag format:** CCRI-AAAA-1111
-
+---
+**🏁 Flag format:** `CCRI-AAAA-1111`

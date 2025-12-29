@@ -1,19 +1,18 @@
-🛰️ Challenge 17: Nmap Scan Puzzle
-==================================
+# 🛰️ Nmap Port Scanner
 
-Several simulated services are running locally on this system.  
-Your mission is to uncover the **REAL flag** hidden among them.
+Several simulated services are running locally on this system.
+We know they are listening on ports between **8000 and 8100**, but we don't know which ones are open.
 
-⚠️ **Not every open port contains a flag:**  
-- Some return random junk text (e.g., error pages, developer APIs).  
-- Four ports return **decoy flags** with slightly wrong formats.  
-- Only **one port** contains the real flag in this format:  
+**The Concept:**
+Before attacking a server, hackers use **Port Scanners** (like `nmap`) to find "open doors." Once a door is found, they interact with the service to see what it is.
 
-   ✅ **CCRI-AAAA-1111**
+**Your Mission:** Scan and Enumerate.
+1.  Scan the local network range (Ports 8000–8100) to find open ports.
+2.  Connect to the open ports (using `curl`) to see what they are broadcasting.
+3.  Identify the one service that returns the real flag.
 
-💡 **Tip:** Pay close attention to the format of each flag. Only one matches the official CCRI style.  
-
+## ⚠️ Warning
+Most ports are closed. Some return fake data. Only one is the target.
 
 ---
-
-🚀 **Objective:** Find the correct flag and paste it into the scoreboard.
+**🏁 Flag format:** `CCRI-AAAA-1111`

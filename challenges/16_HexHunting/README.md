@@ -1,28 +1,18 @@
-🧠 Challenge 16: Hex Flag Hunter
-=================================
+# 🧠 Hex Flag Hunter
 
-CryptKeeper hackers left behind a suspicious binary file: `hex_flag.bin`.  
-It’s too small to be a real program, but something about it feels… hidden.  
+Hackers left behind a suspicious binary file: `hex_flag.bin`.
+It is too small to be a real program, but it contains hidden data.
 
-🎯 **Your Mission:**  
-Analyze the binary and uncover the **real agency flag** embedded in its data.  
+**The Concept:**
+Files are just sequences of bytes. Tools like **Hex Editors** allow you to see the raw data (hexadecimal) alongside its ASCII representation. Even inside compiled code, text strings are often visible.
 
-📖 **Hints:**  
-- The flag is hidden as ASCII text within the binary.  
-- It follows this format: `CCRI-AAAA-1111`  
-- There are **five candidate flags** in the file — but only ONE is correct.  
-- Look for patterns carefully: some decoys are designed to mislead you.  
+**Your Mission:** Analyze the binary.
+1.  Use tools like `strings` to perform a quick scan for readable text.
+2.  Use `xxd` or a hex editor to inspect the raw data layout.
+3.  Find the flag embedded among the binary noise.
 
-🛠️ **Tools at Your Disposal:**  
-• `strings` → Extracts readable text from binaries (quick scan).  
-• `xxd` → Displays hex and ASCII side-by-side for deeper inspection.  
-• `hexedit` → Opens the binary in an interactive hex editor for scrolling/searching.  
-
-📂 **Files Provided:**  
-• `hex_flag.bin` – Suspicious binary to investigate    
+## 📂 Files in this folder
+* `hex_flag.bin` – The suspicious binary file.
 
 ---
-
-🚩 **Goal:** Find and submit the one valid flag in the format:  
-`CCRI-AAAA-1111`
-
+**🏁 Flag format:** `CCRI-AAAA-1111`

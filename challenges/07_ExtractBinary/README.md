@@ -1,24 +1,16 @@
-🔍 Extract from Binary
-=======================
+# ⚙️ Binary Extraction Challenge
 
-A mysterious binary file has appeared: `hidden_flag`.  
+You have recovered a compiled binary file named `hidden_flag`.
 
-Your mission is to perform a forensic analysis of the file and recover the **real agency flag**.  
+Computers read binary code, but humans cannot. However, programmers often leave plain text strings inside compiled programs (like error messages, variables, or secret keys).
 
-Only **one** of the embedded strings matches the official format: `CCRI-AAAA-1111`  
+**Your Mission:** Perform **Static Analysis**.
+1.  The file is not executable or readable by a standard text editor.
+2.  Use the provided tools (like the `strings` command) to sift through the binary data.
+3.  Look for any human-readable text that matches the flag format.
 
-🛠️ **Tools You’ll Use:**  
-- `strings` – Extracts human-readable text from binary files.  
+## 📂 Files in this folder
+* `hidden_flag` – The compiled binary file containing the secret.
 
-🧠 **Your steps:**  
-1. Run the interactive helper: `analyze_binary.sh`  
-2. The script will extract all text from the binary and save it for review.  
-3. Inspect the extracted data and look for flag-like patterns.  
-
-📂 **Files in this folder:**  
-- `hidden_flag` → The binary containing hidden data  
-
-💡 **Tip:** Pay attention to patterns and don’t assume the first candidate is correct.  
-
-🏁 **Flag format:** CCRI-AAAA-1111
-
+---
+**🏁 Flag format:** `CCRI-AAAA-1111`

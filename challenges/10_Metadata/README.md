@@ -1,20 +1,16 @@
-🧠 Challenge 10: Metadata Mystery
-=================================
+# 📷 Metadata Explorer
 
-You’ve recovered a suspicious image file: `capybara.jpg`.  
+You have intercepted an image: `capybara.jpg`.
+Visually, it is just a picture of a cute animal. But digital files contain "data about data," known as **Metadata**.
 
-It looks normal at first glance, but investigators suspect the **flag is hidden in the metadata** — information stored *inside* the file but not visible in the picture itself.  
+Metadata can include the camera model, GPS coordinates, timestamps, or hidden comments added by the creator.
 
-Your mission is to inspect the metadata and uncover the correct flag.  
+**Your Mission:** Extract the metadata.
+1.  Use the provided forensic tools (like `exiftool`) to view the hidden header information of the image.
+2.  Scan the output for any fields that look like a flag.
 
-⚠️ **Be careful:**  
-The image contains 4 **fake flags** and only 1 real one. Look for the flag that fits the agency’s official format and feels legitimate.  
+## 📂 Files in this folder
+* `capybara.jpg` – The image file containing hidden metadata.
 
-🛠️ **Tool Hint:** `exiftool`  
-This tool extracts hidden metadata from image files.  
-
-📂 **Files in this folder:**  
-- `capybara.jpg` → Image containing hidden metadata  
-
-🚩 **Flag format:** `CCRI-AAAA-1111`
-
+---
+**🏁 Flag format:** `CCRI-AAAA-1111`
