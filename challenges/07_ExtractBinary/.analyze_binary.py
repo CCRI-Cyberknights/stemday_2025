@@ -5,53 +5,24 @@ import subprocess
 import time
 import re
 
-regex_pattern = r'\b([A-Z0-9]{4}-){2}[A-Z0-9]{4}\b'
+# === Import Core ===
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+from exploration_core import Colors, header, pause, require_input, spinner, print_success, print_error, print_info, resize_terminal, clear_screen
 
-# === Terminal Utilities ===
-def resize_terminal(rows=35, cols=90):
-    sys.stdout.write(f"\x1b[8;{rows};{cols}t")
-    sys.stdout.flush()
-    time.sleep(0.2)
+# === Config ===
+BINARY_FILE = "hidden_flag"
+STRINGS_FILE = "extracted_strings.txt"
+REGEX_PATTERN = r'\b([A-Z0-9]{4}-){2}[A-Z0-9]{4}\b'
 
-def clear_screen():
-    os.system('clear' if os.name == 'posix' else 'cls')
+def get_path(filename):
+    return os.path.join(os.path.dirname(__file__), filename)
 
-def pause(prompt="Press ENTER to continue..."):
-    input(prompt)
-
-def require_input(prompt, expected):
-    """
-    Pauses and requires the user to type a specific word (case-insensitive) to continue.
-    """
-    while True:
-        answer = input(prompt).strip().lower()
-        if answer == expected.lower():
-            return
-        print(f"↪  Please type '{expected}' to continue!\n")
-
-def spinner(message="Working", duration=2.0, interval=0.15):
-    """
-    Simple text spinner to give the feeling of work being done.
-    """
-    frames = ["|", "/", "-", "\\"]
-    end_time = time.time() + duration
-    i = 0
-    while time.time() < end_time:
-        frame = frames[i % len(frames)]
-        sys.stdout.write(f"\r{message}... {frame}")
-        sys.stdout.flush()
-        time.sleep(interval)
-        i += 1
-    sys.stdout.write("\r" + " " * (len(message) + 10) + "\r")
-    sys.stdout.flush()
-
-# === strings / flag logic ===
 def run_strings(binary_path, output_path):
     try:
         with open(output_path, "w", encoding="utf-8", errors="ignore") as out_f:
             subprocess.run(["strings", binary_path], stdout=out_f, check=True)
     except subprocess.CalledProcessError:
-        print("❌ ERROR: Failed to run 'strings'.", file=sys.stderr)
+        print_error("Failed to run 'strings'.")
         sys.exit(1)
 
 def search_for_flags(file_path, regex):
@@ -62,103 +33,97 @@ def search_for_flags(file_path, regex):
                 if re.search(regex, line):
                     matches.append(line.strip())
     except Exception as e:
-        print(f"❌ ERROR during flag search: {e}", file=sys.stderr)
+        print_error(f"Error during flag search: {e}")
         sys.exit(1)
     return matches
 
-# === Main Flow ===
 def main():
+    # 1. Setup
     resize_terminal(35, 90)
-    script_dir = os.path.abspath(os.path.dirname(__file__))
-    target_binary = os.path.join(script_dir, "hidden_flag")
-    outfile = os.path.join(script_dir, "extracted_strings.txt")
+    
+    binary_path = get_path(BINARY_FILE)
+    strings_path = get_path(STRINGS_FILE)
 
-    clear_screen()
-    print("🧪 Binary Forensics Challenge")
-    print("=============================\n")
-    print("📦 Target binary: hidden_flag")
-    print("🔧 Tool in use: strings\n")
+    # 2. Mission Briefing
+    header("🧪 Binary Forensics Challenge")
+    
+    print(f"📦 Target binary: {Colors.BOLD}{BINARY_FILE}{Colors.END}")
+    print(f"🔧 Tool in use: {Colors.BOLD}strings{Colors.END}\n")
     print("🎯 Goal: Uncover a hidden flag embedded inside this compiled program.\n")
-    print("💡 Why 'strings'?")
+    print(f"{Colors.CYAN}💡 Why 'strings'?{Colors.END}")
     print("   ➤ Compiled programs contain a mix of binary data and human-readable text.")
     print("   ➤ The 'strings' tool scans the file and pulls out the readable text segments.")
     print("   ➤ This is a common first step in binary forensics and malware analysis.\n")
     
     require_input("Type 'ready' when you're ready to see the command we'll run: ", "ready")
 
-    if not os.path.isfile(target_binary):
-        print(f"\n❌ ERROR: The file 'hidden_flag' was not found in {script_dir}.")
-        pause("Press ENTER to close this terminal...")
+    if not os.path.isfile(binary_path):
+        print_error(f"The file '{BINARY_FILE}' was not found.")
         sys.exit(1)
 
-    clear_screen()
-    print("🛠️ Behind the Scenes")
-    print("---------------------------")
+    # 3. Tool Explanation
+    header("🛠️ Behind the Scenes")
     print("To extract all readable strings from the binary, we use:\n")
-    print(f"   strings {os.path.basename(target_binary)} > {os.path.basename(outfile)}\n")
+    print(f"   {Colors.GREEN}strings {BINARY_FILE} > {STRINGS_FILE}{Colors.END}\n")
     print("🔍 Command breakdown:")
-    print("   strings hidden_flag   → Scan the binary for printable text")
-    print(f"   > {os.path.basename(outfile):<20}→ Redirect all found strings into a text file")
+    print(f"   {Colors.BOLD}strings {BINARY_FILE}{Colors.END}   → Scan the binary for printable text")
+    print(f"   {Colors.BOLD}> {STRINGS_FILE:<20}{Colors.END}→ Redirect all found strings into a text file")
     print("\nAfter that, we can search inside the text file using tools like 'grep'.\n")
     
     require_input("Type 'run' when you're ready to extract strings from the binary: ", "run")
 
-    print(f"\n🔍 Running: strings \"{target_binary}\" > \"{outfile}\"")
+    print(f"\n🔍 Running: strings \"{BINARY_FILE}\" > \"{STRINGS_FILE}\"")
     spinner("Extracting strings")
-    run_strings(target_binary, outfile)
+    run_strings(binary_path, strings_path)
     time.sleep(0.3)
-    print(f"✅ All extracted strings saved to: {outfile}\n")
+    print_success(f"All extracted strings saved to: {STRINGS_FILE}\n")
 
-    preview_lines = 15
-    print(f"📄 Previewing the first {preview_lines} lines of extracted text:")
-    print("--------------------------------------------------")
+    print(f"📄 Previewing the first 15 lines of extracted text:")
+    print("-" * 50)
     try:
-        with open(outfile, "r", encoding="utf-8", errors="ignore") as f:
+        with open(strings_path, "r", encoding="utf-8", errors="ignore") as f:
             for i, line in enumerate(f):
-                if i >= preview_lines:
-                    break
-                print(line.strip())
+                if i >= 15: break
+                print(f"{Colors.YELLOW}{line.strip()}{Colors.END}")
     except FileNotFoundError:
-        print("❌ ERROR: Could not open extracted_strings.txt.")
-    print("--------------------------------------------------\n")
+        print_error(f"Could not open {STRINGS_FILE}.")
+    print("-" * 50 + "\n")
 
-    # 🔍 KEYWORD SEARCH FIRST
+    # 4. Keyword Search
     require_input("Type 'search' to enter a keyword search mode: ", "search")
     
     print("You might start by searching for words related to the story, like 'CCRI' or 'Cryptkeepers'.")
-    keyword = input("🔍 Enter a keyword to search (or hit ENTER to skip): ").strip().lower()
+    keyword = input(f"{Colors.YELLOW}🔍 Enter a keyword to search (or hit ENTER to skip): {Colors.END}").strip().lower()
     
     if keyword:
-        print(f"\n🔎 Searching for '{keyword}' in {outfile}...\n")
+        print(f"\n🔎 Searching for '{Colors.BOLD}{keyword}{Colors.END}' in {STRINGS_FILE}...\n")
         print("   Command being used under the hood:")
-        print(f"      grep -i {keyword} {os.path.basename(outfile)}\n")
-        print("   - grep       → Search for lines matching a pattern")
-        print("   - -i         → Case-insensitive search")
-        print(f"   - {os.path.basename(outfile)} → File containing all extracted strings\n")
+        print(f"      {Colors.GREEN}grep -i {keyword} {STRINGS_FILE}{Colors.END}\n")
         time.sleep(0.5)
         try:
-            subprocess.run(["grep", "-i", "--color=always", keyword, outfile], check=False)
+            subprocess.run(["grep", "-i", "--color=always", keyword, strings_path], check=False)
         except FileNotFoundError:
-            print("❌ ERROR: grep command not found.")
+            print_error("grep command not found.")
     else:
-        print("⏭️  Skipping keyword search.\n")
+        print_info("Skipping keyword search.\n")
 
-    # 🔎 FLAG PATTERN SEARCH
+    # 5. Flag Scan
     require_input("Type 'scan' to scan for potential flags: ", "scan")
     
     print("🔎 Scanning for flag-like patterns (format: XXXX-YYYY-ZZZZ)...")
     time.sleep(0.5)
-    matches = search_for_flags(outfile, regex_pattern)
+    matches = search_for_flags(strings_path, REGEX_PATTERN)
 
     if matches:
-        print(f"\n📌 Found {len(matches)} possible flag(s):")
+        print(f"\n{Colors.GREEN}📌 Found {len(matches)} possible flag(s):{Colors.END}")
         for m in matches:
-            print(f"   ➡️ {m}")
+            print(f"   ➡️ {Colors.BOLD}{m}{Colors.END}")
     else:
-        print("\n⚠️ No obvious flags found. Try scanning manually in extracted_strings.txt.")
+        print(f"\n{Colors.RED}⚠️ No obvious flags found. Try scanning manually in {STRINGS_FILE}.{Colors.END}")
 
     print("\n✅ Done! You can inspect extracted_strings.txt further or try other tools like 'hexdump' for deeper analysis.")
-    print("🧠 Remember: Only one string matches the official flag format: CCRI-AAAA-1111\n")
+    print(f"{Colors.CYAN}🧠 Remember: Only one string matches the official flag format: CCRI-AAAA-1111{Colors.END}\n")
+    
     pause("Press ENTER to close this terminal...")
 
 if __name__ == "__main__":

@@ -4,37 +4,19 @@ import sys
 import subprocess
 import time
 
+# === Import Core ===
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+from exploration_core import Colors, header, pause, require_input, print_success, print_error, print_info, resize_terminal, clear_screen
+
 # === Configuration ===
 BINARY_PORT_RANGE = "8000-8100"
 BINARY_HOST = "localhost"
 BINARY_URL = f"http://{BINARY_HOST}"
 SAVE_FILE = "nmap_flag_response.txt"
 
-# === Utilities ===
-def resize_terminal(rows=35, cols=90):
-    sys.stdout.write(f"\x1b[8;{rows};{cols}t")
-    sys.stdout.flush()
-    time.sleep(0.2)
-
-def clear_screen():
-    os.system('clear' if os.name == 'posix' else 'cls')
-
-def pause(prompt="🔸 Press ENTER to continue..."):
-    input(prompt)
-
-def require_input(prompt, expected):
-    """
-    Pauses and requires the user to type a specific word (case-insensitive) to continue.
-    """
-    while True:
-        answer = input(prompt).strip().lower()
-        if answer == expected.lower():
-            return
-        print(f"↪  Please type '{expected}' to continue!\n")
-
 # === Nmap Scan ===
 def run_nmap_scan():
-    print(f"\n📡 Running: nmap -sV --version-light -p{BINARY_PORT_RANGE} {BINARY_HOST}\n")
+    print(f"\n📡 Running: {Colors.BOLD}nmap -sV --version-light -p{BINARY_PORT_RANGE} {BINARY_HOST}{Colors.END}\n")
     try:
         result = subprocess.run(
             ["nmap", "-sV", "--version-light", f"-p{BINARY_PORT_RANGE}", BINARY_HOST],
@@ -44,7 +26,7 @@ def run_nmap_scan():
         )
         return result.stdout
     except FileNotFoundError:
-        print("❌ ERROR: `nmap` is not installed.")
+        print_error("`nmap` is not installed.")
         sys.exit(1)
 
 def extract_open_ports(scan_output):
@@ -69,24 +51,28 @@ def fetch_port_response(port):
         )
         return result.stdout.strip()
     except FileNotFoundError:
-        print("❌ ERROR: `curl` is not installed.")
+        print_error("`curl` is not installed.")
         sys.exit(1)
 
 # === Main Program ===
 def main():
+    # 1. Setup
     resize_terminal(35, 90)
-    clear_screen()
-    print("🛰️  Nmap Scan Puzzle")
-    print("======================================\n")
+    
+    # 2. Mission Briefing
+    header("🛰️  Nmap Scan Puzzle")
+    
     print("Several simulated services are running locally.")
     print("🎯 Your goal: Find the REAL flag by scanning ports 8000–8100.")
-    print("⚠️  Beware! Many ports return fake or junk data.\n")
-    print("🧠 Flag format to watch for: CCRI-AAAA-1111\n")
-    print("In a real terminal, you might do something like:\n")
-    print(f"   nmap -sV --version-light -p{BINARY_PORT_RANGE} {BINARY_HOST}")
-    print("   curl http://localhost:8000")
-    print("   curl http://localhost:8001")
+    print(f"{Colors.RED}⚠️  Beware! Many ports return fake or junk data.{Colors.END}\n")
+    print(f"{Colors.CYAN}🧠 Flag format to watch for: CCRI-AAAA-1111{Colors.END}\n")
+    
+    print("In a real terminal, you might do something like:")
+    print(f"   {Colors.GREEN}nmap -sV --version-light -p{BINARY_PORT_RANGE} {BINARY_HOST}{Colors.END}")
+    print(f"   {Colors.GREEN}curl http://localhost:8000{Colors.END}")
+    print(f"   {Colors.GREEN}curl http://localhost:8001{Colors.END}")
     print("   ...and so on, until you find something interesting.\n")
+    
     print("This helper script automates that workflow by:")
     print("   ➤ Running the nmap scan for you")
     print("   ➤ Listing only the open ports")
@@ -95,8 +81,9 @@ def main():
     require_input("Type 'scan' when you're ready to run the nmap scan: ", "scan")
 
     scan_output = run_nmap_scan()
+    
     clear_screen()
-    print("📝 Nmap Scan Results")
+    print(f"{Colors.CYAN}📝 Nmap Scan Results{Colors.END}")
     print("======================================")
     print(scan_output)
     print("\n✅ Scan complete.\n")
@@ -106,40 +93,45 @@ def main():
     open_ports = extract_open_ports(scan_output)
 
     if not open_ports:
-        print("❌ No open ports found.")
+        print_error("No open ports found.")
         pause()
         sys.exit(1)
 
     while True:
         clear_screen()
-        print("🌐 Open Ports:")
+        print(f"{Colors.CYAN}🌐 Open Ports:{Colors.END}")
         print("======================================")
         for idx, port in enumerate(open_ports, 1):
-            print(f"{idx:2d}. Port {port}")
+            print(f"{Colors.BOLD}{idx:2d}. Port {port}{Colors.END}")
         print(f"{len(open_ports)+1:2d}. 🚪 Exit\n")
 
         try:
-            choice = int(input(f"🔍 Select a port to explore (1-{len(open_ports)+1}): ").strip())
+            choice = int(input(f"{Colors.YELLOW}🔍 Select a port to explore (1-{len(open_ports)+1}): {Colors.END}").strip())
         except ValueError:
-            print("❌ Invalid input. Please enter a number.")
+            print_error("Invalid input. Please enter a number.")
             time.sleep(1)
             continue
 
         if 1 <= choice <= len(open_ports):
             port = open_ports[choice - 1]
             clear_screen()
-            print(f"🔎 Connecting to {BINARY_URL}:{port}")
+            print(f"🔎 Connecting to {Colors.BOLD}{BINARY_URL}:{port}{Colors.END}")
             print("======================================")
-            print(f"(Under the hood this is running: curl -s {BINARY_URL}:{port})\n")
+            print(f"(Under the hood this is running: {Colors.GREEN}curl -s {BINARY_URL}:{port}{Colors.END})\n")
+            
             response = fetch_port_response(port)
-            print(response if response else f"⚠️ No response received from port {port}.")
+            
+            if response:
+                print(f"{Colors.GREEN}{response}{Colors.END}")
+            else:
+                print(f"{Colors.RED}⚠️ No response received from port {port}.{Colors.END}")
             print("======================================\n")
 
             while True:
                 print("Options:")
                 print("  [1] 🔁 Return to port list")
                 print("  [2] 💾 Save this response to file\n")
-                sub_choice = input("Choose an action (1-2): ").strip()
+                sub_choice = input(f"{Colors.YELLOW}Choose an action (1-2): {Colors.END}").strip()
 
                 if sub_choice == "1":
                     break
@@ -147,18 +139,18 @@ def main():
                     with open(SAVE_FILE, "a", encoding="utf-8") as f:
                         f.write(f"Port: {port}\nResponse:\n{response}\n")
                         f.write("======================================\n")
-                    print(f"✅ Response saved to {SAVE_FILE}")
+                    print_success(f"Response saved to {SAVE_FILE}")
                     time.sleep(1)
                     break
                 else:
-                    print("❌ Invalid choice. Please select 1 or 2.")
+                    print_error("Invalid choice. Please select 1 or 2.")
                     time.sleep(1)
 
         elif choice == len(open_ports)+1:
-            print("\n👋 Exiting scanner. Good luck with the flag!")
+            print(f"\n{Colors.CYAN}👋 Exiting scanner. Good luck with the flag!{Colors.END}")
             break
         else:
-            print("❌ Invalid choice. Please choose a valid port.")
+            print_error("Invalid choice. Please choose a valid port.")
             time.sleep(1)
 
 if __name__ == "__main__":

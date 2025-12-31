@@ -2,135 +2,115 @@
 import os
 import subprocess
 import sys
-import time
 
-# === Utilities ===
-def resize_terminal(rows=35, cols=90):
-    sys.stdout.write(f"\x1b[8;{rows};{cols}t")
-    sys.stdout.flush()
-    time.sleep(0.2)
+# === Import Core ===
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+from exploration_core import Colors, header, pause, require_input, spinner, print_success, print_error, print_info
 
-def clear_screen():
-    os.system('clear' if os.name == 'posix' else 'cls')
+# === Config ===
+INPUT_FILE = "encoded.txt"
+OUTPUT_FILE = "decoded_output.txt"
 
-def require_input(prompt, expected):
-    """
-    Pauses and requires the user to type a specific word (case-insensitive) to continue.
-    """
-    while True:
-        answer = input(prompt).strip().lower()
-        if answer == expected.lower():
-            return
-        print(f"↪  Please type '{expected}' to continue!\n")
+def get_path(filename):
+    return os.path.join(os.path.dirname(__file__), filename)
 
-def spinner(message="Working", duration=2.5, interval=0.15):
-    """
-    Simple text spinner to fake 'work' being done.
-    """
-    frames = ["|", "/", "-", "\\"]
-    end_time = time.time() + duration
-    i = 0
-    while time.time() < end_time:
-        frame = frames[i % len(frames)]
-        sys.stdout.write(f"\r{message}... {frame}")
-        sys.stdout.flush()
-        time.sleep(interval)
-        i += 1
-    sys.stdout.write("\r" + " " * (len(message) + 10) + "\r")
-    sys.stdout.flush()
-
-def decode_base64(input_file, output_file):
+def decode_base64(input_path, output_path):
     """Decode a Base64-encoded file and save the result."""
     try:
         result = subprocess.run(
-            ["base64", "--decode", input_file],
+            ["base64", "--decode", input_path],
             capture_output=True,
             text=True,
             check=True
         )
         decoded = result.stdout.strip()
         if decoded:
-            with open(output_file, "w") as f:
+            with open(output_path, "w") as f:
                 f.write(decoded + "\n")
         return decoded
     except subprocess.CalledProcessError:
         return None
+    except FileNotFoundError:
+        return None
 
 # === Main Flow ===
 def main():
-    resize_terminal(35, 90)
-    clear_screen()
-    print("📡 Intercepted Transmission Decoder")
-    print("=====================================\n")
-    print("📄 File to analyze: encoded.txt")
+    # 1. Mission Briefing
+    header("📡 Intercepted Transmission Decoder")
+    
+    print(f"📄 File to analyze: {Colors.BOLD}{INPUT_FILE}{Colors.END}")
     print("🎯 Goal: Decode the intercepted transmission and locate the hidden CCRI flag.\n")
-    print("💡 What is Base64?")
+    print(f"{Colors.CYAN}💡 What is Base64?{Colors.END}")
     print("   ➤ A text-based encoding scheme used to represent binary data as text.")
     print("   ➤ Common in email, HTTP, and digital certificates.\n")
 
     require_input("Type 'ready' when you're ready to begin: ", "ready")
 
-    clear_screen()
-    print("🛠️ Analysis Tools")
-    print("---------------------------")
+    # 2. Tool Explanation
+    header("🛠️ Analysis Tools")
     print("We intercepted a suspicious message from a compromised CryptKeepers system.\n")
-    print("To decode it, we use the Linux `base64` command.\n")
+    print(f"To decode it, we use the Linux {Colors.BOLD}base64{Colors.END} command.\n")
     print("Here’s what the command looks like:\n")
-    print("   base64 --decode encoded.txt\n")
+    print(f"   {Colors.GREEN}base64 --decode {INPUT_FILE}{Colors.END}\n")
     print("🔍 Command breakdown:")
-    print("   base64         → The Base64 encoder/decoder tool")
-    print("   --decode       → Converts encoded text back to the original data")
-    print("   encoded.txt    → The file we recovered\n")
+    print(f"   {Colors.BOLD}base64{Colors.END}         → The Base64 encoder/decoder tool")
+    print(f"   {Colors.BOLD}--decode{Colors.END}       → Converts encoded text back to the original data")
+    print(f"   {Colors.BOLD}{INPUT_FILE}{Colors.END}    → The file we recovered\n")
 
     require_input("Type 'view' to inspect the encoded message: ", "view")
 
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    input_file = os.path.join(script_dir, "encoded.txt")
-    output_file = os.path.join(script_dir, "decoded_output.txt")
+    input_path = get_path(INPUT_FILE)
+    output_path = get_path(OUTPUT_FILE)
 
-    clear_screen()
-    print("🔍 Inspecting intercepted data...\n")
+    # 3. File Inspection
+    header("🔍 Inspecting intercepted data")
     spinner("Reading file")
+    print("\n")
 
-    print("📄 Intercepted Message (encoded.txt):")
-    print("---------------------------------------------")
+    print(f"📄 Intercepted Message ({INPUT_FILE}):")
+    print("-" * 50)
     try:
-        with open(input_file, "r", errors="replace") as f:
-            print(f.read().strip())
+        with open(input_path, "r", errors="replace") as f:
+            print(f"{Colors.YELLOW}{f.read().strip()}{Colors.END}")
     except FileNotFoundError:
-        print("❌ ERROR: encoded.txt not found!")
-        input("Press ENTER to exit...")
+        print_error(f"{INPUT_FILE} not found!")
+        pause()
         return
-    print("---------------------------------------------\n")
+    print("-" * 50 + "\n")
+    
     print("🧠 At first glance, this looks like random characters.")
     print("But this structure strongly indicates Base64-encoded text.\n")
     print("Next step: decoding the message back into its original form using the Base64 tool.\n")
     print("Command to be executed:\n")
-    print("   base64 --decode encoded.txt\n")
+    print(f"   {Colors.GREEN}base64 --decode {INPUT_FILE}{Colors.END}\n")
 
     require_input("Type 'decode' to begin processing the transmission: ", "decode")
 
+    # 4. Decoding Execution
     print("\n⏳ Processing intercepted transmission...")
     spinner("Decoding")
 
-    decoded = decode_base64(input_file, output_file)
+    decoded = decode_base64(input_path, output_path)
 
     if not decoded:
-        print("\n❌ Decoding failed!")
-        print("📛 'encoded.txt' may be missing or corrupted.")
-        input("Press ENTER to exit...")
+        print("\n")
+        print_error("Decoding failed!")
+        print_info(f"'{INPUT_FILE}' may be missing or corrupted.")
+        pause()
         return
 
-    print("\n✅ Transmission successfully decoded!\n")
+    # 5. Success Screen
+    print("\n")
+    print_success("Transmission successfully decoded!\n")
     print("📄 Decoded Output:")
-    print("-----------------------------")
-    print(decoded)
-    print("-----------------------------\n")
-    print(f"📁 Output saved to: {output_file}")
-    print("🔎 Look for a flag in this format: CCRI-AAAA-1111")
+    print("-" * 50)
+    print(f"{Colors.BOLD}{decoded}{Colors.END}")
+    print("-" * 50 + "\n")
+    print(f"📁 Output saved to: {Colors.BOLD}{OUTPUT_FILE}{Colors.END}")
+    print(f"{Colors.CYAN}🔎 Look for a flag in this format: CCRI-AAAA-1111{Colors.END}")
     print("🎯 Submit your flag in the scoreboard to complete this challenge.\n")
 
-    input("Press ENTER to close this terminal...")
+    pause("Press ENTER to close this terminal...")
 
 # === Entry Point ===
 if __name__ == "__main__":

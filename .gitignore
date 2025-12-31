@@ -16,9 +16,10 @@
 # 4. Whitelist Top-level Scripts
 !/*.py
 
-# 4.1 Whitelist Coach Mode Engine
+# 4.1 Whitelist Coach & Exploration Mode Engines
 !/coach_core.py
 !/worker_node.py
+!/exploration_core.py
 
 # 5. Whitelist Infrastructure Directories
 !/debs/

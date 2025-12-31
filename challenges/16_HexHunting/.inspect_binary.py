@@ -6,35 +6,13 @@ import time
 import re
 from pathlib import Path
 
-# === Terminal Utilities ===
-def resize_terminal(rows=35, cols=90):
-    """Force terminal resize for better visibility."""
-    sys.stdout.write(f"\x1b[8;{rows};{cols}t")
-    sys.stdout.flush()
-    time.sleep(0.2)
+# === Import Core ===
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+from exploration_core import Colors, header, pause, require_input, spinner, print_success, print_error, print_info, resize_terminal, clear_screen
 
-def clear_screen():
-    os.system('clear' if os.name == 'posix' else 'cls')
-
-def pause(prompt="Press ENTER to continue..."):
-    input(prompt)
-
-def require_input(prompt, expected):
-    """
-    Pauses and requires the user to type a specific word (case-insensitive) to continue.
-    """
-    while True:
-        answer = input(prompt).strip().lower()
-        if answer == expected.lower():
-            return
-        print(f"↪  Please type '{expected}' to continue!\n")
-
-def scanning_animation():
-    print("\n🔎 Scanning binary for flag-like patterns", end="", flush=True)
-    for _ in range(5):
-        time.sleep(0.3)
-        print(".", end="", flush=True)
-    print()
+# === Config ===
+BINARY_NAME = "hex_flag.bin"
+NOTES_NAME = "notes.txt"
 
 # === Core Helpers ===
 def extract_flag_candidates(binary_path):
@@ -59,7 +37,7 @@ def extract_flag_candidates(binary_path):
         return matches
 
     except Exception as e:
-        print(f"❌ Binary scan failed: {e}")
+        print_error(f"Binary scan failed: {e}")
         return []
 
 def show_hex_context(binary_path, offset, context=64):
@@ -74,93 +52,104 @@ def show_hex_context(binary_path, offset, context=64):
         dd.stdout.close()
         xxd.wait()
     except Exception as e:
-        print(f"❌ Could not show hex context: {e}")
+        print_error(f"Could not show hex context: {e}")
 
 # === Main Flow ===
 def main():
-    # 1. Resize terminal first
+    # 1. Setup
     resize_terminal(35, 90)
-    clear_screen()
-
-    # 2. RESOLVE ABSOLUTE PATHS (The Fix)
-    # This ensures we find the file even if launched from a different folder
+    
+    # RESOLVE ABSOLUTE PATHS
     script_dir = Path(__file__).resolve().parent
-    binary_path = script_dir / "hex_flag.bin"
-    notes_path = script_dir / "notes.txt"
+    binary_path = script_dir / BINARY_NAME
+    notes_path = script_dir / NOTES_NAME
 
-    print("🔍 Hex Flag Hunter")
-    print("============================\n")
-    print(f"🎯 Target binary: {binary_path.name}")
-    print("💡 Goal: Locate the real flag (format: CCRI-AAAA-1111).")
-    print("⚠️  Multiple candidate flags are embedded, but only ONE is correct!\n")
-    print("🧠 What are we actually doing here?")
+    # 2. Mission Briefing
+    header("🔍 Hex Flag Hunter")
+    
+    print(f"🎯 Target binary: {Colors.BOLD}{BINARY_NAME}{Colors.END}")
+    print(f"💡 Goal: Locate the real flag (format: {Colors.GREEN}CCRI-AAAA-1111{Colors.END}).")
+    print(f"{Colors.RED}⚠️  Multiple candidate flags are embedded, but only ONE is correct!{Colors.END}\n")
+    
+    print(f"{Colors.CYAN}🧠 What are we actually doing here?{Colors.END}")
     print("   ➤ A compiled/binary file can contain lots of embedded text and data.")
     print("   ➤ Some of those bytes look like flags, others are decoys.")
     print("   ➤ We'll scan the raw bytes for anything that *looks* like a flag,")
     print("      then inspect a hex dump around each candidate to judge context.\n")
     
-    # 3. SAFETY CHECK WITH PAUSE
+    # 3. Safety Check
     if not binary_path.is_file():
-        print(f"\n❌ CRITICAL ERROR: Cannot find '{binary_path.name}'")
-        print(f"   Looking in: {script_dir}")
-        print("   Did you move the script or the binary file?\n")
-        # Pause allows user to read the error before the window vanishes
+        print_error(f"CRITICAL ERROR: Cannot find '{BINARY_NAME}'")
+        print_info(f"Looking in: {script_dir}")
         pause("Press ENTER to exit...") 
         sys.exit(1)
 
-    # Clean or create notes file
+    # Clean previous notes
     if notes_path.exists():
         os.remove(notes_path)
 
     require_input("Type 'scan' when you're ready to begin scanning the binary: ", "scan")
-    scanning_animation()
+    
+    print(f"\n{Colors.CYAN}🔎 Scanning binary for flag-like patterns...{Colors.END}")
+    spinner("Scanning")
     
     flags = extract_flag_candidates(binary_path)
 
     if not flags:
-        print("❌ No flag-like patterns found in binary.")
+        print_error("No flag-like patterns found in binary.")
         pause("Press ENTER to exit...")
         sys.exit(1)
 
-    print(f"\n✅ Detected {len(flags)} flag-like pattern(s)!")
+    print(f"\n{Colors.GREEN}✅ Detected {len(flags)} flag-like pattern(s)!{Colors.END}")
     print("🧪 You'll now investigate each one by reviewing its raw hex context.")
     print("   Use what you know about the story + placement to decide what's real.")
     
     require_input("🔬 Type 'view' to begin reviewing candidates: ", "view")
 
+    # 4. Review Loop
     for i, (offset, flag) in enumerate(flags):
         clear_screen()
-        print("-------------------------------------------------")
-        print(f"[{i+1}/{len(flags)}] 🏷️  Candidate Flag: {flag}")
-        print(f"📍 Approximate Byte Offset: {offset}")
+        print("-" * 50)
+        print(f"[{i+1}/{len(flags)}] 🏷️  Candidate Flag: {Colors.BOLD}{flag}{Colors.END}")
+        print(f"📍 Approximate Byte Offset: {Colors.YELLOW}{offset}{Colors.END}")
         print("📖 Hex Dump Around Candidate:")
+        print("-" * 50)
+        
+        # Colorize the hex output if possible, but standard xxd is fine
+        print(Colors.CYAN)
         show_hex_context(binary_path, offset)
+        print(Colors.END)
+        print("-" * 50)
 
         while True:
             print("\nActions:")
-            print("  [1] ✅ Mark as POSSIBLE (save to notes.txt)")
+            print(f"  [1] ✅ Mark as {Colors.GREEN}POSSIBLE{Colors.END} (save to {NOTES_NAME})")
             print("  [2] ➡️  Skip to next candidate")
             print("  [3] 🚪 Quit investigation")
-            choice = input("Choose an action (1-3): ").strip()
+            
+            choice = input(f"{Colors.YELLOW}Choose an action (1-3): {Colors.END}").strip()
+            
             if choice == "1":
                 with open(notes_path, "a") as f:
                     f.write(flag + "\n")
-                print(f"✅ Saved '{flag}' to {notes_path.name}")
+                print_success(f"Saved '{flag}' to {NOTES_NAME}")
                 time.sleep(0.6)
                 break
             elif choice == "2":
-                print("➡️ Skipping to next candidate...")
+                print_info("Skipping to next candidate...")
                 time.sleep(0.4)
                 break
             elif choice == "3":
-                print("👋 Exiting early. Your saved flags are in notes.txt.")
+                print(f"\n{Colors.CYAN}👋 Exiting early. Your saved flags are in {NOTES_NAME}.{Colors.END}")
                 sys.exit(0)
             else:
-                print("⚠️ Invalid input. Please enter 1, 2, or 3.")
+                print_error("Invalid input. Please enter 1, 2, or 3.")
 
-    print("\n🎉 Flag inspection complete!")
-    print(f"📁 Review your notes: {notes_path.name}")
-    print("🧠 Remember: Only one of those candidates is the *true* CCRI flag.")
+    # 5. Conclusion
+    print("\n")
+    print_success("Flag inspection complete!")
+    print(f"📁 Review your notes: {Colors.BOLD}{NOTES_NAME}{Colors.END}")
+    print(f"{Colors.CYAN}🧠 Remember: Only one of those candidates is the *true* CCRI flag.{Colors.END}")
     pause("🔚 Press ENTER to exit.")
 
 if __name__ == "__main__":

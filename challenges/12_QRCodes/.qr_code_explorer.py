@@ -5,58 +5,23 @@ import time
 import sys
 import shutil
 
-# === Terminal Utilities ===
-def resize_terminal(rows=35, cols=90):
-    sys.stdout.write(f"\x1b[8;{rows};{cols}t")
-    sys.stdout.flush()
-    time.sleep(0.2)
-
-def clear_screen():
-    os.system('clear' if os.name == 'posix' else 'cls')
-
-def pause(prompt="Press ENTER to continue..."):
-    input(prompt)
-
-def require_input(prompt, expected):
-    """
-    Pauses and requires the user to type a specific word (case-insensitive) to continue.
-    """
-    while True:
-        answer = input(prompt).strip().lower()
-        if answer == expected.lower():
-            return
-        print(f"↪  Please type '{expected}' to continue!\n")
-
-def spinner(message="Working", duration=1.8, interval=0.12):
-    """
-    Simple text spinner to give the feeling of work being done.
-    """
-    frames = ["|", "/", "-", "\\"]
-    end_time = time.time() + duration
-    i = 0
-    while time.time() < end_time:
-        frame = frames[i % len(frames)]
-        print(f"\r{message}... {frame}", end="", flush=True)
-        time.sleep(interval)
-        i += 1
-    print("\r" + " " * (len(message) + 10) + "\r", end="", flush=True)
+# === Import Core ===
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+from exploration_core import Colors, header, pause, require_input, spinner, print_success, print_error, print_info, resize_terminal, clear_screen
 
 # === QR Helpers ===
 def open_image(file_path, duration=10):
     """Open an image using a specific viewer to ensure we can close it."""
-    # List of viewers to try (Parrot OS usually uses eom or eog)
     viewers = ["eom", "eog", "feh", "display", "ristretto"]
-    
     viewer_cmd = "xdg-open" # Fallback
     
-    # Find the first available viewer from our list
     for v in viewers:
         if shutil.which(v):
             viewer_cmd = v
             break
 
     try:
-        # Popen keeps a handle on the specific process (e.g., eom)
+        # Popen keeps a handle on the specific process
         viewer = subprocess.Popen(
             [viewer_cmd, file_path],
             stdout=subprocess.DEVNULL,
@@ -65,14 +30,17 @@ def open_image(file_path, duration=10):
         
         # Show a countdown timer while waiting
         for i in range(duration, 0, -1):
-            print(f"\r⏳ Closing in {i} seconds... ", end="", flush=True)
+            sys.stdout.write(f"\r{Colors.YELLOW}⏳ Closing in {i} seconds... {Colors.END}")
+            sys.stdout.flush()
             time.sleep(1)
             # If the student closes it early, stop counting
             if viewer.poll() is not None:
-                print("\r✅ Image closed.             ", end="", flush=True)
+                sys.stdout.write(f"\r{Colors.GREEN}✅ Image closed.             {Colors.END}")
+                sys.stdout.flush()
                 break
         else:
-            print("\r⏳ Time’s up! Closing viewer.", end="", flush=True)
+            sys.stdout.write(f"\r{Colors.YELLOW}⏳ Time’s up! Closing viewer.{Colors.END}")
+            sys.stdout.flush()
 
         # Force close if it's still running
         if viewer.poll() is None:
@@ -81,7 +49,7 @@ def open_image(file_path, duration=10):
         print() # New Line
 
     except Exception as e:
-        print(f"\n❌ Could not open image: {e}")
+        print_error(f"Could not open image: {e}")
 
 def decode_qr(file_path):
     """Run zbarimg to extract QR content."""
@@ -94,53 +62,56 @@ def decode_qr(file_path):
         )
         return result.stdout.strip()
     except FileNotFoundError:
-        print("❌ ERROR: zbarimg is not installed.")
+        print_error("zbarimg is not installed.")
         return ""
 
-# === Main Flow ===
 def main():
+    # 1. Setup
     resize_terminal(35, 90)
     script_dir = os.path.abspath(os.path.dirname(__file__))
     qr_codes = [os.path.join(script_dir, f"qr_0{i}.png") for i in range(1, 6)]
 
-    clear_screen()
-    print("📦 QR Code Explorer")
-    print("==========================\n")
+    # 2. Mission Briefing
+    header("📦 QR Code Explorer")
+    
     print("🎯 Mission Briefing:")
-    print("----------------------------")
+    print("-" * 30)
     print("🔍 You’ve recovered 5 mysterious QR codes from a digital drop site.")
     print("Each one may contain:")
     print("  • A secret message")
     print("  • A fake flag")
-    print("  • Or… the **real flag** in CCRI-AAAA-1111 format!\n")
-    print("🛠️ Your options:")
+    print(f"  • Or… the {Colors.BOLD}real flag{Colors.END} in CCRI-AAAA-1111 format!\n")
+    
+    print(f"{Colors.CYAN}🛠️ Your options:{Colors.END}")
     print("  • Scan with your phone’s QR scanner")
     print("  • OR use this tool to open and auto-decode them\n")
-    print("📖 Behind the scenes, this script will use a command like:")
-    print("     zbarimg qr_01.png")
+    
+    print(f"{Colors.CYAN}📖 Behind the scenes, this script will use a command like:{Colors.END}")
+    print(f"     {Colors.GREEN}zbarimg qr_01.png{Colors.END}")
     print("   to read the QR code and print its contents.\n")
+    
     print("⏳ Each QR opens for 10 seconds so you can inspect it,")
     print("   then the script decodes the QR and saves the result to a .txt file.\n")
 
     require_input("Type 'start' when you're ready to explore the QR codes: ", "start")
     clear_screen()
 
+    # 3. Interactive Loop
     while True:
-        print("🗂️  Available QR codes:")
+        header("🗂️  Available QR codes")
         for i, qr in enumerate(qr_codes, 1):
-            print(f"{i}. {os.path.basename(qr)}")
-        print("6. Exit Explorer\n")
+            print(f"{Colors.BOLD}{i}{Colors.END}. {os.path.basename(qr)}")
+        print(f"{len(qr_codes)+1}. Exit Explorer\n")
 
-        choice = input("Select a QR code (1-5) or 6 to exit: ").strip().lower()
+        choice = input(f"{Colors.YELLOW}Select a QR code (1-{len(qr_codes)+1}): {Colors.END}").strip()
 
-        if choice == "6":
-            print("👋 Exiting QR Explorer.")
+        if choice == str(len(qr_codes) + 1):
+            print(f"\n{Colors.CYAN}👋 Exiting QR Explorer.{Colors.END}")
             break
 
         if not choice.isdigit():
-            print("❌ Invalid input. Please enter a number.")
+            print_error("Invalid input. Please enter a number.")
             pause()
-            clear_screen()
             continue
 
         index = int(choice) - 1
@@ -148,35 +119,35 @@ def main():
             file_path = qr_codes[index]
             txt_file = file_path.replace(".png", ".txt")
 
-            print(f"\n🖼️ Opening {os.path.basename(file_path)}...")
+            clear_screen()
+            print(f"🖼️ Opening {Colors.BOLD}{os.path.basename(file_path)}{Colors.END}...")
             open_image(file_path)
 
-            print(f"\n🔎 Scanning {os.path.basename(file_path)}...")
-            print(f"💻 Running: zbarimg \"{os.path.basename(file_path)}\"\n")
+            print(f"\n🔎 Scanning {Colors.BOLD}{os.path.basename(file_path)}{Colors.END}...")
+            print(f"💻 Running: {Colors.GREEN}zbarimg \"{os.path.basename(file_path)}\"{Colors.END}")
 
             spinner("Decoding QR")
             result = decode_qr(file_path)
+            print("\n")
 
             if not result:
-                print("❌ No QR code found or could not decode.")
+                print_error("No QR code found or could not decode.")
             else:
-                print("✅ Decoded Result:")
-                print("----------------------------")
-                print(result)
-                print("----------------------------")
+                print_success("Decoded Result:")
+                print("-" * 40)
+                print(f"{Colors.BOLD}{result}{Colors.END}")
+                print("-" * 40)
                 try:
                     with open(txt_file, "w", encoding="utf-8") as f:
                         f.write(result + "\n")
-                    print(f"💾 Saved to: {os.path.basename(txt_file)}")
+                    print(f"💾 Saved to: {Colors.BOLD}{os.path.basename(txt_file)}{Colors.END}")
                 except Exception as e:
-                    print(f"⚠️ Could not save output: {e}")
+                    print_error(f"Could not save output: {e}")
 
-            pause("\nPress ENTER to continue...")
-            clear_screen()
-        else:
-            print("❌ Invalid selection. Please choose 1–5.")
             pause()
-            clear_screen()
+        else:
+            print_error(f"Invalid selection. Please choose 1–{len(qr_codes)+1}.")
+            pause()
 
 if __name__ == "__main__":
     main()

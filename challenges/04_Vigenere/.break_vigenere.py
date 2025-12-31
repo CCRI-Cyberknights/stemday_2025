@@ -2,51 +2,20 @@
 import os
 import sys
 import re
-import time
 
-# === Terminal Utilities ===
-def resize_terminal(rows=35, cols=90):
-    """
-    Forces the terminal window to resize to the specified dimensions.
-    """
-    sys.stdout.write(f"\x1b[8;{rows};{cols}t")
-    sys.stdout.flush()
-    time.sleep(0.2)
+# === Import Core ===
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+from exploration_core import Colors, header, pause, require_input, spinner, print_success, print_error, print_info, resize_terminal, clear_screen
 
-def clear_screen():
-    os.system('clear' if os.name == 'posix' else 'cls')
-
-def pause(prompt="Press ENTER to continue..."):
-    input(prompt)
-
-def require_input(prompt, expected):
-    """
-    Pauses and requires the user to type a specific word (case-insensitive) to continue.
-    """
-    while True:
-        answer = input(prompt).strip().lower()
-        if answer == expected.lower():
-            return
-        print(f"↪  Please type '{expected}' to continue!\n")
-
-def spinner(message="Working", duration=2.0, interval=0.15):
-    frames = ["|", "/", "-", "\\"]
-    end_time = time.time() + duration
-    i = 0
-    while time.time() < end_time:
-        frame = frames[i % len(frames)]
-        sys.stdout.write(f"\r{message}... {frame}")
-        sys.stdout.flush()
-        time.sleep(interval)
-        i += 1
-    sys.stdout.write("\r" + " " * (len(message) + 10) + "\r")
-    sys.stdout.flush()
+# === Config ===
+CIPHER_FILE = "cipher.txt"
+OUTPUT_FILE = "decoded_output.txt"
 
 # === Vigenère Cipher Logic ===
 def vigenere_decrypt(ciphertext, key):
     result = []
     key = key.lower()
-    if not key: return ciphertext # Safety for empty key
+    if not key: return ciphertext 
     
     key_len = len(key)
     key_indices = [ord(k) - ord('a') for k in key]
@@ -65,117 +34,112 @@ def vigenere_decrypt(ciphertext, key):
 
     return ''.join(result)
 
-# === Flag Extractor ===
 def find_flag(text):
     match = re.search(r"CCRI-[A-Z0-9]{4}-\d{4}", text)
     return match.group(0) if match else None
 
+def get_path(filename):
+    return os.path.join(os.path.dirname(__file__), filename)
+
 # === Main Flow ===
 def main():
-    # 1. Resize Window for better visibility
+    # 1. Setup
     resize_terminal(35, 90)
     
-    script_dir = os.path.abspath(os.path.dirname(__file__))
-    cipher_file = os.path.join(script_dir, "cipher.txt")
-    output_file = os.path.join(script_dir, "decoded_output.txt")
+    cipher_path = get_path(CIPHER_FILE)
+    output_path = get_path(OUTPUT_FILE)
 
-    if not os.path.isfile(cipher_file):
-        print("❌ ERROR: cipher.txt not found.")
+    if not os.path.isfile(cipher_path):
+        print_error(f"{CIPHER_FILE} not found.")
         sys.exit(1)
 
-    clear_screen()
-    print("🔐 Vigenère Cipher Breaker")
-    print("===============================\n")
-    print("📄 Encrypted message: cipher.txt")
+    # 2. Mission Briefing
+    header("🔐 Vigenère Cipher Breaker")
+    
+    print(f"📄 Encrypted message: {Colors.BOLD}{CIPHER_FILE}{Colors.END}")
     print("🎯 Goal: Decrypt the message and locate the CCRI flag.\n")
-    print("💡 What is the Vigenère cipher?")
+    print(f"{Colors.CYAN}💡 What is the Vigenère cipher?{Colors.END}")
     print("   ➤ A substitution cipher that uses a repeating keyword.")
     print("   ➤ Each letter of the key shifts the alphabet by a different amount.")
     print("   ➤ Stronger than a basic Caesar cipher because the pattern repeats over a key.\n")
     
-    # Read the file first
-    with open(cipher_file, "r", encoding="utf-8") as f:
+    with open(cipher_path, "r", encoding="utf-8") as f:
         ciphertext = f.read()
 
     require_input("Type 'ready' to load the decryption tool: ", "ready")
 
-    clear_screen()
-    print("🛠️ Behind the Scenes")
-    print("---------------------------")
+    # 3. Tool Explanation
+    header("🛠️ Behind the Scenes")
     print("We intercepted an encrypted message stored in cipher.txt.")
     print("In this guided helper, Python is doing the Vigenère math for you.\n")
     print("If you were writing your own tool, a command-line workflow might look like:\n")
-    print("   python3 vigenere_helper.py cipher.txt SECRETKEY > decoded_output.txt\n")
+    print(f"   {Colors.GREEN}python3 vigenere_helper.py cipher.txt SECRETKEY > decoded_output.txt{Colors.END}\n")
     print("In this challenge, you'll test different keywords to uncover the hidden CCRI flag.\n")
     
     require_input("Type 'start' to see the encrypted message: ", "start")
 
-    # 2. Main Decryption Loop
+    # 4. Main Decryption Loop
     while True:
         clear_screen()
-        print("🔐 Vigenère Decryption Tool")
+        print(f"{Colors.CYAN}{Colors.BOLD}🔐 Vigenère Decryption Tool{Colors.END}")
         print("===========================\n")
         
-        # DISPLAY THE ORIGINAL CIPHERTEXT (Restored Feature)
-        print("📄 Current File Contents (Encrypted):")
-        print("-------------------------------------")
-        # Print first 5 lines or whole thing if short, to save space
+        print(f"📄 Current File Contents ({Colors.RED}Encrypted{Colors.END}):")
+        print("-" * 50)
         preview_lines = ciphertext.splitlines()
         for line in preview_lines[:8]: 
-            print(f"> {line}")
+            print(f"> {Colors.YELLOW}{line}{Colors.END}")
         if len(preview_lines) > 8:
-            print("> ... [remaining text hidden] ...")
-        print("-------------------------------------\n")
+            print(f"> {Colors.YELLOW}... [remaining text hidden] ...{Colors.END}")
+        print("-" * 50 + "\n")
 
-        key = input("🔑 Enter a keyword to try (or type 'exit' to quit): ").strip().lower()
+        key = input(f"{Colors.YELLOW}🔑 Enter a keyword to try (or type 'exit' to quit): {Colors.END}").strip().lower()
 
         if key == "exit":
-            print("\n👋 Exiting. Stay sharp, Agent.")
+            print(f"\n{Colors.CYAN}👋 Exiting. Stay sharp, Agent.{Colors.END}")
             break
 
         if not key:
-            continue # Just redraw the screen
+            continue
 
-        print(f"\n⏳ Decrypting with keyword: '{key}'")
+        print(f"\n⏳ Decrypting with keyword: '{Colors.BOLD}{key}{Colors.END}'")
         spinner("Processing")
 
         plaintext = vigenere_decrypt(ciphertext, key)
         flag = find_flag(plaintext)
 
-        # Show the result of this attempt
+        # Show Results
         clear_screen()
-        print(f"🔑 Key Used: '{key}'")
+        print(f"🔑 Key Used: '{Colors.BOLD}{key}{Colors.END}'")
         print("=============================")
         print("📄 Resulting Text:")
-        print("-----------------------------")
-        print(plaintext)
-        print("-----------------------------\n")
+        print("-" * 50)
+        # We print a snippet if it's too long, or the whole thing if it fits
+        print(plaintext[:500] + ("..." if len(plaintext) > 500 else ""))
+        print("-" * 50 + "\n")
 
         if flag:
-            print(f"✅ SUCCESS! Flag found: {flag}")
-            print(f"📁 Saved to: {output_file}\n")
-            with open(output_file, "w", encoding="utf-8") as f_out:
+            print_success(f"SUCCESS! Flag found: {Colors.BOLD}{flag}{Colors.END}")
+            print(f"📁 Saved to: {Colors.BOLD}{OUTPUT_FILE}{Colors.END}\n")
+            with open(output_path, "w", encoding="utf-8") as f_out:
                 f_out.write(plaintext)
+            pause("Press ENTER to close this terminal...")
             break
         else:
-            print("❌ FAILURE: No valid CCRI flag found in the output.")
+            print_error("FAILURE: No valid CCRI flag found in the output.")
             print("   The text still looks like garbage. That was the wrong key.")
-            print("   (Hint: The key relates to the user 'ccri_stem' credentials...)\n")
+            print(f"   (Hint: The key relates to the user {Colors.BOLD}'ccri_stem'{Colors.END} credentials...)\n")
             
-            # Strict loop for Yes/No validation
             while True:
-                again = input("🔁 Do you want to try another keyword? (yes/no): ").strip().lower()
+                again = input(f"{Colors.YELLOW}🔁 Do you want to try another keyword? (yes/no): {Colors.END}").strip().lower()
                 if again == "yes":
-                    break # Break this loop to continue the main outer loop
+                    break 
                 elif again == "no":
-                    print("\n👋 Exiting.")
+                    print(f"\n{Colors.CYAN}👋 Exiting.{Colors.END}")
                     pause("Press ENTER to close this terminal...")
                     sys.exit(0)
                 else:
-                    print("   ❌ Please type 'yes' or 'no'.\n")
+                    print(f"{Colors.RED}   ❌ Please type 'yes' or 'no'.{Colors.END}\n")
 
-    pause("Press ENTER to close this terminal...")
-
-# === Entry Point ===
 if __name__ == "__main__":
     main()

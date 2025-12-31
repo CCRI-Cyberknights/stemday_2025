@@ -2,54 +2,24 @@
 import os
 import sys
 import subprocess
-import time
 import shutil
 
-# === Terminal Utilities ===
-def resize_terminal(rows=35, cols=90):
-    sys.stdout.write(f"\x1b[8;{rows};{cols}t")
-    sys.stdout.flush()
-    time.sleep(0.2)
+# === Import Core ===
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+from exploration_core import Colors, header, pause, require_input, spinner, print_success, print_error, print_info, resize_terminal, clear_screen
 
-def clear_screen():
-    os.system('clear' if os.name == 'posix' else 'cls')
+# === Config ===
+HASHES_FILE = "hashes.txt"
+WORDLIST_FILE = "wordlist.txt"
+POTFILE = "hashcat.potfile"
+SEGMENTS_DIR = "segments"
+EXTRACTED_DIR = "extracted"
+DECODED_DIR = "decoded_segments"
+ASSEMBLED_FILE = "assembled_flag.txt"
 
-def pause(prompt="Press ENTER to continue..."):
-    input(prompt)
+def get_path(filename):
+    return os.path.join(os.path.dirname(__file__), filename)
 
-def require_input(prompt, expected):
-    """
-    Pauses and requires the user to type a specific word (case-insensitive) to continue.
-    """
-    while True:
-        answer = input(prompt).strip().lower()
-        if answer == expected.lower():
-            return
-        print(f"↪  Please type '{expected}' to continue!\n")
-
-def print_progress_bar(length=30, delay=0.02):
-    for _ in range(length):
-        print("█", end="", flush=True)
-        time.sleep(delay)
-    print()
-
-def spinner(message="Working", duration=2.0, interval=0.15):
-    """
-    Simple text spinner to give the feeling of work being done.
-    """
-    frames = ["|", "/", "-", "\\"]
-    end_time = time.time() + duration
-    i = 0
-    while time.time() < end_time:
-        frame = frames[i % len(frames)]
-        sys.stdout.write(f"\r{message}... {frame}")
-        sys.stdout.flush()
-        time.sleep(interval)
-        i += 1
-    sys.stdout.write("\r" + " " * (len(message) + 10) + "\r")
-    sys.stdout.flush()
-
-# === Helpers ===
 def decode_base64_file(input_path, output_path):
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     try:
@@ -81,57 +51,56 @@ def flatten_extracted_dir(extracted_dir):
             try:
                 os.rmdir(os.path.join(root, d))
             except OSError:
-                # Directory not empty or other issue; ignore.
                 pass
 
 def extract_zip_files_with_passwords(passwords, segments_dir, extracted_dir, decoded_dir):
     os.makedirs(decoded_dir, exist_ok=True)
     for idx, password in enumerate(passwords, start=1):
         zipfile = os.path.join(segments_dir, f"part{idx}.zip")
-        print(f"\n📦 Segment {idx}: {zipfile}")
+        print(f"\n{Colors.CYAN}📦 Segment {idx}: {zipfile}{Colors.END}")
 
         if not os.path.isfile(zipfile):
-            print(f"⚠️ ZIP file missing for segment {idx}, skipping.")
+            print_error(f"ZIP file missing for segment {idx}, skipping.")
             continue
 
         if not password:
-            print("❌ No password available for this segment (hash not cracked). Skipping.")
+            print_error("No password available for this segment (hash not cracked). Skipping.")
             continue
 
-        print(f"🔑 Unlocking with password: {password}")
+        print(f"🔑 Unlocking with password: {Colors.BOLD}{password}{Colors.END}")
         result = subprocess.run(
             ["unzip", "-o", "-P", password, zipfile, "-d", extracted_dir],
             capture_output=True,
             text=True
         )
         if result.returncode != 0:
-            print(f"❌ Failed to unzip {zipfile} with password '{password}'", file=sys.stderr)
-            print(f"📄 unzip error: {result.stderr.strip()}", file=sys.stderr)
+            print_error(f"Failed to unzip {zipfile}")
             continue
 
-        print(f"✅ Unzipped {zipfile} successfully.")
+        print_success(f"Unzipped {zipfile} successfully.")
         flatten_extracted_dir(extracted_dir)
 
+        # Process Extracted Files
         for f in os.listdir(extracted_dir):
             if f.startswith("encoded_"):
                 encoded_path = os.path.join(extracted_dir, f)
                 decoded_path = os.path.join(decoded_dir, f"decoded_" + f)
 
-                print(f"\n📦 Encoded Base64 contents from {f}:")
-                print("--------------------------")
+                print(f"📦 Encoded Base64 contents from {f}:")
+                print("-" * 30)
                 with open(encoded_path, "r", encoding="utf-8", errors="replace") as ef:
-                    print(ef.read().strip())
-                print("--------------------------")
+                    print(f"{Colors.YELLOW}{ef.read().strip()}{Colors.END}")
+                print("-" * 30)
 
                 decoded = decode_base64_file(encoded_path, decoded_path)
 
                 if decoded:
                     print(f"\n🧾 Decoded contents from {f}:")
-                    print("--------------------------")
-                    print(decoded)
-                    print("--------------------------")
+                    print("-" * 30)
+                    print(f"{Colors.GREEN}{decoded}{Colors.END}")
+                    print("-" * 30)
                 else:
-                    print("❌ Failed to decode base64 content.")
+                    print_error("Failed to decode base64 content.")
 
         require_input("Type 'next' to continue to the next ZIP: ", "next")
 
@@ -143,8 +112,7 @@ def reassemble_flags(decoded_dir, assembled_file):
     assembled_lines = []
     try:
         with open(assembled_file, "w", encoding="utf-8") as out_f:
-            # Assume each decoded file contains multiple lines,
-            # with each line representing a piece of a candidate flag.
+            # We assume 5 lines per file
             for i in range(5):
                 parts = []
                 for f in decoded_files:
@@ -156,7 +124,7 @@ def reassemble_flags(decoded_dir, assembled_file):
                 out_f.write(flag + "\n")
         return assembled_lines
     except Exception as e:
-        print(f"❌ ERROR during flag reassembly: {e}", file=sys.stderr)
+        print_error(f"Flag reassembly failed: {e}")
         return []
 
 def run_hashcat(hashes_file, wordlist_file, potfile):
@@ -170,131 +138,111 @@ def run_hashcat(hashes_file, wordlist_file, potfile):
         stderr=subprocess.DEVNULL
     )
 
-# === Main Student Flow ===
-def student_interactive(script_dir):
+def main():
+    # 1. Setup
     resize_terminal(35, 90)
-    hashes_file = os.path.join(script_dir, "hashes.txt")
-    wordlist_file = os.path.join(script_dir, "wordlist.txt")
-    potfile = os.path.join(script_dir, "hashcat.potfile")
-    segments_dir = os.path.join(script_dir, "segments")
-    extracted_dir = os.path.join(script_dir, "extracted")
-    decoded_dir = os.path.join(script_dir, "decoded_segments")
-    assembled_file = os.path.join(script_dir, "assembled_flag.txt")
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    hashes_path = get_path(HASHES_FILE)
+    wordlist_path = get_path(WORDLIST_FILE)
+    potfile_path = get_path(POTFILE)
+    segments_path = get_path(SEGMENTS_DIR)
+    extracted_path = get_path(EXTRACTED_DIR)
+    decoded_path = get_path(DECODED_DIR)
+    assembled_path = get_path(ASSEMBLED_FILE)
 
-    try:
-        clear_screen()
-        print("🔓 Hashcat ChainCrack Demo")
-        print("===============================\n")
-        print("📂 Hashes to crack:     hashes.txt")
-        print("📖 Wordlist to use:     wordlist.txt")
-        print("📦 Encrypted segments:  segments/part*.zip\n")
-        print("🎯 Goal: Crack hashes, unlock ZIPs, decode Base64, assemble the real CCRI flag.\n")
-        print("💡 Scenario:")
-        print("   ➤ Each hash unlocks one ZIP file containing a piece of the puzzle.")
-        print("   ➤ Each ZIP contains a Base64-encoded text segment.")
-        print("   ➤ When all segments are decoded and combined, they form multiple candidate flags.")
-        print("   ➤ Only ONE of those flags is the true CCRI-AAAA-1111 flag.\n")
-        
-        require_input("Type 'ready' when you're ready to see the commands behind this challenge: ", "ready")
+    # 2. Mission Briefing
+    header("🔓 Hashcat ChainCrack Demo")
+    
+    print(f"📂 Hashes to crack:     {Colors.BOLD}{HASHES_FILE}{Colors.END}")
+    print(f"📖 Wordlist to use:     {Colors.BOLD}{WORDLIST_FILE}{Colors.END}")
+    print(f"📦 Encrypted segments:  {Colors.BOLD}segments/part*.zip{Colors.END}\n")
+    print("🎯 Goal: Crack hashes, unlock ZIPs, decode Base64, assemble the real CCRI flag.\n")
+    
+    print(f"{Colors.CYAN}💡 Scenario:{Colors.END}")
+    print("   ➤ Each hash unlocks one ZIP file containing a piece of the puzzle.")
+    print("   ➤ Each ZIP contains a Base64-encoded text segment.")
+    print("   ➤ When all segments are decoded and combined, they form multiple candidate flags.")
+    print("   ➤ Only ONE of those flags is the true CCRI-AAAA-1111 flag.\n")
+    
+    require_input("Type 'ready' when you're ready to see the commands behind this challenge: ", "ready")
 
-        if not os.path.isfile(hashes_file) or not os.path.isfile(wordlist_file):
-            print("❌ ERROR: Required files hashes.txt or wordlist.txt are missing.")
-            pause("Press ENTER to close...")
-            return
+    if not os.path.isfile(hashes_path) or not os.path.isfile(wordlist_path):
+        print_error("Required files hashes.txt or wordlist.txt are missing.")
+        sys.exit(1)
 
-        if not os.path.isdir(segments_dir):
-            print("❌ ERROR: Segments folder missing.")
-            pause("Press ENTER to close...")
-            return
+    if not os.path.isdir(segments_path):
+        print_error("Segments folder missing.")
+        sys.exit(1)
 
-        clear_screen()
-        print("🛠️ Behind the Scenes")
-        print("---------------------------")
-        print("Step 1: Use Hashcat to crack the hashes.\n")
-        print("   Command (conceptually):")
-        print(f"     hashcat -m 0 -a 0 {os.path.basename(hashes_file)} {os.path.basename(wordlist_file)} \\")
-        print(f"       --potfile-path {os.path.basename(potfile)} --force\n")
-        print("   -m 0            → Hash mode 0 (raw MD5 in this challenge)")
-        print("   -a 0            → Attack mode 0 (straight wordlist attack)")
-        print("   hashes.txt      → File containing hashes to crack")
-        print("   wordlist.txt    → Candidate passwords to test")
-        print("   --potfile-path  → Where cracked hash:password pairs are stored\n")
-        print("Step 2: Use each cracked password to unlock a ZIP segment:\n")
-        print("   unzip -o -P [password] partN.zip -d extracted/\n")
-        print("   -P [password]   → Use this password for the encrypted ZIP")
-        print("   -o              → Overwrite existing files without prompting")
-        print("   -d extracted/   → Extract into the 'extracted' directory\n")
-        print("Step 3: Decode Base64-encoded message segments:\n")
-        print("   base64 --decode encoded_X.txt > decoded_segments/decoded_encoded_X.txt\n")
-        print("Step 4: Reassemble the decoded pieces into candidate flags.")
-        print("   Each decoded file contributes one part of each candidate flag,")
-        print("   and we join the pieces together with '-' separators.\n")
-        
-        require_input("Type 'start' when you're ready to begin the chain-cracking process: ", "start")
+    # 3. Tool Explanation
+    header("🛠️ Behind the Scenes")
+    print("Step 1: Use Hashcat to crack the hashes.\n")
+    print(f"   {Colors.GREEN}hashcat -m 0 -a 0 {HASHES_FILE} {WORDLIST_FILE} ...{Colors.END}\n")
+    print("   -m 0            → Hash mode 0 (raw MD5)")
+    print("   -a 0            → Attack mode 0 (straight wordlist attack)")
+    
+    print("\nStep 2: Use each cracked password to unlock a ZIP segment:")
+    print(f"   {Colors.GREEN}unzip -o -P [password] partN.zip -d extracted/{Colors.END}")
+    
+    print("\nStep 3: Decode Base64-encoded message segments:")
+    print(f"   {Colors.GREEN}base64 --decode encoded_X.txt > decoded.txt{Colors.END}")
+    
+    print("\nStep 4: Reassemble decoded pieces into candidate flags.")
+    
+    require_input("Type 'start' when you're ready to begin the chain-cracking process: ", "start")
 
-        print("\n[🧹] Cleaning previous results...")
-        for path in [potfile, assembled_file]:
-            if os.path.exists(path):
-                os.remove(path)
-        for d in [extracted_dir, decoded_dir]:
-            if os.path.exists(d):
-                subprocess.run(["rm", "-rf", d])
-        os.makedirs(extracted_dir, exist_ok=True)
-        os.makedirs(decoded_dir, exist_ok=True)
+    # 4. Execution Phase
+    print_info("Cleaning previous results...")
+    for path in [potfile_path, assembled_path]:
+        if os.path.exists(path): os.remove(path)
+    for d in [extracted_path, decoded_path]:
+        if os.path.exists(d): shutil.rmtree(d)
+    os.makedirs(extracted_path, exist_ok=True)
+    os.makedirs(decoded_path, exist_ok=True)
 
-        print("\n🛠️ Running Hashcat...")
-        print_progress_bar(length=20, delay=0.03)
-        run_hashcat(hashes_file, wordlist_file, potfile)
+    header("🛠️ Running Hashcat...")
+    spinner("Cracking hashes")
+    run_hashcat(hashes_path, wordlist_path, potfile_path)
 
-        print("\n[✅] Cracked hashes:")
-        cracked_passwords_by_hash = {}
-        if not os.path.isfile(potfile):
-            print("⚠️ No potfile created. Hashcat may not have cracked any hashes.")
-        else:
-            with open(potfile, "r", encoding="utf-8", errors="replace") as pf:
-                for line in pf:
-                    if ':' in line:
-                        hash_val, password = line.strip().split(':', 1)
-                        cracked_passwords_by_hash[hash_val] = password
-                        print(f"🔓 {hash_val} : {password}")
+    print("\n[✅] Cracked hashes:")
+    cracked_passwords_by_hash = {}
+    if not os.path.isfile(potfile_path):
+        print_error("No potfile created. Hashcat failed.")
+    else:
+        with open(potfile_path, "r", encoding="utf-8", errors="replace") as pf:
+            for line in pf:
+                if ':' in line:
+                    hash_val, password = line.strip().split(':', 1)
+                    cracked_passwords_by_hash[hash_val] = password
+                    print(f"🔓 {hash_val} : {Colors.BOLD}{password}{Colors.END}")
 
-        require_input("\nType 'map' to map cracked passwords to ZIP segments: ", "map")
+    require_input("\nType 'map' to map cracked passwords to ZIP segments: ", "map")
 
-        ordered_passwords = []
-        with open(hashes_file, "r", encoding="utf-8", errors="replace") as hf:
-            for line in hf:
-                hash_val = line.strip()
-                if not hash_val:
-                    continue
-                pw = cracked_passwords_by_hash.get(hash_val)
-                if pw:
-                    ordered_passwords.append(pw)
-                else:
-                    ordered_passwords.append(None)  # No match for this hash
+    ordered_passwords = []
+    with open(hashes_path, "r", encoding="utf-8", errors="replace") as hf:
+        for line in hf:
+            hash_val = line.strip()
+            if not hash_val: continue
+            ordered_passwords.append(cracked_passwords_by_hash.get(hash_val))
 
-        print("\n📦 Using cracked passwords to unlock ZIP segments...")
-        spinner("Unlocking segments")
-        extract_zip_files_with_passwords(ordered_passwords, segments_dir, extracted_dir, decoded_dir)
+    print("\n📦 Using cracked passwords to unlock ZIP segments...")
+    extract_zip_files_with_passwords(ordered_passwords, segments_path, extracted_path, decoded_path)
 
-        print("\n🧩 Assembling candidate flags from decoded pieces...")
-        print_progress_bar()
-        candidate_flags = reassemble_flags(decoded_dir, assembled_file)
+    print("\n🧩 Assembling candidate flags from decoded pieces...")
+    candidate_flags = reassemble_flags(decoded_path, assembled_path)
 
-        if not candidate_flags:
-            print("⚠️ No flags could be assembled. Check decoded_segments/ for issues.")
-        else:
-            print("\n🎯 Candidate Flags:")
-            for flag in candidate_flags:
-                print(f"- {flag}")
+    if not candidate_flags:
+        print_error("No flags could be assembled.")
+    else:
+        header("🎯 Candidate Flags")
+        for flag in candidate_flags:
+            print(f"- {Colors.BOLD}{flag}{Colors.END}")
 
-            print(f"\n✅ Flags saved to: {assembled_file}")
-            print("🧠 Only ONE candidate will match the true CCRI-AAAA-1111 flag pattern used in the challenge story.")
+        print(f"\n✅ Flags saved to: {Colors.BOLD}{ASSEMBLED_FILE}{Colors.END}")
+        print(f"{Colors.CYAN}🧠 Only ONE candidate will match the true CCRI-AAAA-1111 flag pattern used in the challenge story.{Colors.END}")
 
-        pause("\n🎉 Press ENTER to exit...")
-    except Exception as e:
-        print(f"❌ Unexpected error: {e}", file=sys.stderr)
-        pause("\n💥 Press ENTER to exit after error...")
+    pause("\n🎉 Press ENTER to exit...")
 
 if __name__ == "__main__":
-    script_dir = os.path.abspath(os.path.dirname(__file__))
-    student_interactive(script_dir)
+    main()
