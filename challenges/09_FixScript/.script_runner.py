@@ -14,7 +14,8 @@ SCRIPT_NAME = "broken_flag.py"
 OUTPUT_FLAG_FILE = "flag.txt"
 
 def get_path(filename):
-    return os.path.join(os.path.dirname(__file__), filename)
+    """Ensure the file is saved next to this script, regardless of where it's run from."""
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
 
 def flatten_broken_script_dir(script_dir, script_name):
     for root, dirs, files in os.walk(script_dir):
@@ -60,7 +61,7 @@ def patch_operator_in_script(script_path, new_operator):
 def main():
     # 1. Setup
     resize_terminal(35, 90)
-    script_dir = os.path.abspath(os.path.dirname(__file__))
+    script_dir = os.path.dirname(os.path.abspath(__file__))
     broken_script = get_path(SCRIPT_NAME)
     flag_output_file = get_path(OUTPUT_FLAG_FILE)
 
@@ -86,7 +87,7 @@ def main():
     
     require_input("Type 'ready' when you're ready to check the files: ", "ready")
 
-    # 3. File Inspection (Added Step)
+    # 3. File Inspection
     clear_screen()
     header("🔍 Source Code Inspection")
     print(f"Opening {Colors.BOLD}{SCRIPT_NAME}{Colors.END} to see what we're dealing with...\n")

@@ -12,11 +12,11 @@ from exploration_core import Colors, header, pause, require_input, spinner, prin
 # === Config ===
 BINARY_FILE = "hidden_flag"
 STRINGS_FILE = "extracted_strings.txt"
-# Explicit regex for 3 groups of 4 alphanumeric chars
 REGEX_PATTERN = r'[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}'
 
 def get_path(filename):
-    return os.path.join(os.path.dirname(__file__), filename)
+    """Ensure the file is saved next to this script, regardless of where it's run from."""
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
 
 def run_strings(binary_path, output_path):
     try:
@@ -34,7 +34,6 @@ def search_for_flags(file_path, regex):
                 # Find all occurrences in the line
                 found = re.findall(regex, line)
                 for flag in found:
-                    # Append ONLY the matched part (stripping artifacts like 'r' or '_')
                     matches.append(flag)
     except Exception as e:
         print_error(f"Error during flag search: {e}")

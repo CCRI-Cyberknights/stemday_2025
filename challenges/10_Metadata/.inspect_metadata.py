@@ -15,7 +15,8 @@ IMAGE_FILE = "capybara.jpg"
 OUTPUT_FILE = "metadata_dump.txt"
 
 def get_path(filename):
-    return os.path.join(os.path.dirname(__file__), filename)
+    """Ensure the file is saved next to this script, regardless of where it's run from."""
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
 
 def extract_flag_candidates(text):
     """Extract and display a few plausible flag-like values from metadata."""
@@ -125,11 +126,10 @@ def main():
             ["grep", "-i", "--color=always", keyword, output_path],
             check=False
         )
-        print("\n") # Spacing after search results
+        print("\n")
     else:
         print_info("Skipping custom search.\n")
 
-    # === NEW STEP: Pause before revealing flags ===
     require_input("Type 'scan' to check specifically for flag-like patterns: ", "scan")
 
     # 6. Flag Candidates

@@ -34,7 +34,8 @@ DUMP_FILE = "ps_dump.txt"
 OUTPUT_FILE = "process_output.txt"
 
 def get_path(filename):
-    return os.path.join(os.path.dirname(__file__), filename)
+    """Ensure the file is saved next to this script, regardless of where it's run from."""
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
 
 def relaunch_in_bigger_terminal(script_path):
     """Re-executes the script in a larger MATE Terminal window for visibility."""
@@ -47,7 +48,6 @@ def relaunch_in_bigger_terminal(script_path):
     time.sleep(1)
 
     try:
-        # Force geometry in command + escape sequence
         subprocess.Popen([
             "mate-terminal",
             "--geometry=140x48", 
@@ -122,7 +122,7 @@ def main():
     safe_resize() 
 
     # 3. Setup
-    script_dir = os.path.abspath(os.path.dirname(__file__))
+    script_dir = os.path.dirname(os.path.abspath(__file__))
     ps_dump_path = get_path(DUMP_FILE)
     output_path = get_path(OUTPUT_FILE)
     
