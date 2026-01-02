@@ -8,11 +8,15 @@ import time
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 from exploration_core import Colors, header, pause, require_input, print_success, print_error, print_info, resize_terminal, clear_screen
 
-# === Configuration ===
+# === Config ===
 BINARY_PORT_RANGE = "8000-8100"
 BINARY_HOST = "localhost"
 BINARY_URL = f"http://{BINARY_HOST}"
-SAVE_FILE = "nmap_flag_response.txt"
+SAVE_FILENAME = "nmap_flag_response.txt"
+
+def get_path(filename):
+    """Ensure the file is saved next to this script, regardless of where it's run from."""
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
 
 # === Nmap Scan ===
 def run_nmap_scan():
@@ -58,6 +62,7 @@ def fetch_port_response(port):
 def main():
     # 1. Setup
     resize_terminal(35, 90)
+    save_file_path = get_path(SAVE_FILENAME)
     
     # 2. Mission Briefing
     header("🛰️  Nmap Scan Puzzle")
@@ -130,16 +135,19 @@ def main():
             while True:
                 print("Options:")
                 print("  [1] 🔁 Return to port list")
-                print("  [2] 💾 Save this response to file\n")
+                print(f"  [2] 💾 Save this response to file ({SAVE_FILENAME})\n")
                 sub_choice = input(f"{Colors.YELLOW}Choose an action (1-2): {Colors.END}").strip()
 
                 if sub_choice == "1":
                     break
                 elif sub_choice == "2":
-                    with open(SAVE_FILE, "a", encoding="utf-8") as f:
-                        f.write(f"Port: {port}\nResponse:\n{response}\n")
-                        f.write("======================================\n")
-                    print_success(f"Response saved to {SAVE_FILE}")
+                    try:
+                        with open(save_file_path, "a", encoding="utf-8") as f:
+                            f.write(f"Port: {port}\nResponse:\n{response}\n")
+                            f.write("======================================\n")
+                        print_success(f"Response saved to {SAVE_FILENAME}")
+                    except Exception as e:
+                        print_error(f"Could not save file: {e}")
                     time.sleep(1)
                     break
                 else:

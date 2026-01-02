@@ -6,8 +6,28 @@ import time
 import shlex
 
 # === Import Core ===
+# We need the full module to patch it
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
-from exploration_core import Colors, header, pause, require_input, print_success, print_error, print_info, resize_terminal, clear_screen
+import exploration_core 
+from exploration_core import Colors, header, pause, require_input, print_success, print_error, print_info, clear_screen
+
+# === THE FIX: Patch the module itself ===
+# This ensures that even if 'header()' calls resize_terminal internally,
+# it uses THIS version, not the original one.
+original_resize = exploration_core.resize_terminal
+
+def safe_resize(rows=35, cols=90):
+    # If in Big Mode, IGNORE small resize requests
+    if os.environ.get("BIGGER_TERMINAL") == "1":
+        # Force the big size (48x140) regardless of what was asked
+        sys.stdout.write(f"\x1b[8;48;140t")
+        sys.stdout.flush()
+    else:
+        # Standard behavior
+        original_resize(rows, cols)
+
+# Overwrite the function in the library
+exploration_core.resize_terminal = safe_resize
 
 # === Config ===
 DUMP_FILE = "ps_dump.txt"
@@ -27,8 +47,10 @@ def relaunch_in_bigger_terminal(script_path):
     time.sleep(1)
 
     try:
+        # Force geometry in command + escape sequence
         subprocess.Popen([
             "mate-terminal",
+            "--geometry=140x48", 
             "--", "bash", "-c",
             f"printf '\\033[8;48;140t'; python3 '{abs_script}'; exec bash"
         ])
@@ -51,7 +73,7 @@ def load_process_map(ps_dump_path):
                         args = shlex.split(full_cmd)
                         binary = args[0] if args else full_cmd
                     except Exception:
-                        binary = full_cmd  # Fallback on parsing error
+                        binary = full_cmd
 
                     if binary not in proc_map:
                         proc_map[binary] = full_cmd
@@ -60,7 +82,6 @@ def load_process_map(ps_dump_path):
     return proc_map
 
 def inspect_process(binary, ps_dump_path):
-    """Displays matching line(s) from ps_dump.txt and formats arguments."""
     clear_screen()
     print(f"\n🔍 Inspecting process: {Colors.BOLD}{binary}{Colors.END}")
     print("-" * 50)
@@ -75,7 +96,6 @@ def inspect_process(binary, ps_dump_path):
         if not result.stdout.strip():
             print_error("No matching process found.")
         else:
-            # Visual formatting to make long argument lists easier to read
             formatted = result.stdout.replace("--", "\n    --")
             print(f"{Colors.YELLOW}{formatted}{Colors.END}")
             print("-" * 50)
@@ -93,15 +113,20 @@ def save_output(text, path):
         print_error(f"Failed to save output: {e}")
 
 def main():
-    # 1. Setup (Special resize for this challenge)
-    resize_terminal(35, 90)
+    # 1. Relaunch Check
+    relaunch_in_bigger_terminal(__file__)
+
+    # 2. Resize
+    # Just call it normally; our patch handles the logic now.
+    time.sleep(0.2)
+    safe_resize() 
+
+    # 3. Setup
     script_dir = os.path.abspath(os.path.dirname(__file__))
     ps_dump_path = get_path(DUMP_FILE)
     output_path = get_path(OUTPUT_FILE)
-
-    relaunch_in_bigger_terminal(__file__)
     
-    # 2. Mission Briefing
+    # 4. Mission Briefing
     header("🖥️  Process Inspection")
     
     print(f"You've obtained a snapshot of running processes ({Colors.BOLD}{DUMP_FILE}{Colors.END}).\n")
@@ -115,7 +140,7 @@ def main():
         print_error(f"{DUMP_FILE} not found in this folder!")
         sys.exit(1)
 
-    # 3. Tool Explanation
+    # 5. Tool Explanation
     header("🛠️ Behind the Scenes")
     print("This challenge is based on the output of a Linux process listing command like:\n")
     print(f"   {Colors.GREEN}ps aux{Colors.END}")
@@ -136,7 +161,7 @@ def main():
     proc_map = load_process_map(ps_dump_path)
     display_names = sorted(proc_map.keys())
 
-    # 4. Interactive Loop
+    # 6. Interactive Loop
     while True:
         clear_screen()
         print(f"{Colors.CYAN}📂 Process List (from {DUMP_FILE}):{Colors.END}")

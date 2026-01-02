@@ -86,17 +86,41 @@ def main():
     
     require_input("Type 'ready' when you're ready to check the files: ", "ready")
 
+    # 3. File Inspection (Added Step)
+    clear_screen()
+    header("🔍 Source Code Inspection")
+    print(f"Opening {Colors.BOLD}{SCRIPT_NAME}{Colors.END} to see what we're dealing with...\n")
+    spinner("Reading file")
+    
     if not os.path.isfile(broken_script):
         print_error(f"{SCRIPT_NAME} not found in {script_dir}.")
         sys.exit(1)
 
+    print("\n" + "-" * 50)
+    try:
+        with open(broken_script, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+            for line in lines:
+                # Highlight the broken logic line
+                if "code = part1" in line:
+                    print(f"{Colors.YELLOW}{Colors.BOLD}>> {line.strip()} <<  (THIS IS THE BUG){Colors.END}")
+                else:
+                    print(line.rstrip())
+    except Exception as e:
+        print_error(f"Could not read script: {e}")
+    print("-" * 50 + "\n")
+    
+    print(f"👀 Notice the line highlighted above? That determines how the flag is built.")
+    print("   We need to change that operator to make the math work out.\n")
+
     require_input("Type 'run' to execute the broken script: ", "run")
 
-    # 3. Interactive Debug Loop
+    # 4. Interactive Debug Loop
     while True:
         print(f"\n💻 Running: {Colors.BOLD}python {SCRIPT_NAME}{Colors.END}")
         print("-" * 50)
         output = run_python_script(broken_script)
+        
         # Highlight potential flag output
         if "CCRI-" in output:
             print(output.replace("CCRI-", f"{Colors.YELLOW}CCRI-") + Colors.END)

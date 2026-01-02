@@ -12,7 +12,8 @@ from exploration_core import Colors, header, pause, require_input, spinner, prin
 # === Config ===
 BINARY_FILE = "hidden_flag"
 STRINGS_FILE = "extracted_strings.txt"
-REGEX_PATTERN = r'\b([A-Z0-9]{4}-){2}[A-Z0-9]{4}\b'
+# Explicit regex for 3 groups of 4 alphanumeric chars
+REGEX_PATTERN = r'[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}'
 
 def get_path(filename):
     return os.path.join(os.path.dirname(__file__), filename)
@@ -30,8 +31,11 @@ def search_for_flags(file_path, regex):
     try:
         with open(file_path, "r", errors="ignore") as f:
             for i, line in enumerate(f):
-                if re.search(regex, line):
-                    matches.append(line.strip())
+                # Find all occurrences in the line
+                found = re.findall(regex, line)
+                for flag in found:
+                    # Append ONLY the matched part (stripping artifacts like 'r' or '_')
+                    matches.append(flag)
     except Exception as e:
         print_error(f"Error during flag search: {e}")
         sys.exit(1)

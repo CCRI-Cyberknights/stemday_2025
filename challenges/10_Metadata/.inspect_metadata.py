@@ -125,13 +125,17 @@ def main():
             ["grep", "-i", "--color=always", keyword, output_path],
             check=False
         )
+        print("\n") # Spacing after search results
     else:
         print_info("Skipping custom search.\n")
 
+    # === NEW STEP: Pause before revealing flags ===
+    require_input("Type 'scan' to check specifically for flag-like patterns: ", "scan")
+
     # 6. Flag Candidates
     flag_candidates = extract_flag_candidates(metadata_text)
-
-    print(f"{Colors.CYAN}🧠 One of these fields hides the correct flag in the format: CCRI-AAAA-1111{Colors.END}")
+    
+    print(f"\n{Colors.CYAN}🧠 One of these fields hides the correct flag in the format: CCRI-AAAA-1111{Colors.END}")
     print("👁️‍🗨️ Candidate flag-like values found in metadata:")
     for fake in flag_candidates:
         print(f"   ➡️ {Colors.BOLD}{fake}{Colors.END}")

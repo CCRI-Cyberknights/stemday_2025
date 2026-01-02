@@ -131,7 +131,13 @@ def main():
                     print(f"{Colors.BOLD}{idx:2d}) {file}{Colors.END}")
 
             try:
-                index = int(input(f"\n{Colors.YELLOW}Enter number to view: {Colors.END}").strip())
+                index_input = input(f"\n{Colors.YELLOW}Enter number to view: {Colors.END}").strip()
+                if not index_input.isdigit():
+                    print_error("Invalid input. Please enter a number.")
+                    pause()
+                    continue
+
+                index = int(index_input)
                 if 1 <= index <= len(files):
                     filename = files[index - 1]
                     filepath = os.path.join(current_dir, filename)
@@ -148,15 +154,21 @@ def main():
                         print_error(f"Could not read file: {e}")
                     print("-" * 40 + "\n")
 
-                    save_choice = input(f"Save output to {RESULTS_FILE}? (yes/no): ").strip().lower()
-                    if save_choice == "yes":
-                        with open(results_path, "a") as rf:
-                            rf.write(f"\n----- {os.path.relpath(filepath, script_dir)} -----\n")
-                            rf.write(content)
-                        print_success(f"Saved to: {RESULTS_FILE}")
-                        pause()
-                    else:
-                        pause()
+                    # === STRICT YES/NO LOOP ===
+                    while True:
+                        save_choice = input(f"Save output to {RESULTS_FILE}? (yes/no): ").strip().lower()
+                        if save_choice == "yes":
+                            with open(results_path, "a") as rf:
+                                rf.write(f"\n----- {os.path.relpath(filepath, script_dir)} -----\n")
+                                rf.write(content)
+                            print_success(f"Saved to: {RESULTS_FILE}")
+                            pause()
+                            break
+                        elif save_choice == "no":
+                            pause()
+                            break
+                        else:
+                            print_error("Please type 'yes' or 'no'.")
                 else:
                     print_error("Invalid selection.")
                     pause()
