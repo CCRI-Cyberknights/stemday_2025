@@ -16,11 +16,11 @@ def get_correct_stream_id(pcap_file):
         return "0"
         
     try:
-        # Command: tshark -r traffic.pcap -Y "frame contains CCRI" -T fields -e tcp.stream
-        # This asks tshark to list the stream IDs of any packet containing "CCRI"
+        # FIX: We must quote "CCRI" inside the filter so tshark treats it as a string
+        # Filter: frame contains "CCRI"
         cmd = [
             "tshark", "-r", pcap_file, 
-            "-Y", "frame contains CCRI", 
+            "-Y", 'frame contains "CCRI"', 
             "-T", "fields", "-e", "tcp.stream"
         ]
         result = subprocess.run(cmd, capture_output=True, text=True)
@@ -31,16 +31,11 @@ def get_correct_stream_id(pcap_file):
             return streams[0]
             
     except FileNotFoundError:
-        # Fail gracefully if tshark isn't installed (though it should be on Parrot)
         pass
-    return "0" # Default fallback
+    return "0" 
 
 def main():
     bot = Coach("Packet Analyzer (tshark)")
-    
-    # 1. Analyze the PCAP before starting to find the dynamic Stream ID
-    target_stream = get_correct_stream_id("traffic.pcap")
-    
     bot.start()
 
     try:
@@ -49,40 +44,56 @@ def main():
             instruction=(
                 "First, enter the challenge directory."
             ),
-            command_to_display="cd challenges/18_PCAP"
+            command_to_display="cd challenges/18_PcapSearch"
         )
         
-        # Sync directory
-        os.chdir(os.path.join(os.path.dirname(__file__))) 
+        # === SYNC DIRECTORY ===
+        target_dir = "challenges/18_PcapSearch"
+        if os.path.exists(target_dir):
+            os.chdir(target_dir)
+        # ======================
 
-        # STEP 2: Quick Scan (strings)
+        # Detect the stream ID dynamically (now with correct syntax)
+        target_stream = get_correct_stream_id("traffic.pcap")
+
+        # STEP 2: Discovery
         bot.teach_step(
             instruction=(
-                "We have a packet capture file: `traffic.pcap`.\n"
-                "Before using complex tools, let's try the 'quick and dirty' method.\n"
-                "Run `strings` on the pcap to see if the flag is in plain text."
+                "Let's see what we are dealing with."
+            ),
+            command_to_display="ls -l"
+        )
+
+        # STEP 3: The "Quick" Way (Strings)
+        bot.teach_step(
+            instruction=(
+                "We have `traffic.pcap`. Let's try the 'lazy' method first.\n"
+                "Run `strings` to pull all text out of the file."
             ),
             command_to_display="strings traffic.pcap | grep CCRI"
         )
 
-        # STEP 3: The Problem (Context)
+        # STEP 4: The Forensics Lesson (Syntax Fix)
         bot.teach_step(
             instruction=(
-                "You probably saw multiple flags or fragments.\n"
-                "`strings` shows the text, but it loses the **context** (who sent it, and what was the reply).\n"
-                "To see the full conversation, we need `tshark`.\n"
-                "First, let's find the **TCP Stream ID** of the packets containing 'CCRI'."
+                "**Analysis:** `strings` found the text, but stripped the context (IPs, Ports, Time).\n"
+                "We need `tshark` to find the **TCP Stream ID** so we can reconstruct the full conversation.\n\n"
+                "**Note on Syntax:** We use `'single quotes'` to wrap the command so the `\"double quotes\"` get passed to tshark correctly."
             ),
-            command_to_display="tshark -r traffic.pcap -Y \"frame contains CCRI\" -T fields -e tcp.stream"
+            # FIX: Using 'frame contains "CCRI"' to satisfy tshark syntax
+            command_to_display="tshark -r traffic.pcap -Y 'frame contains \"CCRI\"' -T fields -e tcp.stream"
         )
 
-        # STEP 4: Follow TCP Stream
-        # 
+        # STEP 5: Reconstruct the Stream
         bot.teach_loop(
             instruction=(
-                f"The previous command identified that Stream **{target_stream}** contains the flag.\n"
-                "Now we 'Follow the TCP Stream' to reconstruct the entire conversation (like reading a chat log).\n\n"
-                "Command syntax: `tshark -r [FILE] -q -z follow,tcp,ascii,[STREAM_ID]`"
+                f"The flag is inside Stream **{target_stream}**.\n"
+                "Now, let's 'Follow the Stream' to see the full conversation context.\n"
+                "This will show us the HTTP Headers (proving it was a web server).\n\n"
+                "Construct the command:\n"
+                "1. Read file: `-r traffic.pcap`\n"
+                "2. Quiet mode: `-q`\n"
+                "3. Follow Stream: `-z follow,tcp,ascii,[STREAM_ID]`"
             ),
             # Template showing the correct ID
             command_template=f"tshark -r traffic.pcap -q -z follow,tcp,ascii,{target_stream}",
@@ -90,8 +101,34 @@ def main():
             # Prefix for validation
             command_prefix="tshark -r traffic.pcap -q -z follow,tcp,ascii,",
             
-            # We explicitly check for the ID we found earlier
-            correct_password=target_stream 
+            # Regex ensures they use the correct stream ID
+            command_regex=rf"^tshark -r traffic\.pcap -q -z follow,tcp,ascii,{target_stream}$"
+        )
+
+        # STEP 6: Save Evidence
+        bot.teach_loop(
+            instruction=(
+                "Look at the output! You can see `HTTP/1.1 200 OK`.\n"
+                "This proves the flag came from a web server response.\n\n"
+                "Run the command again and save the full evidence to `flag.txt`."
+            ),
+            command_template=f"tshark -r traffic.pcap -q -z follow,tcp,ascii,{target_stream} > flag.txt",
+            
+            command_prefix="tshark",
+            
+            # Regex for the redirect
+            command_regex=rf"^tshark -r traffic\.pcap -q -z follow,tcp,ascii,{target_stream} > flag\.txt$",
+            
+            clean_files=["flag.txt"]
+        )
+
+        # STEP 7: Verify
+        bot.teach_step(
+            instruction=(
+                "Success! You reconstructed the packet stream and captured the forensic evidence.\n"
+                "Read 'flag.txt' to finish."
+            ),
+            command_to_display="cat flag.txt"
         )
 
         bot.finish()

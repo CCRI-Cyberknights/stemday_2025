@@ -12,7 +12,6 @@ def check_web_server():
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(1)
-        # Check port 5000 (main web challenges)
         result = sock.connect_ex(('127.0.0.1', 5000))
         sock.close()
         
@@ -24,8 +23,29 @@ def check_web_server():
     except Exception:
         pass
 
+def create_intel_file():
+    """Creates a dummy intel file so the user has something to 'discover'."""
+    filename = "active_portals.txt"
+    content = (
+        "--- INTERNAL NETWORK CONFIG ---\n"
+        "Active Portals:\n"
+        "- alpha\n"
+        "- beta\n"
+        "- gamma\n"
+        "- delta\n"
+        "- omega\n"
+    )
+    # Only create if it doesn't exist to avoid overwriting user changes
+    if not os.path.exists(filename):
+        with open(filename, "w") as f:
+            f.write(content)
+
+def cleanup_intel_file():
+    """Removes the intel file on exit to leave no trace (optional)."""
+    if os.path.exists("active_portals.txt"):
+        os.remove("active_portals.txt")
+
 def main():
-    # 1. Pre-flight Check
     check_web_server()
 
     bot = Coach("Source Code Hunter (curl)")
@@ -34,58 +54,94 @@ def main():
     try:
         # STEP 1: Navigation
         bot.teach_step(
-            instruction=(
-                "First, enter the challenge directory."
-            ),
+            instruction="First, enter the challenge directory.",
             command_to_display="cd challenges/14_InternalPortals"
         )
         
-        # Sync directory
-        os.chdir(os.path.join(os.path.dirname(__file__))) 
+        # === SYNC & SETUP ===
+        target_dir = "challenges/14_InternalPortals"
+        if os.path.exists(target_dir):
+            os.chdir(target_dir)
+        
+        # Create the file the user needs to "find"
+        create_intel_file()
+        # ====================
 
-        # STEP 2: The Concept
+        # STEP 2: Discovery (Recon)
         bot.teach_step(
             instruction=(
-                "We have 5 internal portals: `alpha`, `beta`, `gamma`, `delta`, and `omega`.\n"
-                "The flag is hidden in the HTML source code (the 'Body') of one of them.\n\n"
-                "To view the source code in the terminal, we use `curl` (without the -I flag).\n"
-                "Let's inspect the `alpha` portal first."
+                "We need to know what to attack.\n"
+                "List the files. You should see an intel file named `active_portals.txt`."
+            ),
+            command_to_display="ls -l"
+        )
+
+        # STEP 3: Read Intel
+        bot.teach_step(
+            instruction=(
+                "Read `active_portals.txt` to find the names of the internal portals."
+            ),
+            command_to_display="cat active_portals.txt"
+        )
+
+        # STEP 4: The Test (Curl one)
+        bot.teach_step(
+            instruction=(
+                "The file lists 5 portals: `alpha`, `beta`, `gamma`, `delta`, and `omega`.\n"
+                "To view their source code, we use `curl`.\n\n"
+                "Let's manually inspect the first one (`alpha`) to see what we are up against:"
             ),
             command_to_display="curl http://localhost:5000/internal/alpha"
         )
 
-        # STEP 3: The Result
+        # STEP 5: Automation (The Attack)
         bot.teach_step(
             instruction=(
-                "You see a bunch of HTML tags (`<html>`, `<div>`, etc).\n"
-                "Somewhere in that mess, or in one of the other 4 portals, is the flag.\n"
-                "Checking them one by one is slow. We need automation."
+                "That was a mess of HTML. The flag is hidden in one of those 5 portals.\n"
+                "Instead of typing 5 commands, we can pass a **list** to `curl` using curly braces `{}`.\n"
+                "We must use quotes `\"` to prevent the shell from breaking the list.\n\n"
+                "Run this to download all 5 portals at once:"
             ),
-            command_to_display="echo Understood"
+            command_to_display="curl \"http://localhost:5000/internal/{alpha,beta,gamma,delta,omega}\""
         )
 
-        # STEP 4: Advanced Brace Expansion
+        # STEP 6: Filter and Save
         bot.teach_loop(
             instruction=(
-                "Bash Brace Expansion isn't just for numbers.\n"
-                "We can provide a comma-separated list of words.\n"
-                "   `{alpha,beta,gamma,delta,omega}`\n\n"
-                "Construct a command to `curl` all 5 portals at once and pipe the output to `grep` to find 'CCRI'."
+                "We fetched them all! Now we filter the massive output:\n"
+                "1. Add `-s` (silent) to remove the progress bars.\n"
+                "2. Pipe to `grep` to find 'CCRI'.\n"
+                "3. **Save** the result to 'flag.txt'.\n\n"
+                "Construct the command:"
             ),
-            # Template showing the pattern
-            command_template="curl http://localhost:5000/internal/{alpha,beta,gamma,delta,omega} | grep CCRI",
+            # Template
+            command_template="curl -s \"http://localhost:5000/internal/{alpha,beta,gamma,delta,omega}\" | grep \"CCRI\" > flag.txt",
             
-            # Prefix for validation
-            command_prefix="curl http://localhost:5000/internal/{alpha,beta,gamma,delta,omega} | grep ",
+            # Prefix
+            command_prefix="curl -s ",
             
-            # The search term
-            correct_password="CCRI" 
+            # Regex to match the complex command
+            command_regex=r"^curl -s \"http://localhost:5000/internal/\{alpha,beta,gamma,delta,omega\}\" \| grep \"CCRI\" > flag\.txt$",
+            
+            clean_files=["flag.txt"]
+        )
+
+        # STEP 7: Verify
+        bot.teach_step(
+            instruction=(
+                "Success! You enumerated the targets, scanned them, and captured the flag.\n"
+                "Read 'flag.txt' to finish."
+            ),
+            command_to_display="cat flag.txt"
         )
 
         bot.finish()
 
     except KeyboardInterrupt:
         bot.finish()
+    finally:
+        # Optional: cleanup the file so the directory is clean for next time
+        cleanup_intel_file()
 
 if __name__ == "__main__":
     main()

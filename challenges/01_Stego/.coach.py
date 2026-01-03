@@ -20,15 +20,10 @@ def get_stego_password(filename="squirrel.jpg"):
         # Use strings to scan the binary for the hint text injected by the generator
         output = subprocess.check_output(["strings", filename], text=True)
         
-        # Pattern 1 (Guided): "Guided hint: steghide passphrase is 'password'."
-        match_guided = re.search(r"passphrase is '(.+?)'", output)
-        if match_guided: 
-            return match_guided.group(1)
-        
-        # Pattern 2 (Solo): "The key they whisper is "ckeepers"."
-        match_solo = re.search(r"whisper is \"(.+?)\"", output)
-        if match_solo: 
-            return match_solo.group(1)
+        # Look for the specific guided hint pattern
+        match = re.search(r"passphrase is '(.+?)'", output)
+        if match: 
+            return match.group(1)
 
     except Exception:
         pass
@@ -39,7 +34,6 @@ def main():
     bot = Coach("Steganography Decode")
 
     # 1. Determine the correct password before starting
-    # This prevents the coach from giving the wrong instruction in Solo mode
     real_pass = get_stego_password()
 
     bot.start()
@@ -55,12 +49,10 @@ def main():
         )
         
         # === CRITICAL: SYNC COACH DIRECTORY ===
-        # Now that the student has CD'd in the worker, we move the Coach there too.
-        # This allows Tab Completion to find 'squirrel.jpg' in the next steps.
         os.chdir(os.path.join(os.path.dirname(__file__))) 
         # ======================================
 
-        # STEP 2: Discovery
+        # STEP 2: Discovery (List Files)
         bot.teach_step(
             instruction=(
                 "Let's see what files are here using 'ls' (list segments) with '-l'."
@@ -68,12 +60,21 @@ def main():
             command_to_display="ls -l"
         )
 
-        # STEP 3: The Extraction
+        # STEP 3: Analysis (Finding the Password)
+        bot.teach_step(
+            instruction=(
+                "We see 'squirrel.jpg'. Before we can extract data, we need a password.\n"
+                "Attackers sometimes leave credentials in the file metadata.\n\n"
+                "Run 'strings' but use the pipe '|' and 'head' to see just the top lines."
+            ),
+            command_to_display="strings squirrel.jpg | head -n 15"
+        )
+
+        # STEP 4: The Extraction
         bot.teach_loop(
             instruction=(
-                "We see 'squirrel.jpg'. We need to extract the data using 'steghide'.\n"
-                f"We scanned the file metadata and found a hint that the password is: **{real_pass}**\n\n"
-                "Construct the command using that password."
+                "Review the output above. Did you see a line mention a **passphrase**?\n"
+                "Use that password to extract the hidden 'flag.txt' file."
             ),
             # Template showing where the password goes
             command_template=f"steghide extract -sf squirrel.jpg -xf flag.txt -p {real_pass}",
@@ -88,7 +89,7 @@ def main():
             clean_files=["flag.txt"] 
         )
 
-        # STEP 4: Verification
+        # STEP 5: Verification
         bot.teach_step(
             instruction=(
                 "Great! The tool extracted the secret message to 'flag.txt'.\n"

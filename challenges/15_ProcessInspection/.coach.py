@@ -19,46 +19,65 @@ def main():
             command_to_display="cd challenges/15_ProcessInspection"
         )
         
-        # Sync directory
-        os.chdir(os.path.join(os.path.dirname(__file__))) 
+        # === SYNC DIRECTORY ===
+        target_dir = "challenges/15_ProcessInspection"
+        if os.path.exists(target_dir):
+            os.chdir(target_dir)
+        elif os.path.basename(os.getcwd()) == "15_ProcessInspection":
+            pass
+        else:
+            bot.print_error(f"Could not find '{target_dir}'.")
+            return
+        # ======================
 
-        # STEP 2: The Context
+        # STEP 2: The Setup
         bot.teach_step(
             instruction=(
                 "We have a file named `ps_dump.txt`.\n"
-                "This is a snapshot of all running processes on a compromised system (captured using `ps aux`).\n"
-                "Sometimes, careless developers pass secrets as command-line arguments.\n\n"
-                "Let's peek at the file."
+                "This is a snapshot of all running processes (captured with `ps aux`).\n"
+                "Developers sometimes carelessly pass secrets as command-line arguments.\n\n"
+                "Let's check the size of the file to see what we are up against."
             ),
-            command_to_display="head -n 10 ps_dump.txt"
+            command_to_display="wc -l ps_dump.txt"
         )
 
-        # STEP 3: The Problem
-        # 
+        # STEP 3: The "Bad" Way (Information Overload)
         bot.teach_step(
             instruction=(
-                "You see columns for USER, PID, and COMMAND.\n"
-                "The COMMAND column shows exactly how the program was launched.\n"
-                "If we read the whole file, it would take forever."
+                "That is nearly 100 lines of processes!\n"
+                "Let's try to read it manually. Run `cat` to dump the file to the screen.\n"
+                "Try to spot the flag as it scrolls by (Good luck!)."
             ),
-            command_to_display="echo Understood"
+            command_to_display="cat ps_dump.txt"
         )
 
-        # STEP 4: The Solution
+        # STEP 4: The "Good" Way (The Filter)
         bot.teach_loop(
             instruction=(
-                "We are looking for a flag in the format `CCRI-AAAA-1111`.\n"
-                "We suspect it was passed in an argument like `--flag=CCRI...`.\n\n"
-                "Use `grep` to search `ps_dump.txt` for the text 'CCRI'."
+                "Okay, that was impossible. The text flew by too fast.\n"
+                "This is why we use `grep`.\n"
+                "It acts as a filter, discarding the noise and showing ONLY the lines matching our pattern.\n\n"
+                "Use `grep` to search for 'CCRI' and **save the output** to 'flag.txt'."
             ),
             # Template showing the search
-            command_template="grep \"CCRI\" ps_dump.txt",
+            command_template="grep \"CCRI\" ps_dump.txt > flag.txt",
             
             # Prefix for validation
             command_prefix="grep \"CCRI\" ps_dump.txt",
             
-            # Since the command itself is the answer, no extra password needed
-            correct_password="" 
+            # Strict Regex
+            command_regex=r"^grep \"CCRI\" ps_dump\.txt > flag\.txt$",
+            
+            clean_files=["flag.txt"]
+        )
+
+        # STEP 5: Verification
+        bot.teach_step(
+            instruction=(
+                "Success! `grep` reduced the noise down to just the lines we care about.\n"
+                "Read 'flag.txt' to finish."
+            ),
+            command_to_display="cat flag.txt"
         )
 
         bot.finish()

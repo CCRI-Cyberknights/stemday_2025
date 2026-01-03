@@ -40,18 +40,25 @@ def main():
             command_to_display="cat cipher.txt"
         )
 
-        # STEP 4: Explanation & Decoding
+        # STEP 4: Decoding and Saving
         # ROT13 is a shift of 13 places. We use 'tr' to swap the alphabet.
-        # A-M becomes N-Z, and N-Z becomes A-M (and same for lowercase).
+        # We also use '>' to save the output.
         bot.teach_step(
             instruction=(
                 "This is a ROT13 cipher (a Caesar cipher shifted by 13).\n"
                 "Since Linux doesn't have a 'rot13' command, we build one using 'tr' (translate).\n\n"
-                "We tell 'tr' to swap the first half of the alphabet with the second half:\n"
-                "   'A-Za-z'  (Input characters)\n"
-                "   'N-ZA-Mn-za-m' (Output mapping)"
+                "We will pipe the file into 'tr' to swap the letters, and redirect `>` the result to 'flag.txt'."
             ),
-            command_to_display="cat cipher.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'"
+            command_to_display="cat cipher.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m' > flag.txt"
+        )
+
+        # STEP 5: Verification
+        bot.teach_step(
+            instruction=(
+                "Perfect. The decrypted text is now safely stored in 'flag.txt'.\n"
+                "Read the file to get your flag."
+            ),
+            command_to_display="cat flag.txt"
         )
 
         bot.finish()

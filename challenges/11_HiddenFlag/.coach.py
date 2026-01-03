@@ -10,40 +10,71 @@ def main():
     bot.start()
 
     try:
+        # STEP 1: Navigation
         bot.teach_step(
             instruction="First, enter the challenge directory.",
             command_to_display="cd challenges/11_HiddenFlag"
         )
-        os.chdir(os.path.join(os.path.dirname(__file__))) 
+        
+        # === SYNC DIRECTORY ===
+        target_dir = "challenges/11_HiddenFlag"
+        if os.path.exists(target_dir):
+            os.chdir(target_dir)
+        # ======================
 
+        # STEP 2: Discovery (The Haystack)
         bot.teach_step(
-            instruction="Go inside the 'junk' directory.",
-            command_to_display="cd junk"
-        )
-        os.chdir(os.path.join(os.getcwd(), 'junk'))
-
-        bot.teach_step(
-            instruction="Use 'ls -R' to see the scale of the problem.",
+            instruction=(
+                "We have a directory called 'junk'.\n"
+                "Use `ls -R` (recursive list) to see what is inside it without entering yet."
+            ),
             command_to_display="ls -R"
         )
 
-        # STEP 4: GREP (Exact Match)
+        # STEP 3: Enter the Maze
+        bot.teach_step(
+            instruction=(
+                "That is a lot of files! It would take forever to check them manually.\n"
+                "Move inside the directory to start our search."
+            ),
+            command_to_display="cd junk"
+        )
+        if os.path.exists("junk"):
+            os.chdir("junk")
+
+        # STEP 4: GREP (Find the path)
         bot.teach_loop(
-            instruction="Use 'grep' with the '-r' (recursive) flag to search for 'CCRI'.",
+            instruction=(
+                "We need to find the file containing 'CCRI'.\n"
+                "Use `grep` with the `-r` (recursive) flag to search every file in this folder (`.`)."
+            ),
             command_template="grep -r \"CCRI\" .",
             command_prefix="grep -r ",
-            correct_password="\"CCRI\" ."
+            command_regex=r"^grep -r \"CCRI\" \.$"
         )
 
-        # STEP 5: CAT (Anchored Regex)
-        # We accept "cat ./path/to/file"
+        # STEP 5: CAT (Clearer Instruction)
         bot.teach_loop(
-            instruction="The grep command showed the file path. Use 'cat' to read it.",
-            command_template="cat ./path/to/hidden/file",
+            instruction=(
+                "Look at the output above. `grep` found a match and printed the file path (e.g., `./folder/.hidden_file`).\n\n"
+                "**Copy that path.**\n"
+                "Run `cat` on that path and save it to 'flag.txt'."
+            ),
+            # Clearer visual placeholder
+            command_template="cat [PATH_FROM_ABOVE] > flag.txt",
+            
             command_prefix="cat ",
-            # Regex: Start with cat, space, maybe dot-slash, then chars, dot, chars
-            # Example matches: "cat ./backup/.config" or "cat data/.hidden"
-            command_regex=r"^cat (\./)?[\w/]+\.[\w]+$" 
+            
+            # Regex accepts any valid path characters
+            command_regex=r"^cat [\w\-\./]+ > flag\.txt$",
+            
+            clean_files=["flag.txt"]
+        )
+        
+        # STEP 6: Verify
+        bot.teach_step(
+            instruction="Success! You isolated the flag file. Read 'flag.txt' to finish.",
+            command_to_display="cat flag.txt"
         )
 
         bot.finish()

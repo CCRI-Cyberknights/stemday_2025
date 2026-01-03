@@ -19,14 +19,22 @@ def main():
             command_to_display="cd challenges/08_FakeAuthLog"
         )
         
-        # Sync directory
-        os.chdir(os.path.join(os.path.dirname(__file__))) 
+        # === SYNC DIRECTORY ===
+        target_dir = "challenges/08_FakeAuthLog"
+        if os.path.exists(target_dir):
+            os.chdir(target_dir)
+        elif os.path.basename(os.getcwd()) == "08_FakeAuthLog":
+            pass
+        else:
+            bot.print_error(f"Could not find '{target_dir}'.")
+            return
+        # ======================
 
         # STEP 2: Discovery
         bot.teach_step(
             instruction=(
                 "We have a file named 'auth.log'.\n"
-                "This is a standard Linux log file that records login attempts (SSH, sudo, etc).\n"
+                "This is a standard Linux log file that records login attempts.\n"
                 "Check the file size with 'ls -lh' (human readable)."
             ),
             command_to_display="ls -lh"
@@ -41,34 +49,52 @@ def main():
             command_to_display="head -n 20 auth.log"
         )
 
-        # STEP 4: Searching (grep)
-        # The prompt says the flag format is CCRI-AAAA-1111.
-        # Instead of reading 1000 lines, we can just search for "CCRI".
-        bot.teach_step(
-            instruction=(
-                "We are looking for a hidden flag inside a PID (Process ID) field.\n"
-                "We know the flag starts with 'CCRI'.\n"
-                "Use 'grep' to search the file for that specific text."
-            ),
-            command_to_display="grep \"CCRI\" auth.log"
-        )
-
-        # STEP 5: Advanced Regex (Bonus Lesson)
-        # Explain that if we didn't know "CCRI", we could search for the pattern XXXX-XXXX-XXXX
-        # grep -E means "Extended Regex"
+        # STEP 4: Simple Searching + Saving
         bot.teach_loop(
             instruction=(
-                "Excellent. You found it.\n\n"
-                "**Bonus Lesson:** What if we didn't know it started with 'CCRI'?\n"
-                "We could search for the *pattern* (4 chars - 4 chars - 4 chars).\n"
-                "Linux uses 'grep -E' for patterns.\n"
-                "Try searching for the regex: '[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}'"
+                "We know the flag starts with 'CCRI'.\n"
+                "Instead of reading thousands of lines, use 'grep' to search for that specific text.\n"
+                "**Save the output** to 'flag.txt'."
             ),
-            command_template="grep -E \"[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}\" auth.log",
+            command_template="grep \"CCRI\" auth.log > flag.txt",
+            command_prefix="grep \"CCRI\" auth.log",
+            command_regex=r"^grep \"CCRI\" auth\.log > flag\.txt$",
+            clean_files=["flag.txt"]
+        )
+
+        # STEP 5: Verify Specific Flag
+        bot.teach_step(
+            instruction=(
+                "Success! You isolated the specific flag.\n"
+                "Read 'flag.txt' to confirm."
+            ),
+            command_to_display="cat flag.txt"
+        )
+
+        # STEP 6: Advanced Regex + Saving (New File)
+        bot.teach_loop(
+            instruction=(
+                "**Bonus Lesson:** If we didn't know the 'CCRI' prefix, we could search for the *pattern* (4 chars - 4 chars - 4 chars).\n"
+                "Linux uses `grep -E` for extended regex patterns.\n\n"
+                "Run this regex search and save the output to a **new file** called 'candidates.txt'."
+            ),
+            command_template="grep -E \"[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}\" auth.log > candidates.txt",
+            
             command_prefix="grep -E ",
-            correct_password="[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}\" auth.log" 
-            # Note: The 'correct_password' logic here is checking the suffix of the command 
-            # because we are using a loop. The input is "grep -E ...", we check the rest.
+            
+            # Use Regex to safely match the complex command string
+            command_regex=r"^grep -E \"\[A-Z0-9\]\{4\}-\[A-Z0-9\]\{4\}-\[A-Z0-9\]\{4\}\" auth\.log > candidates\.txt$",
+            
+            clean_files=["candidates.txt"]
+        )
+
+        # STEP 7: Verify Candidates
+        bot.teach_step(
+            instruction=(
+                "Read 'candidates.txt'.\n"
+                "You will see it captured the 'CCRI' flag PLUS other matching patterns (decoys)."
+            ),
+            command_to_display="cat candidates.txt"
         )
 
         bot.finish()

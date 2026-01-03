@@ -7,12 +7,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'
 from coach_core import Coach
 
 # === THE EPHEMERAL TOOL CODE ===
-# Heavily commented for educational transparency
 SOLVER_SCRIPT_CONTENT = r"""#!/usr/bin/env python3
 import sys
-
-# This script decrypts a Vigenere cipher.
-# Logic: (CipherChar - KeyChar) % 26 = PlainChar
 
 def decrypt(text, key):
     res = []
@@ -20,20 +16,11 @@ def decrypt(text, key):
     key = key.lower()
     for c in text:
         if c.isalpha():
-            # Determine ASCII base (65 for A, 97 for a)
             base = 65 if c.isupper() else 97
-            
-            # Get shift amount from key character (a=0, b=1, etc.)
             k = ord(key[key_idx % len(key)]) - 97
-            
-            # Reverse the shift
-            # (Current - Base - Shift) % 26 + Base
             res.append(chr((ord(c) - base - k) % 26 + base))
-            
-            # Move to next letter of the key
             key_idx += 1
         else:
-            # Keep punctuation/spaces as is
             res.append(c)
     return "".join(res)
 
@@ -42,44 +29,34 @@ if len(sys.argv) < 2:
     sys.exit(1)
 
 try:
-    # 1. Read Encrypted Data
     with open("cipher.txt", "r") as f:
         data = f.read().strip()
     
-    # 2. Run Decryption
     key = sys.argv[1]
     result = decrypt(data, key)
     
-    print(f"Decrypting with key '{key}'...\n")
+    # Just print the result to stdout
     print(result)
-    
-    # 3. Save Output
-    with open("decoded_output.txt", "w") as f:
-        f.write(result)
         
 except Exception as e:
     print(f"Error: {e}")
 """
 
-def create_solver_tool():
-    """Writes the temporary solver script to the current folder."""
-    tool_path = os.path.join(os.path.dirname(__file__), ".solver.py")
-    with open(tool_path, "w") as f:
+def create_local_solver():
+    """Writes the solver to the CURRENT working directory."""
+    # DEBUG: Uncomment the next line if you need to verify where it is writing
+    # print(f"DEBUG: Writing .solver.py to {os.getcwd()}")
+    with open(".solver.py", "w") as f:
         f.write(SOLVER_SCRIPT_CONTENT)
-    return tool_path
 
-def cleanup_solver_tool():
-    """Removes the temporary solver script."""
-    tool_path = os.path.join(os.path.dirname(__file__), ".solver.py")
-    if os.path.exists(tool_path):
-        os.remove(tool_path)
+def cleanup_local_solver():
+    """Removes the solver from the CURRENT working directory."""
+    if os.path.exists(".solver.py"):
+        os.remove(".solver.py")
 
 def main():
     bot = Coach("Vigenère Cipher Breaker")
     bot.start()
-
-    # 1. Create the tool before we start teaching
-    create_solver_tool()
 
     try:
         # STEP 1: Navigation
@@ -91,8 +68,25 @@ def main():
             command_to_display="cd challenges/04_Vigenere"
         )
         
-        # SYNC DIRECTORY
-        os.chdir(os.path.join(os.path.dirname(__file__))) 
+        # === SYNC DIRECTORY ===
+        # We assume standard repo structure. 
+        # The user ran 'cd challenges/04_Vigenere', so we must follow.
+        target_dir = "challenges/04_Vigenere"
+        
+        # Check if we can find the directory relative to where the script started
+        if os.path.exists(target_dir):
+            os.chdir(target_dir)
+        elif os.path.basename(os.getcwd()) == "04_Vigenere":
+            # Just in case we are already there
+            pass
+        else:
+            # Fallback for complex relative paths (development environment)
+            bot.print_error(f"Could not find '{target_dir}' from '{os.getcwd()}'")
+            return
+
+        # === CREATE TOOL ===
+        create_local_solver()
+        # ===================
 
         # STEP 2: Discovery
         bot.teach_step(
@@ -109,44 +103,49 @@ def main():
             command_to_display="cat cipher.txt"
         )
 
-        # STEP 4: Code Transparency (NEW STEP)
+        # STEP 4: Code Transparency
         bot.teach_step(
             instruction=(
-                "We have a script called '.solver.py' to handle the decryption math.\n"
-                "Before we use it, look at the code.\n"
-                "Notice the math: `(ord(c) - base - k) % 26`. That reverses the shift!"
+                "We have a custom script '.solver.py'.\n"
+                "Use 'cat' to audit the code before running it.\n"
+                "Notice it prints the result but **does not save it**."
             ),
             command_to_display="cat .solver.py"
         )
 
-        # STEP 5: The Ephemeral Tool
-        # We guide them to use the tool we just silently created (.solver.py)
+        # STEP 5: The Ephemeral Tool + Redirection
         bot.teach_loop(
-            instruction="...",
-            command_template="python3 .solver.py [KEY]",
-            command_prefix="python3 .solver.py ",
-            # ANCHORED REGEX
-            command_regex=r"^python3 \.solver\.py (login)$", 
-            clean_files=["decoded_output.txt"]
+            instruction=(
+                "We found a sticky note on the monitor with the word: **login**\n"
+                "That must be the key!\n\n"
+                "Run the solver with that key, and redirect `>` the output to 'flag.txt'."
+            ),
+            command_template="python3 .solver.py login > flag.txt",
+            
+            # === FIX: Added the mandatory command_prefix ===
+            command_prefix="python3 .solver.py",
+            
+            # We strictly enforce the full command via regex
+            command_regex=r"^python3 \.solver\.py login > flag\.txt$",
+            
+            clean_files=["flag.txt"]
         )
 
         # STEP 6: Verification
         bot.teach_step(
             instruction=(
-                "Success! The tool found the flag and saved it to 'decoded_output.txt'.\n"
-                "Let's display that file to finish."
+                "Success! The tool decrypted the data and you safely stored it.\n"
+                "Read 'flag.txt' to finish."
             ),
-            command_to_display="cat decoded_output.txt"
+            command_to_display="cat flag.txt"
         )
 
-        # Cleanup happens in finally block
         bot.finish()
 
     except KeyboardInterrupt:
         bot.finish()
     finally:
-        # Ensure we delete the temporary tool even if they crash/exit
-        cleanup_solver_tool()
+        cleanup_local_solver()
 
 if __name__ == "__main__":
     main()

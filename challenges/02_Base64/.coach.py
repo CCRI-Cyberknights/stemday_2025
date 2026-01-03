@@ -22,7 +22,6 @@ def main():
         )
 
         # === SYNC DIRECTORY FOR TAB COMPLETION ===
-        # Moves the coach process into the folder so "enc[TAB]" works
         os.chdir(os.path.join(os.path.dirname(__file__))) 
 
         # STEP 2: Discovery
@@ -45,17 +44,23 @@ def main():
             command_to_display="cat encoded.txt"
         )
 
-        # STEP 4: Decoding
+        # STEP 4: Decoding and Saving
         bot.teach_step(
             instruction=(
-                "That content definitely looks like Base64.\n"
-                "We can use the Linux 'base64' tool to reverse it.\n\n"
-                "🔍 Command breakdown:\n"
-                "   base64       → The decoding tool\n"
-                "   -d           → The 'decode' flag (converts text back to data)\n"
-                "   encoded.txt  → The file we are processing"
+                "That definitely looks like Base64. Let's decode it.\n"
+                "⚠️ **Important:** We will save the output to a file so we don't lose it.\n\n"
+                "Use the greater-than symbol `>` to redirect the output into 'flag.txt'."
             ),
-            command_to_display="base64 -d encoded.txt"
+            command_to_display="base64 -d encoded.txt > flag.txt"
+        )
+
+        # STEP 5: Verification
+        bot.teach_step(
+            instruction=(
+                "Success! The output was saved to 'flag.txt' instead of printing to the screen.\n"
+                "Now, safely read your flag using 'cat'."
+            ),
+            command_to_display="cat flag.txt"
         )
 
         bot.finish()

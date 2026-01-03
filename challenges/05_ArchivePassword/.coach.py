@@ -2,19 +2,17 @@
 import sys
 import os
 import subprocess
+import time
 
 # Add root to path to find coach_core
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 from coach_core import Coach
 
 # === THE EPHEMERAL TOOL CODE ===
-# Heavily commented for educational transparency
 CRACKER_SCRIPT_CONTENT = r"""#!/usr/bin/env python3
 import sys
 import subprocess
-
-# This script performs a "Dictionary Attack".
-# It reads a list of passwords and tries them one by one against the ZIP file.
+import time
 
 if len(sys.argv) < 3:
     print("Usage: python3 .cracker.py [ZIP_FILE] [WORDLIST]")
@@ -23,8 +21,10 @@ if len(sys.argv) < 3:
 zip_file = sys.argv[1]
 wordlist = sys.argv[2]
 
-print(f"🔨 Starting dictionary attack on {zip_file}...")
-print(f"📖 Using wordlist: {wordlist}")
+print(f"Target:   {zip_file}")
+print(f"Wordlist: {wordlist}")
+print("-" * 40)
+print("Starting Brute Force Attack...")
 print("-" * 40)
 
 try:
@@ -35,12 +35,11 @@ try:
             if not password: continue
             
             count += 1
-            if count % 50 == 0:
-                print(f"\rTrying password #{count}...", end="")
+            # VISUAL: Overwrite the line (\r) to show rapid-fire testing
+            print(f"\r[Attempt #{count}] Testing: {password:<20}", end="")
+            sys.stdout.flush()
+            time.sleep(0.01) 
 
-            # === THE CORE ATTACK ===
-            # We run the Linux 'unzip' command in "test mode" (-t).
-            # If the exit code is 0, the password was correct.
             res = subprocess.call(
                 ["unzip", "-P", password, "-tq", zip_file],
                 stdout=subprocess.DEVNULL,
@@ -48,7 +47,9 @@ try:
             )
             
             if res == 0:
-                print(f"\n\n✅ Password found: {password}")
+                print(f"\n\n{'='*40}")
+                print(f"✅ PASSWORD CRACKED: {password}")
+                print(f"{'='*40}")
                 sys.exit(0)
 
     print("\n❌ Password not found in wordlist.")
@@ -59,32 +60,32 @@ except FileNotFoundError:
     sys.exit(1)
 """
 
-def create_tool():
-    """Writes the temporary cracker script."""
-    tool_path = os.path.join(os.path.dirname(__file__), ".cracker.py")
-    with open(tool_path, "w") as f:
+def create_local_cracker():
+    """Writes the cracker script to the CURRENT working directory."""
+    with open(".cracker.py", "w") as f:
         f.write(CRACKER_SCRIPT_CONTENT)
-    return tool_path
 
-def cleanup_tool():
-    """Removes the temporary cracker script."""
-    tool_path = os.path.join(os.path.dirname(__file__), ".cracker.py")
-    if os.path.exists(tool_path):
-        os.remove(tool_path)
+def cleanup_local_cracker():
+    """Removes the cracker script from the CURRENT working directory."""
+    if os.path.exists(".cracker.py"):
+        os.remove(".cracker.py")
 
 def determine_correct_password():
     """
-    Runs the cracking logic internally ONCE so the Coach knows the answer.
-    This ensures the script works even if you change the secret.zip password later.
+    Runs a quick check in the CURRENT directory to find the real password.
     """
-    base_dir = os.path.dirname(__file__)
-    zip_file = os.path.join(base_dir, "secret.zip")
-    wordlist = os.path.join(base_dir, "wordlist.txt")
+    zip_file = "secret.zip"
+    wordlist = "wordlist.txt"
+
+    if not os.path.exists(zip_file) or not os.path.exists(wordlist):
+        return "unknown"
 
     try:
         with open(wordlist, "r", errors="ignore") as f:
             for line in f:
                 password = line.strip()
+                if not password: continue
+                
                 res = subprocess.call(
                     ["unzip", "-P", password, "-tq", zip_file],
                     stdout=subprocess.DEVNULL, 
@@ -98,12 +99,7 @@ def determine_correct_password():
 
 def main():
     bot = Coach("Archive Password Cracker")
-    
-    # 1. Pre-flight: Determine the password so we can validate user input later
-    real_password = determine_correct_password()
-    
     bot.start()
-    create_tool()
 
     try:
         # STEP 1: Navigation
@@ -115,8 +111,19 @@ def main():
             command_to_display="cd challenges/05_ArchivePassword"
         )
         
-        # SYNC DIRECTORY
-        os.chdir(os.path.join(os.path.dirname(__file__))) 
+        # === SYNC DIRECTORY & CREATE TOOL ===
+        target_dir = "challenges/05_ArchivePassword"
+        if os.path.exists(target_dir):
+            os.chdir(target_dir)
+        elif os.path.basename(os.getcwd()) == "05_ArchivePassword":
+            pass
+        else:
+            bot.print_error(f"Could not find '{target_dir}'.")
+            return
+
+        create_local_cracker()
+        real_password = determine_correct_password()
+        # ====================================
 
         # STEP 2: Discovery
         bot.teach_step(
@@ -126,7 +133,7 @@ def main():
             command_to_display="ls -l"
         )
 
-        # STEP 3: Code Transparency (NEW STEP)
+        # STEP 3: Code Transparency
         bot.teach_step(
             instruction=(
                 "We have a tool called '.cracker.py'.\n"
@@ -139,48 +146,51 @@ def main():
         # STEP 4: The Ephemeral Tool (Cracking)
         bot.teach_step(
             instruction=(
-                "Now that you see how it works, let's run the dictionary attack.\n"
-                "We give it the target (secret.zip) and the wordlist."
+                "Now, launch the attack.\n"
+                "**Watch the screen**: You will see it trying passwords one by one until it breaks the lock."
             ),
             command_to_display="python3 .cracker.py secret.zip wordlist.txt"
         )
 
         # STEP 5: Manual Extraction
+        # FIXED: Removed 'correct_password' and added 'command_regex' to handle the full string
         bot.teach_loop(
             instruction=(
-                "The tool found the password!\n"
-                "Now we need to extract the files manually using 'unzip'.\n"
-                "We use the '-P' flag to provide the password we just found."
+                f"It worked! The password is **{real_password}**.\n"
+                "Now extract the files manually using the '-P' flag."
             ),
-            # Template
-            command_template="unzip -P [PASSWORD] secret.zip",
+            command_template=f"unzip -P {real_password} secret.zip",
             
-            # Prefix
-            command_prefix="unzip -P ",
+            # The prefix is still required by the Coach logic, but it won't be used for slicing
+            command_prefix="unzip -P",
             
-            # Validation (using the password we discovered at startup)
-            correct_password=real_password,
+            # Strict regex validation for "unzip -P [pass] secret.zip"
+            command_regex=fr"^unzip -P {real_password} secret\.zip$",
             
-            # Clean up previous extractions so unzip doesn't prompt for overwrite
             clean_files=["message_encoded.txt"]
         )
 
         # STEP 6: Inspect the contents
         bot.teach_step(
-            instruction=(
-                "The zip contained a file called 'message_encoded.txt'.\n"
-                "Let's look at it using 'cat'."
-            ),
+            instruction="The zip contained 'message_encoded.txt'. Read it.",
             command_to_display="cat message_encoded.txt"
         )
 
-        # STEP 7: Final Decode
-        bot.teach_step(
+        # STEP 7: Final Decode and Save
+        bot.teach_loop(
             instruction=(
-                "That looks like Base64 again (random characters ending in '=').\n"
-                "Decode it to reveal the flag!"
+                "Decode the Base64 message and **save the output** to 'flag.txt'."
             ),
-            command_to_display="base64 -d message_encoded.txt"
+            command_template="base64 -d message_encoded.txt > flag.txt",
+            command_prefix="base64 -d",
+            command_regex=r"^base64 -d message_encoded\.txt > flag\.txt$",
+            clean_files=["flag.txt"]
+        )
+
+        # STEP 8: Verification
+        bot.teach_step(
+            instruction="Success! Read 'flag.txt' to finish.",
+            command_to_display="cat flag.txt"
         )
 
         bot.finish()
@@ -188,7 +198,7 @@ def main():
     except KeyboardInterrupt:
         bot.finish()
     finally:
-        cleanup_tool()
+        cleanup_local_cracker()
 
 if __name__ == "__main__":
     main()

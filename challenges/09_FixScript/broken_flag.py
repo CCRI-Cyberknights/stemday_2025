@@ -7,6 +7,6 @@ part1 = 2142
 part2 = 2946
 
 # MATH ERROR!
-code = part1 + part2  # <- fixed math
+code = part1 / part2  
 
 print(f"Your flag is: CCRI-SCRP-{int(code)}")

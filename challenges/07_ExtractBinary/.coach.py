@@ -19,8 +19,16 @@ def main():
             command_to_display="cd challenges/07_ExtractBinary"
         )
         
-        # Sync directory
-        os.chdir(os.path.join(os.path.dirname(__file__))) 
+        # === SYNC DIRECTORY ===
+        target_dir = "challenges/07_ExtractBinary"
+        if os.path.exists(target_dir):
+            os.chdir(target_dir)
+        elif os.path.basename(os.getcwd()) == "07_ExtractBinary":
+            pass
+        else:
+            bot.print_error(f"Could not find '{target_dir}'.")
+            return
+        # ======================
 
         # STEP 2: Discovery
         bot.teach_step(
@@ -35,7 +43,7 @@ def main():
         bot.teach_step(
             instruction=(
                 "Try to read the binary file using 'cat'.\n"
-                "You will see a mess of random characters and noise. This is compiled code, not text."
+                "**Warning:** You will see a mess of random characters and noise because this is compiled code, not text."
             ),
             command_to_display="cat hidden_flag"
         )
@@ -43,24 +51,40 @@ def main():
         # STEP 4: The Solution (Strings)
         bot.teach_step(
             instruction=(
-                "That was messy.\n"
+                "That was messy. (You might need to type 'reset' if your terminal looks weird afterwards, but usually it's fine).\n\n"
                 "To extract human-readable text from a binary, we use the 'strings' command.\n"
-                "Let's dump all the strings found in the file."
+                "Run it now to see everything hidden inside."
             ),
             command_to_display="strings hidden_flag"
         )
 
-        # STEP 5: Filtering with Grep
+        # STEP 5: Filtering and Saving
         bot.teach_loop(
             instruction=(
-                "That's a lot of output!\n"
-                "We can use the pipe operator '|' to send that output into 'grep' to search for the flag.\n"
-                "We know the flag contains 'CCRI'.\n\n"
-                "Combine 'strings' and 'grep' to find it!"
+                "That scroll was too fast!\n"
+                "We can combine tools to pinpoint the flag:\n"
+                "1. `strings` extracts the text.\n"
+                "2. `grep` filters for 'CCRI'.\n"
+                "3. `>` saves it to 'flag.txt'.\n\n"
+                "Construct the command:"
             ),
-            command_template="strings hidden_flag | grep [SEARCH_TERM]",
+            command_template="strings hidden_flag | grep CCRI > flag.txt",
+            
             command_prefix="strings hidden_flag | grep ",
-            correct_password="CCRI"
+            
+            # Enforce the full pipeline structure
+            command_regex=r"^strings hidden_flag \| grep CCRI > flag\.txt$",
+            
+            clean_files=["flag.txt"]
+        )
+
+        # STEP 6: Verification
+        bot.teach_step(
+            instruction=(
+                "Success! You extracted the hidden data and saved it.\n"
+                "Read 'flag.txt' to finish."
+            ),
+            command_to_display="cat flag.txt"
         )
 
         bot.finish()

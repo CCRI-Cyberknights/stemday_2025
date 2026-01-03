@@ -7,40 +7,84 @@ import re
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 from coach_core import Coach
 
-def identify_bug(filepath):
+def get_script_data(filename):
     """
-    Reads the file to find the broken line and the operator used.
-    Returns the operator symbol (e.g., '*', '-', '/')
+    Reads the file to extract part1, part2, and the current broken symbol.
+    Returns: (part1, part2, bug_symbol) or (None, None, None) if failed.
     """
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    filepath = os.path.join(base_dir, filename)
+    
     try:
         with open(filepath, "r") as f:
             content = f.read()
         
-        # Regex looks for: code = part1 [OPERATOR] part2
-        # It captures whatever symbol is in the middle group
-        match = re.search(r"code\s*=\s*part1\s*([\+\-\*\/])\s*part2", content)
-        if match:
-            return match.group(1)
-    except:
+        p1 = re.search(r"part1\s*=\s*(\d+)", content)
+        p2 = re.search(r"part2\s*=\s*(\d+)", content)
+        bug = re.search(r"code\s*=\s*part1\s*([\+\-\*\/])\s*part2", content)
+        
+        if p1 and p2 and bug:
+            return int(p1.group(1)), int(p2.group(1)), bug.group(1)
+            
+    except Exception:
         pass
-    return "*" # Default fallback if we can't read it
+    return None, None, "*"
+
+def generate_math_table(p1, p2):
+    """
+    Generates a text table showing the result of all 4 operators.
+    Returns the string table and the correct symbol.
+    """
+    if p1 is None or p2 is None:
+        return "Could not read data.", "+"
+
+    rows = []
+    correct_symbol = "+" # default
+    
+    # Header
+    table =  "\n   Operator | Calculation       | Result      | Status\n"
+    table += "   ---------|-------------------|-------------|-----------\n"
+    
+    for symbol, name in [("+", "Add"), ("-", "Sub"), ("*", "Mult"), ("/", "Div")]:
+        try:
+            val = eval(f"{p1} {symbol} {p2}")
+            
+            # Formatting checks
+            is_valid = False
+            if isinstance(val, int):
+                val_str = f"{val}"
+            elif val.is_integer():
+                val = int(val)
+                val_str = f"{val}"
+            else:
+                val_str = f"{val:.2f}"
+            
+            # Logic check (Must be 4-digit integer)
+            if 1000 <= val <= 9999 and val == int(val):
+                status = "✅ VALID (Target)"
+                correct_symbol = symbol
+            else:
+                status = "❌ Invalid"
+                
+            table += f"      {symbol}     | {p1} {symbol} {p2:<6} | {val_str:<11} | {status}\n"
+            
+        except ZeroDivisionError:
+             table += f"      {symbol}     | {p1} {symbol} {p2:<6} | ERROR       | ❌ Invalid\n"
+
+    return table, correct_symbol
 
 def main():
     bot = Coach("Python Debugging")
-    bot.start()
-
-    # 1. Analyze the file BEFORE we start teaching
-    # This makes the script "smart" enough to handle the randomized generator
-    bug_symbol = identify_bug("broken_flag.py")
     
-    # Map symbols to human-readable names for the dialogue
-    symbol_names = {
-        "*": "asterisk (multiplication)",
-        "-": "minus sign (subtraction)",
-        "/": "slash (division)",
-        "+": "plus sign"
-    }
-    bug_name = symbol_names.get(bug_symbol, "operator")
+    # 1. Analyze the file JIT
+    p1, p2, bug_symbol = get_script_data("broken_flag.py")
+    math_table, correct_symbol = generate_math_table(p1, p2)
+    
+    # Determine human-readable name for the correct symbol
+    symbol_map = {"+": "Plus (+)", "-": "Minus (-)", "*": "Multiply (*)", "/": "Divide (/)"}
+    correct_name = symbol_map.get(correct_symbol, "Operator")
+
+    bot.start()
 
     try:
         # STEP 1: Navigation
@@ -49,8 +93,11 @@ def main():
             command_to_display="cd challenges/09_FixScript"
         )
         
-        # Sync directory
-        os.chdir(os.path.join(os.path.dirname(__file__))) 
+        # === SYNC DIRECTORY ===
+        target_dir = "challenges/09_FixScript"
+        if os.path.exists(target_dir):
+            os.chdir(target_dir)
+        # ======================
 
         # STEP 2: Discovery
         bot.teach_step(
@@ -58,34 +105,58 @@ def main():
             command_to_display="ls -l"
         )
 
-        # STEP 3: Run the broken code
+        # STEP 3: Read Source Code
         bot.teach_step(
             instruction=(
-                "Run the script to see the error.\n"
-                "The numbers will look wrong because the math is incorrect."
+                "**Before we run it, we must read it.**\n"
+                "Look for the variables `part1`, `part2`, and the math error."
+            ),
+            command_to_display="cat broken_flag.py"
+        )
+
+        # STEP 4: Run the broken code
+        bot.teach_step(
+            instruction=(
+                "Now run the script to see the error in action.\n"
+                "The output is scrambled because the operator is wrong."
             ),
             command_to_display="python3 broken_flag.py"
         )
 
-        # STEP 4: Editing (Dynamic Instruction)
-        # We inject the actual symbol found into the instructions
+        # STEP 5: The Debug Analysis & Editing
         bot.teach_step(
             instruction=(
-                f"The script is currently using a **{bug_name}** (`{bug_symbol}`), which is incorrect.\n"
-                "We need to change it to a **plus sign** (`+`) to make the math work.\n\n"
+                f"From `cat`, we saw the code uses `{bug_symbol}`.\n"
+                f"We extracted the values: `part1={p1}`, `part2={p2}`.\n\n"
+                "**Let's calculate all possibilities:**\n"
+                f"{math_table}\n"
+                f"The table proves the correct operator is **{correct_name}**.\n\n"
                 "👉 **Task:**\n"
-                "   1. `nano broken_flag.py`\n"
-                f"   2. Find the line: `code = part1 {bug_symbol} part2`\n"
-                f"   3. Change `{bug_symbol}` to `+`\n"
-                "   4. Save (Ctrl+O) and Exit (Ctrl+X)."
+                "   1. Run `nano broken_flag.py`.\n"
+                "   2. **Click the terminal** to ensure it is focused.\n"
+                f"   3. Use **Arrow Keys** to move to `{bug_symbol}`.\n"
+                f"   4. Delete it and type `{correct_symbol}`.\n"
+                "   5. **Exit & Save:** Press `Ctrl+X`.\n"
+                "   6. **Confirm:** Type `Y` -> `Enter`."
             ),
             command_to_display="nano broken_flag.py"
         )
 
-        # STEP 5: Verify
+        # STEP 6: Verify and Save
+        bot.teach_loop(
+            instruction=(
+                "Now that the logic is fixed, run the script and **save the output** to 'flag.txt'."
+            ),
+            command_template="python3 broken_flag.py > flag.txt",
+            command_prefix="python3 broken_flag.py",
+            command_regex=r"^python3 broken_flag\.py > flag\.txt$",
+            clean_files=["flag.txt"]
+        )
+
+        # STEP 7: Final Confirm
         bot.teach_step(
-            instruction="Now run the fixed script to get the flag!",
-            command_to_display="python3 broken_flag.py"
+            instruction="Success! Read 'flag.txt' to see the corrected flag.",
+            command_to_display="cat flag.txt"
         )
 
         bot.finish()

@@ -176,3 +176,8 @@
 
 !challenges_solo/18_PcapSearch/README.md
 !challenges_solo/18_PcapSearch/traffic.pcap
+
+# 8. Final Overrides (Ensures these are ALWAYS ignored)
+# This overrides the whitelists above (like junk/**)
+flag.txt
+**/flag.txt

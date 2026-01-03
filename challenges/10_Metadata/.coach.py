@@ -19,15 +19,23 @@ def main():
             command_to_display="cd challenges/10_Metadata"
         )
         
-        # Sync directory
-        os.chdir(os.path.join(os.path.dirname(__file__))) 
+        # === SYNC DIRECTORY ===
+        target_dir = "challenges/10_Metadata"
+        if os.path.exists(target_dir):
+            os.chdir(target_dir)
+        elif os.path.basename(os.getcwd()) == "10_Metadata":
+            pass
+        else:
+            bot.print_error(f"Could not find '{target_dir}'.")
+            return
+        # ======================
 
         # STEP 2: Discovery
         bot.teach_step(
             instruction=(
                 "We have an image file: 'capybara.jpg'.\n"
-                "Images often contain hidden 'metadata' (EXIF data) like camera model, location, or comments.\n"
-                "List the files to confirm it's there."
+                "Images often contain hidden 'metadata' (EXIF data) like camera model, GPS, or comments.\n"
+                "List the files to confirm it is there."
             ),
             command_to_display="ls -l"
         )
@@ -35,29 +43,41 @@ def main():
         # STEP 3: Inspection
         bot.teach_step(
             instruction=(
-                "To see this hidden data, we use a tool called 'exiftool'.\n"
+                "To see this hidden data, we use a tool called `exiftool`.\n"
                 "Run it against the image to dump all available metadata."
             ),
             command_to_display="exiftool capybara.jpg"
         )
 
-        # STEP 4: Filtering
+        # STEP 4: Filtering & Saving
         bot.teach_loop(
             instruction=(
-                "That was a lot of data!\n"
-                "We are looking for a hidden flag, which likely contains the text 'CCRI'.\n"
-                "Instead of scrolling, let's use the pipe `|` and `grep` to filter the output."
+                "That was a lot of scrolling!\n"
+                "We know the flag contains 'CCRI'. Instead of scrolling manually:\n"
+                "1. Use `| grep` to filter for 'CCRI'.\n"
+                "2. Use `>` to save the result to 'flag.txt'.\n\n"
+                "Construct the command:"
             ),
             # Template showing the pattern
-            command_template="exiftool capybara.jpg | grep [KEYWORD]",
+            command_template="exiftool capybara.jpg | grep \"CCRI\" > flag.txt",
             
-            # Prefix for validation
+            # Prefix for visual hint
             command_prefix="exiftool capybara.jpg | grep ",
             
-            # We accept "CCRI" or "Artist" or "Comment" as valid search terms for this lesson
-            # But the 'correct_password' logic in the core expects a single match.
-            # We will force them to search for the flag prefix "CCRI" to win.
-            correct_password="CCRI"
+            # Strict validation regex
+            # Matches: exiftool capybara.jpg | grep "CCRI" > flag.txt
+            command_regex=r"^exiftool capybara\.jpg \| grep \"CCRI\" > flag\.txt$",
+            
+            clean_files=["flag.txt"]
+        )
+
+        # STEP 5: Verification
+        bot.teach_step(
+            instruction=(
+                "Success! You extracted the hidden metadata and saved it.\n"
+                "Read 'flag.txt' to finish."
+            ),
+            command_to_display="cat flag.txt"
         )
 
         bot.finish()
