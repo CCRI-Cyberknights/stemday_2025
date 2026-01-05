@@ -28,6 +28,7 @@ include = [
     "Launch_CCRI_CTF_HUB.desktop",
     ".ccri_ctf_root",
     "LICENSE",
+    "reset_environment.py",
 ]
 
 def ensure_owner_perms(path: Path, uid: int, gid: int):

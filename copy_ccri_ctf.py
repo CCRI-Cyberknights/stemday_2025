@@ -51,6 +51,7 @@ include = [
     "coach_core.py",       # ⬅️ NEW: Coach Mode Backend
     "worker_node.py",      # ⬅️ NEW: Coach Mode Worker
     "exploration_core.py",
+    "reset_environment.py",
 ]
 
 def copy_and_fix(src: Path, dst: Path, uid: int, gid: int):
