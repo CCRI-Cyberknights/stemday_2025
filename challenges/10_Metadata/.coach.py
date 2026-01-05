@@ -23,11 +23,6 @@ def main():
         target_dir = "challenges/10_Metadata"
         if os.path.exists(target_dir):
             os.chdir(target_dir)
-        elif os.path.basename(os.getcwd()) == "10_Metadata":
-            pass
-        else:
-            bot.print_error(f"Could not find '{target_dir}'.")
-            return
         # ======================
 
         # STEP 2: Discovery

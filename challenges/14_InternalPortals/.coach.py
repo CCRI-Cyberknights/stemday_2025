@@ -16,9 +16,9 @@ def check_web_server():
         sock.close()
         
         if result != 0:
-            print("\n\033[91m❌ ERROR: The Web Server is not running!\033[0m")
+            print("\n❌ ERROR: The Web Server is not running!")
             print("This challenge requires the background web services.")
-            print("👉 Please open a new terminal tab and run: \033[1;93mpython3 start_web_hub.py\033[0m\n")
+            print("👉 Please open a new terminal tab and run: python3 start_web_hub.py\n")
             sys.exit(1)
     except Exception:
         pass
@@ -41,14 +41,21 @@ def create_intel_file():
             f.write(content)
 
 def cleanup_intel_file():
-    """Removes the intel file on exit to leave no trace (optional)."""
+    """Removes the intel file on exit to leave no trace."""
     if os.path.exists("active_portals.txt"):
         os.remove("active_portals.txt")
+    if os.path.exists("flag.txt"):
+        os.remove("flag.txt")
 
 def main():
     check_web_server()
 
     bot = Coach("Source Code Hunter (curl)")
+    
+    # Ensure fresh state
+    cleanup_intel_file()
+    create_intel_file()
+    
     bot.start()
 
     try:
@@ -58,14 +65,11 @@ def main():
             command_to_display="cd challenges/14_InternalPortals"
         )
         
-        # === SYNC & SETUP ===
+        # === SYNC DIRECTORY ===
         target_dir = "challenges/14_InternalPortals"
         if os.path.exists(target_dir):
             os.chdir(target_dir)
-        
-        # Create the file the user needs to "find"
-        create_intel_file()
-        # ====================
+        # ======================
 
         # STEP 2: Discovery (Recon)
         bot.teach_step(
@@ -94,12 +98,12 @@ def main():
             command_to_display="curl http://localhost:5000/internal/alpha"
         )
 
-        # STEP 5: Automation (The Attack)
+        # STEP 5: Automation (Brace Expansion)
         bot.teach_step(
             instruction=(
                 "That was a mess of HTML. The flag is hidden in one of those 5 portals.\n"
-                "Instead of typing 5 commands, we can pass a **list** to `curl` using curly braces `{}`.\n"
-                "We must use quotes `\"` to prevent the shell from breaking the list.\n\n"
+                "Instead of typing 5 commands, we can use **Brace Expansion** `{}`.\n"
+                "This tells the shell (and curl) to generate multiple URLs.\n\n"
                 "Run this to download all 5 portals at once:"
             ),
             command_to_display="curl \"http://localhost:5000/internal/{alpha,beta,gamma,delta,omega}\""
@@ -109,18 +113,19 @@ def main():
         bot.teach_loop(
             instruction=(
                 "We fetched them all! Now we filter the massive output:\n"
-                "1. Add `-s` (silent) to remove the progress bars.\n"
+                "1. Add `-s` (silent) to clean up the output.\n"
                 "2. Pipe to `grep` to find 'CCRI'.\n"
                 "3. **Save** the result to 'flag.txt'.\n\n"
                 "Construct the command:"
             ),
-            # Template
+            # Template showing the logic
             command_template="curl -s \"http://localhost:5000/internal/{alpha,beta,gamma,delta,omega}\" | grep \"CCRI\" > flag.txt",
             
-            # Prefix
+            # Prefix for visual hint
             command_prefix="curl -s ",
             
-            # Regex to match the complex command
+            # Regex to match the brace expansion command
+            # Note: We escape the braces \{ \} for regex
             command_regex=r"^curl -s \"http://localhost:5000/internal/\{alpha,beta,gamma,delta,omega\}\" \| grep \"CCRI\" > flag\.txt$",
             
             clean_files=["flag.txt"]
@@ -140,7 +145,6 @@ def main():
     except KeyboardInterrupt:
         bot.finish()
     finally:
-        # Optional: cleanup the file so the directory is clean for next time
         cleanup_intel_file()
 
 if __name__ == "__main__":

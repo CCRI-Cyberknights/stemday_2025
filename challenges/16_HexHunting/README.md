@@ -1,15 +1,17 @@
 # 🧠 Hex Flag Hunter
 
+**Mission Briefing:**
 Hackers left behind a suspicious binary file: `hex_flag.bin`.
 It is too small to be a real program, but it contains hidden data.
 
-**The Concept:**
-Files are just sequences of bytes. Tools like **Hex Editors** allow you to see the raw data (hexadecimal) alongside its ASCII representation. Even inside compiled code, text strings are often visible.
+## 🧠 Intelligence Report
+* **The Concept:** Files are just sequences of bytes. Even inside compiled code ("binary noise"), text strings are often stored in plain text.
+* **The Strategy:** **Static Analysis**. Instead of running the file (which might be dangerous), we will inspect its raw data.
+* **The Tools:**
+    * `xxd` – A Hex Dumper that shows the raw data layout.
+    * `strings` – A utility that extracts readable text sequences from binary files.
 
-**Your Mission:** Analyze the binary.
-1.  Use tools like `strings` to perform a quick scan for readable text.
-2.  Use `xxd` or a hex editor to inspect the raw data layout.
-3.  Find the flag embedded among the binary noise.
+**Your Goal:** Scan the binary, sift through the noise, and find the flag embedded inside.
 
 ## 📂 Files in this folder
 * `hex_flag.bin` – The suspicious binary file.

@@ -1,15 +1,16 @@
 # 🦈 PCAP Packet Analysis
 
+**Mission Briefing:**
 You have intercepted a network file: `traffic.pcap`.
-This file contains a recording of data packets transmitted across the network.
+This file contains a recording of data packets transmitted across the network during a suspicious event.
 
-**The Concept:**
-Network traffic is sent in "packets." Forensics analysts use tools like **Wireshark** or **TShark** to capture and replay these packets to find stolen credentials or secrets.
+## 🧠 Intelligence Report
+* **The Concept:** Network traffic is broken into small chunks called "packets." Forensics analysts capture these to replay conversations later.
+* **The Lock:** The data is mixed with thousands of other packets.
+* **The Strategy:** **Stream Reconstruction**. Instead of looking at individual packets, we want to reassemble the "TCP Stream" to read the full conversation as if we were there.
+* **The Tool:** `tshark` (Terminal Wireshark) is the command-line version of the world's most popular packet analyzer.
 
-**Your Mission:** Analyze the capture.
-1.  Use packet analysis tools to read the `pcap` file.
-2.  Reconstruct the "TCP Streams" to read the full conversations between computers.
-3.  Find the flag hidden in the transmission data.
+**Your Goal:** Read the capture file, identify the stream containing the flag, and reconstruct the conversation.
 
 ## 📂 Files in this folder
 * `traffic.pcap` – The captured network traffic file.

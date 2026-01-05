@@ -12,15 +12,18 @@ def get_script_data(filename):
     Reads the file to extract part1, part2, and the current broken symbol.
     Returns: (part1, part2, bug_symbol) or (None, None, None) if failed.
     """
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    filepath = os.path.join(base_dir, filename)
+    # Look for file in current directory
+    filepath = filename 
     
     try:
         with open(filepath, "r") as f:
             content = f.read()
         
+        # Regex to find: part1 = 123
         p1 = re.search(r"part1\s*=\s*(\d+)", content)
+        # Regex to find: part2 = 456
         p2 = re.search(r"part2\s*=\s*(\d+)", content)
+        # Regex to find: code = part1 [OPERATOR] part2
         bug = re.search(r"code\s*=\s*part1\s*([\+\-\*\/])\s*part2", content)
         
         if p1 and p2 and bug:
@@ -28,7 +31,7 @@ def get_script_data(filename):
             
     except Exception:
         pass
-    return None, None, "*"
+    return None, None, "?"
 
 def generate_math_table(p1, p2):
     """
@@ -38,7 +41,6 @@ def generate_math_table(p1, p2):
     if p1 is None or p2 is None:
         return "Could not read data.", "+"
 
-    rows = []
     correct_symbol = "+" # default
     
     # Header
@@ -50,7 +52,6 @@ def generate_math_table(p1, p2):
             val = eval(f"{p1} {symbol} {p2}")
             
             # Formatting checks
-            is_valid = False
             if isinstance(val, int):
                 val_str = f"{val}"
             elif val.is_integer():
@@ -59,7 +60,7 @@ def generate_math_table(p1, p2):
             else:
                 val_str = f"{val:.2f}"
             
-            # Logic check (Must be 4-digit integer)
+            # Logic check: Valid flags use a 4-digit integer code (1000-9999)
             if 1000 <= val <= 9999 and val == int(val):
                 status = "✅ VALID (Target)"
                 correct_symbol = symbol
@@ -76,13 +77,36 @@ def generate_math_table(p1, p2):
 def main():
     bot = Coach("Python Debugging")
     
-    # 1. Analyze the file JIT
-    p1, p2, bug_symbol = get_script_data("broken_flag.py")
-    math_table, correct_symbol = generate_math_table(p1, p2)
-    
-    # Determine human-readable name for the correct symbol
-    symbol_map = {"+": "Plus (+)", "-": "Minus (-)", "*": "Multiply (*)", "/": "Divide (/)"}
-    correct_name = symbol_map.get(correct_symbol, "Operator")
+    # 1. Analyze the file JIT (Just In Time)
+    # We do this before starting the bot so we have the 'Intel' ready
+    try:
+        if os.path.exists("challenges/09_FixScript/broken_flag.py"):
+             target_path = "challenges/09_FixScript/broken_flag.py"
+        elif os.path.exists("broken_flag.py"):
+             target_path = "broken_flag.py"
+        else:
+             target_path = None
+
+        if target_path:
+            p1, p2, bug_symbol = get_script_data(target_path)
+            math_table, correct_symbol = generate_math_table(p1, p2)
+            
+            # Determine human-readable name for the correct symbol
+            symbol_map = {"+": "Plus (+)", "-": "Minus (-)", "*": "Multiply (*)", "/": "Divide (/)"}
+            correct_name = symbol_map.get(correct_symbol, "Operator")
+        else:
+            # Fallback if file is missing (prevents crash)
+            p1, p2, bug_symbol = 0, 0, "?"
+            math_table = "File not found."
+            correct_symbol = "+"
+            correct_name = "Plus"
+
+    except Exception:
+        # Fallback for safety
+        p1, p2, bug_symbol = 0, 0, "?"
+        math_table = "Error analyzing file."
+        correct_symbol = "+"
+        correct_name = "Plus"
 
     bot.start()
 
@@ -109,7 +133,8 @@ def main():
         bot.teach_step(
             instruction=(
                 "**Before we run it, we must read it.**\n"
-                "Look for the variables `part1`, `part2`, and the math error."
+                "Use `cat` to see the code.\n"
+                "Look for the variables `part1`, `part2`, and the math equation."
             ),
             command_to_display="cat broken_flag.py"
         )
@@ -117,8 +142,8 @@ def main():
         # STEP 4: Run the broken code
         bot.teach_step(
             instruction=(
-                "Now run the script to see the error in action.\n"
-                "The output is scrambled because the operator is wrong."
+                "Now run the script to see the bug in action.\n"
+                "The output is likely scrambled or wrong because the operator is incorrect."
             ),
             command_to_display="python3 broken_flag.py"
         )
@@ -126,18 +151,18 @@ def main():
         # STEP 5: The Debug Analysis & Editing
         bot.teach_step(
             instruction=(
-                f"From `cat`, we saw the code uses `{bug_symbol}`.\n"
-                f"We extracted the values: `part1={p1}`, `part2={p2}`.\n\n"
-                "**Let's calculate all possibilities:**\n"
+                f"**Analysis:**\n"
+                f"The code uses the operator `{bug_symbol}`.\n"
+                f"The variables are: `part1={p1}`, `part2={p2}`.\n\n"
+                "**Let's calculate all possibilities to find the 4-digit code:**\n"
                 f"{math_table}\n"
                 f"The table proves the correct operator is **{correct_name}**.\n\n"
                 "👉 **Task:**\n"
                 "   1. Run `nano broken_flag.py`.\n"
-                "   2. **Click the terminal** to ensure it is focused.\n"
-                f"   3. Use **Arrow Keys** to move to `{bug_symbol}`.\n"
+                "   2. **Click the terminal** to focus.\n"
+                f"   3. Use **Arrow Keys** to find `{bug_symbol}`.\n"
                 f"   4. Delete it and type `{correct_symbol}`.\n"
-                "   5. **Exit & Save:** Press `Ctrl+X`.\n"
-                "   6. **Confirm:** Type `Y` -> `Enter`."
+                "   5. **Save & Exit:** `Ctrl+X`, then `Y`, then `Enter`."
             ),
             command_to_display="nano broken_flag.py"
         )

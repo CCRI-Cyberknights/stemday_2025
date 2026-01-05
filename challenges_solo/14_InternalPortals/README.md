@@ -1,56 +1,49 @@
-# 🌐 Challenge 14: Internal Portals
+# 🌐 Challenge 14: Internal Portal Audit
 
-CryptKeepers' internal infrastructure spans multiple virtual portals, each hosting seemingly mundane content. But one of them is hiding an authentic agency flag — buried deep within the document structure.
+**Mission Briefing:**
+The CryptKeepers network relies on multiple internal portals for administration. You have identified a list of **five active web pages**.
+Visually, they appear to be standard maintenance pages. However, intelligence suggests that one of them contains a hidden flag hardcoded into the HTML source, invisible to the naked eye.
 
----
+## 🧠 Intelligence Report
+* **The Concept:** **Source Inspection**. Web browsers "render" code, turning raw HTML tags into the visual page you see. Developers often hide secrets, comments, or disabled elements (`<input type="hidden">`) in the raw code that never appear on the main screen. 
+* **The Strategy:** We must bypass the visual rendering and inspect the raw code sent by the server.
+* **The Tool:** `curl` is perfect for this. Unlike a browser, it prints the raw HTML directly to the terminal.
 
-## 🧩 Your Objective
+## 📝 Investigator’s Journal
+*Notes from the field:*
 
-Access the internal sites and determine which one conceals the real flag.
+> "I checked these pages in a browser, and they looked clean. But that's the trap—what you see isn't always what you get.
+>
+> Developers are lazy. They hide system IDs and debug flags in HTML comments or hidden div tags. If you just look at the screen, you'll miss it. You need to view the Page Source.
+>
+> Use `curl` to grab the raw code. If you see `display: none` or ``, that's where they're hiding the good stuff."
 
-Only **one** portal contains a valid flag. All others include decoy flags or no flags at all.
-
-You must inspect the **DOM (Document Object Model)** or **Page Source** for each site. Look for hidden elements or debug-style data that doesn't appear on the rendered page.
-
-Remember:
-**The real flag is hidden from plain sight.**
-It may be tucked inside hidden tags, metadata blocks, or developer-only spans that are not visible during normal browsing.
+## 🌐 Target Portals
+The intercepted services are running locally on your machine:
+* `http://localhost:5000/internal/alpha`
+* `http://localhost:5000/internal/beta`
+* `http://localhost:5000/internal/gamma`
+* `http://localhost:5000/internal/delta`
+* `http://localhost:5000/internal/omega`
 
 ---
 
 ## 🛠 Tools & Techniques
 
-| Tool / Method                        | What It Helps You Do                              |
-| ------------------------------------ | ------------------------------------------------- |
-| **Ctrl+U** (in browser)              | View Page Source — reveals hidden tags            |
-| **F12** or **Inspect Element** | Open DevTools to explore the DOM tree             |
-| `curl <URL> | grep "CCRI-"`         | Search the source code via command line           |
-| **Ctrl+F** → search `CCRI`           | Quickly locate embedded data in the source        |
+You have two ways to inspect the source. The terminal method is faster for checking multiple pages.
 
-> 💡 **Tip:** Just because the page looks empty doesn't mean it is. 
-> Developers often hide "debug info" or "system IDs" in tags with `display: none` or hidden attributes.
+| Method | Tool | Usage Example |
+| :--- | :--- | :--- |
+| **Command Line** | **curl** | `curl http://localhost:5000/internal/alpha` |
+| **Browser** | **View Source** | Right-click the page -> **View Page Source** (or Ctrl+U). |
+| **Search** | **grep** | `curl -s http://localhost:5000/internal/alpha \| grep "CCRI-"` |
 
----
-
-## 📂 Portals to Inspect
-
-When the local web server is running, you can access the portals at these local URLs:
-
-* **Alpha Portal**: `http://localhost:5000/internal/alpha`
-* **Beta Portal**: `http://localhost:5000/internal/beta`
-* **Gamma Portal**: `http://localhost:5000/internal/gamma`
-* **Delta Portal**: `http://localhost:5000/internal/delta`
-* **Omega Portal**: `http://localhost:5000/internal/omega`
-
-Only one contains the genuine flag. The rest are red herrings designed to waste your time.
+> 💡 **Tip:** If you are using the command line, you can check all of them quickly by using **Brace Expansion**:
+> `curl http://localhost:5000/internal/{alpha,beta,gamma,delta,omega}`
 
 ---
 
 ## 🏁 Flag Format
-
-All flags follow the official format:
-
 **`CCRI-AAAA-1111`**
 
-Replace `AAAA` and the digits with the correct values you uncover.
-Then enter the flag into the verification website.
+Retrieve the source code and find the hidden tag.

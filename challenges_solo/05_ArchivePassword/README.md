@@ -1,79 +1,43 @@
-# 🔓 Challenge 05: ZIP File Crack & Decode
+# 🔓 Challenge 05: ZIP File Crack
 
-Password-protected ZIP files can be brute-forced if you know — or can guess — the possible passwords.
-Weak passwords, reused passwords, or predictable wordlists make cracking only a matter of time and technique.
+**Mission Briefing:**
+You have recovered a mysterious ZIP archive (`secret.zip`) from a CryptKeepers exfiltration attempt. It is locked with a password.
+However, during the data recovery, we also found a text file (`wordlist.txt`) containing thousands of potential passwords used by the agent.
 
-A password-locked ZIP archive was intercepted during a CryptKeepers exfiltration attempt.
-You’ve also recovered a list of likely passwords the agent tends to use.
-
-Inside the archive is a scrambled message encoded in Base64.
-
----
-
-## 🧩 Objective
-
-Crack the ZIP, decode the message, and uncover the real flag.
-
-### Your Tasks
-
-1. Analyze the files:
-
-   * `secret.zip` — the encrypted archive
-   * `wordlist.txt` — the list of potential passwords
-
-2. Brute-force the ZIP file using the provided wordlist.
-
-3. Once the archive opens, extract `message_encoded.txt`.
-
-4. Decode its Base64 content.
-
-5. Inspect the decoded output and locate the **one valid flag** among possible decoys.
-
-Unlocking the ZIP is only **phase one** — the message inside must be decoded before the flag becomes readable.
-
----
+## 🧠 Intelligence Report
+* **The Lock:** Standard ZIP encryption.
+* **The Strategy:** **Dictionary Attack**. Instead of guessing random characters, we will automate the process of trying every single word in the provided list until one works. 
+* **The Twist:** Unlocking the ZIP is only Phase 1. Inside, you will find a scrambled text file that requires further decoding (Base64).
 
 ## 📝 Investigator’s Journal
+*Notes from the field:*
 
-They always use the same weak password list — lazy OPSEC at its finest.
-If you’ve found the wordlist, you’re already halfway in.
+> "Lazy OPSEC at its finest. They always reuse the same weak passwords from this specific list.
+>
+> You don't need to be a genius to break this; you just need to be persistent. If you have `wordlist.txt`, you already have the key—you just need a tool to find which specific line opens the lock. Once you're inside, don't celebrate yet. The payload is likely encoded again."
 
-This challenge is all about exploiting predictable password habits and peeling back layers of obfuscation.
-Work through the outer shell before digging into the core.
+## 📂 Files in This Folder
+* `secret.zip` — The password-protected archive.
+* `wordlist.txt` — A list of common passwords to attempt.
 
 ---
 
 ## 🛠 Tools & Techniques
 
-Use the following tools throughout the cracking and decoding phases:
+While you *could* try passwords manually, automation is the key here.
 
-| Phase             | Tool                   | Use Case / Command Example                              |
-| ----------------- | ---------------------- | ------------------------------------------------------- |
-| **ZIP Cracking**  | `fcrackzip`            | `fcrackzip -u -D -p wordlist.txt secret.zip`            |
-|                   | `unzip`                | Test passwords manually: `unzip -P guess -t secret.zip` |
-|                   | `python`               | Write a script to loop through password candidates      |
-| **Base64 Decode** | `base64`               | `base64 --decode message_encoded.txt`                   |
-|                   | `python3`              | Use `base64.b64decode()`                                |
-| **Advanced**      | `zip2john` + `hashcat` | Convert ZIP to hash format, crack via GPU acceleration  |
+| Tool | Purpose | Usage Example |
+| :--- | :--- | :--- |
+| **fcrackzip** | A fast ZIP password cracker. The `-D` flag tells it to use a dictionary (wordlist). | `fcrackzip -u -D -p wordlist.txt secret.zip` |
+| **John the Ripper** | Advanced cracking tool. Requires converting the zip to a hash first. | `zip2john secret.zip > hash.txt` then `john hash.txt` |
+| **Bash / Python** | You can script a loop to try passwords using the standard `unzip` command. | *Scripting required (for loops)* |
+| **Base64** | Once the zip is open, use this to decode the inner message. | `base64 -d message.txt` |
 
-> 💡 **Note:**
-> Automated tools can sometimes corrupt a ZIP file if misused.
-> Validate each attempt cleanly — especially when using scripts.
-
----
-
-## 📂 Files in This Folder
-
-* `secret.zip` — The password-protected archive
-* `wordlist.txt` — The password list used for cracking
+> 💡 **Tip:** If you are using `fcrackzip`, the `-u` flag is important—it verifies the password actually works by trying to unzip the file. Without it, the tool might give false positives.
 
 ---
 
 ## 🏁 Flag Format
-
-All flags follow the official format:
-
 **`CCRI-AAAA-1111`**
 
-Replace `AAAA` and the digits with the correct values you uncover.
-Then enter the flag into the website to verify your answer.
+Crack the zip, extract the file, decode the message, and find the flag.

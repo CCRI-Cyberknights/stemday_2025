@@ -1,64 +1,45 @@
-# 📷 Challenge 12: QR Code Decode
+# 📷 Challenge 12: QR Code Puzzle
 
+**Mission Briefing:**
 Agents intercepted a packet of digital images passed between suspected operatives.
-Each one is a QR code — a potential clue… or a distraction.
+Each file contains a QR code. While they look identical to the naked eye, they contain vastly different data.
+Our intelligence suggests that four of them are decoys containing junk data or fake flags, while only one contains the valid agency flag.
 
-Only **one** hides a valid knight’s flag.
-The rest? Pure misdirection.
+## 🧠 Intelligence Report
+* **The Concept:** **QR Codes** (Quick Response) are 2D barcodes that encode text, URLs, or data into a grid of black and white squares. 
+* **The Strategy:** **Bulk Scanning**. You *could* scan each one with your smartphone, but that is slow and inefficient. A true analyst uses command-line tools to scan all of them instantly.
+* **The Trap:** Watch out for fake flags like `QR-HINT-1234` or `SCAN-CODE-####`.
 
----
+## 📝 Investigator’s Journal
+*Notes from the field:*
 
-## 🧩 Your Objective
-
-Search through **five suspicious QR codes** and uncover which one contains the real flag.
-
-Fake flags may look convincing but will use the wrong prefix, wrong order, or an invalid structure such as:
-
-* `QR-HINT-1234`
-* `CCRI-1111-FAKE`
-* `SCAN-CODE-####`
-
-Don’t fall for imitations.
-
-### What to Do
-
-1. Examine all five QR codes using the tools of your choice.
-2. Decode the embedded text from each image.
-3. Compare the outputs — some will be fake.
-4. Only one decoded result follows the correct flag format.
-
----
-
-## 🛠 Suggested Tools
-
-Choose whichever approach fits your investigative style:
-
-| Tool / Command     | Purpose                                                   |
-| ------------------ | --------------------------------------------------------- |
-| `zbarimg qr_*.png` | Scan and decode QR images from the command line (fastest) |
-| `feh` or `eog`     | Visually inspect the QR codes                             |
-| Smartphone camera  | Scan QR codes directly from the VM screen                 |
-| `cat *.txt`        | View decoded text if your tools write output to files     |
-
-> 💡 **Hint:** Each QR code is a PNG image. You’ll need to decode the contents to reveal any embedded text.
-
----
+> "I managed to grab five images (`qr_01.png` to `qr_05.png`).
+>
+> Searching them one by one is tedious. I recommend using `zbarimg`. It allows you to scan image files directly from the terminal without needing a camera. If you use a wildcard (`*`), you can dump the data from all five images in a single command. The real flag will stand out immediately."
 
 ## 📂 Files in This Folder
+* `qr_01.png` through `qr_05.png` – The suspicious QR code images.
 
-* `qr_01.png`
-* `qr_02.png`
-* `qr_03.png`
-* `qr_04.png`
-* `qr_05.png`
+---
+
+## 🛠 Tools & Techniques
+
+While you can use a phone, we encourage learning the terminal method.
+
+| Tool | Purpose | Usage Example |
+| :--- | :--- | :--- |
+| **zbarimg** | Scans image files for barcodes/QR codes and prints the decoded text. | `zbarimg qr_01.png` |
+| **Wildcard (*)** | A shell feature that lets you select multiple files at once. | `zbarimg qr_*.png` |
+| **Smartphone** | The manual fallback. | *Point camera at screen* |
+
+> 💡 **Tip:** The `zbarimg` tool outputs the type of code found (e.g., `QR-Code:`) followed by the data.
+>
+> Example output:
+> `QR-Code:This is the hidden message`
 
 ---
 
 ## 🏁 Flag Format
-
-All flags follow the official format:
-
 **`CCRI-AAAA-1111`**
 
-Replace `AAAA` and the numbers with the correct values you uncover.
-Then enter the flag into the website to verify your answer.
+Scan the codes, filter the results, and identify the valid flag.

@@ -1,63 +1,42 @@
 # 🖼️ Challenge 10: Metadata Mystery
 
-You’ve recovered a suspicious image file: `capybara.jpg`.
-At first glance it seems harmless — just a goofy capybara.
-But appearances can be deceiving.
+**Mission Briefing:**
+You have recovered a suspicious image file (`capybara.jpg`) from a server used by the **CryptKeepers**.
+At first glance, it seems harmless—just a goofy animal photo.
+However, investigators believe a CryptKeeper operative embedded a flag inside the image’s **metadata** to pass it to a handler without raising suspicion.
 
-Investigators believe someone embedded a flag inside the image’s metadata, where it won’t show up just by opening the file.
+## 🧠 Intelligence Report
+* **The Concept:** **Metadata** is "data about data." For images, this includes camera settings, GPS coordinates, authors, and comments. 
+* **The Lock:** The information isn't in the pixels; it's in the file header. Opening the image in a viewer won't reveal it.
+* **The Warning:** This file contains **four fake flags** and only **one real flag**. The enemy knows we are watching and planted decoys.
 
----
+## 📝 Investigator’s Journal
+*Notes from the field:*
 
-## 🧠 What Is Metadata?
+> "These guys love hiding stuff in the `Comment` or `Author` tags. I've seen them use `exiftool` to inject fake flags into standard fields like 'Camera Model' just to waste our time.
+>
+> You need to dump *all* the metadata and sift through it. The real flag will follow the strict agency format (`CCRI-AAAA-1111`). If a flag looks weird or has the wrong format, it's bait."
 
-Metadata is *“data about data.”*
-In images, metadata can include:
-
-* Camera model and lens
-* Author and comments
-* Creation date and GPS location
-* …and sometimes, secrets.
-
-Cybercriminals often hide sensitive or incriminating details in these fields, knowing they’re rarely checked by casual viewers. Sometimes the most revealing information isn’t in the image — it’s in the silence between pixels.
+## 📂 Files in This Folder
+* `capybara.jpg` — The image hiding the data.
 
 ---
 
 ## 🛠 Tools & Techniques
 
-| Tool       | Purpose                                    |
-| ---------- | ------------------------------------------ |
-| `exiftool` | Inspect or edit metadata from media files  |
-| `strings`  | Search for readable text in any file       |
-| `identify` | Show basic image info (ImageMagick suite)  |
-| `grep`     | Filter specific fields from metadata dumps |
+We need a tool that looks *at* the file properties, not *inside* the image.
 
-Some metadata fields are rarely used — and perfect for hiding things.
+| Tool | Purpose | Usage Example |
+| :--- | :--- | :--- |
+| **exiftool** | The industry standard for reading/writing metadata. | `exiftool capybara.jpg` |
+| **identify** | Part of ImageMagick; shows basic details. | `identify -verbose capybara.jpg` |
+| **grep** | Use this to filter the output for the flag format. | `exiftool capybara.jpg \| grep "CCRI"` |
 
----
-
-## 📝 Your Objectives
-
-1. Use `exiftool` (or a similar tool) to examine the metadata in `capybara.jpg`.
-2. Look for anything resembling a flag — but be cautious!
-3. This image contains **four fake flags** and **one real flag**.
-4. Only the correct flag follows the agency’s format *and* feels authentic.
-
-> ⚠️ **Remember:**
-> Just because something *looks* like a flag doesn’t mean it’s real. Metadata lies.
-
----
-
-## 📂 Files in This Folder
-
-* `capybara.jpg` — Image file hiding something important.
+> 💡 **Tip:** Some metadata fields are obscure. Don't just look at the top few lines; scroll through the entire output.
 
 ---
 
 ## 🏁 Flag Format
-
-All flags follow this format:
-
 **`CCRI-AAAA-1111`**
 
-Replace `AAAA` and the digits with the correct values you uncover.
-Then input the flag into the website to verify the answer.
+Extract the metadata, ignore the decoys, and find the true flag.

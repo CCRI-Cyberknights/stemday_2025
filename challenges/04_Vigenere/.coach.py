@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 import sys
 import os
+import time
 
 # Add root to path to find coach_core
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 from coach_core import Coach
 
 # === THE EPHEMERAL TOOL CODE ===
+TOOL_NAME = "decoder.py"
 SOLVER_SCRIPT_CONTENT = r"""#!/usr/bin/env python3
 import sys
 
@@ -24,37 +26,41 @@ def decrypt(text, key):
             res.append(c)
     return "".join(res)
 
-if len(sys.argv) < 2:
-    print("Usage: python3 .solver.py [KEY]")
+if len(sys.argv) < 3:
+    print("Usage: python3 decoder.py <file> <key>")
     sys.exit(1)
 
 try:
-    with open("cipher.txt", "r") as f:
+    with open(sys.argv[1], 'r') as f:
         data = f.read().strip()
     
-    key = sys.argv[1]
-    result = decrypt(data, key)
-    
-    # Just print the result to stdout
-    print(result)
-        
+    key = sys.argv[2]
+    print(decrypt(data, key))
 except Exception as e:
     print(f"Error: {e}")
 """
 
-def create_local_solver():
+def create_tool():
     """Writes the solver to the CURRENT working directory."""
-    # DEBUG: Uncomment the next line if you need to verify where it is writing
-    # print(f"DEBUG: Writing .solver.py to {os.getcwd()}")
-    with open(".solver.py", "w") as f:
+    with open(TOOL_NAME, "w") as f:
         f.write(SOLVER_SCRIPT_CONTENT)
+    # Make it executable for good measure
+    os.chmod(TOOL_NAME, 0o755)
 
-def cleanup_local_solver():
-    """Removes the solver from the CURRENT working directory."""
-    if os.path.exists(".solver.py"):
-        os.remove(".solver.py")
+def cleanup_tool():
+    """Removes the solver to keep the directory clean."""
+    if os.path.exists(TOOL_NAME):
+        os.remove(TOOL_NAME)
+    if os.path.exists("flag.txt"):
+        try:
+            os.remove("flag.txt")
+        except:
+            pass
 
 def main():
+    # Ensure clean state
+    cleanup_tool()
+    
     bot = Coach("Vigenère Cipher Breaker")
     bot.start()
 
@@ -62,31 +68,16 @@ def main():
         # STEP 1: Navigation
         bot.teach_step(
             instruction=(
-                "First, move into the challenge directory.\n"
-                "We are looking for 'cipher.txt'."
+                "First, move into the challenge directory."
             ),
             command_to_display="cd challenges/04_Vigenere"
         )
         
         # === SYNC DIRECTORY ===
-        # We assume standard repo structure. 
-        # The user ran 'cd challenges/04_Vigenere', so we must follow.
         target_dir = "challenges/04_Vigenere"
-        
-        # Check if we can find the directory relative to where the script started
         if os.path.exists(target_dir):
             os.chdir(target_dir)
-        elif os.path.basename(os.getcwd()) == "04_Vigenere":
-            # Just in case we are already there
-            pass
-        else:
-            # Fallback for complex relative paths (development environment)
-            bot.print_error(f"Could not find '{target_dir}' from '{os.getcwd()}'")
-            return
-
-        # === CREATE TOOL ===
-        create_local_solver()
-        # ===================
+        # ======================
 
         # STEP 2: Discovery
         bot.teach_step(
@@ -98,43 +89,58 @@ def main():
         bot.teach_step(
             instruction=(
                 "Read the encrypted file.\n"
-                "It looks like random letters, but the pattern suggests a Vigenère cipher."
+                "It looks like random letters. The README says this is Vigenère."
             ),
             command_to_display="cat cipher.txt"
         )
 
-        # STEP 4: Code Transparency
+        # STEP 4: Tool Provisioning
+        # The Coach explicitly provides the tool here, filling the gap in the generic README.
+        print("\n[Coach] 🛠️  The README notes that you need a tool for this.")
+        print("[Coach] 📡  I am generating a Python script named 'decoder.py' for you now...")
+        create_tool()
+        time.sleep(1)
+        
         bot.teach_step(
             instruction=(
-                "We have a custom script '.solver.py'.\n"
-                "Use 'cat' to audit the code before running it.\n"
-                "Notice it prints the result but **does not save it**."
+                "I have created `decoder.py`.\n"
+                "Verify it is now in your directory."
             ),
-            command_to_display="cat .solver.py"
+            command_to_display="ls -l"
         )
 
-        # STEP 5: The Ephemeral Tool + Redirection
+        # STEP 5: Intel Analysis (Key Deduction)
+        bot.teach_step(
+            instruction=(
+                "Vigenère requires a **Key**.\n"
+                "The **Mission Brief** asks: *'What is the opposite of logout?'*\n"
+                "The answer is **login**. That is our key.\n\n"
+                "Acknowledge this intel."
+            ),
+            command_to_display="echo \"Key is login\""
+        )
+
+        # STEP 6: Execution
         bot.teach_loop(
             instruction=(
-                "We found a sticky note on the monitor with the word: **login**\n"
-                "That must be the key!\n\n"
-                "Run the solver with that key, and redirect `>` the output to 'flag.txt'."
+                "Now, run the decoder using the key we found.\n"
+                "Redirect `>` the output to `flag.txt`.\n\n"
+                "Syntax: `python3 decoder.py cipher.txt [KEY] > flag.txt`"
             ),
-            command_template="python3 .solver.py login > flag.txt",
+            # Template showing the args
+            command_template="python3 decoder.py cipher.txt login > flag.txt",
             
-            # === FIX: Added the mandatory command_prefix ===
-            command_prefix="python3 .solver.py",
-            
-            # We strictly enforce the full command via regex
-            command_regex=r"^python3 \.solver\.py login > flag\.txt$",
+            # Validation
+            command_prefix="python3 decoder.py",
+            command_regex=r"^python3 decoder\.py cipher\.txt login > flag\.txt$",
             
             clean_files=["flag.txt"]
         )
 
-        # STEP 6: Verification
+        # STEP 7: Verification
         bot.teach_step(
             instruction=(
-                "Success! The tool decrypted the data and you safely stored it.\n"
+                "Success! The tool decrypted the data.\n"
                 "Read 'flag.txt' to finish."
             ),
             command_to_display="cat flag.txt"
@@ -145,7 +151,9 @@ def main():
     except KeyboardInterrupt:
         bot.finish()
     finally:
-        cleanup_local_solver()
+        # Cleanup acts as a "Secure Deletion" simulation
+        if os.path.exists(TOOL_NAME):
+            os.remove(TOOL_NAME)
 
 if __name__ == "__main__":
     main()

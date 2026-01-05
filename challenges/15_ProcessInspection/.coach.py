@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'
 from coach_core import Coach
 
 def main():
-    bot = Coach("Process Hunter (ps & grep)")
+    bot = Coach("Process Hunter (grep)")
     bot.start()
 
     try:
@@ -23,11 +23,6 @@ def main():
         target_dir = "challenges/15_ProcessInspection"
         if os.path.exists(target_dir):
             os.chdir(target_dir)
-        elif os.path.basename(os.getcwd()) == "15_ProcessInspection":
-            pass
-        else:
-            bot.print_error(f"Could not find '{target_dir}'.")
-            return
         # ======================
 
         # STEP 2: The Setup
@@ -46,7 +41,7 @@ def main():
             instruction=(
                 "That is nearly 100 lines of processes!\n"
                 "Let's try to read it manually. Run `cat` to dump the file to the screen.\n"
-                "Try to spot the flag as it scrolls by (Good luck!)."
+                "Try to spot the flag as it scrolls by."
             ),
             command_to_display="cat ps_dump.txt"
         )
@@ -54,7 +49,7 @@ def main():
         # STEP 4: The "Good" Way (The Filter)
         bot.teach_loop(
             instruction=(
-                "Okay, that was impossible. The text flew by too fast.\n"
+                "That was impossible. The text flew by too fast.\n"
                 "This is why we use `grep`.\n"
                 "It acts as a filter, discarding the noise and showing ONLY the lines matching our pattern.\n\n"
                 "Use `grep` to search for 'CCRI' and **save the output** to 'flag.txt'."

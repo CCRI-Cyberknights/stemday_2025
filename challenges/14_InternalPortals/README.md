@@ -1,19 +1,17 @@
 # 🌐 Internal Portal Audit
 
-The network relies on multiple internal portals. You have identified **five internal web pages**, but only ONE contains the flag.
+**Mission Briefing:**
+The network relies on multiple internal portals for administration. You have identified a list of **five active web pages**, but only ONE contains the hidden flag.
 
-**The Concept:**
-What you see in a browser is just the rendered view. Developers often hide secrets, comments, or disabled elements in the **HTML Source Code**.
+## 🧠 Intelligence Report
+* **The Concept:** What you see in a web browser is the "rendered" view. Developers often hide secrets, comments, or disabled elements in the raw **HTML Source Code** which are invisible on the main screen.
+* **The Strategy:** **Source Inspection**. You must bypass the visual rendering and inspect the raw code sent by the server.
+* **The Tool:** `curl` is perfect for this. Unlike a browser, it prints the raw HTML directly to the terminal.
 
-**Your Mission:** Inspect the Source.
-1.  Access the internal portals via the local web server.
-2.  Retrieve the raw HTML code (using `curl` or by viewing source).
-3.  Search the code for hidden tags or comments containing the flag.
+**Your Goal:** Retrieve the raw HTML from the portals and search the code for hidden tags or comments containing the flag.
 
-## 🌐 Target Portals
-* `http://localhost:5000/internal/alpha`
-* `http://localhost:5000/internal/beta`
-* ...and so on (gamma, delta, omega).
+## 📂 Files in this folder
+* `active_portals.txt` – A list of the internal portal names to check.
 
 ---
 **🏁 Flag format:** `CCRI-AAAA-1111`

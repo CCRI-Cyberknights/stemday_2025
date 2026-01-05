@@ -1,12 +1,16 @@
 # 🔐 ZIP File Crack & Decode
 
-You have recovered a mysterious ZIP archive: `secret.zip`.
+**Mission Briefing:**
+You have recovered a mysterious ZIP archive: `secret.zip`. It is password-protected, and standard extraction methods fail without the key.
 
-It is password-protected, and we don't have the key. However, we also found a `wordlist.txt` file containing thousands of potential passwords.
+However, during the data recovery, we also found a `wordlist.txt` file containing thousands of potential passwords.
 
-**Your Mission:** Perform a **Dictionary Attack**.
-1.  Use the provided tools to automatically try every password in the wordlist against the ZIP file.
-2.  Once cracked, examine the contents of the archive to find the flag.
+## 🧠 Intelligence Report
+* **The Lock:** Standard ZIP encryption.
+* **The Strategy:** **Dictionary Attack**. This involves automating the process of trying every single word in a list until one works.
+* **The Requirement:** You cannot do this by hand. You must use (or build) an automated tool to try the passwords rapidly.
+
+**Your Goal:** Execute a dictionary attack to crack the password, extract the archive, and decode the flag inside.
 
 ## 📂 Files in this folder
 * `secret.zip` – The password-protected archive.

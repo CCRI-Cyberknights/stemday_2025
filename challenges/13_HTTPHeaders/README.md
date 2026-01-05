@@ -1,18 +1,18 @@
 # 📡 HTTP Header Analysis
 
+**Mission Briefing:**
 CryptKeeper operatives have been exchanging secret messages through internal HTTP servers.
-You have discovered **five active API endpoints**, but only ONE contains the real agency flag.
+You have discovered a server log file identifying **five active API endpoints**, but only ONE contains the real agency flag.
 
-**The Concept:**
-Web servers send invisible data called **HTTP Headers** before sending the actual page content. Headers often contain technical info, cookies, or in this case, hidden secrets.
+## 🧠 Intelligence Report
+* **The Concept:** Web servers send invisible data called **HTTP Headers** before sending the actual page content.
+* **The Lock:** The flag is hidden in a custom header (e.g., `X-Flag` or `Secret-Key`). Standard browsers often hide these.
+* **The Tool:** `curl` (Client URL) is the standard tool for interacting with web servers. Using the `-I` flag fetches *only* the headers.
 
-**Your Mission:** Interrogate the server.
-1.  The flag is hidden in a custom header (e.g., `X-Flag`).
-2.  Standard web browsers often hide these headers.
-3.  Use command-line tools (like `curl -I`) or the provided scripts to inspect the headers of the endpoints below.
+**Your Goal:** Interrogate the endpoints found in the logs to find the hidden header.
 
-## 🌐 Target Endpoints
-* `http://localhost:5000/mystery/endpoint_1` through `endpoint_5`
+## 📂 Files in this folder
+* `server_logs.txt` – Intercepted logs listing the active endpoints.
 
 ---
 **🏁 Flag format:** `CCRI-AAAA-1111`

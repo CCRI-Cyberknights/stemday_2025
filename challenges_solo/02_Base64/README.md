@@ -1,60 +1,40 @@
-# 🛰️ Challenge 02: Intercepted Transmission — Base64 Decode
+# 🛰️ Challenge 02: Intercepted Transmission (Base64)
 
-Base64 is a method for encoding binary data into readable text characters.
-It’s commonly used to transmit images, documents, or binary blobs across text-based channels like email or logging systems.
+**Mission Briefing:**
+A recovered message from a compromised CryptKeepers field device appears to contain a secure transmission. The content looks like random gibberish, but it follows a very specific pattern often used to bypass text filters.
 
-A recovered message from a compromised CryptKeepers field device appears to contain a secure transmission — scrambled just enough to slip past filters unnoticed.
-This isn’t encryption; anyone with the right tools can decode it.
-
----
-
-## 🧩 Objective
-
-Inspect the contents of `encoded.txt`, then decode it using one of the tools listed below.
-
-The decoded output may contain **several fake flags**. Only **one** is real.
-Look closely for the flag that follows the correct agency format.
-
----
+## 🧠 Intelligence Report
+* **The Concept:** **Base64** is an encoding scheme, *not* encryption. It translates binary data into a set of 64 readable characters (A-Z, a-z, 0-9, +, /). It is commonly used to send files over text channels like email. 
+* **The Lock:** The text is readable but unintelligible. It usually ends with one or two equals signs (`=`) which act as padding.
+* **The Strategy:** We need to reverse the encoding process to restore the original text.
 
 ## 📝 Investigator’s Journal
+*Notes from the field:*
 
-The field agent’s message was scrambled before transmission.
-They must have assumed the receiver knew how to reverse the signal…
+> "The field agent scrambled this message before sending it. They assumed the receiver would know how to reverse the signal.
+>
+> One crucial detail: The decoded output might contain **decoy flags**. I've seen them do this before—throwing in fake codes to confuse us. You need to look closely for the one that perfectly matches our agency's format (`CCRI-AAAA-1111`)."
 
-Lucky for us, the encoding wasn’t strong — just standard issue Base64.
+## 📂 Files in This Folder
+* `encoded.txt` — The Base64-encoded transmission.
 
 ---
 
 ## 🛠 Tools & Techniques
 
-Here are some useful tools for decoding Base64:
+This is a standard encoding format, so most Linux systems have a built-in tool to handle it.
 
-| Tool         | Use Case                               | Example Command                                                                   |
-| ------------ | -------------------------------------- | --------------------------------------------------------------------------------- |
-| `base64`     | Standard command-line Base64 utility   | `base64 --decode encoded.txt`                                                     |
-| `openssl`    | Cryptographic tool with Base64 support | `openssl enc -d -base64 -in encoded.txt`                                          |
-| `python3`    | Script your own decoding logic         | `python3 -c "import base64; print(base64.b64decode(open('encoded.txt').read()))"` |
-| `xxd`        | View file as a hex dump (optional)     | `xxd encoded.txt \| less`                                                         |
-| Online tools | Browser-based Base64 decoders          | *Use with caution — avoid uploading real flags.*                                  |
+| Tool | Purpose | Usage Example |
+| :--- | :--- | :--- |
+| **cat** | View the file contents first to confirm it looks like Base64. | `cat encoded.txt` |
+| **base64** | The standard utility for encoding/decoding. | `base64 --decode encoded.txt` |
+| **Pipe (`\|`)** | Advanced technique: Send the file content directly into the decoder. | `cat encoded.txt \| base64 -d` |
 
-> 💡 **Tip:**
-> If you see something readable in the decoded result, don’t overlook it.
-> Sometimes the message is buried in formatting or surrounded by noise.
-
----
-
-## 📂 Files in This Folder
-
-* `encoded.txt` — The Base64-encoded transmission.
+> 💡 **Tip:** If the output looks like a mess of symbols *after* decoding, you might be decoding a binary file (like an image) instead of text. But in this case, we expect text. 
 
 ---
 
 ## 🏁 Flag Format
-
-All flags follow this structure:
-
 **`CCRI-AAAA-1111`**
 
-Replace `AAAA` and the digits with the code you uncover,
-then input the flag into the website to verify your answer.
+Decode the file, ignore the decoys, and identify the valid flag.

@@ -9,27 +9,39 @@
 </head>
 
 <body>
-  <div class="landing-container">
-    <h1>🚀 CCRI CTF {{ base_mode|capitalize }} Hub</h1>
-    <p>Select which version of the challenges you want to start:</p>
+  <div class="landing-container" style="margin-top: 0;">
+
+    <h1 style="margin-top: 0; margin-bottom: 10px;">🚀 CCRI CTF {{ base_mode|capitalize }} Hub</h1>
+    <p class="landing-subtitle" style="margin-top: 0; margin-bottom: 15px;">Welcome to the Training Hub. Select your
+      mission profile below to begin:</p>
 
     <div class="grid">
       {% if 'regular' in available_modes %}
-      <div class="challenge-card">
+      <div class="challenge-card landing-card">
         <h3>🔭 Exploration Mode</h3>
-        <p>Includes helper scripts and walkthroughs for each challenge.</p>
+        <p><strong>Guided Learning &amp; Demos</strong></p>
+        <p>
+          Perfect for beginners. Features automated <strong>Helper Scripts</strong> for demos
+          and an interactive <strong>Coach Mode</strong> to guide you step-by-step.
+          Learn real tools and see cybersecurity concepts in action.
+        </p>
         <a href="{{ url_for('main.set_mode', mode='regular') }}">
-          <button class="view-btn">🚀 Start Exploration Challenge List</button>
+          <button class="view-btn">🚀 Start Exploration Track</button>
         </a>
       </div>
       {% endif %}
 
       {% if 'solo' in available_modes %}
-      <div class="challenge-card">
+      <div class="challenge-card landing-card">
         <h3>🔥 Solo Mode</h3>
-        <p>No helpers. Solve challenges manually for the full experience.</p>
+        <p><strong>Unassisted Investigation</strong></p>
+        <p>
+          The ultimate test. No coaches, no custom scripts, and no safety nets.
+          You are dropped into the environment with only standard Linux tools and your wits.
+          Find the flags using pure skill.
+        </p>
         <a href="{{ url_for('main.set_mode', mode='solo') }}">
-          <button class="view-btn">🚀 Start Solo Challenge List</button>
+          <button class="view-btn">🚀 Start Solo Track</button>
         </a>
       </div>
       {% endif %}
@@ -42,16 +54,15 @@
     </div>
     {% endif %}
 
-    <div style="margin-top: 30px;">
-      <a href="{{ url_for('main.linux_basics') }}" class="nav-btn">
+    <div style="margin-top: 20px; margin-bottom: 5px;">
+      <a href="{{ url_for('main.linux_basics') }}" class="nav-btn secondary-btn">
         🐧 Linux Basics &amp; Command Guide
       </a>
     </div>
 
-    <div class="info-section">
-      {{ welcome_html|safe }}
+    <div>
       <img src="{{ url_for('static', filename='assets/CyberKnights_2.png') }}" alt="CyberKnights Logo"
-        class="landing-logo" />
+        class="landing-logo" style="margin-top: 10px;" />
     </div>
   </div>
 </body>

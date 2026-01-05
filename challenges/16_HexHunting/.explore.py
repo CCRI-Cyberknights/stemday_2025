@@ -29,51 +29,52 @@ def main():
         bot.teach_step(
             instruction=(
                 "We have a binary file named `hex_flag.bin`.\n"
-                "Binaries contain compiled code, which looks like garbage to humans.\n"
-                "Verify the file is there."
+                "Binaries contain compiled code. To a computer, it's instructions.\n"
+                "To a human, it looks like garbage.\n\n"
+                "Let's see the file size first."
             ),
-            command_to_display="ls -l"
+            command_to_display="ls -lh hex_flag.bin"
         )
 
-        # STEP 3: The "Wrong" Way (Chaos)
+        # STEP 3: The "Raw" Way (xxd)
         bot.teach_step(
             instruction=(
-                "If you try to read a binary with `cat`, your terminal will interpret the raw bytes as text.\n"
-                "This results in 'Matrix code' (garbage).\n"
-                "Try it anyway to see the mess."
+                "If we want to see the *actual* data inside, we use a **Hex Dumper**.\n"
+                "The tool `xxd` shows the raw hexadecimal values on the left and any printable characters on the right.\n\n"
+                "Run this to see the raw structure."
             ),
-            command_to_display="cat hex_flag.bin"
+            command_to_display="xxd hex_flag.bin | head -n 20"
         )
 
-        # STEP 4: The "Hex" Way (Order)
+        # STEP 4: The Problem (Noise)
         bot.teach_step(
             instruction=(
-                "That was useless. To analyze binaries properly, we need a **Hex Dump**.\n"
-                "The tool `xxd` shows the raw Hexadecimal (math) on the left and the ASCII (text) representation on the right.\n\n"
-                "Run `xxd` to see the file's true structure."
+                "**Analysis:** Look at that output. It's mostly dots `.` and random symbols.\n"
+                "Finding a specific password or flag in thousands of lines of hex code is like finding a needle in a haystack.\n\n"
+                "We need a tool that ignores the binary data and **extracts only the human-readable text**."
             ),
-            command_to_display="xxd hex_flag.bin"
+            # No command here, just a pause for reading
+            command_to_display="clear" 
         )
 
-        # STEP 5: The "Easy" Way (strings)
+        # STEP 5: The Solution (strings)
         bot.teach_step(
             instruction=(
-                "You can see the text on the right side of the `xxd` output, but it's mixed with dots and symbols.\n"
-                "To extract **only** the readable text, we use the `strings` command.\n\n"
-                "Run it to clean up the output."
+                "The tool for this is called `strings`.\n"
+                "It scans the file for sequences of printable characters (letters, numbers, punctuation) and prints them.\n\n"
+                "Try running it on the binary."
             ),
             command_to_display="strings hex_flag.bin"
         )
 
-        # STEP 6: Filter and Save (The Solution)
+        # STEP 6: Refining the Search
         bot.teach_loop(
             instruction=(
-                "That is much clearer! Now we filter for the flag.\n"
-                "**Note:** `strings` is 'dumb'—it grabs *any* printable character. You might see random letters attached to the flag (e.g., `xyCCRI...`). This is normal in forensics!\n\n"
-                "1. `strings` to clean the binary.\n"
-                "2. `grep` to find 'CCRI'.\n"
-                "3. `>` to save it to 'flag.txt'.\n\n"
-                "Construct the command:"
+                "That's better! But notice it's still 'messy'—`strings` grabs *anything* that looks like text, including random garbage like `H)^8s`.\n\n"
+                "We need to filter this output. Since we know the flag format contains 'CCRI', we can combine `strings` with `grep`.\n\n"
+                "1. Extract text with `strings`.\n"
+                "2. Filter for 'CCRI' with `grep`.\n"
+                "3. Save it to `flag.txt`."
             ),
             # Template showing the pipeline
             command_template="strings hex_flag.bin | grep \"CCRI\" > flag.txt",
@@ -82,7 +83,6 @@ def main():
             command_prefix="strings hex_flag.bin | grep ",
             
             # Regex: strings hex_flag.bin | grep "CCRI" > flag.txt
-            # We allow optional quotes around "CCRI"
             command_regex=r"^strings hex_flag\.bin \| grep \"?CCRI\"? > flag\.txt$",
             
             clean_files=["flag.txt"]
@@ -91,7 +91,7 @@ def main():
         # STEP 7: Verify
         bot.teach_step(
             instruction=(
-                "Success! You turned raw binary data into a text flag.\n"
+                "Success! You turned raw binary data into a clean text flag.\n"
                 "Read 'flag.txt' to finish."
             ),
             command_to_display="cat flag.txt"

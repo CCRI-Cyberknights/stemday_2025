@@ -8,6 +8,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'
 from coach_core import Coach
 
 # === THE EPHEMERAL ASSEMBLER TOOL ===
+TOOL_NAME = ".assembler.py"
 ASSEMBLER_SCRIPT_CONTENT = r"""#!/usr/bin/env python3
 import os
 import subprocess
@@ -45,19 +46,28 @@ if __name__ == "__main__":
     main()
 """
 
-def create_assembler():
-    with open(".assembler.py", "w") as f:
+def create_tool():
+    """Writes the assembler script to the CURRENT working directory."""
+    with open(TOOL_NAME, "w") as f:
         f.write(ASSEMBLER_SCRIPT_CONTENT)
 
-def cleanup_assembler():
-    if os.path.exists(".assembler.py"):
-        os.remove(".assembler.py")
+def cleanup_tool():
+    """Removes the assembler script and temp files."""
+    if os.path.exists(TOOL_NAME):
+        os.remove(TOOL_NAME)
+    if os.path.exists("hashcat.potfile"):
+        os.remove("hashcat.potfile")
+    # Optional: cleanup the unzipped parts if you want a fresh start
+    for i in range(1, 4):
+        if os.path.exists(f"encoded_segments{i}.txt"):
+            os.remove(f"encoded_segments{i}.txt")
+    if os.path.exists("flag.txt"):
+        os.remove("flag.txt")
 
 def get_ordered_passwords():
     """
-    1. Reads hashes.txt to establish the required order (Part 1, 2, 3).
-    2. Looks up those hashes in the local potfile.
-    Returns the passwords in the correct order for the zip files.
+    Reads hashcat.potfile to map hashes to passwords, ensuring we return them
+    in the order requested by hashes.txt (which matches part1, part2, part3).
     """
     potfile = "hashcat.potfile"
     hashes_file = "hashes.txt"
@@ -72,7 +82,7 @@ def get_ordered_passwords():
                     h, p = line.strip().split(":", 1)
                     cracked[h] = p
     
-    # Retrieve in strict input order to match the zip files
+    # Retrieve in strict input order
     if os.path.exists(hashes_file):
         with open(hashes_file, "r") as f:
             for line in f:
@@ -86,7 +96,11 @@ def get_ordered_passwords():
     return passwords
 
 def main():
-    bot = Coach("Hashcat Chain Reaction (Manual)")
+    bot = Coach("Hashcat ChainCrack")
+    
+    # Ensure clean slate
+    cleanup_tool()
+    
     bot.start()
 
     try:
@@ -98,21 +112,17 @@ def main():
             command_to_display="cd challenges/06_Hashcat"
         )
         
-        # === SYNC & SETUP ===
+        # === SYNC DIRECTORY ===
         target_dir = "challenges/06_Hashcat"
         if os.path.exists(target_dir):
             os.chdir(target_dir)
-        
-        create_assembler()
-        if os.path.exists("hashcat.potfile"):
-            os.remove("hashcat.potfile")
-        # ====================
+        # ======================
 
         # STEP 2: Discovery
         bot.teach_step(
             instruction=(
                 "Let's survey the battlefield.\n"
-                "Use 'ls -R' (recursive list) to see the files."
+                "Use 'ls -R' (recursive list) to see the segments inside the folder."
             ),
             command_to_display="ls -R"
         )
@@ -120,11 +130,11 @@ def main():
         # STEP 3: Cracking
         bot.teach_step(
             instruction=(
-                "We need to crack the hashes.\n"
-                "   -m 0             → MD5 Mode\n"
-                "   -a 0             → Dictionary Attack\n"
-                "   --potfile-path   → Saves passwords locally\n\n"
-                "Run the attack now:"
+                "We need to crack the hashes to get the passwords.\n"
+                "   `-m 0`           → MD5 Mode\n"
+                "   `-a 0`           → Dictionary Attack\n"
+                "   `--potfile-path` → Saves cracked passwords locally\n\n"
+                "Run the attack:"
             ),
             command_to_display="hashcat -m 0 -a 0 hashes.txt wordlist.txt --potfile-path hashcat.potfile"
         )
@@ -132,21 +142,22 @@ def main():
         # STEP 4: Reveal
         bot.teach_step(
             instruction=(
-                "Results are saved. Now we reveal them using `--show`.\n\n"
-                "💡 **Pro Tip:** Press **Up Arrow** to recall the command, then append ` --show`."
+                "The passwords are saved in the potfile. Now we reveal them using `--show`.\n"
+                "💡 **Tip:** Press **Up Arrow** to recall the command, then add ` --show`."
             ),
             command_to_display="hashcat -m 0 -a 0 hashes.txt wordlist.txt --potfile-path hashcat.potfile --show"
         )
 
         # === READ LOCAL RESULTS ===
+        # The coach needs to know the passwords to validate the unzipping
         p1, p2, p3 = get_ordered_passwords()[:3]
         # ==========================
 
-        # STEP 5: Unlock Part 1 (The Mapping Lesson)
+        # STEP 5: Unlock Part 1
         bot.teach_loop(
             instruction=(
-                "**Crucial Lesson:** Hashcat's `--show` command prints passwords in the **exact order** of the input file.\n\n"
-                "1. The **first line** of output matches the **first zip** (part1).\n"
+                "**Crucial Lesson:** Hashcat's `--show` output matches the input order.\n"
+                "1. The **first line** matches the **first zip** (part1).\n"
                 f"2. That password is **{p1}**.\n\n"
                 "Use it to unzip Part 1:"
             ),
@@ -159,7 +170,7 @@ def main():
         # STEP 6: Unlock Part 2
         bot.teach_loop(
             instruction=(
-                "Following the list order, the **second line** matches **part2.zip**.\n"
+                "The **second line** matches **part2.zip**.\n"
                 f"The password is **{p2}**.\n\n"
                 "Unlock Part 2:"
             ),
@@ -182,11 +193,15 @@ def main():
             clean_files=["encoded_segments3.txt"]
         )
 
-        # STEP 8: Code Transparency
+        # STEP 8: Tool Provisioning (The Logic Fix)
+        print("\n[Coach] 🧠  The Mission Brief says we need to 'Assemble' the data.")
+        print("[Coach] ⚠️   We have three separate files. Combining them by hand is slow.")
+        print("[Coach] 📡  I am generating a helper script `.assembler.py` for you now...")
+        create_tool()
+
         bot.teach_step(
             instruction=(
-                "We now have three 'encoded' text files.\n"
-                "We wrote a helper script `.assembler.py` to combine them.\n"
+                "I have created `.assembler.py`.\n"
                 "**Always inspect code before running it.** Read the script now."
             ),
             command_to_display="cat .assembler.py"
@@ -195,7 +210,7 @@ def main():
         # STEP 9: Assembly
         bot.teach_loop(
             instruction=(
-                "The code looks safe (it just decodes Base64 and joins lines).\n"
+                "The code looks safe (it decodes Base64 and merges the lines).\n"
                 "Run it and save the result to 'flag.txt'."
             ),
             command_template="python3 .assembler.py > flag.txt",
@@ -207,7 +222,7 @@ def main():
         # STEP 10: Finish
         bot.teach_step(
             instruction=(
-                "Success! Read 'flag.txt' to see the candidate flags."
+                "Success! Read 'flag.txt' to see the reassembled flag."
             ),
             command_to_display="cat flag.txt"
         )
@@ -217,7 +232,7 @@ def main():
     except KeyboardInterrupt:
         bot.finish()
     finally:
-        cleanup_assembler()
+        cleanup_tool()
 
 if __name__ == "__main__":
     main()

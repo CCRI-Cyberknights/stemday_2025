@@ -1,14 +1,22 @@
 # 🔓 Hashcat ChainCrack
 
-You have intercepted **3 encrypted archive segments**. Each segment is locked, but we found a list of **MD5 hashes** (`hashes.txt`) that correspond to the passwords.
+**Mission Briefing:**
+You have intercepted **3 encrypted archive segments** from a data exfiltration attempt. Each segment is locked with a different password.
 
-To solve this, you must chain together several techniques:
-1.  **Crack:** Use the provided tools (like Hashcat) and the `wordlist.txt` to reverse the hashes and reveal the passwords.
-2.  **Unlock:** Use those passwords to open the ZIP segments.
-3.  **Assemble:** Combine the data found in the segments to reveal the final flag.
+However, we also found a file (`hashes.txt`) containing the **MD5 hashes** of those passwords.
+
+## 🧠 Intelligence Report
+* **The Lock:** Three separate ZIP files (`part1.zip`, `part2.zip`, `part3.zip`).
+* **The Keys:** The passwords are hidden behind MD5 hashes. You must crack them to open the archives.
+* **The Strategy:**
+    1.  **Crack:** Use **Hashcat** and the provided `wordlist.txt` to reverse the hashes.
+    2.  **Unlock:** Use the revealed passwords to extract the segments.
+    3.  **Assemble:** The extracted files are fragments. You must combine them to reconstruct the final flag.
+
+**Your Goal:** Execute the crack, unlock the segments, and reassemble the intelligence.
 
 ## 📂 Files in this folder
-* `hashes.txt` – 3 MD5 hashes hiding the passwords.
+* `hashes.txt` – The list of target MD5 hashes.
 * `wordlist.txt` – A list of candidate passwords.
 * `segments/` – A folder containing the encrypted ZIP files.
 

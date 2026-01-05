@@ -1,32 +1,25 @@
-# 📡 Challenge 13: HTTP Headers Mystery
+# 📡 Challenge 13: HTTP Header Analysis
 
-CryptKeepers operatives have been quietly passing secret messages through internal web servers.
-You have discovered **five active API endpoints** on the local network, but only **one** contains the real flag.
+**Mission Briefing:**
+CryptKeepers operatives have been exchanging secret messages through internal HTTP servers.
+You have discovered **five active API endpoints** on the local network. While they all serve generic web pages, our intelligence suggests that ONE of them is transmitting the agency flag in a covert channel.
 
-This challenge sharpens your ability to interact with live network services and extract intel from HTTP headers — a critical skill for penetration testers.
+## 🧠 Intelligence Report
+* **The Concept:** **HTTP Headers**. When you visit a website, the server sends a block of invisible metadata *before* it sends the actual page content (HTML). This includes data like `Server Type`, `Date`, and `Cookies`. 
+* **The Lock:** The flag is hidden in a **Custom Header** (e.g., `X-Flag` or `Secret-Key`). Standard web browsers often hide these headers from the user.
+* **The Strategy:** **Headless Interaction**. We will use a command-line tool to talk to the server directly and request *only* the headers.
 
----
+## 📝 Investigator’s Journal
+*Notes from the field:*
 
-## 🧩 Your Objective
-
-Query the active HTTP endpoints and uncover the secret hidden in the server headers.
-
-You are looking for a custom header that looks like:
-
-**`X-Flag: CCRI-....`**
-
-**What to do:**
-1.  Manually query each endpoint using command-line tools.
-2.  Inspect the **HTTP Headers** returned by the server.
-3.  Ignore the body content (HTML/JSON) and focus on the metadata.
-4.  Identify the flag that matches the official format.
-
----
+> "I found five active endpoints running on `localhost:5000`.
+>
+> If you just open them in a browser, you won't see anything. The secret isn't on the page; it's in the handshake. You need to inspect the HTTP response headers. Look for anything suspicious starting with `X-`.
+>
+> Use `curl` with the `-I` flag. It tells the server 'I only want the headers, keep the body'."
 
 ## 🌐 Target Endpoints
-
 The intercepted services are running locally on your machine:
-
 1.  `http://localhost:5000/mystery/endpoint_1`
 2.  `http://localhost:5000/mystery/endpoint_2`
 3.  `http://localhost:5000/mystery/endpoint_3`
@@ -35,36 +28,27 @@ The intercepted services are running locally on your machine:
 
 ---
 
-## 🛠 Useful Tools & Techniques
+## 🛠 Tools & Techniques
 
-Since these are live web addresses, standard file tools like `cat` or `less` won't work. You need a tool that speaks HTTP.
+Since these are live web addresses, standard file tools like `cat` won't work.
 
-| Command | Description |
-| :--- | :--- |
-| **`curl -I <URL>`** | Fetches **Headers Only**. Perfect for this challenge. |
-| `curl -v <URL>` | Verbose mode. Shows request AND response headers. |
-| `curl <URL>` | Fetches the body (HTML/JSON). Useful, but the flag isn't there! |
+| Tool | Purpose | Usage Example |
+| :--- | :--- | :--- |
+| **curl -I** | **Fetch Headers Only**. This is the key command. | `curl -I http://localhost:5000/mystery/endpoint_1` |
+| **curl -v** | **Verbose Mode**. Shows the entire request/response conversation. | `curl -v http://localhost:5000/mystery/endpoint_1` |
+| **Browser DevTools** | You can also press F12 in a browser and check the "Network" tab, but the terminal is faster. | *N/A* |
 
-**Example Usage:**
-To inspect the headers of the first endpoint, run:
-
-    curl -I http://localhost:5000/mystery/endpoint_1
-
-**What to look for in the output:**
-
-    HTTP/1.1 200 OK
-    Server: CryptKeepers-Gateway/2.3.1
-    Date: Mon, 25 Dec 2025 12:00:00 GMT
-    Content-Type: text/html; charset=utf-8
-    X-Flag: CCRI-????-????  <-- LOOK FOR THIS
+> 💡 **Tip:** Example output of `curl -I`:
+> ```text
+> HTTP/1.0 200 OK
+> Server: Werkzeug/2.0.3 Python/3.10
+> Content-Type: text/html; charset=utf-8
+> X-Flag: CCRI-????-????   <-- TARGET ACQUIRED
+> ```
 
 ---
 
 ## 🏁 Flag Format
-
-All flags follow the official structure:
-
 **`CCRI-AAAA-1111`**
 
-Replace `AAAA` and the digits with the correct values you uncover.
-Then enter the flag into the website to verify your answer.
+Interrogate the endpoints and capture the header.

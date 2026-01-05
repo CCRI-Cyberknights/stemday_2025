@@ -1,60 +1,52 @@
 # 📡 Challenge 17: Nmap Scan Puzzle
 
-Several suspicious services are running on the local system.
-Your mission: **scan, probe, and identify the real agency flag hiding in plain sight.**
+**Mission Briefing:**
+CryptKeepers operatives are hosting several rogue services on this system to communicate with their botnet.
+We know these services are listening on local TCP ports in the **9000–9100** range.
+Your mission is to scan the network, identify the active "doors" (ports), and interrogate each service to find the one carrying the valid agency flag.
 
----
+## 🧠 Intelligence Report
+* **The Concept:** **Port Scanning**. Computers use "ports" (numbered 1–65535) to manage network connections. Think of an IP address as a building and ports as the apartment numbers.
+* **The Tool:** **Nmap** (Network Mapper). It knocks on every door in a specified range to see which ones are open. 
+* **The Strategy:**
+    1.  **Scan:** Find the open ports between 9000 and 9100.
+    2.  **Connect:** Use `curl` or `nc` (Netcat) to talk to the services running on those ports.
+    3.  **Filter:** Distinguish the real flag from the decoys.
 
-## 🧩 Your Objective
+## 📝 Investigator’s Journal
+*Notes from the field:*
 
-1. Scan for open **TCP ports on localhost** in the **9000–9100** range.
-2. Investigate the responses from any open ports.
-3. Identify the *real* flag among decoys and noise.
-4. Save the correct flag into a file named `flag.txt`.
+> "I know they are hiding in the 9000s. If you scan the whole machine, it'll take too long. Focus your Nmap scan on `9000-9100`.
+>
+> Once you see the open ports, you have to manually check them. Some might just send garbage data. Others might send fake flags like `CCRI-FAKE-...`. You need to grab the output from the right one and save it to a file named `flag.txt`."
 
----
-
-## 🛠 Investigation Steps
-
-* Begin with an **Nmap scan** of the port range.
-* For each open port, use `curl` or `nc` to retrieve the service’s response.
-* Look carefully for flag-like strings — even minor differences matter.
-* Compare responses across ports.
-* Four ports will return **plausible fake flags**.
-* Other ports may return nonsense or developer notes.
-* Only **one** port contains a flag matching the agency’s official format.
-
-You may find it helpful to record each port’s response in a separate notes file.
-
-> 🔎 **Tip:**
-> This simulates a real-world pentest scenario — services often return unexpected data.
-> Train your eye to spot anomalies and subtle clues.
+## 📂 Files in This Folder
+*(None — all work occurs directly in the terminal via network interaction.)*
 
 ---
 
 ## 🛠 Tools & Techniques
 
-| Tool / Command                                   | Purpose                                         |
-| ------------------------------------------------ | ----------------------------------------------- |
-| `nmap -p9000-9100 localhost`                     | Discover open ports in the specified range      |
-| `nmap -sV --version-light -p9000-9100 localhost` | Optionally identify service versions            |
-| `curl http://localhost:PORT`                     | Retrieve response data from a specific port     |
-| `nc localhost PORT`                              | Manually interact with a service for raw output |
-| `grep "CCRI-"` or regex filters                  | Spot flag-like strings in output                |
+You are mapping the digital terrain.
 
----
+| Tool | Purpose | Usage Example |
+| :--- | :--- | :--- |
+| **nmap** | The industry standard scanner. `-p` specifies the range. | `nmap -p 9000-9100 localhost` |
+| **curl** | Connects to web-based ports (HTTP). | `curl http://localhost:9001` |
+| **nc** | "Netcat". Connects to raw TCP ports. Use this if `curl` fails. | `nc localhost 9001` |
+| **Output Redirection** | Save your findings to the required file. | `echo "CCRI-AAAA-1111" > flag.txt` |
 
-## 📂 Files in This Folder
-
-*(None — all work occurs directly in the terminal.)*
+> 💡 **Tip:** Nmap output looks like this:
+> ```text
+> PORT     STATE SERVICE
+> 9001/tcp open  tor-orport
+> 9050/tcp open  tor-socks
+> ```
+> Each "open" line is a target you need to investigate.
 
 ---
 
 ## 🏁 Flag Format
-
-All flags follow the official format:
-
 **`CCRI-AAAA-1111`**
 
-Replace `AAAA` and the digits with the correct values you uncover.
-Enter the flag into the website to verify your answer.
+Scan the range, interrogate the ports, and identify the true flag.

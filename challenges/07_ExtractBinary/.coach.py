@@ -23,11 +23,6 @@ def main():
         target_dir = "challenges/07_ExtractBinary"
         if os.path.exists(target_dir):
             os.chdir(target_dir)
-        elif os.path.basename(os.getcwd()) == "07_ExtractBinary":
-            pass
-        else:
-            bot.print_error(f"Could not find '{target_dir}'.")
-            return
         # ======================
 
         # STEP 2: Discovery
@@ -51,8 +46,8 @@ def main():
         # STEP 4: The Solution (Strings)
         bot.teach_step(
             instruction=(
-                "That was messy. (You might need to type 'reset' if your terminal looks weird afterwards, but usually it's fine).\n\n"
-                "To extract human-readable text from a binary, we use the 'strings' command.\n"
+                "That was messy. (If your terminal looks weird, typing 'reset' fixes it).\n\n"
+                "To extract human-readable text from a binary, we use the `strings` command.\n"
                 "Run it now to see everything hidden inside."
             ),
             command_to_display="strings hidden_flag"
@@ -64,7 +59,7 @@ def main():
                 "That scroll was too fast!\n"
                 "We can combine tools to pinpoint the flag:\n"
                 "1. `strings` extracts the text.\n"
-                "2. `grep` filters for 'CCRI'.\n"
+                "2. `grep` filters for the flag prefix 'CCRI'.\n"
                 "3. `>` saves it to 'flag.txt'.\n\n"
                 "Construct the command:"
             ),
@@ -72,7 +67,7 @@ def main():
             
             command_prefix="strings hidden_flag | grep ",
             
-            # Enforce the full pipeline structure
+            # Enforce the pipeline structure. We explicitly look for 'CCRI'
             command_regex=r"^strings hidden_flag \| grep CCRI > flag\.txt$",
             
             clean_files=["flag.txt"]

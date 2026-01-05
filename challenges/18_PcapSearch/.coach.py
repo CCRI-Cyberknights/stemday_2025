@@ -16,7 +16,7 @@ def get_correct_stream_id(pcap_file):
         return "0"
         
     try:
-        # FIX: We must quote "CCRI" inside the filter so tshark treats it as a string
+        # We must carefully quote "CCRI" inside the filter so tshark treats it as a string
         # Filter: frame contains "CCRI"
         cmd = [
             "tshark", "-r", pcap_file, 
@@ -53,7 +53,7 @@ def main():
             os.chdir(target_dir)
         # ======================
 
-        # Detect the stream ID dynamically (now with correct syntax)
+        # Detect the stream ID dynamically
         target_stream = get_correct_stream_id("traffic.pcap")
 
         # STEP 2: Discovery

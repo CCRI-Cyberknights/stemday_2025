@@ -41,40 +41,41 @@ def main():
     # 2. Mission Briefing
     header("🔓 ZIP Password Cracking Challenge")
     
-    print("🎯 Goal: Crack the password, extract the archive, and decode the hidden flag.\n")
-    print(f"{Colors.CYAN}💡 Scenario:{Colors.END}")
-    print("   ➤ CryptKeepers has locked important data inside an encrypted ZIP archive.")
-    print("   ➤ You recovered a wordlist of possible passwords.")
-    print("   ➤ Your mission: try each password until the archive opens, then decode the contents.\n")
+    print(f"📄 Target Archive: {Colors.BOLD}{ZIP_FILE}{Colors.END}")
+    print(f"📄 Password List:  {Colors.BOLD}{WORDLIST}{Colors.END}")
+    print("🎯 Goal: Automate a dictionary attack to break the lock.\n")
     
-    require_input("Type 'ready' when you're ready to see how this works behind the scenes: ", "ready")
+    # Narrative Alignment: Reference the README Intel
+    print(f"{Colors.CYAN}🧠 Intelligence Report (from README):{Colors.END}")
+    print("   ➤ **The Lock:** Standard ZIP encryption.")
+    print("   ➤ **The Strategy:** Dictionary Attack.")
+    print("   ➤ **The Concept:** Trying every single word in a list until one works.")
+    print("   ➤ **The Requirement:** Humans are too slow. We must use automation.\n")
+    
+    require_input("Type 'ready' to initialize the attack tools: ", "ready")
 
     # 3. Tool Explanation
     header("🛠️ Behind the Scenes")
-    print("Step 1: Dictionary attack against a protected ZIP file.\n")
-    print(f"For each candidate password in {WORDLIST}, we run a command like:\n")
-    print(f"   {Colors.GREEN}unzip -P [password] -t {ZIP_FILE}{Colors.END}\n")
-    print("🔍 Command breakdown:")
-    print(f"   {Colors.BOLD}unzip{Colors.END}                → Tool for working with ZIP archives")
-    print(f"   {Colors.BOLD}-P [password]{Colors.END}        → Use this password to try to unlock the archive")
-    print(f"   {Colors.BOLD}-t{Colors.END}                   → 'Test' the ZIP file without fully extracting it")
-    print(f"   {Colors.BOLD}{ZIP_FILE:<21}{Colors.END}→ The encrypted archive we captured\n")
-    print("If the test reports 'OK', we know we found the correct password.\n")
+    print("This script simulates the automation required for a Dictionary Attack.")
+    print("It effectively writes a loop that runs the following commands thousands of times:\n")
     
-    print("Step 2: Once we have the password, we extract the archive.\n")
-    print(f"   {Colors.GREEN}unzip -o -P [password] {ZIP_FILE} -d .{Colors.END}\n")
+    print("Step 1: Test a password candidate (without extracting yet)")
+    print(f"   {Colors.GREEN}unzip -P [PASSWORD] -t {ZIP_FILE}{Colors.END}\n")
     
-    print("Step 3: Inside the archive is a Base64-encoded message.\n")
+    print("Step 2: If the test returns 'OK', extract the files")
+    print(f"   {Colors.GREEN}unzip -o -P [PASSWORD] {ZIP_FILE} -d .{Colors.END}\n")
+    
+    print("Step 3: Decode the inner content (as seen in Challenge #2)")
     print(f"   {Colors.GREEN}base64 --decode {B64_FILE} > {OUTPUT_FILE}{Colors.END}\n")
     
-    require_input("Type 'start' when you're ready to begin the cracking process: ", "start")
+    require_input("Type 'start' to launch the brute force attack: ", "start")
 
     # 4. Cracking Phase
     clear_screen()
-    print(f"{Colors.CYAN}🔍 Beginning password cracking...{Colors.END}\n")
+    print(f"{Colors.CYAN}🔍 Beginning Dictionary Attack...{Colors.END}\n")
     print(f"📁 Wordlist: {Colors.BOLD}{WORDLIST}{Colors.END}")
-    print(f"📦 Target ZIP: {Colors.BOLD}{ZIP_FILE}{Colors.END}\n")
-    print("⏳ Launching dictionary attack...\n")
+    print(f"📦 Target:   {Colors.BOLD}{ZIP_FILE}{Colors.END}\n")
+    print("⏳ Starting engine...\n")
     progress_bar(length=20, delay=0.04)
 
     found = False
@@ -85,10 +86,11 @@ def main():
             pw = line.strip()
             if not pw: continue
             
-            # Simulated cracking output
-            print(f"\r[🔐] Trying password: {Colors.YELLOW}{pw:<20}{Colors.END}", end="", flush=True)
-            time.sleep(0.05)
+            # Simulated cracking output - Overwrite line for speed effect
+            print(f"\r[🔐] Testing: {Colors.YELLOW}{pw:<20}{Colors.END}", end="", flush=True)
+            time.sleep(0.01) # Slightly faster to look cool
 
+            # The actual check
             result = subprocess.run(
                 ["unzip", "-P", pw, "-t", zip_path],
                 stdout=subprocess.PIPE,
@@ -97,7 +99,7 @@ def main():
             )
 
             if "OK" in result.stdout:
-                print(f"\n\n{Colors.GREEN}✅ Password found: {Colors.BOLD}{pw}{Colors.END}")
+                print(f"\n\n{Colors.GREEN}✅ MATCH FOUND: {Colors.BOLD}{pw}{Colors.END}")
                 password = pw
                 found = True
                 break

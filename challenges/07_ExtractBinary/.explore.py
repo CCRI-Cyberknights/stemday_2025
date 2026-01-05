@@ -12,7 +12,7 @@ from exploration_core import Colors, header, pause, require_input, spinner, prin
 # === Config ===
 BINARY_FILE = "hidden_flag"
 STRINGS_FILE = "extracted_strings.txt"
-REGEX_PATTERN = r'[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}'
+REGEX_PATTERN = r'CCRI-[A-Z0-9]{4}-\d{4}' # Updated to match standard CCRI flag format precisely
 
 def get_path(filename):
     """Ensure the file is saved next to this script, regardless of where it's run from."""
@@ -47,22 +47,24 @@ def main():
     binary_path = get_path(BINARY_FILE)
     strings_path = get_path(STRINGS_FILE)
 
+    if not os.path.isfile(binary_path):
+        print_error(f"The file '{BINARY_FILE}' was not found.")
+        sys.exit(1)
+
     # 2. Mission Briefing
     header("🧪 Binary Forensics Challenge")
     
     print(f"📦 Target binary: {Colors.BOLD}{BINARY_FILE}{Colors.END}")
     print(f"🔧 Tool in use: {Colors.BOLD}strings{Colors.END}\n")
     print("🎯 Goal: Uncover a hidden flag embedded inside this compiled program.\n")
-    print(f"{Colors.CYAN}💡 Why 'strings'?{Colors.END}")
-    print("   ➤ Compiled programs contain a mix of binary data and human-readable text.")
-    print("   ➤ The 'strings' tool scans the file and pulls out the readable text segments.")
-    print("   ➤ This is a common first step in binary forensics and malware analysis.\n")
+    
+    # Narrative Alignment: Reference the README Intel
+    print(f"{Colors.CYAN}🧠 Intelligence Report (from README):{Colors.END}")
+    print("   ➤ **The Lock:** The file is a binary executable (not readable text).")
+    print("   ➤ **The Strategy:** Static Analysis (reading the raw data bytes).")
+    print("   ➤ **The Tool:** The `strings` command pulls readable text out of binary noise.\n")
     
     require_input("Type 'ready' when you're ready to see the command we'll run: ", "ready")
-
-    if not os.path.isfile(binary_path):
-        print_error(f"The file '{BINARY_FILE}' was not found.")
-        sys.exit(1)
 
     # 3. Tool Explanation
     header("🛠️ Behind the Scenes")
@@ -95,39 +97,37 @@ def main():
     # 4. Keyword Search
     require_input("Type 'search' to enter a keyword search mode: ", "search")
     
-    print("You might start by searching for words related to the story, like 'CCRI' or 'Cryptkeepers'.")
-    keyword = input(f"{Colors.YELLOW}🔍 Enter a keyword to search (or hit ENTER to skip): {Colors.END}").strip().lower()
+    print(f"We know the flag starts with '{Colors.BOLD}CCRI{Colors.END}'.")
+    keyword = input(f"{Colors.YELLOW}🔍 Enter a keyword to search (or hit ENTER to use 'CCRI'): {Colors.END}").strip()
     
-    if keyword:
-        print(f"\n🔎 Searching for '{Colors.BOLD}{keyword}{Colors.END}' in {STRINGS_FILE}...\n")
-        print("   Command being used under the hood:")
-        print(f"      {Colors.GREEN}grep -i {keyword} {STRINGS_FILE}{Colors.END}\n")
-        time.sleep(0.5)
-        try:
-            subprocess.run(["grep", "-i", "--color=always", keyword, strings_path], check=False)
-        except FileNotFoundError:
-            print_error("grep command not found.")
-    else:
-        print_info("Skipping keyword search.\n")
-
-    # 5. Flag Scan
-    require_input("Type 'scan' to scan for potential flags: ", "scan")
+    if not keyword:
+        keyword = "CCRI"
     
-    print("🔎 Scanning for flag-like patterns (format: XXXX-YYYY-ZZZZ)...")
+    print(f"\n🔎 Searching for '{Colors.BOLD}{keyword}{Colors.END}' in {STRINGS_FILE}...\n")
+    
+    # Show the grep command they are simulating
+    print("   Command being used under the hood:")
+    print(f"      {Colors.GREEN}grep {keyword} {STRINGS_FILE}{Colors.END}\n")
     time.sleep(0.5)
-    matches = search_for_flags(strings_path, REGEX_PATTERN)
+    
+    try:
+        # We use subprocess to get the nice colored grep output if available
+        subprocess.run(["grep", "--color=always", keyword, strings_path], check=False)
+    except FileNotFoundError:
+        print_error("grep command not found.")
+        
+    print("\n")
+    print(f"{Colors.CYAN}🧠 Hint: If you see the flag above, copy it!{Colors.END}")
+    print(f"   Format: CCRI-AAAA-1111\n")
 
+    # 5. Automated Scan (Backup)
+    matches = search_for_flags(strings_path, REGEX_PATTERN)
     if matches:
-        print(f"\n{Colors.GREEN}📌 Found {len(matches)} possible flag(s):{Colors.END}")
+        print(f"{Colors.GREEN}📌 Automated Scan confirmed {len(matches)} flag(s):{Colors.END}")
         for m in matches:
             print(f"   ➡️ {Colors.BOLD}{m}{Colors.END}")
-    else:
-        print(f"\n{Colors.RED}⚠️ No obvious flags found. Try scanning manually in {STRINGS_FILE}.{Colors.END}")
-
-    print("\n✅ Done! You can inspect extracted_strings.txt further or try other tools like 'hexdump' for deeper analysis.")
-    print(f"{Colors.CYAN}🧠 Remember: Only one string matches the official flag format: CCRI-AAAA-1111{Colors.END}\n")
     
-    pause("Press ENTER to close this terminal...")
+    pause("\nPress ENTER to close this terminal...")
 
 if __name__ == "__main__":
     main()

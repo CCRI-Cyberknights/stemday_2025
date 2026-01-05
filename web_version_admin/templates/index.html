@@ -31,24 +31,26 @@
   <div class="mode-intro guided-intro">
     <h2>🔭 Exploration Mode Overview</h2>
     <p>
-      Exploration Mode is a hands-on demo track. Each challenge has a helper script that
-      runs real Linux commands on real files in the challenge folder.
+      In this track, each challenge folder contains two different scripts. You generally run <strong>one or the
+        other</strong>:
     </p>
     <p>
-      Your job is to spot the <strong>one real flag</strong> that matches our standard format:
-      <strong>CCRI-AAAA-1111</strong>.
+      <strong>Exploration Mode</strong> (via the helper/solver script) is a high-level demo of what a CTF is. It
+      performs the actual work behind the scenes—running real commands on real files—to show you the result immediately.
+    </p>
+    <p>
+      On the other hand, <strong>Coach Mode</strong> is an interactive,
+      command-by-command guide that walks you through the steps to solve the puzzle yourself.
     </p>
   </div>
   {% elif mode == 'solo' %}
   <div class="mode-intro solo-intro">
     <h2>🔥 Solo Mode Overview</h2>
     <p>
-      Solo Mode is the full investigation experience. There are no helper scripts here —
-      <strong>you</strong> choose the tools and dig through the data to uncover the flag.
+      Solo Mode is the full investigation experience. There is no Coach and no script to hold your hand.
     </p>
     <p>
-      Your mission is simple: find the hidden flag in the challenge files and submit it
-      in our standard flag format: <strong>CCRI-AAAA-1111</strong>.
+      <strong>You</strong> choose the tools, you analyze the data, and you uncover the flag using your own skills.
     </p>
   </div>
   {% endif %}

@@ -13,13 +13,13 @@ from exploration_core import Colors, header, pause, require_input, print_success
 
 # === THE FIX: Patch the module itself ===
 # This ensures that even if 'header()' calls resize_terminal internally,
-# it uses THIS version, not the original one.
+# it uses THIS version (allowing for the bigger window logic).
 original_resize = exploration_core.resize_terminal
 
 def safe_resize(rows=35, cols=90):
     # If in Big Mode, IGNORE small resize requests
     if os.environ.get("BIGGER_TERMINAL") == "1":
-        # Force the big size (48x140) regardless of what was asked
+        # Force the big size (48x140)
         sys.stdout.write(f"\x1b[8;48;140t")
         sys.stdout.flush()
     else:
@@ -38,7 +38,7 @@ def get_path(filename):
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
 
 def relaunch_in_bigger_terminal(script_path):
-    """Re-executes the script in a larger MATE Terminal window for visibility."""
+    """Re-executes the script in a larger terminal window for visibility."""
     if os.environ.get("BIGGER_TERMINAL") == "1":
         return
 
@@ -48,6 +48,7 @@ def relaunch_in_bigger_terminal(script_path):
     time.sleep(1)
 
     try:
+        # Try MATE Terminal first (common in Kali/Parrot)
         subprocess.Popen([
             "mate-terminal",
             "--geometry=140x48", 
@@ -57,7 +58,8 @@ def relaunch_in_bigger_terminal(script_path):
         time.sleep(1)
         os._exit(0)
     except FileNotFoundError:
-        print_error("MATE Terminal not found. Continuing in current terminal.")
+        # Fallback: Just try to resize the current window and proceed
+        safe_resize(48, 140)
 
 def load_process_map(ps_dump_path):
     """Parses ps_dump.txt and returns a {binary: full_command} mapping."""
@@ -66,6 +68,7 @@ def load_process_map(ps_dump_path):
         with open(ps_dump_path, "r", encoding="utf-8") as f:
             next(f)  # Skip header
             for line in f:
+                # ps aux columns: USER PID %CPU %MEM VSZ RSS TTY STAT START TIME COMMAND
                 parts = line.strip().split(maxsplit=10)
                 if len(parts) == 11:
                     full_cmd = parts[10]
@@ -88,6 +91,7 @@ def inspect_process(binary, ps_dump_path):
     time.sleep(0.5)
 
     try:
+        # Use grep to find the specific lines
         result = subprocess.run(
             ["grep", binary, ps_dump_path],
             stdout=subprocess.PIPE,
@@ -96,6 +100,7 @@ def inspect_process(binary, ps_dump_path):
         if not result.stdout.strip():
             print_error("No matching process found.")
         else:
+            # Format output for readability (wrap long lines)
             formatted = result.stdout.replace("--", "\n    --")
             print(f"{Colors.YELLOW}{formatted}{Colors.END}")
             print("-" * 50)
@@ -117,7 +122,6 @@ def main():
     relaunch_in_bigger_terminal(__file__)
 
     # 2. Resize
-    # Just call it normally; our patch handles the logic now.
     time.sleep(0.2)
     safe_resize() 
 
@@ -129,12 +133,17 @@ def main():
     # 4. Mission Briefing
     header("🖥️  Process Inspection")
     
-    print(f"You've obtained a snapshot of running processes ({Colors.BOLD}{DUMP_FILE}{Colors.END}).\n")
-    print(f"🎯 Your goal: Find the rogue process hiding a flag in a {Colors.BOLD}--flag={Colors.END} argument!\n")
-    print(f"{Colors.CYAN}🧠 Flag format: CCRI-AAAA-1111{Colors.END}")
-    print("   Somewhere in the command line of a process, a --flag= argument hides the real CCRI flag.\n")
+    print(f"📄 Snapshot File: {Colors.BOLD}{DUMP_FILE}{Colors.END}")
+    print(f"🔧 Strategy: {Colors.BOLD}Process Auditing{Colors.END}\n")
+    print("🎯 Goal: Identify the rogue process carrying the flag in its arguments.\n")
     
-    require_input("Type 'ready' when you're ready to learn how we're inspecting these processes: ", "ready")
+    # Narrative Alignment: Reference the README Intel
+    print(f"{Colors.CYAN}🧠 Intelligence Report (from README):{Colors.END}")
+    print("   ➤ **The Concept:** Every program is a process.")
+    print("   ➤ **The Clue:** Malware often hides secrets in **Command Line Arguments**.")
+    print("   ➤ **The Task:** Filter the snapshot to find the argument `--flag=...`\n")
+    
+    require_input("Type 'ready' to learn how to audit processes: ", "ready")
 
     if not os.path.isfile(ps_dump_path):
         print_error(f"{DUMP_FILE} not found in this folder!")
@@ -142,21 +151,17 @@ def main():
 
     # 5. Tool Explanation
     header("🛠️ Behind the Scenes")
-    print("This challenge is based on the output of a Linux process listing command like:\n")
+    print("This challenge is based on the output of the Linux command:\n")
     print(f"   {Colors.GREEN}ps aux{Colors.END}")
-    print("\nThat output was saved into ps_dump.txt for offline analysis.")
-    print("Each line typically contains:")
-    print(f"   {Colors.BOLD}USER  PID  CPU%  MEM%  VSZ  RSS  TTY  STAT  TIME  COMMAND{Colors.END}")
-    print("   ...and the COMMAND column includes the full command line.\n")
-    print("In a normal investigation, you might do things like:\n")
-    print(f"   {Colors.GREEN}grep 'python' ps_dump.txt{Colors.END}       # find all python processes")
-    print(f"   {Colors.GREEN}grep '--flag=' ps_dump.txt{Colors.END}      # find any process with a --flag argument\n")
-    print("This helper script:")
-    print("   ➤ Builds a list of unique binaries from ps_dump.txt")
-    print("   ➤ Lets you choose one by name")
-    print("   ➤ Shows you the full command line so you can spot suspicious arguments\n")
+    print("\nThat output was saved into ps_dump.txt. Each line contains:")
+    print(f"   {Colors.BOLD}USER  PID  CPU% ... COMMAND{Colors.END}")
+    print("   (The COMMAND column shows exactly how the program was started)\n")
     
-    require_input("Type 'start' when you're ready to view the process list: ", "start")
+    print("In a real terminal, you would search it like this:\n")
+    print(f"   {Colors.GREEN}grep '--flag=' ps_dump.txt{Colors.END}\n")
+    print("This helper script will list the binaries for you to inspect manually.\n")
+    
+    require_input("Type 'start' to view the process list: ", "start")
 
     proc_map = load_process_map(ps_dump_path)
     display_names = sorted(proc_map.keys())
@@ -164,15 +169,20 @@ def main():
     # 6. Interactive Loop
     while True:
         clear_screen()
-        print(f"{Colors.CYAN}📂 Process List (from {DUMP_FILE}):{Colors.END}")
+        print(f"{Colors.CYAN}📂 Process List (Unique Binaries):{Colors.END}")
         print("-" * 40)
         for idx, name in enumerate(display_names, 1):
-            print(f"{Colors.BOLD}{idx}{Colors.END}. {name}")
+            # Truncate long names for menu
+            display_name = (name[:50] + '..') if len(name) > 50 else name
+            print(f"{Colors.BOLD}{idx}{Colors.END}. {display_name}")
         print(f"{len(display_names) + 1}. Exit")
         print("-" * 40)
 
         try:
-            choice = int(input(f"\n{Colors.YELLOW}Select a process to inspect (1-{len(display_names)+1}): {Colors.END}").strip())
+            choice_str = input(f"\n{Colors.YELLOW}Select a process to inspect (1-{len(display_names)+1}): {Colors.END}").strip()
+            if not choice_str.isdigit():
+                raise ValueError
+            choice = int(choice_str)
         except ValueError:
             print_error("Invalid input. Please enter a number.")
             pause()
@@ -183,6 +193,10 @@ def main():
             result_text = inspect_process(binary, ps_dump_path)
 
             if result_text:
+                if "CCRI-" in result_text:
+                    print(f"\n{Colors.GREEN}✅ SUSPICIOUS ARGUMENT FOUND!{Colors.END}")
+                    print(f"   The flag is hidden in the arguments of {Colors.BOLD}{os.path.basename(binary)}{Colors.END}.")
+
                 while True:
                     print("\nOptions:")
                     print("1. Return to process list")
@@ -198,10 +212,10 @@ def main():
                     else:
                         print_error("Invalid choice.")
         elif choice == len(display_names) + 1:
-            print(f"\n{Colors.CYAN}👋 Exiting. Good luck identifying the rogue process!{Colors.END}")
+            print(f"\n{Colors.CYAN}👋 Exiting.{Colors.END}")
             break
         else:
-            print_error("Invalid choice. Please select a valid process.")
+            print_error("Invalid choice.")
             pause()
 
 if __name__ == "__main__":

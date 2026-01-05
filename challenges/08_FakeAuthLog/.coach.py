@@ -23,11 +23,6 @@ def main():
         target_dir = "challenges/08_FakeAuthLog"
         if os.path.exists(target_dir):
             os.chdir(target_dir)
-        elif os.path.basename(os.getcwd()) == "08_FakeAuthLog":
-            pass
-        else:
-            bot.print_error(f"Could not find '{target_dir}'.")
-            return
         # ======================
 
         # STEP 2: Discovery
@@ -35,7 +30,7 @@ def main():
             instruction=(
                 "We have a file named 'auth.log'.\n"
                 "This is a standard Linux log file that records login attempts.\n"
-                "Check the file size with 'ls -lh' (human readable)."
+                "Check the file size with `ls -lh` (human readable) to see how big it is."
             ),
             command_to_display="ls -lh"
         )
@@ -43,8 +38,8 @@ def main():
         # STEP 3: Preview (head)
         bot.teach_step(
             instruction=(
-                "Logs can be huge. Reading the whole thing with 'cat' is messy.\n"
-                "Use 'head' to look at just the first 20 lines to understand the format."
+                "Logs can be huge. Reading the whole thing with `cat` is messy.\n"
+                "Use `head` to look at just the first 20 lines to understand the format."
             ),
             command_to_display="head -n 20 auth.log"
         )
@@ -53,12 +48,16 @@ def main():
         bot.teach_loop(
             instruction=(
                 "We know the flag starts with 'CCRI'.\n"
-                "Instead of reading thousands of lines, use 'grep' to search for that specific text.\n"
+                "Instead of reading thousands of lines, use `grep` to search for that specific text.\n"
                 "**Save the output** to 'flag.txt'."
             ),
             command_template="grep \"CCRI\" auth.log > flag.txt",
+            
             command_prefix="grep \"CCRI\" auth.log",
+            
+            # Regex enforces the redirection to flag.txt
             command_regex=r"^grep \"CCRI\" auth\.log > flag\.txt$",
+            
             clean_files=["flag.txt"]
         )
 
@@ -82,7 +81,8 @@ def main():
             
             command_prefix="grep -E ",
             
-            # Use Regex to safely match the complex command string
+            # Use Regex to safely match the complex command string.
+            # We escape the brackets \[ \] and braces \{ \} for the python regex engine.
             command_regex=r"^grep -E \"\[A-Z0-9\]\{4\}-\[A-Z0-9\]\{4\}-\[A-Z0-9\]\{4\}\" auth\.log > candidates\.txt$",
             
             clean_files=["candidates.txt"]

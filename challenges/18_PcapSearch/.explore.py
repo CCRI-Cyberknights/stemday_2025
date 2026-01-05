@@ -34,11 +34,8 @@ def check_tshark():
 
 # === Flag Extraction Phase ===
 def extract_flag_candidates(pcap_path):
-    print(f"{Colors.CYAN}🔍 Scanning entire PCAP for flag-like patterns...{Colors.END}\n")
-    print(f"Running command:")
-    print(f"  {Colors.GREEN}tshark -r traffic.pcap -Y tcp -T fields -e tcp.payload | xxd -r -p | strings{Colors.END}\n")
-    
     # We pipe shell commands, so we use shell=True safely here with a controlled path
+    # Strategy: Dump all TCP payloads -> Convert Hex to Bin -> Extract Strings
     cmd = f"tshark -r '{str(pcap_path)}' -Y tcp -T fields -e tcp.payload | xxd -r -p | strings"
     try:
         result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, text=True)
@@ -56,13 +53,9 @@ def extract_flag_candidates(pcap_path):
 
 # === Flag-to-Stream Mapping ===
 def map_flags_to_streams(pcap_path, flags):
-    print(f"\n{Colors.CYAN}🔗 Mapping detected flags to their TCP stream IDs...{Colors.END}\n")
-    print(f"Running command:")
-    print(f"  {Colors.GREEN}tshark -r traffic.pcap -Y tcp -T fields -e tcp.stream -e tcp.payload{Colors.END}\n")
-
     stream_map = {}
     
-    # We need to find which stream contains which flag
+    # Get Stream ID and Payload for every packet
     result = subprocess.run(
         ["tshark", "-r", str(pcap_path), "-Y", "tcp", "-T", "fields", "-e", "tcp.stream", "-e", "tcp.payload"],
         stdout=subprocess.PIPE,
@@ -80,13 +73,12 @@ def map_flags_to_streams(pcap_path, flags):
         except ValueError:
             continue
 
-    # Check payloads
+    # Reassemble strings in memory to check which stream owns the flag
     spinner("Mapping streams")
     for stream_id, chunks in stream_data.items():
         full_data = '\n'.join(chunks)
         try:
-            # We use xxd to reverse the hex so we can search for the plain text flag
-            # We pass input via stdin to avoid shell=True complexity
+            # Reverse hex to ascii
             proc = subprocess.Popen(
                 ["xxd", "-r", "-p"],
                 stdin=subprocess.PIPE,
@@ -112,7 +104,7 @@ def show_stream_summary(pcap_path, sid):
     print(f"  {Colors.GREEN}tshark -r traffic.pcap -qz follow,tcp,ascii,{sid}{Colors.END}\n")
     print("-" * 50)
     
-    # This is the "Big Reveal" - we show the real output here
+    # This shows the actual "Follow TCP Stream" output
     subprocess.run(["tshark", "-r", str(pcap_path), "-qz", f"follow,tcp,ascii,{sid}"])
     print("-" * 50)
 
@@ -136,91 +128,104 @@ def main():
     script_dir = Path(__file__).resolve().parent
     pcap_path = script_dir / PCAP_FILE
     notes_path = script_dir / NOTES_FILENAME
-
-    # 2. Mission Briefing
-    header("📡 PCAP Investigation Tool")
-    
-    print(f"Analyzing: {Colors.BOLD}{pcap_path.name}{Colors.END}")
-    print(f"🎯 Goal: Discover the real flag ({Colors.GREEN}CCRI-AAAA-1111{Colors.END}).")
-    print(f"{Colors.RED}🧪 Some TCP streams contain fake flags; only one is correct.{Colors.END}\n")
-    
-    print(f"{Colors.CYAN}What’s happening behind the scenes?{Colors.END}")
-    print("  ➤ We read packet data from the PCAP with tshark.")
-    print("  ➤ We scan for flag patterns, but we will REDACT them initially.")
-    print("  ➤ You must inspect the TCP stream to see the full content and context.\n")
     
     if not pcap_path.is_file():
         print_error(f"Missing file '{pcap_path.name}'")
-        pause("Press ENTER to exit...")
         sys.exit(1)
 
     check_tshark()
 
-    if notes_path.exists():
-        os.remove(notes_path)
+    # 2. Mission Briefing
+    header("📡 PCAP Stream Reconstructor")
+    
+    print(f"📄 Capture File: {Colors.BOLD}{pcap_path.name}{Colors.END}")
+    print(f"🔧 Tool in use: {Colors.BOLD}tshark{Colors.END} (Terminal Wireshark)\n")
+    print("🎯 Goal: Identify the TCP Stream containing the hidden flag.\n")
+    
+    # Narrative Alignment: Reference the README Intel
+    print(f"{Colors.CYAN}🧠 Intelligence Report (from README):{Colors.END}")
+    print("   ➤ **The Concept:** Network traffic consists of thousands of small packets.")
+    print("   ➤ **The Strategy:** Stream Reconstruction (reassembling packets into a conversation).")
+    print("   ➤ **The Tool:** `tshark` allows us to filter and follow streams.\n")
+    
+    require_input("Type 'ready' to initialize the analysis: ", "ready")
 
-    require_input("Type 'scan' when you're ready to begin scanning the PCAP: ", "scan")
+    # 3. Tool Explanation
+    header("🛠️ Behind the Scenes")
+    print("We will simulate a forensic workflow:\n")
+    
+    print(f"Step 1: Scan for Patterns")
+    print("   We search the raw packet payloads for 'CCRI-'.")
+    print(f"   {Colors.GREEN}tshark -r traffic.pcap -Y tcp ... | strings | grep CCRI{Colors.END}\n")
+    
+    print(f"Step 2: Map to Streams")
+    print("   We identify which 'TCP Stream ID' (conversation) contains that pattern.\n")
+    
+    print(f"Step 3: Follow Stream")
+    print("   We reconstruct the full conversation text.")
+    print(f"   {Colors.GREEN}tshark -r traffic.pcap -z follow,tcp,ascii,[ID]{Colors.END}\n")
+    
+    require_input("Type 'scan' to start Phase 1: ", "scan")
 
-    # 3. Phase 1: Find flag-like values (REDACTED OUTPUT)
+    # 4. Phase 1: Find flag-like values
+    if notes_path.exists(): os.remove(notes_path)
+    
+    print(f"\n{Colors.CYAN}🔎 Scanning entire PCAP for flag-like patterns...{Colors.END}")
+    spinner("Analyzing packets")
+
     flags_found = extract_flag_candidates(pcap_path)
     if not flags_found:
         print_error("No flag-like patterns found.")
-        pause("Press ENTER to exit...")
         sys.exit(0)
 
     print(f"\n{Colors.GREEN}✅ Scan complete. Detected {len(flags_found)} potential flag patterns.{Colors.END}")
     print("   (Content hidden to prevent spoilers - map to streams to view)\n")
     
     for f in sorted(flags_found):
-        # Redaction Logic: Show first 5 chars, hide the rest
         redacted = f[:5] + "****-****"
         print(f"   ➡️  {Colors.YELLOW}{redacted}{Colors.END}")
         
     print()
     require_input("Type 'map' to map these patterns to TCP streams: ", "map")
 
-    # 4. Phase 2: Map flags to streams
+    # 5. Phase 2: Map flags to streams
+    print(f"\n{Colors.CYAN}🔗 Mapping detected flags to their TCP stream IDs...{Colors.END}")
     stream_map = map_flags_to_streams(pcap_path, flags_found)
+    
     if not stream_map:
         print_error("No streams matched the candidate flags.")
-        pause()
         sys.exit(0)
 
     candidates = sorted(stream_map.keys())
-    print_success(f"{len(candidates)} TCP stream(s) contain suspect data.")
+    print_success(f"{len(candidates)} TCP stream(s) contain suspect data.\n")
     
     require_input("Type 'investigate' to explore the streams: ", "investigate")
 
-    # 5. Phase 3: Exploration UI (REDACTED MENU)
+    # 6. Phase 3: Exploration UI
     while True:
         clear_screen()
         print(f"{Colors.CYAN}📜 Candidate Streams:{Colors.END}")
         print("-" * 40)
         for idx, sid in enumerate(candidates, 1):
-            # Don't show the flags here either!
             count = len(stream_map[sid])
             print(f"{Colors.BOLD}{idx}{Colors.END}. Stream ID: {Colors.YELLOW}{sid}{Colors.END} (Contains {count} hidden candidate(s))")
         print(f"{len(candidates)+1}. Exit\n")
 
         try:
             choice_str = input(f"{Colors.YELLOW}Choose stream to inspect (1-{len(candidates)+1}): {Colors.END}").strip()
-            if not choice_str.isdigit():
-                print_error("Invalid input. Please enter a number.")
-                pause()
-                continue
             choice = int(choice_str)
         except ValueError:
-            print_error("Invalid input.")
-            pause()
+            time.sleep(1)
             continue
 
         if 1 <= choice <= len(candidates):
             sid = candidates[choice - 1]
             clear_screen()
             
-            # THE REVEAL happens inside this function
+            # The Reveal
             show_stream_summary(pcap_path, sid)
 
+            # Interaction
             while True:
                 print("\nOptions:")
                 print("1) 🔁 Back to list")
@@ -232,19 +237,15 @@ def main():
                 elif opt == "2":
                     save_summary(pcap_path, sid, notes_path)
                 elif opt == "3":
-                    print(f"\n{Colors.CYAN}👋 Done. Notes saved in {notes_path.name}{Colors.END}")
-                    pause()
+                    print(f"\n{Colors.CYAN}👋 Done.{Colors.END}")
                     sys.exit(0)
                 else:
-                    print_error("Invalid option. Please choose 1–3.")
+                    print_error("Invalid option.")
         elif choice == len(candidates)+1:
             break
         else:
             print_error("Invalid selection.")
-            pause()
-
-    print_success(f"Done. Notes saved in {notes_path.name}")
-    pause()
+            time.sleep(1)
 
 if __name__ == "__main__":
     main()

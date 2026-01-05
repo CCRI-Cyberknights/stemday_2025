@@ -1,67 +1,43 @@
-# 🔐 Challenge 03: ROT13 Decode Challenge
+# 🔐 Challenge 03: ROT13 Decode
 
-ROT13 is a simple substitution cipher that rotates each letter 13 positions forward in the alphabet.
-After `Z`, it wraps back around to `A`.
-
-It’s symmetrical:
-
-* `A` → `N`
-* `N` → `A`
-* Apply ROT13 twice and you return to the original message.
-
-It’s not secure — but it *is* great for confusing casual readers.
-
+**Mission Briefing:**
 A scrambled message was intercepted from a compromised CryptKeepers communication relay.
-It looks human-readable… just twisted.
+It looks human-readable… just twisted. The letters seem familiar, but the words make no sense.
 
----
-
-## 🧩 Objective
-
-Decode the message in `cipher.txt` using any of the tools below.
-The decoded output may contain **multiple flag-like candidates**, but **only one** is real.
-
-ROT13 is simple, but don’t get complacent — only one decoded flag will match the correct structure.
-
----
+## 🧠 Intelligence Report
+* **The Cipher:** **ROT13** (Rotate 13) is a simple substitution cipher that replaces a letter with the 13th letter after it in the alphabet. 
+* **The Mechanics:** Because the alphabet has 26 letters, shifting by 13 is symmetrical. Applying the cipher twice returns the original text (`A` → `N` → `A`).
+* **The Strategy:** Shift every letter back by 13 positions.
 
 ## 📝 Investigator’s Journal
+*Notes from the field:*
 
-They really used that childish cipher again.
-At this point it’s practically a habit for them.
+> "They really used that childish cipher again? It's not even encryption; it's just obfuscation.
+>
+> It looks like they tried to hide a flag in there, but ROT13 leaves numbers and symbols unchanged. If you see something like `PPEV-nnnn-1111`, that's likely the flag staring right at you, just shifted."
 
-Run it through a rotator and see what shakes loose.
+## 📂 Files in This Folder
+* `cipher.txt` — The scrambled transmission.
 
 ---
 
 ## 🛠 Tools & Techniques
 
-These tools can help decode ROT13 automatically or manually:
+While there are many online converters, a true Linux pro uses the terminal.
 
-| Tool            | Use Case                                       | Example Command                                                                         |
-| --------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------- |
-| `tr`            | Translate character sets using shell utilities | `tr 'A-Za-z' 'N-ZA-Mn-za-m' < cipher.txt`                                               |
-| `python3`       | Use a one-liner with `codecs`                  | `python3 -c "import codecs; print(codecs.decode(open('cipher.txt').read(), 'rot_13'))"` |
-| `vim` / `emacs` | ROT13 decoding built into editors              | `:%!tr A-Za-z N-ZA-Mn-za-m` *(inside Vim normal mode)*                                  |
-| Online tools    | Browser-based ROT13 converters                 | *Use cautiously — avoid pasting real flags.*                                            |
+| Tool | Purpose | Usage Example |
+| :--- | :--- | :--- |
+| **tr** | The "translate" command is perfect for swapping character sets. | `tr 'A-Za-z' 'N-ZA-Mn-za-m' < cipher.txt` |
+| **Python** | Python has a built-in library for this specific cipher. | `python3 -c "import codecs; print(codecs.decode(open('cipher.txt').read(), 'rot_13'))"` |
 
-> 💡 **Tip:**
-> ROT13 only affects alphabetic characters (`A–Z`, `a–z`).
-> Numbers, punctuation, and spacing remain unchanged.
-
----
-
-## 📂 Files in This Folder
-
-* `cipher.txt` — The scrambled transmission encoded with ROT13.
+> 💡 **Tip:** The `tr` command looks scary, but it's just a mapping:
+> * `A-Za-z` = The alphabet inputs.
+> * `N-ZA-Mn-za-m` = The alphabet shifted by 13.
+> * It tells the computer: "Replace A with N, B with O... and N with A."
 
 ---
 
 ## 🏁 Flag Format
-
-All flags follow the official structure:
-
 **`CCRI-AAAA-1111`**
 
-Replace `AAAA` and the digits with the code you uncover.
-Then enter the flag into the website to verify your answer.
+Decode the message and find the flag in the output.

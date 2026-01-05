@@ -1,13 +1,17 @@
 # 📜 Log Analysis Challenge
 
+**Mission Briefing:**
 A server has been compromised. The system administrators have provided the `auth.log` file, which records every login attempt.
 
 The file contains thousands of lines of noise. Somewhere in there, a hacker successfully logged in or executed a suspicious command.
 
-**Your Mission:** Filter the noise.
-1.  Analyze the log file (`auth.log`).
-2.  Use text processing tools (like `grep`) to search for keywords like "Accepted", "root", or the agency flag format.
-3.  Identify the specific log entry that contains the flag.
+## 🧠 Intelligence Report
+* **The Problem:** The log file is too large to read line-by-line.
+* **The Needle:** We are looking for the agency flag format (`CCRI-...`) or suspicious pattern matches.
+* **The Strategy:** **Filtering**. Instead of reading everything, we display only the lines that match our criteria.
+* **The Tool:** `grep` (Global Regular Expression Print) is the standard Linux tool for searching plain-text data sets.
+
+**Your Goal:** Filter the noise to identify the specific log entry that contains the flag.
 
 ## 📂 Files in this folder
 * `auth.log` – A large server log file containing thousands of entries.

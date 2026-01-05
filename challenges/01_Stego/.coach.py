@@ -1,40 +1,24 @@
 #!/usr/bin/env python3
 import sys
 import os
-import subprocess
-import re
 
 # Add root to path to find coach_core
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 from coach_core import Coach
 
-def get_stego_password(filename="squirrel.jpg"):
-    """
-    Reads the file to find the embedded password hint.
-    Generators store hints in EXIF data which 'strings' can read.
-    """
-    try:
-        if not os.path.exists(filename):
-            return "password"
-
-        # Use strings to scan the binary for the hint text injected by the generator
-        output = subprocess.check_output(["strings", filename], text=True)
-        
-        # Look for the specific guided hint pattern
-        match = re.search(r"passphrase is '(.+?)'", output)
-        if match: 
-            return match.group(1)
-
-    except Exception:
-        pass
-    
-    return "password" # Fallback default
+def cleanup():
+    """Ensures we don't have a stale flag file before starting."""
+    if os.path.exists("flag.txt"):
+        try:
+            os.remove("flag.txt")
+        except:
+            pass
 
 def main():
     bot = Coach("Steganography Decode")
-
-    # 1. Determine the correct password before starting
-    real_pass = get_stego_password()
+    
+    # Ensure clean slate for the existence check later
+    cleanup()
 
     bot.start()
 
@@ -49,51 +33,59 @@ def main():
         )
         
         # === CRITICAL: SYNC COACH DIRECTORY ===
-        os.chdir(os.path.join(os.path.dirname(__file__))) 
+        target_dir = "challenges/01_Stego"
+        if os.path.exists(target_dir):
+            os.chdir(target_dir)
         # ======================================
 
-        # STEP 2: Discovery (List Files)
+        # STEP 2: Discovery
         bot.teach_step(
             instruction=(
-                "Let's see what files are here using 'ls' (list segments) with '-l'."
+                "Let's confirm the target file is present."
             ),
             command_to_display="ls -l"
         )
 
-        # STEP 3: Analysis (Finding the Password)
+        # STEP 3: Intel Analysis
         bot.teach_step(
             instruction=(
-                "We see 'squirrel.jpg'. Before we can extract data, we need a password.\n"
-                "Attackers sometimes leave credentials in the file metadata.\n\n"
-                "Run 'strings' but use the pipe '|' and 'head' to see just the top lines."
+                "According to the **Mission Brief** (README), this file is locked with a password.\n"
+                "The hint provided is: *'The password is the most common password in the world.'*\n\n"
+                "Review the hint and prepare to guess the password."
             ),
-            command_to_display="strings squirrel.jpg | head -n 15"
+            command_to_display="echo \"Intel received: Common Password\""
         )
 
-        # STEP 4: The Extraction
-        bot.teach_loop(
-            instruction=(
-                "Review the output above. Did you see a line mention a **passphrase**?\n"
-                "Use that password to extract the hidden 'flag.txt' file."
-            ),
-            # Template showing where the password goes
-            command_template=f"steghide extract -sf squirrel.jpg -xf flag.txt -p {real_pass}",
-            
-            # We validate the prefix...
-            command_prefix="steghide extract -sf squirrel.jpg -xf flag.txt -p ",
-            
-            # ...and check for the dynamically found password
-            correct_password=real_pass,
-            
-            # Coach Core handles cleaning up previous failed attempts
-            clean_files=["flag.txt"] 
-        )
+        # STEP 4: The Extraction Loop
+        success = False
+        while not success:
+            bot.teach_loop(
+                instruction=(
+                    "Now, use `steghide` to extract the data using that password hint.\n"
+                    "We need to specify the source file (`-sf`) and the output file (`-xf`).\n\n"
+                    "Command format: `steghide extract -sf squirrel.jpg -xf flag.txt -p [YOUR_GUESS]`\n"
+                    "Common guesses: `123456`, `password`, `admin`."
+                ),
+                # We show them the structure, they fill in the blank
+                command_template="steghide extract -sf squirrel.jpg -xf flag.txt -p [PASSWORD]",
+                
+                # We validate the command structure, but allow any password at the end
+                command_prefix="steghide extract",
+                command_regex=r"^steghide extract -sf squirrel\.jpg -xf flag\.txt -p .+$"
+            )
+
+            # LOGIC CHECK: Did the command actually work?
+            if os.path.exists("flag.txt") and os.path.getsize("flag.txt") > 0:
+                success = True
+            else:
+                print("\n❌ Access Denied. That password did not unlock the file.")
+                print("Consult the Mission Brief hint again. What is the literal word for a password?\n")
 
         # STEP 5: Verification
         bot.teach_step(
             instruction=(
-                "Great! The tool extracted the secret message to 'flag.txt'.\n"
-                "Read the file using 'cat' to get your flag."
+                "🎉 **Access Granted!** The password was correct.\n"
+                "Read the extracted 'flag.txt' file to retrieve the flag."
             ),
             command_to_display="cat flag.txt"
         )

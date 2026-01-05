@@ -1,13 +1,16 @@
 # ⚙️ Binary Extraction Challenge
 
+**Mission Briefing:**
 You have recovered a compiled binary file named `hidden_flag`.
 
-Computers read binary code, but humans cannot. However, programmers often leave plain text strings inside compiled programs (like error messages, variables, or secret keys).
+Computers read binary code easily, but humans cannot. However, developers often leave plain text strings inside compiled programs (like error messages, variable names, or secret keys).
 
-**Your Mission:** Perform **Static Analysis**.
-1.  The file is not executable or readable by a standard text editor.
-2.  Use the provided tools (like the `strings` command) to sift through the binary data.
-3.  Look for any human-readable text that matches the flag format.
+## 🧠 Intelligence Report
+* **The Lock:** The file is a binary executable, not a text file. Standard editors cannot read it.
+* **The Strategy:** **Static Analysis**. We will search through the raw data bytes for readable text sequences.
+* **The Tool:** The `strings` command is the industry standard for this task.
+
+**Your Goal:** Sift through the binary noise to find the human-readable text string matching the flag format.
 
 ## 📂 Files in this folder
 * `hidden_flag` – The compiled binary file containing the secret.

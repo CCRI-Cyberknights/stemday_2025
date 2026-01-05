@@ -1,12 +1,16 @@
 # 🧩 Vigenère Cipher Challenge
 
-You have recovered a scrambled message (`cipher.txt`) from an intercepted communication. Analysts suspect it was encoded using the **Vigenère cipher**.
+**Mission Briefing:**
+You have recovered a scrambled message (`cipher.txt`) from an intercepted communication. Our analysts suspect it was encoded using the **Vigenère cipher**.
 
-Unlike simple rotation ciphers, Vigenère uses a **keyword** to shift letters differently throughout the message. To break it, you need to know (or guess) that keyword.
+Unlike simple rotation ciphers (like ROT13), Vigenère uses a **keyword** to shift letters differently throughout the message. To break it, you need to know (or guess) that keyword.
 
-## 🔐 The Clue
-**Hint:** What is the opposite of `logout`?
-👉 Use that word as your keyword when running the decryption tools.
+## 🧠 Intelligence Report
+* **The Cipher:** Vigenère (Polyalphabetic Substitution).
+* **The Clue:** The system administrator left a hint in the logs: **"What is the opposite of `logout`?"**
+* **The Requirement:** Decrypting Vigenère by hand is slow and error-prone. You will need to use a script or tool capable of handling the complex shifting logic.
+
+**Your Goal:** Deduce the keyword from the clue, use the available tools to decrypt the message, and capture the flag.
 
 ## 📂 Files in this folder
 * `cipher.txt` – The encrypted message.

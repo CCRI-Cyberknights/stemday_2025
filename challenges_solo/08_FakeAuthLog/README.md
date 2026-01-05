@@ -1,58 +1,47 @@
 # 🕵️ Challenge 08: Fake Auth Log Investigation
 
-System logs like `auth.log` record login attempts, user authentication, and session activity. But logs can be noisy — especially on compromised systems where attackers might try to blend false entries in with real ones.
+**Mission Briefing:**
+You have intercepted a suspicious system log file (`auth.log`) from a server controlled by the **CryptKeepers**.
+On Linux systems, this file records every login attempt, sudo command, and authentication event.
+It looks like a standard server log... except our analysts detected a pattern anomaly. A flag is hidden inside one of the entries, disguised as a system process to evade detection.
 
-You’ve intercepted a suspicious system log: `auth.log`.
-It looks like a normal SSH activity log... except something’s off. Among the login entries is a hidden flag, disguised in plain sight.
+## 🧠 Intelligence Report
+* **The Concept:** System logs follow a strict structure: `Date Hostname Process[PID]: Message`. 
+* **The Anomaly:** The **PID** (Process ID) inside the square brackets `[]` is *always* a number (e.g., `sshd[1234]`).
+* **The Strategy:** **Log Analysis**. We suspect the attacker tampered with the logs and replaced a numeric PID with text characters to hide their flag.
 
-Sometimes the trick isn’t *what’s* in the log, but *where*.
+## 📝 Investigator’s Journal
+*Notes from the field:*
+
+> "The log is filled with noise—thousands of SSH login attempts.
+>
+> But I noticed something weird. Look closely at the Process IDs. They are supposed to be numbers, right? I saw some entries where the PID looked... off. Not numeric. That's where I started digging. If you can filter out the normal numbers, the flag should be the only thing left."
+
+## 📂 Files in This Folder
+* `auth.log` – The simulated log file.
 
 ---
 
 ## 🛠 Tools & Techniques
 
-| Tool      | Use Case                                         | Example Command                                |
-| --------- | ------------------------------------------------ | ---------------------------------------------- |
-| `grep`    | Search for text patterns in log entries          | `grep sshd auth.log`                           |
-| `awk`     | Extract structured fields like usernames or PIDs | `awk '{print $5}' auth.log`                    |
-| `less`    | Scroll and inspect large log files interactively | `less auth.log`                                |
-| `head`    | Preview the beginning of a file                  | `head auth.log`                                |
-| `grep -E` | Use regex for smarter filtering                  | `grep -E 'CCRI-[A-Z0-9]{4}-[0-9]{4}' auth.log` |
+You need to filter thousands of lines to find the needle in the haystack.
 
-> 💡 **Tip:** SSH logs often follow this format:
-> `sshd[PID]: Accepted/Failed ... from IP ...`
+| Tool | Purpose | Usage Example |
+| :--- | :--- | :--- |
+| **grep** | Search for specific text patterns. | `grep "CCRI-" auth.log` |
+| **awk** | Advanced filtering. Can check specific columns. | `awk '{print $5}' auth.log` (Prints only the Process column) |
+| **less** | Scroll through the file manually. | `less auth.log` |
+| **Regex** | Search for the pattern directly. | `grep -E "CCRI-[A-Z0-9]+" auth.log` |
 
-Can you spot something unusual about the PIDs?
-
----
-
-## 🧩 Investigator’s Journal
-
-🗒️ *“The log was filled with noise, but I noticed the patterns didn’t make sense. Some process IDs looked… off. Not numeric. That’s where I started digging.”*
-
----
-
-## 📝 Your Objective
-
-1. Explore the `auth.log` file.
-2. Look for login entries with strange or non-numeric process IDs.
-3. Use tools like `grep` or `awk` to narrow your search.
-4. One line contains a hidden flag that fits the agency format.
-
----
-
-## 📂 Files in This Folder
-
-* `auth.log` – Simulated log file for forensic analysis.
+> 💡 **Tip:** A normal log entry looks like this:
+> `sshd[2910]: Accepted password...`
+>
+> A suspicious entry might look like this:
+> `sshd[FLAG]: Accepted password...`
 
 ---
 
 ## 🏁 Flag Format
-
-All flags follow this format:
-
 **`CCRI-AAAA-1111`**
 
-Replace `AAAA` and the numbers with the correct code you uncover.
-
-Input the flag into the website to verify the answer.
+Filter the logs and find the non-numeric PID.

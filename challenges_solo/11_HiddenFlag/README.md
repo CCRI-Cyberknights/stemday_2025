@@ -1,64 +1,43 @@
 # 🗃️ Challenge 11: Hidden File Hunt
 
-A rogue operative may have stashed the real agency flag somewhere deep in this folder structure.
+**Mission Briefing:**
+A rogue CryptKeeper operative has stashed the agency flag somewhere deep inside the `junk/` directory.
+To the naked eye, this folder looks like a boring collection of backups and logs. However, intelligence indicates that the flag is hidden inside a file that "doesn't want to be found."
 
-The directory tree you’re exploring — `junk/` — looks like a boring collection of backups and logs… but somewhere inside, a hidden file contains the flag you’re after.
+## 🧠 Intelligence Report
+* **The Concept:** **Hidden Files**. In Linux, any file starting with a dot (`.secret`) is hidden from standard directory listings. 
+* **The Challenge:** **Recursion**. The folder contains subfolders, which contain more subfolders. You cannot check them one by one.
+* **The Trap:** The operative planted **four fake flags** (decoys) to slow you down.
 
-Just one problem: **four fake flags** have also been planted to throw you off the trail.
+## 📝 Investigator’s Journal
+*Notes from the field:*
 
-Some files are easy to find. Others? Not so much.
-Not all files *want* to be found.
+> "It's a needle in a haystack. I tried running `ls`, but I saw nothing useful.
+>
+> You need to dig deeper. The flag might be inside a hidden file (a 'dotfile') or buried three levels down in a subdirectory. Don't trust the decoys—if you see a flag like `FLAG-HIDE-1234` or `FAKE-1111`, ignore it. The real one matches our standard format perfectly."
 
-Dig with purpose, filter with precision, and don’t be fooled by fakes.
-
-Only one true flag follows the official knight format:
-
-**`CCRI-AAAA-1111`**
-
-Fake flags may appear using misleading formats such as:
-
-* `FLAG-HIDE-####`
-* `HIDE-####-CODE`
-* `CCRI-1111-FAKE`
-
-…don’t fall for them.
+## 📂 Files in This Folder
+* `junk/` — A maze of subdirectories containing junk files and the flag.
 
 ---
 
 ## 🛠 Tools & Techniques
 
-| Tool / Command       | What It Does                                   |
-| -------------------- | ---------------------------------------------- |
-| `ls -a`              | Lists files — including hidden dotfiles        |
-| `find junk/ -type f` | Lists **all** files under `junk/`, recursively |
-| `grep -R CCRI junk/` | Searches for real-looking flags recursively    |
-| `cat`                | Outputs file contents                          |
-| `file`               | Identifies file type                           |
+You need tools that can see the invisible and look through walls (folders).
 
-> 🔎 **Pro Tip:** Some files are hidden *and* buried in subdirectories. You’ll need to dig deep.
+| Tool | Purpose | Usage Example |
+| :--- | :--- | :--- |
+| **ls -a** | Lists **all** files, revealing hidden dotfiles. | `ls -a junk/` |
+| **find** | The ultimate search tool. Lists every file in every subfolder recursively. | `find junk/ -type f` |
+| **grep -r** | recursively searches the *contents* of files for a pattern. | `grep -r "CCRI-" junk/` |
 
----
-
-## 📝 Objective
-
-1. Begin your search in the `junk/` folder.
-2. Use the tools above to recursively explore all files — especially those starting with a dot (`.`).
-3. If you spot a flag, verify that it matches the official format **exactly**.
-4. Ignore fakes and locate the real `CCRI-AAAA-1111` flag.
-
----
-
-## 📂 Files in This Folder
-
-* `junk/` — A maze of subdirectories containing junk files and (possibly) a flag.
+> 💡 **Tip:** The `find` command is powerful.
+> * `-type f` means "look for files only" (ignore folders).
+> * `-name ".*"` would find only hidden files.
 
 ---
 
 ## 🏁 Flag Format
-
-All flags follow this structure:
-
 **`CCRI-AAAA-1111`**
 
-Replace `AAAA` and the digits with the correct values you uncover.
-Then input the flag into the website to verify the answer.
+Recursively search the directory, find the hidden file, and verify the flag format.

@@ -1,69 +1,44 @@
-# 🔑 Challenge 04: Vigenère Cipher Challenge
+# 🔑 Challenge 04: Vigenère Cipher
 
-The Vigenère cipher encrypts text by shifting each letter according to a repeating keyword.
-Every letter in the plaintext is moved forward in the alphabet based on the corresponding letter of the keyword.
+**Mission Briefing:**
+You have recovered a scrambled message (`cipher.txt`) from an intercepted communication. Our analysts suspect it was encoded using the **Vigenère cipher**.
 
-For example:
+Unlike simple rotation ciphers (like ROT13), Vigenère uses a **keyword** to shift letters differently throughout the message. To break it, you need to know (or guess) that keyword.
 
-```
-Plaintext: ATTACK
-Keyword:   KEYKEY
-Ciphertext: KXRIGU
-```
-
-Using a different keyword produces a completely different ciphertext — making the **key** essential to successful decryption.
-
----
-
-## 🧩 Objective
-
-Recover the original message and extract the correct flag.
-
-1. Inspect `cipher.txt`.
-2. Decode the text using an appropriate keyword.
-3. Look for readable sentences and flag-like patterns in the decrypted result.
-
-This cipher once earned the nickname “the unbreakable cipher.”
-Now it’s your turn to reverse it.
-
----
+## 🧠 Intelligence Report
+* **The Cipher:** **Vigenère** is a polyalphabetic substitution cipher. 
+* **The Mechanics:** It uses a keyword to shift each letter of the plaintext by a different amount. To break it, you must use the correct keyword.
+* **The Clue:** The agent used a familiar word—something local. Intelligence suggests the CryptKeepers frequently use **Rhode Island city names** as encryption keywords.
 
 ## 📝 Investigator’s Journal
+*Notes from the field:*
 
-The agent used a familiar word — something close to home.
-We’ve seen the CryptKeepers lean on **regional references** before.
+> "This isn't a simple Caesar shift. The frequency analysis is all over the place, confirming it's polyalphabetic.
+>
+> You need a keyword to unlock it. We know the group operates locally. I already tried 'Newport' and 'Warwick', but the output was still garbage.
+>
+> It must be another **major city in Rhode Island**. You might need to try a few famous ones before the text snaps into focus."
 
-If you know where we are… you know the key.
+## 📂 Files in This Folder
+* `cipher.txt` — The encrypted message.
 
 ---
 
 ## 🛠 Tools & Techniques
 
-Here are tools that can help decode a Vigenère cipher:
+Vigenère is mathematically complex to do by hand. We recommend using a script or a robust cyber tool.
 
-| Tool                           | Use Case                                 | Example / Description                                            |
-| ------------------------------ | ---------------------------------------- | ---------------------------------------------------------------- |
-| `python3`                      | Write your own decoder using shift logic | Use `codecs`, string arithmetic, or a custom Python script       |
-| Online tools                   | Quickly test different keywords          | Search “Vigenère Cipher Decoder”                                 |
-| `gpg`, `cryptool`, `CyberChef` | Advanced GUI/CLI options                 | Some tools offer built-in Vigenère decoding (GUI often required) |
+| Tool | Purpose | Usage Example |
+| :--- | :--- | :--- |
+| **CyberChef** | The "Swiss Army Knife" of cyber decoding. Use the "Vigenère Decode" recipe. | [GCHQ CyberChef](https://gchq.github.io/CyberChef/) |
+| **Python** | You can write a script to handle the modulo math for you. | *See `vigenere_solver.py` examples online* |
+| **Online Decoders** | Quickest way if you know the key. | Search "Vigenère Decoder" |
 
-> 💡 **Tip:**
-> The **correct keyword** makes the message snap into clarity.
-> The wrong one produces only noise.
-
----
-
-## 📂 Files in This Folder
-
-* `cipher.txt` — The message encrypted using the Vigenère cipher.
+> 💡 **Tip:** In a Vigenère cipher, the letter 'A' in the plaintext might be encrypted as 'K' the first time, but as 'Z' the second time, depending on the keyword. This destroys standard letter frequency patterns.
 
 ---
 
 ## 🏁 Flag Format
-
-All flags follow the official structure:
-
 **`CCRI-AAAA-1111`**
 
-Replace `AAAA` and the digits with the code you uncover.
-Then enter the flag into the website to verify your answer.
+Decrypt the message and capture the flag.

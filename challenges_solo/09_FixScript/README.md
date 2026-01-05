@@ -1,47 +1,49 @@
 # 🐍 Challenge 09: Fix the Flag!
 
-You’ve found a Python script that’s supposed to reveal the cryptkeeper’s flag — but it’s broken!
+**Mission Briefing:**
+You recovered a Python script (`broken_flag.py`) that was supposed to generate the agency's daily authentication code.
+However, the script is malfunctioning. It runs without crashing, but the number it produces at the end is incorrect. It seems the developer made a typo in the math logic.
 
-Instead of showing the correct flag, it prints the wrong number at the end. Your task is to debug and repair the code so the full flag is revealed.
+## 🧠 Intelligence Report
+* **The Concept:** **Logic Errors**. Unlike "Syntax Errors" (which stop the code from running), logic errors happen when the code runs perfectly but does the *wrong thing* (e.g., adding instead of multiplying).
+* **The Lock:** The final four digits of the flag are calculated mathematically. Currently, that calculation is wrong.
+* **The Strategy:** **Debugging**. You must open the source code, find the line doing the math, and fix the operator.
 
-Even small mistakes in code can have big consequences. This script has a bug that causes it to calculate the wrong value. You’ll need to identify the issue and fix it like a proper developer would.
+## 📝 Investigator’s Journal
+*Notes from the field:*
 
-Think like a coder. Follow the flow of logic. One wrong operator is all that stands between you and the flag!
+> "I ran the script, but the flag it spit out was rejected by the system.
+>
+> I took a peek at the source code. It looks like a simple math mistake. The comments in the code say it's supposed to *multiply* the values to get the final checksum, but I think I saw a different operator in there.
+>
+> You'll need to open the file, find the bug, fix it, and run it again."
+
+## 📂 Files in This Folder
+* `broken_flag.py` – The buggy Python script.
 
 ---
 
 ## 🛠 Tools & Techniques
 
-| Tool / Command  | Purpose                                        |
-| --------------- | ---------------------------------------------- |
-| `nano` / `vim`  | Edit the Python script in the terminal         |
-| `python`        | Run the script and see what it prints          |
-| `print()`       | Add extra output to help debug variable values |
-| `int()` / `f""` | Convert values and format output cleanly       |
+To solve this, you need to edit the code and run it.
 
-> 💡 **Tip:** Pay special attention to how the code performs calculations.
+| Tool | Purpose | Usage Example |
+| :--- | :--- | :--- |
+| **nano** | A beginner-friendly terminal text editor. Use this to fix the bug. | `nano broken_flag.py` <br> *(Ctrl+O to save, Ctrl+X to exit)* |
+| **python3** | Runs the script. | `python3 broken_flag.py` |
+| **cat** | Quickly view the code without editing. | `cat broken_flag.py` |
 
----
-
-## 📝 Objectives
-
-1. Open `broken_flag.py` and carefully review the code.
-2. Look for logic or math errors in how the final number is calculated.
-3. Correct the mistake and re-run the script to reveal the proper flag.
-
----
-
-## 📂 Files in This Folder
-
-* `broken_flag.py` – The buggy Python script that needs fixing.
+> 💡 **Tip:** Look closely at the math symbols.
+> * `+` (Add)
+> * `-` (Subtract)
+> * `*` (Multiply)
+> * `/` (Divide)
+>
+> One of these is wrong. 
 
 ---
 
 ## 🏁 Flag Format
-
-All flags follow this format:
-
 **`CCRI-AAAA-1111`**
 
-Replace `AAAA` and the numbers with the code you uncover.
-Input the flag into the website to verify the answer.
+Fix the code, run the script, and get the correct flag.

@@ -16,9 +16,9 @@ def check_web_server():
         sock.close()
         
         if result != 0:
-            print("\n\033[91m❌ ERROR: The Web Server is not running!\033[0m")
+            print("\n❌ ERROR: The Web Server is not running!")
             print("This challenge requires the background web services.")
-            print("👉 Please open a new terminal tab and run: \033[1;93mpython3 start_web_hub.py\033[0m\n")
+            print("👉 Please open a new terminal tab and run: python3 start_web_hub.py\n")
             sys.exit(1)
     except Exception:
         pass
@@ -36,18 +36,24 @@ def create_intel_file():
         " - /mystery/endpoint_4  (Status: Active)\n"
         " - /mystery/endpoint_5  (Status: Active)\n"
     )
-    if not os.path.exists(filename):
-        with open(filename, "w") as f:
-            f.write(content)
+    with open(filename, "w") as f:
+        f.write(content)
 
 def cleanup_intel_file():
     if os.path.exists("server_logs.txt"):
         os.remove("server_logs.txt")
+    if os.path.exists("flag.txt"):
+        os.remove("flag.txt")
 
 def main():
     check_web_server()
 
     bot = Coach("HTTP Header Detective (curl)")
+    
+    # Ensure fresh state
+    cleanup_intel_file()
+    create_intel_file()
+    
     bot.start()
 
     try:
@@ -59,13 +65,11 @@ def main():
             command_to_display="cd challenges/13_HTTPHeaders"
         )
         
-        # === SYNC & SETUP ===
+        # === SYNC DIRECTORY ===
         target_dir = "challenges/13_HTTPHeaders"
         if os.path.exists(target_dir):
             os.chdir(target_dir)
-        
-        create_intel_file()
-        # ====================
+        # ======================
 
         # STEP 2: Discovery (Recon)
         bot.teach_step(
@@ -84,13 +88,12 @@ def main():
             command_to_display="cat server_logs.txt"
         )
 
-        # STEP 4: The Concept
+        # STEP 4: The Concept (Manual Test)
         bot.teach_step(
             instruction=(
-                "The logs show 5 endpoints: `endpoint_1` through `endpoint_5`.\n"
-                "The flag is hidden in a custom **Header** (e.g., `X-Flag`).\n\n"
-                "To see headers, we use `curl` with the `-I` (Info) flag.\n"
-                "Test the first endpoint manually:"
+                "The logs show 5 endpoints (`endpoint_1` through `5`).\n"
+                "The flag is hidden in a custom **Header**.\n\n"
+                "Use `curl -I` (Fetch Headers Only) to inspect the first endpoint manually:"
             ),
             command_to_display="curl -I http://localhost:5000/mystery/endpoint_1"
         )
@@ -98,9 +101,9 @@ def main():
         # STEP 5: Automation (Curl Sequencing)
         bot.teach_step(
             instruction=(
-                "You checked one, but to be thorough, we must check **all 5**.\n"
-                "Since the logs showed a clear pattern (1-5), we can use `curl`'s built-in sequencer `[1-5]`.\n\n"
-                "**Note:** Use quotes `\"` to protect the brackets from the shell.\n"
+                "You checked one, but we need to check **all 5**.\n"
+                "Curl supports **Sequencing** using brackets `[]`.\n"
+                "**Important:** You must wrap the URL in quotes `\"` so the shell doesn't break.\n\n"
                 "Scan all 5 endpoints at once:"
             ),
             command_to_display="curl -I \"http://localhost:5000/mystery/endpoint_[1-5]\""
@@ -109,20 +112,19 @@ def main():
         # STEP 6: Filter and Save
         bot.teach_loop(
             instruction=(
-                "We successfully scanned the whole list!\n"
-                "Now filter the output to find the 'CCRI' flag:\n"
-                "1. Add `-s` (silent) to clean up the output.\n"
+                "We scanned the list! Now let's filter the noise.\n"
+                "1. Add `-s` (silent) to hide the progress bar.\n"
                 "2. Pipe to `grep` to find 'CCRI'.\n"
                 "3. **Save** the result to 'flag.txt'.\n\n"
                 "Construct the command:"
             ),
-            # Template
+            # Template showing the logic
             command_template="curl -I -s \"http://localhost:5000/mystery/endpoint_[1-5]\" | grep \"CCRI\" > flag.txt",
             
-            # Prefix
+            # Prefix for visual hint
             command_prefix="curl -I -s ",
             
-            # Regex match
+            # Regex match for the sequence command
             command_regex=r"^curl -I -s \"http://localhost:5000/mystery/endpoint_\[1-5\]\" \| grep \"CCRI\" > flag\.txt$",
             
             clean_files=["flag.txt"]

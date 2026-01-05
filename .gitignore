@@ -41,82 +41,65 @@
 # We use !filename to keep files. Because we whitelisted directories above, 
 # any file NOT explicitly whitelisted here will stay ignored by the '*' rule.
 
-# --- Coach Mode Scripts (Global Whitelist for all challenges) ---
+# --- Global Script Whitelists (Applies to all challenges) ---
 !challenges/*/.coach.py
+!challenges/*/.explore.py
 
-# --- Guided Challenges ---
+# --- Guided Challenges Assets ---
 !challenges/01_Stego/README.md
-!challenges/01_Stego/.extract_flag.py
 !challenges/01_Stego/squirrel.jpg
 
 !challenges/02_Base64/README.md
-!challenges/02_Base64/.solve.py
 !challenges/02_Base64/encoded.txt
 
 !challenges/03_ROT13/README.md
-!challenges/03_ROT13/.decode_rot13.py
 !challenges/03_ROT13/cipher.txt
 
 !challenges/04_Vigenere/README.md
-!challenges/04_Vigenere/.break_vigenere.py
 !challenges/04_Vigenere/cipher.txt
 
 !challenges/05_ArchivePassword/README.md
-!challenges/05_ArchivePassword/.crack_zip.py
 !challenges/05_ArchivePassword/secret.zip
 !challenges/05_ArchivePassword/wordlist.txt
 
 !challenges/06_Hashcat/README.md
 !challenges/06_Hashcat/hashes.txt
-!challenges/06_Hashcat/.run_chain_crack.py
 !challenges/06_Hashcat/wordlist.txt
 !challenges/06_Hashcat/segments/part*.zip
 
 !challenges/07_ExtractBinary/README.md
-!challenges/07_ExtractBinary/.analyze_binary.py
 !challenges/07_ExtractBinary/hidden_flag
 
 !challenges/08_FakeAuthLog/README.md
 !challenges/08_FakeAuthLog/auth.log
-!challenges/08_FakeAuthLog/.investigate_authlog.py
 
 !challenges/09_FixScript/README.md
 !challenges/09_FixScript/broken_flag.py
-!challenges/09_FixScript/.script_runner.py
 
 !challenges/10_Metadata/README.md
-!challenges/10_Metadata/.inspect_metadata.py
 !challenges/10_Metadata/capybara.jpg
 
 !challenges/11_HiddenFlag/README.md
-!challenges/11_HiddenFlag/.search_for_flag.py
 !challenges/11_HiddenFlag/junk/**
 
 !challenges/12_QRCodes/README.md
-!challenges/12_QRCodes/.qr_code_explorer.py
 !challenges/12_QRCodes/qr_*.png
 
 !challenges/13_HTTPHeaders/README.md
-!challenges/13_HTTPHeaders/.investigate_headers.py
 !challenges/13_HTTPHeaders/.server_data
 
 !challenges/14_InternalPortals/README.md
-!challenges/14_InternalPortals/.explore_portals.py
 !challenges/14_InternalPortals/.server_data
 
 !challenges/15_ProcessInspection/README.md
-!challenges/15_ProcessInspection/.explore_processes.py
 !challenges/15_ProcessInspection/ps_dump.txt
 
 !challenges/16_HexHunting/README.md
-!challenges/16_HexHunting/.inspect_binary.py
 !challenges/16_HexHunting/hex_flag.bin
 
 !challenges/17_NmapScanning/README.md
-!challenges/17_NmapScanning/.helper_scan.py
 
 !challenges/18_PcapSearch/README.md
-!challenges/18_PcapSearch/.analyze_pcap.py
 !challenges/18_PcapSearch/traffic.pcap
 
 # --- Solo Challenges ---
@@ -178,6 +161,5 @@
 !challenges_solo/18_PcapSearch/traffic.pcap
 
 # 8. Final Overrides (Ensures these are ALWAYS ignored)
-# This overrides the whitelists above (like junk/**)
 flag.txt
 **/flag.txt
