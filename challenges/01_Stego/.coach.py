@@ -46,24 +46,15 @@ def main():
             command_to_display="ls -l"
         )
 
-        # STEP 3: Intel Analysis
-        bot.teach_step(
-            instruction=(
-                "According to the **Mission Brief** (README), this file is locked with a password.\n"
-                "The hint provided is: *'The password is the most common password in the world.'*\n\n"
-                "Review the hint and prepare to guess the password."
-            ),
-            command_to_display="echo \"Intel received: Common Password\""
-        )
-
-        # STEP 4: The Extraction Loop
+        # STEP 3: The Extraction Loop (Intel Merged Here)
         success = False
         while not success:
             bot.teach_loop(
                 instruction=(
-                    "Now, use `steghide` to extract the data using that password hint.\n"
-                    "We need to specify the source file (`-sf`) and the output file (`-xf`).\n\n"
-                    "Command format: `steghide extract -sf squirrel.jpg -xf flag.txt -p [YOUR_GUESS]`\n"
+                    "According to the **Mission Brief**, this file is locked with a password.\n"
+                    "The hint is: *'The password is the most common password in the world.'*\n\n"
+                    "Use `steghide` to extract the data (`-sf`) and save it to `flag.txt` (`-xf`).\n"
+                    "Command format: `steghide extract -sf squirrel.jpg -xf flag.txt -p [PASSWORD]`\n"
                     "Common guesses: `123456`, `password`, `admin`."
                 ),
                 # We show them the structure, they fill in the blank
@@ -81,7 +72,7 @@ def main():
                 print("\n❌ Access Denied. That password did not unlock the file.")
                 print("Consult the Mission Brief hint again. What is the literal word for a password?\n")
 
-        # STEP 5: Verification
+        # STEP 4: Verification
         bot.teach_step(
             instruction=(
                 "🎉 **Access Granted!** The password was correct.\n"

@@ -109,22 +109,12 @@ def main():
             command_to_display="ls -l"
         )
 
-        # STEP 5: Intel Analysis (Key Deduction)
-        bot.teach_step(
-            instruction=(
-                "Vigenère requires a **Key**.\n"
-                "The **Mission Brief** asks: *'What is the opposite of logout?'*\n"
-                "The answer is **login**. That is our key.\n\n"
-                "Acknowledge this intel."
-            ),
-            command_to_display="echo \"Key is login\""
-        )
-
-        # STEP 6: Execution
+        # STEP 5: Execution (Intel Merged Here)
         bot.teach_loop(
             instruction=(
-                "Now, run the decoder using the key we found.\n"
-                "Redirect `>` the output to `flag.txt`.\n\n"
+                "Vigenère requires a **Key**.\n"
+                "The **Mission Brief** asks: *'What is the opposite of logout?'* -> **login**.\n\n"
+                "Run the decoder using that key and redirect `>` the output to `flag.txt`.\n"
                 "Syntax: `python3 decoder.py cipher.txt [KEY] > flag.txt`"
             ),
             # Template showing the args
@@ -137,7 +127,7 @@ def main():
             clean_files=["flag.txt"]
         )
 
-        # STEP 7: Verification
+        # STEP 6: Verification
         bot.teach_step(
             instruction=(
                 "Success! The tool decrypted the data.\n"
