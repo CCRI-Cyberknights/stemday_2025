@@ -8,6 +8,7 @@ However, during the data recovery, we also found a text file (`wordlist.txt`) co
 * **The Lock:** Standard ZIP encryption.
 * **The Strategy:** **Dictionary Attack**. Instead of guessing random characters, we will automate the process of trying every single word in the provided list until one works. 
 * **The Twist:** Unlocking the ZIP is only Phase 1. Inside, you will find a scrambled text file that requires further decoding (Base64).
+* **The Warning:** The recovered file contains **multiple flag candidates**. You must determine which one is the real flag.
 
 ## 📝 Investigator’s Journal
 *Notes from the field:*

@@ -3,10 +3,13 @@
 **📡 Intercepted Transmission**
 An encoded message has been intercepted from a compromised system. The file `encoded.txt` contains data obfuscated using **Base64**.
 
-## 🧠 Mission Briefing
+**Mission Briefing:**
 **Base64 is NOT encryption.** It is a common encoding scheme used to represent binary data as text.
+
+## 🧠 Intelligence Report
 * **The Signature:** Base64 strings consist of random alphanumeric characters and almost always end with one or two equals signs (`=` or `==`) as padding.
 * **The Tools:** Linux has a built-in tool called `base64` specifically for reversing this.
+* **The Warning:** The decoded transmission lists **multiple flag candidates**. You must identify which one is the real flag.
 
 **Your Goal:** Confirm the file matches the signature, then decode it to retrieve the flag.
 

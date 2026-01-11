@@ -9,13 +9,14 @@ It looks like a standard server log... except our analysts detected a pattern an
 * **The Concept:** System logs follow a strict structure: `Date Hostname Process[PID]: Message`. 
 * **The Anomaly:** The **PID** (Process ID) inside the square brackets `[]` is *always* a number (e.g., `sshd[1234]`).
 * **The Strategy:** **Log Analysis**. We suspect the attacker tampered with the logs and replaced a numeric PID with text characters to hide their flag.
+* **The Warning:** The log contains **decoy entries** designed to mislead investigators. You must verify which flag is the valid one.
 
 ## 📝 Investigator’s Journal
 *Notes from the field:*
 
 > "The log is filled with noise—thousands of SSH login attempts.
 >
-> But I noticed something weird. Look closely at the Process IDs. They are supposed to be numbers, right? I saw some entries where the PID looked... off. Not numeric. That's where I started digging. If you can filter out the normal numbers, the flag should be the only thing left."
+> But I noticed something weird. Look closely at the Process IDs. They are supposed to be numbers, right? I saw some entries where the PID looked... off. Not numeric. That's where I started digging. Filter out the normal numbers to reveal the hidden strings, but check them carefully—I saw more than one odd entry."
 
 ## 📂 Files in This Folder
 * `auth.log` – The simulated log file.

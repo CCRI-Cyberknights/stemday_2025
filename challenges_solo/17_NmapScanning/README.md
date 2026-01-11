@@ -11,14 +11,14 @@ Your mission is to scan the network, identify the active "doors" (ports), and in
 * **The Strategy:**
     1.  **Scan:** Find the open ports between 9000 and 9100.
     2.  **Connect:** Use `curl` or `nc` (Netcat) to talk to the services running on those ports.
-    3.  **Filter:** Distinguish the real flag from the decoys.
+* **The Warning:** Most of the open ports are decoys hosting **fake flags**. You must verify which one is the real flag.
 
 ## 📝 Investigator’s Journal
 *Notes from the field:*
 
 > "I know they are hiding in the 9000s. If you scan the whole machine, it'll take too long. Focus your Nmap scan on `9000-9100`.
 >
-> Once you see the open ports, you have to manually check them. Some might just send garbage data. Others might send fake flags like `CCRI-FAKE-...`. You need to grab the output from the right one and save it to a file named `flag.txt`."
+> Once you see the open ports, you have to manually check them. Use `curl` or `nc` to interact with the services. When you identify the one transmitting the valid signal, don't just read it—capture it. Redirect the specific output containing the flag into a file named `flag.txt`."
 
 ## 📂 Files in This Folder
 *(None — all work occurs directly in the terminal via network interaction.)*

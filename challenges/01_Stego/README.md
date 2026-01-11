@@ -7,6 +7,7 @@ We have recovered a suspicious image file (`squirrel.jpg`) from a target machine
 * **The Lock:** Steganography tools usually require a **passphrase** to extract the hidden data.
 * **The Key:** We believe the user practiced poor security hygiene. The password is rumored to be **"the most common password in the world."**
 * **The Tool:** We have deployed `steghide` to this environment to help you attempt the extraction.
+* **The Warning:** The hidden file inside the image contains **multiple flag candidates**. Verify which one is real.
 
 **Your Goal:** Guess the password based on the intel, unlock the file, and retrieve the flag.
 

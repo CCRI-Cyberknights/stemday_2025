@@ -8,6 +8,7 @@ It looks human-readable… just twisted. The letters seem familiar, but the word
 * **The Cipher:** **ROT13** (Rotate 13) is a simple substitution cipher that replaces a letter with the 13th letter after it in the alphabet. 
 * **The Mechanics:** Because the alphabet has 26 letters, shifting by 13 is symmetrical. Applying the cipher twice returns the original text (`A` → `N` → `A`).
 * **The Strategy:** Shift every letter back by 13 positions.
+* **The Warning:** The decoded message lists **multiple flag candidates**. You must identify which one is the real flag.
 
 ## 📝 Investigator’s Journal
 *Notes from the field:*

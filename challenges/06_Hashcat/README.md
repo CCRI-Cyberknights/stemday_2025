@@ -8,10 +8,11 @@ However, we also found a file (`hashes.txt`) containing the **MD5 hashes** of th
 ## 🧠 Intelligence Report
 * **The Lock:** Three separate ZIP files (`part1.zip`, `part2.zip`, `part3.zip`).
 * **The Keys:** The passwords are hidden behind MD5 hashes. You must crack them to open the archives.
+* **The Warning:** Once reassembled, the data will yield **multiple potential flags**. Only one is valid.
 * **The Strategy:**
     1.  **Crack:** Use **Hashcat** and the provided `wordlist.txt` to reverse the hashes.
     2.  **Unlock:** Use the revealed passwords to extract the segments.
-    3.  **Assemble:** The extracted files are fragments. You must combine them to reconstruct the final flag.
+    3.  **Assemble:** The extracted files are fragments. You must combine them to reconstruct the final flag list.
 
 **Your Goal:** Execute the crack, unlock the segments, and reassemble the intelligence.
 

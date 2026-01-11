@@ -11,6 +11,7 @@ However, we also found a file (`hashes.txt`) containing the **MD5 hashes** of th
     1.  **Crack:** Reverse the hashes to find the passwords.
     2.  **Unlock:** Use the passwords to extract the archives.
     3.  **Assemble:** The extracted files are fragments. Combine them to reveal the flag.
+* **The Warning:** Once reassembled, the data will yield **multiple potential flags**. Only one is valid.
 
 ## 📝 Investigator’s Journal
 *Notes from the field:*

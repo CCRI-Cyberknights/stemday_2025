@@ -3,7 +3,6 @@
 **Mission Briefing:**
 CryptKeepers hackers left behind a mysterious binary file (`hex_flag.bin`).
 It is far too small to be a functional program. Our analysts believe it was crafted specifically to smuggle data past our filters.
-Buried inside the raw bytes are **five possible flags**. Only **one** is real; the others are traps.
 
 ## 🧠 Intelligence Report
 * **The Concept:** **Hexadecimal Dumps**. Computer files are just sequences of numbers (bytes). A "Hex Dump" allows a human to view the raw data.
@@ -12,6 +11,7 @@ Buried inside the raw bytes are **five possible flags**. Only **one** is real; t
     2.  **Hex:** The raw data (e.g., `41 42 43`).
     3.  **ASCII:** The text translation (e.g., `A B C`). 
 * **The Strategy:** You need to look at the ASCII column to find the flag, but also check the Hex column for context.
+* **The Warning:** Buried inside the raw bytes are **five possible flags**. Only **one** is real; the others are traps.
 
 ## 📝 Investigator’s Journal
 *Notes from the field:*
@@ -33,8 +33,8 @@ To see the matrix, you need a hex viewer.
 
 | Tool | Purpose | Usage Example |
 | :--- | :--- | :--- |
-| **xxd** | The standard command-line hex viewer. | `xxd hex_flag.bin \| less` |
-| **hexdump** | Canonical hex dump tool. The `-C` flag makes it readable. | `hexdump -C hex_flag.bin \| less` |
+| **xxd** | The standard command-line hex viewer. | `xxd hex_flag.bin | less` |
+| **hexdump** | Canonical hex dump tool. The `-C` flag makes it readable. | `hexdump -C hex_flag.bin | less` |
 | **grep** | You can still search for text inside the binary. | `grep -a "CCRI-" hex_flag.bin` |
 | **hexedit** | (Optional) Allows you to scroll and edit the hex in real-time. | `hexedit hex_flag.bin` |
 

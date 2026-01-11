@@ -9,6 +9,7 @@ Unlike simple rotation ciphers (like ROT13), Vigenère uses a **keyword** to shi
 * **The Cipher:** **Vigenère** is a polyalphabetic substitution cipher. 
 * **The Mechanics:** It uses a keyword to shift each letter of the plaintext by a different amount. To break it, you must use the correct keyword.
 * **The Clue:** The agent used a familiar word—something local. Intelligence suggests the CryptKeepers frequently use **Rhode Island city names** as encryption keywords.
+* **The Warning:** The decrypted message lists **multiple flag candidates**. You must identify which one is the real flag.
 
 ## 📝 Investigator’s Journal
 *Notes from the field:*

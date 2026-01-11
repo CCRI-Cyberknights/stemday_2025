@@ -10,8 +10,9 @@ The file contains thousands of lines of noise. Somewhere in there, a hacker succ
 * **The Needle:** We are looking for the agency flag format (`CCRI-...`) or suspicious pattern matches.
 * **The Strategy:** **Filtering**. Instead of reading everything, we display only the lines that match our criteria.
 * **The Tool:** `grep` (Global Regular Expression Print) is the standard Linux tool for searching plain-text data sets.
+* **The Warning:** The log contains **decoy entries** designed to mislead investigators.
 
-**Your Goal:** Filter the noise to identify the specific log entry that contains the flag.
+**Your Goal:** Filter the noise to identify the specific log entry that contains the valid flag.
 
 ## 📂 Files in this folder
 * `auth.log` – A large server log file containing thousands of entries.

@@ -8,6 +8,7 @@ QR codes are just a visual way of encoding text data. One of these images contai
 * **The Lock:** The data is encoded visually in 2D barcodes.
 * **The Strategy:** **Bulk Scanning**. You have multiple images, and checking them one by one on a phone is inefficient.
 * **The Tool:** Command-line tools like `zbarimg` allow you to scan image files directly in the terminal without a camera.
+* **The Warning:** This folder contains **decoy QR codes** that yield fake flags.
 
 **Your Goal:** Scan the images, filter the output, and find the one that decodes to a valid flag.
 

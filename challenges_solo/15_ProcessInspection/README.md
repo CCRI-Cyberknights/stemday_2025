@@ -9,6 +9,7 @@ Somewhere in that list of running programs is a rogue agent executing a command 
 * **The Concept:** **Process Listing**. Every program running on a computer (browser, system clock, malware) is a "process."
 * **The Vulnerability:** **Command Line Arguments**. When a program is launched, it often takes arguments (e.g., `python3 script.py --password=SECRET`). On Linux, these arguments are visible to anyone who lists the running processes. 
 * **The Strategy:** We need to scan the "COMMAND" column of the snapshot for suspicious activity or sensitive strings.
+* **The Warning:** The process list contains **decoy processes** with fake flag arguments. You must verify which one is real.
 
 ## 📝 Investigator’s Journal
 *Notes from the field:*

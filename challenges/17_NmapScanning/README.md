@@ -11,7 +11,7 @@ Several simulated services are running locally on this system. Intelligence sugg
 **Your Goal:** Scan the local network range, enumerate the open services, and identify the one carrying the flag.
 
 ## 📂 Files in this folder
-* `README.md` – This briefing file.
+*(None — all work occurs directly in the terminal via network interaction.)*
 
 ---
 **🏁 Flag format:** `CCRI-AAAA-1111`

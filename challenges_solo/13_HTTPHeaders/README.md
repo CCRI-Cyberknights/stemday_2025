@@ -8,6 +8,7 @@ You have discovered **five active API endpoints** on the local network. While th
 * **The Concept:** **HTTP Headers**. When you visit a website, the server sends a block of invisible metadata *before* it sends the actual page content (HTML). This includes data like `Server Type`, `Date`, and `Cookies`. 
 * **The Lock:** The flag is hidden in a **Custom Header** (e.g., `X-Flag` or `Secret-Key`). Standard web browsers often hide these headers from the user.
 * **The Strategy:** **Headless Interaction**. We will use a command-line tool to talk to the server directly and request *only* the headers.
+* **The Warning:** Most of the endpoints are decoys returning **fake flags**. You must verify which one is the real flag.
 
 ## 📝 Investigator’s Journal
 *Notes from the field:*

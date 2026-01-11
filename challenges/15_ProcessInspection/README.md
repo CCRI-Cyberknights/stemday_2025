@@ -8,8 +8,9 @@ You have obtained a snapshot (`ps_dump.txt`) of the system’s running processes
 * **The Concept:** Every program running on a computer is a "process." Processes often accept **Command Line Arguments** (flags) when they start.
 * **The Clue:** Malware often gives itself away via these arguments (e.g., passing a secret password or flag explicitly in the command).
 * **The Strategy:** **Process Auditing**. You must filter through the snapshot to identify any suspicious command-line strings.
+* **The Warning:** The process list contains **decoy processes** with fake flag arguments.
 
-**Your Goal:** Analyze the process list, check the command arguments, and identify the process carrying the agency flag.
+**Your Goal:** Analyze the process list, check the command arguments, and identify the process carrying the real agency flag.
 
 ## 📂 Files in this folder
 * `ps_dump.txt` – A snapshot of running processes and their arguments.

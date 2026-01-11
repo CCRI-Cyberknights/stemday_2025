@@ -8,7 +8,7 @@ Our intelligence suggests that four of them are decoys containing junk data or f
 ## 🧠 Intelligence Report
 * **The Concept:** **QR Codes** (Quick Response) are 2D barcodes that encode text, URLs, or data into a grid of black and white squares. 
 * **The Strategy:** **Bulk Scanning**. You *could* scan each one with your smartphone, but that is slow and inefficient. A true analyst uses command-line tools to scan all of them instantly.
-* **The Trap:** Watch out for fake flags like `QR-HINT-1234` or `SCAN-CODE-####`.
+* **The Warning:** Watch out for fake flags like `QR-HINT-1234` or `SCAN-CODE-####`. The folder contains decoys.
 
 ## 📝 Investigator’s Journal
 *Notes from the field:*
