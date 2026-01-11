@@ -6,6 +6,7 @@ import argparse
 import shlex
 import shutil
 import stat
+from pathlib import Path
 
 STEGO_DEB_URL = "https://raw.githubusercontent.com/CCRI-Cyberknights/stemday_2025/main/debs/steghide_0.6.0-1_amd64.deb"
 
@@ -69,7 +70,7 @@ def arch():
     except Exception:
         return None
 
-# ---------- Wireshark / dumpcap (parity with live-CD script) ----------
+# ---------- Wireshark / dumpcap ----------
 def ensure_group(name):
     rc = run(["getent", "group", name], check=False)
     if rc != 0:
@@ -103,39 +104,29 @@ def ensure_dumpcap_nonroot():
         print("ℹ️ dumpcap not found; skipping perms setup.")
         return
 
-    # Prefer capabilities
     run(["sudo", "setcap", "cap_net_raw,cap_net_admin+eip", dumpcap], check=False)
     caps = getcap(dumpcap)
     if "cap_net_admin,cap_net_raw" in caps and "eip" in caps:
         print(f"✅ dumpcap caps OK: {caps}")
         return
 
-    # Maintainer setuid path
     run("echo 'wireshark-common wireshark-common/install-setuid boolean true' | sudo debconf-set-selections", check=False)
     run(["sudo", "dpkg-reconfigure", "-f", "noninteractive", "wireshark-common"], check=False)
     if is_setuid(dumpcap):
         print(f"✅ dumpcap setuid OK: {dumpcap}")
         return
 
-    # Final fallback: local copy in /usr/local/bin (first in PATH)
     local_dump = "/usr/local/bin/dumpcap"
     run(["sudo", "install", "-o", "root", "-g", "wireshark", "-m", "0750", dumpcap, local_dump], check=False)
     run(["sudo", "chmod", "u+s", local_dump], check=False)
-    # Verify
     use_path = shutil.which("dumpcap") or local_dump
-    caps2 = getcap(use_path)
-    suid2 = is_setuid(use_path)
     print(f"🛠 Using dumpcap at: {use_path}")
-    print(f"    caps: {caps2 or 'none'}")
-    print(f"    suid: {suid2}")
 
 def preseed_wireshark_and_install():
     print("🧪 Preseeding Wireshark (allow non-root capture) and installing non-interactively...")
     preseed = 'wireshark-common wireshark-common/install-setuid boolean true'
     run(f"echo '{preseed}' | sudo debconf-set-selections")
-    # Install GUI+CLI & caps tooling (parity with bash installer)
     apt_install_packages(["wireshark", "wireshark-common", "tshark", "libcap2-bin"])
-    # Create group and add plausible users
     ensure_group("wireshark")
     env_user = os.environ.get("SUDO_USER") or os.environ.get("USER") or ""
     add_users_to_group("wireshark", [env_user, "user", "parrot"])
@@ -214,38 +205,25 @@ Pin-Priority: 1001
         run(["sudo", "mv", "/tmp/steghide-pin", pin_file])
 
 def install_steghide_auto(mode: str = "auto"):
-    """
-    mode: 'auto' (default), 'deb', or 'apt'
-    - auto: Parrot => deb, others => apt
-    - deb: force .deb path (honors arch check)
-    - apt: force repo install
-    ENV override: FORCE_STEGHIDE_DEB=1 behaves like mode='deb'
-    """
     env_force_deb = os.environ.get("FORCE_STEGHIDE_DEB") == "1"
     if env_force_deb and mode == "auto":
         mode = "deb"
-
     if mode not in ("auto", "deb", "apt"):
-        print(f"⚠️ Unknown steghide mode '{mode}', falling back to 'auto'")
         mode = "auto"
-
     if mode == "apt" or (mode == "auto" and not is_parrot()):
         print("🧩 Installing Steghide from distro repositories...")
         apt_install_packages(["steghide"])
         return
-
     print("🧩 Installing Steghide via patched .deb...")
     install_steghide_deb()
 
 # ---------- Helpers for john/*2john parity ----------
 def ensure_john_and_helpers_on_path():
     print("🧰 Ensuring john/*2john helpers are in PATH...")
-    # john symlink
     for cand in ("/usr/sbin/john", "/usr/bin/john"):
         if os.path.exists(cand) and os.access(cand, os.X_OK):
             run(["sudo", "ln", "-sf", cand, "/usr/local/bin/john"], check=False)
             break
-    # /usr/sbin/*2john
     for root in ("/usr/sbin",):
         if os.path.isdir(root):
             for name in os.listdir(root):
@@ -253,7 +231,6 @@ def ensure_john_and_helpers_on_path():
                     src = os.path.join(root, name)
                     if os.access(src, os.X_OK):
                         run(["sudo", "ln", "-sf", src, f"/usr/local/bin/{name}"], check=False)
-    # /usr/share/john/*2john + *2john.py (wrap if non-executable)
     share = "/usr/share/john"
     if os.path.isdir(share):
         for name in os.listdir(share):
@@ -271,49 +248,60 @@ exec python3 "{src}" "$@"
 
 # ---------- Git ----------
 def get_git_config(key):
-    res = subprocess.run(["git", "config", "--global", key],
-                         capture_output=True, text=True)
-    if res.returncode == 0:
-        val = res.stdout.strip()
-        return val if val else None
-    return None
+    res = subprocess.run(["git", "config", "--global", key], capture_output=True, text=True)
+    return res.stdout.strip() if res.returncode == 0 else None
 
 def configure_git(git_name=None, git_email=None):
     print("\n🔧 Checking Git configuration...")
-    current_name = get_git_config("user.name")
-    current_email = get_git_config("user.email")
-    if current_name and current_email:
-        print(f"✅ Git is already configured:\n   Name : {current_name}\n   Email: {current_email}")
+    if get_git_config("user.name") and get_git_config("user.email"):
         return
-    if not git_name:
-        git_name = os.environ.get("GIT_NAME")
-    if not git_email:
-        git_email = os.environ.get("GIT_EMAIL")
+    if not git_name: git_name = os.environ.get("GIT_NAME")
+    if not git_email: git_email = os.environ.get("GIT_EMAIL")
+    
     if git_name and git_email:
-        print("📝 Setting Git config from flags/env...")
         run(["git", "config", "--global", "user.name", git_name])
         run(["git", "config", "--global", "user.email", git_email])
         run(["git", "config", "--global", "credential.helper", "store"])
-        print(f"✅ Git configuration saved:\n   Name : {git_name}\n   Email: {git_email}")
-        return
-    if sys.stdin.isatty():
-        try:
-            git_name = input("Enter your Git name: ").strip()
-            git_email = input("Enter your Git email: ").strip()
-        except EOFError:
-            git_name = git_email = None
-    else:
-        git_name = git_email = None
-    if git_name and git_email:
-        run(["git", "config", "--global", "user.name", git_name])
-        run(["git", "config", "--global", "user.email", git_email])
-        run(["git", "config", "—global", "credential.helper", "store"])
         print("✅ Git configuration saved.")
     else:
         print("⚠️  Skipping Git prompts (non-interactive).")
-        print("    Set these and rerun if needed:")
-        print("    - Flags: --git-name 'Your Name' --git-email 'you@example.com'")
-        print("    - Or env: GIT_NAME='Your Name' GIT_EMAIL='you@example.com'")
+
+# ---------- Desktop Launcher Setup ----------
+def setup_desktop_launcher():
+    print("📎 Configuring desktop launcher for Main Repo...")
+    repo_root = Path(__file__).resolve().parent
+    icon_path = repo_root / "web_version_admin" / "static" / "assets" / "CyberKnights_2.png"
+    launcher_path = repo_root / "Launch_CCRI_CTF_HUB.desktop"
+
+    # Fallback if the custom icon isn't there
+    final_icon = str(icon_path) if icon_path.exists() else "utilities-terminal"
+    
+    content = f"""[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=true
+Name=Launch_CCRI_CTF_Hub
+Exec=bash -c "cd {repo_root} && python3 start_web_hub.py"
+Icon={final_icon}
+Name[en_US]=Launch_CCRI_CTF_Hub
+Comment=Launch the Dev Environment for CCRI CTF
+"""
+    try:
+        with open(launcher_path, "w") as f:
+            f.write(content)
+        os.chmod(launcher_path, 0o755)
+        
+        # Determine the user who owns the script to chown the launcher
+        uid = os.stat(__file__).st_uid
+        gid = os.stat(__file__).st_gid
+        os.chown(launcher_path, uid, gid)
+        
+        # Try to mark trusted
+        subprocess.run(["gio", "set", str(launcher_path), "metadata::trusted", "true"],
+                       check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        print("✅ Launcher updated with absolute paths & custom icon.")
+    except Exception as e:
+        print(f"⚠️  Could not update launcher: {e}")
 
 # ---------- CLI ----------
 def parse_args():
@@ -348,27 +336,21 @@ def main():
     ]
     apt_install_packages(apt_packages)
 
-    # Steghide (OS-aware)
     install_steghide_auto(args.steghide_mode)
-
-    # PATH fixes & helpers
     ensure_john_and_helpers_on_path()
-
-    # Optional extras to match live-CD UX
     install_cyberchef_offline()
-
-    # Python tooling
     pip_install()
     install_zsteg()
-
-    # Git config
     configure_git(args.git_name, args.git_email)
+    
+    # NEW: Fix the launcher icon in the main repo
+    setup_desktop_launcher()
 
     print("\n✅ Base environment ready.")
     print("   • Admin run (dev):   python3 web_version_admin/server.py")
     print("   • Student run:       python3 ccri_ctf.pyz")
-    print("   • Desktop launcher:  start_web_hub.py decides Admin vs Student at runtime")
-    print("\n🎉 Setup complete! If Wireshark group membership was added, log out/in once to capture without sudo.")
+    print("   • Desktop launcher:  Updated with custom icon! Double-click to run.")
+    print("\n🎉 Setup complete!")
 
 if __name__ == "__main__":
     if os.geteuid() != 0:
