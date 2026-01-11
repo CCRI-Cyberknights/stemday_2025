@@ -1,8 +1,6 @@
-enable_logging=true
+# [No sensitive data found here]
 user=guest
 last_modified=2019-08-12
 # Legacy configuration file
-user=guest
 last_modified=2019-08-12
-user=guest
-TNKA-4406-YFHX
+# Legacy configuration file

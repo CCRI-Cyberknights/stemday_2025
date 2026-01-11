@@ -22,18 +22,34 @@ def xor_encode(plaintext: str, key: str) -> str:
     ).decode()
 
 def make_scripts_executable(challenges_data, base_dir):
-    """Set chmod +x on all helper scripts in challenges (if present)."""
+    """Set chmod +x on helper scripts AND coach scripts."""
+    print("🔧 Setting executable permissions on scripts...")
     for meta in challenges_data.values():
-        script = meta.get("script")
-        if not script:
-            continue
         challenge_folder = os.path.join(base_dir, "challenges", os.path.basename(meta["folder"]))
-        script_path = os.path.join(challenge_folder, script)
-        if os.path.isfile(script_path):
-            os.chmod(script_path, os.stat(script_path).st_mode | stat.S_IXUSR)
-            print(f"✅ Made executable: {script_path}")
-        else:
-            print(f"⚠️ Skipping missing script: {script_path}")
+        
+        # 1. Handle Exploration Script (.explore.py)
+        script = meta.get("script")
+        if script:
+            script_path = os.path.join(challenge_folder, script)
+            if os.path.isfile(script_path):
+                try:
+                    os.chmod(script_path, os.stat(script_path).st_mode | stat.S_IXUSR)
+                    print(f"   ✅ Executable: {script}")
+                except Exception as e:
+                    print(f"   ⚠️ Failed to chmod {script}: {e}")
+            else:
+                print(f"   ⚠️ Missing script: {script_path}")
+
+        # 2. Handle Coach Script (.coach.py) if present
+        if meta.get("has_coach"):
+            coach_script = ".coach.py"
+            coach_path = os.path.join(challenge_folder, coach_script)
+            if os.path.isfile(coach_path):
+                try:
+                    os.chmod(coach_path, os.stat(coach_path).st_mode | stat.S_IXUSR)
+                    print(f"   ✅ Executable: {coach_script}")
+                except Exception as e:
+                    print(f"   ⚠️ Failed to chmod {coach_script}: {e}")
 
 def sanitize_templates(template_dir):
     """Replace Admin Hub text with dynamic mode handling."""
@@ -111,10 +127,16 @@ def prepare_web_version(base_dir):
             "folder": meta["folder"],
             "flag": xor_encode(meta["flag"], ENCODE_KEY),
         }
+        # Copy Script metadata
         if meta.get("script"):
             entry["script"] = meta["script"]
+        # Copy Coach metadata (CRITICAL FIX)
+        if meta.get("has_coach"):
+            entry["has_coach"] = meta["has_coach"]
+            
         guided_data[cid] = entry
 
+    # Ensure scripts (explore and coach) are executable
     make_scripts_executable(admin_data, base_dir)
 
     guided_json_path = os.path.join(student_dir, "challenges.json")
@@ -141,6 +163,10 @@ def prepare_web_version(base_dir):
             entry["script"] = meta["script"]
         if "hint" in meta:
             entry["hint"] = meta["hint"]
+        # Copy Coach metadata for Solo (if it exists)
+        if meta.get("has_coach"):
+            entry["has_coach"] = meta["has_coach"]
+
         solo_data[cid] = entry
 
     solo_json_path = os.path.join(student_dir, "challenges_solo.json")
