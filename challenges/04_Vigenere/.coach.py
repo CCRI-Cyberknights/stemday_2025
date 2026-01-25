@@ -109,6 +109,15 @@ def main():
             command_to_display="ls -l"
         )
 
+        # === NEW STEP: Code Inspection ===
+        bot.teach_step(
+            instruction=(
+                "**Always inspect unknown scripts before running them.**\n"
+                "Read the script to see how it shifts the letters back based on the key."
+            ),
+            command_to_display="cat decoder.py"
+        )
+
         # STEP 5: Execution (Intel Merged Here)
         bot.teach_loop(
             instruction=(

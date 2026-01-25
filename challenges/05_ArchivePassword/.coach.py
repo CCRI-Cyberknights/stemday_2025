@@ -138,6 +138,15 @@ def main():
             command_to_display="ls -l"
         )
 
+        # === NEW STEP: Code Inspection ===
+        bot.teach_step(
+            instruction=(
+                "**Good security practice:** valid that the script does what you expect.\n"
+                "Read the code to see how it iterates through the wordlist."
+            ),
+            command_to_display="cat cracker.py"
+        )
+
         # STEP 4: Execution
         bot.teach_step(
             instruction=(
