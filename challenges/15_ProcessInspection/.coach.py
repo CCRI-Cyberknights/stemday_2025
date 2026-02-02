@@ -30,7 +30,7 @@ def main():
             instruction=(
                 "We have a file named `ps_dump.txt`.\n"
                 "This is a snapshot of all running processes (captured with `ps aux`).\n"
-                "Developers sometimes carelessly pass secrets as command-line arguments.\n\n"
+                "Developers sometimes carelessly pass secrets as command-line options.\n\n"
                 "Let's check the size of the file to see what we are up against."
             ),
             command_to_display="wc -l ps_dump.txt"

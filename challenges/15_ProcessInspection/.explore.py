@@ -135,13 +135,13 @@ def main():
     
     print(f"📄 Snapshot File: {Colors.BOLD}{DUMP_FILE}{Colors.END}")
     print(f"🔧 Strategy: {Colors.BOLD}Process Auditing{Colors.END}\n")
-    print("🎯 Goal: Identify the rogue process carrying the flag in its arguments.\n")
+    print("🎯 Goal: Identify the rogue process carrying the flag in its options.\n")
     
     # Narrative Alignment: Reference the README Intel
     print(f"{Colors.CYAN}🧠 Intelligence Report (from README):{Colors.END}")
     print("   ➤ **The Concept:** Every program is a process.")
-    print("   ➤ **The Clue:** Malware often hides secrets in **Command Line Arguments**.")
-    print("   ➤ **The Task:** Filter the snapshot to find the argument `--flag=...`\n")
+    print("   ➤ **The Clue:** Malware often hides secrets in **Command Line Options**.")
+    print("   ➤ **The Task:** Filter the snapshot to find the option `--flag=...`\n")
     
     require_input("Type 'ready' to learn how to audit processes: ", "ready")
 
@@ -194,8 +194,8 @@ def main():
 
             if result_text:
                 if "CCRI-" in result_text:
-                    print(f"\n{Colors.GREEN}✅ SUSPICIOUS ARGUMENT FOUND!{Colors.END}")
-                    print(f"   The flag is hidden in the arguments of {Colors.BOLD}{os.path.basename(binary)}{Colors.END}.")
+                    print(f"\n{Colors.GREEN}✅ SUSPICIOUS OPTION FOUND!{Colors.END}")
+                    print(f"   The flag is hidden in the options of {Colors.BOLD}{os.path.basename(binary)}{Colors.END}.")
 
                 while True:
                     print("\nOptions:")
