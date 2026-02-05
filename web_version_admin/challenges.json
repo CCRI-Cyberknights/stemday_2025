@@ -2,126 +2,126 @@
   "01_Stego": {
     "name": "Stego Decode",
     "folder": "01_Stego",
-    "flag": "CCRI-QGMM-6011",
+    "flag": "CCRI-BHQP-4497",
     "script": ".explore.py",
     "has_coach": true
   },
   "02_Base64": {
     "name": "Base64 Decoder",
     "folder": "02_Base64",
-    "flag": "CCRI-BSFO-7356",
+    "flag": "CCRI-RRHV-4335",
     "script": ".explore.py",
     "has_coach": true
   },
   "03_ROT13": {
     "name": "ROT13 Explorer",
     "folder": "03_ROT13",
-    "flag": "CCRI-GFUZ-3224",
+    "flag": "CCRI-ZDOE-6620",
     "script": ".explore.py",
     "has_coach": true
   },
   "04_Vigenere": {
     "name": "Vigen\u00e8re Cipher",
     "folder": "04_Vigenere",
-    "flag": "CCRI-WNKQ-4164",
+    "flag": "CCRI-VUUO-9264",
     "script": ".explore.py",
     "has_coach": true
   },
   "05_ArchivePassword": {
     "name": "Archive Password Cracker",
     "folder": "05_ArchivePassword",
-    "flag": "CCRI-TKMT-6355",
+    "flag": "CCRI-USXM-8135",
     "script": ".explore.py",
     "has_coach": true
   },
   "06_Hashcat": {
     "name": "Hashcat Challenge",
     "folder": "06_Hashcat",
-    "flag": "CCRI-MPXU-1996",
+    "flag": "CCRI-XHKR-2602",
     "script": ".explore.py",
     "has_coach": true
   },
   "07_ExtractBinary": {
     "name": "Extract from Binary",
     "folder": "07_ExtractBinary",
-    "flag": "CCRI-WRCZ-9934",
+    "flag": "CCRI-QAHJ-6802",
     "script": ".explore.py",
     "has_coach": true
   },
   "08_FakeAuthLog": {
     "name": "Fake Auth Log",
     "folder": "08_FakeAuthLog",
-    "flag": "CCRI-QKPU-8381",
+    "flag": "CCRI-GZAE-3390",
     "script": ".explore.py",
     "has_coach": true
   },
   "09_FixScript": {
     "name": "Fix the Script",
     "folder": "09_FixScript",
-    "flag": "CCRI-SCRP-5224",
+    "flag": "CCRI-SCRP-5759",
     "script": ".explore.py",
     "has_coach": true
   },
   "10_Metadata": {
     "name": "Metadata Explorer",
     "folder": "10_Metadata",
-    "flag": "CCRI-NWEH-1592",
+    "flag": "CCRI-SGFG-8377",
     "script": ".explore.py",
     "has_coach": true
   },
   "11_HiddenFlag": {
     "name": "Hidden Flag Hunt",
     "folder": "11_HiddenFlag",
-    "flag": "CCRI-RXTQ-5224",
+    "flag": "CCRI-HLZK-2387",
     "script": ".explore.py",
     "has_coach": true
   },
   "12_QRCodes": {
     "name": "QR Codes Puzzle",
     "folder": "12_QRCodes",
-    "flag": "CCRI-HSIQ-1740",
+    "flag": "CCRI-NXCB-6314",
     "script": ".explore.py",
     "has_coach": true
   },
   "13_HTTPHeaders": {
     "name": "HTTP Headers Analysis",
     "folder": "13_HTTPHeaders",
-    "flag": "CCRI-UYVT-4413",
+    "flag": "CCRI-RRYG-2065",
     "script": ".explore.py",
     "has_coach": true
   },
   "14_InternalPortals": {
     "name": "Internal Portals",
     "folder": "14_InternalPortals",
-    "flag": "CCRI-JAGG-2034",
+    "flag": "CCRI-MLAY-2647",
     "script": ".explore.py",
     "has_coach": true
   },
   "15_ProcessInspection": {
     "name": "Process Inspection",
     "folder": "15_ProcessInspection",
-    "flag": "CCRI-PPNO-4715",
+    "flag": "CCRI-FMII-3572",
     "script": ".explore.py",
     "has_coach": true
   },
   "16_HexHunting": {
     "name": "Hex Hunting",
     "folder": "16_HexHunting",
-    "flag": "CCRI-CKRM-9540",
+    "flag": "CCRI-XEHJ-0824",
     "script": ".explore.py",
     "has_coach": true
   },
   "17_NmapScanning": {
     "name": "Nmap Scanning",
     "folder": "17_NmapScanning",
-    "flag": "CCRI-VRCW-0314",
+    "flag": "CCRI-HPWG-2471",
     "script": ".explore.py",
     "has_coach": true
   },
   "18_PcapSearch": {
     "name": "Pcap Search",
     "folder": "18_PcapSearch",
-    "flag": "CCRI-KJDS-8868",
+    "flag": "CCRI-MNET-0432",
     "script": ".explore.py",
     "has_coach": true
   }

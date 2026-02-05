@@ -11,8 +11,13 @@ The network relies on multiple internal portals for administration. You have ide
 
 **Your Goal:** Retrieve the raw HTML from the portals and search the code for hidden tags or comments containing the real flag.
 
-## 📂 Files in this folder
-* `active_portals.txt` – A list of the internal portal names to check.
+## 🌐 Target Portals
+The intercepted services are running locally on your machine:
+* `http://localhost:5000/internal/alpha`
+* `http://localhost:5000/internal/beta`
+* `http://localhost:5000/internal/gamma`
+* `http://localhost:5000/internal/delta`
+* `http://localhost:5000/internal/omega`
 
 ---
 **🏁 Flag format:** `CCRI-AAAA-1111`

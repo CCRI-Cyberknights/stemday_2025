@@ -19,13 +19,13 @@ You have discovered **five active API endpoints** on the local network. While th
 >
 > Use `curl` with the `-I` flag. It tells the server 'I only want the headers, keep the body'."
 
-## 🌐 Target Endpoints
+## 🌐 Target Channels
 The intercepted services are running locally on your machine:
-1.  `http://localhost:5000/mystery/endpoint_1`
-2.  `http://localhost:5000/mystery/endpoint_2`
-3.  `http://localhost:5000/mystery/endpoint_3`
-4.  `http://localhost:5000/mystery/endpoint_4`
-5.  `http://localhost:5000/mystery/endpoint_5`
+1.  `http://localhost:5000/covert/channel_1`
+2.  `http://localhost:5000/covert/channel_2`
+3.  `http://localhost:5000/covert/channel_3`
+4.  `http://localhost:5000/covert/channel_4`
+5.  `http://localhost:5000/covert/channel_5`
 
 ---
 
@@ -35,8 +35,8 @@ Since these are live web addresses, standard file tools like `cat` won't work.
 
 | Tool | Purpose | Usage Example |
 | :--- | :--- | :--- |
-| **curl -I** | **Fetch Headers Only**. This is the key command. | `curl -I http://localhost:5000/mystery/endpoint_1` |
-| **curl -v** | **Verbose Mode**. Shows the entire request/response conversation. | `curl -v http://localhost:5000/mystery/endpoint_1` |
+| **curl -I** | **Fetch Headers Only**. This is the key command. | `curl -I http://localhost:5000/covert/channel_1` |
+| **curl -v** | **Verbose Mode**. Shows the entire request/response conversation. | `curl -v http://localhost:5000/covert/channel_1` |
 | **Browser DevTools** | You can also press F12 in a browser and check the "Network" tab, but the terminal is faster. | *N/A* |
 
 > 💡 **Tip:** Example output of `curl -I`:

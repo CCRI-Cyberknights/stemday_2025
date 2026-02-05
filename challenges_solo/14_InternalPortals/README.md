@@ -19,13 +19,13 @@ Visually, they appear to be standard maintenance pages. However, intelligence su
 >
 > Use `curl` to grab the raw code. If you see `display: none` or ``, that's where they're hiding the good stuff."
 
-## 🌐 Target Portals
+## 🌐 Target Sectors
 The intercepted services are running locally on your machine:
-* `http://localhost:5000/internal/alpha`
-* `http://localhost:5000/internal/beta`
-* `http://localhost:5000/internal/gamma`
-* `http://localhost:5000/internal/delta`
-* `http://localhost:5000/internal/omega`
+* `http://localhost:5000/private/sector-1`
+* `http://localhost:5000/private/sector-2`
+* `http://localhost:5000/private/sector-3`
+* `http://localhost:5000/private/sector-4`
+* `http://localhost:5000/private/sector-5`
 
 ---
 
@@ -35,12 +35,12 @@ You have two ways to inspect the source. The terminal method is faster for check
 
 | Method | Tool | Usage Example |
 | :--- | :--- | :--- |
-| **Command Line** | **curl** | `curl http://localhost:5000/internal/alpha` |
+| **Command Line** | **curl** | `curl http://localhost:5000/private/sector-1` |
 | **Browser** | **View Source** | Right-click the page -> **View Page Source** (or Ctrl+U). |
-| **Search** | **grep** | `curl -s http://localhost:5000/internal/alpha | grep "CCRI-"` |
+| **Search** | **grep** | `curl -s http://localhost:5000/private/sector-1` | grep "CCRI-"` |
 
 > 💡 **Tip:** If you are using the command line, you can check all of them quickly by using **Brace Expansion**:
-> `curl http://localhost:5000/internal/{alpha,beta,gamma,delta,omega}`
+> `curl http://localhost:5000/private/sector-{1,2,3,4,5}`
 
 ---
 

@@ -19,7 +19,6 @@ class InternalPortalFlagGenerator:
         self.metadata = {}
 
     def get_template(self, title, desc, flag, domain):
-        # We use direct string concatenation to be 100% safe
         html = "<!DOCTYPE html>\n<html>\n<head>\n"
         html += "  <meta charset='UTF-8'>\n"
         html += "  <title>" + str(title) + "</title>\n"
@@ -28,19 +27,13 @@ class InternalPortalFlagGenerator:
         html += "  <h1>" + str(title) + "</h1>\n"
         html += "  <p>" + str(desc) + "</p>\n"
         html += "  <hr>\n"
-        
-        # INJECTION: Using a hidden span instead of a comment
-        # This is harder for environment 'cleaners' to strip
         html += "  <span style='display:none' id='debug-info'>Flag: " + str(flag) + "</span>\n"
-        
         html += "  <p>System ID: " + str(domain) + "</p>\n"
         html += "</body>\n</html>"
         
-        # Immediate Forensic Check
         if str(flag) not in html:
             print(f"\nFATAL: Flag {flag} still not in string after concatenation!")
             sys.exit(1)
-            
         return html
 
     def generate_flag(self, challenge_folder: Path) -> str:
@@ -49,13 +42,23 @@ class InternalPortalFlagGenerator:
         all_flags = fakes + [real_flag]
         random.shuffle(all_flags)
         
-        portals = [
-            ("alpha", "Alpha Service", "All systems operational."),
-            ("beta",  "Beta Dashboard", "Restricted Access."),
-            ("gamma", "Gamma API",      "Maintenance Mode."),
-            ("delta", "Delta Service",  "API Online."),
-            ("omega", "Omega Tools",    "Internal Testing.")
-        ]
+        # DISTINCT NAMES for Solo Mode
+        if self.mode == "solo":
+            portals = [
+                ("sector-1", "Restricted Zone 1", "Auth required."),
+                ("sector-2", "Restricted Zone 2", "Camera feed active."),
+                ("sector-3", "Restricted Zone 3", "Data retention policy."),
+                ("sector-4", "Restricted Zone 4", "Maintenance access only."),
+                ("sector-5", "Restricted Zone 5", "Offline.")
+            ]
+        else:
+            portals = [
+                ("alpha", "Alpha Service", "All systems operational."),
+                ("beta",  "Beta Dashboard", "Restricted Access."),
+                ("gamma", "Gamma API",      "Maintenance Mode."),
+                ("delta", "Delta Service",  "API Online."),
+                ("omega", "Omega Tools",    "Internal Testing.")
+            ]
 
         server_data = {}
         for i, (name, title, desc) in enumerate(portals):
@@ -64,7 +67,6 @@ class InternalPortalFlagGenerator:
             if current_flag == real_flag:
                 print(f"DEBUG: Real flag assigned to {name}")
 
-        # Write to Disk
         challenge_folder.mkdir(parents=True, exist_ok=True)
         target_file = challenge_folder / '.server_data'
         
@@ -72,11 +74,13 @@ class InternalPortalFlagGenerator:
         b64_data = base64.b64encode(raw_json.encode('utf-8')).decode('utf-8')
         target_file.write_text(b64_data, encoding='utf-8')
 
+        url_hint = "sector-X" if self.mode == "solo" else "alpha/beta/..."
+        
         self.metadata = {
             "real_flag": real_flag,
             "challenge_folder": str(challenge_folder),
             "unlock_method": "Inspect DOM / View Source",
-            "hint": "Check hidden span elements"
+            "hint": f"Check hidden span elements on {url_hint}"
         }
         
         print(f"✅ {self.mode.capitalize()} flag: {real_flag}")

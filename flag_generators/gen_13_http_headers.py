@@ -87,20 +87,16 @@ class HTTPHeaderFlagGenerator:
         }
 
     def clean_previous_data(self, challenge_folder: Path):
-        """Removes old artifacts to ensure a clean generation."""
         server_data_file = challenge_folder / ".server_data"
         if server_data_file.exists():
             try:
                 server_data_file.unlink()
-                # print(f"🗑️ Removed old server configuration.") 
             except Exception as e:
                 print(f"⚠️ Could not delete {server_data_file.name}: {e}", file=sys.stderr)
 
     def embed_data(self, challenge_folder: Path, real_flag: str, fake_flags: list):
         try:
             challenge_folder.mkdir(parents=True, exist_ok=True)
-            
-            # clean up both .server_data
             self.clean_previous_data(challenge_folder)
 
             all_flags = fake_flags + [real_flag]
@@ -108,28 +104,32 @@ class HTTPHeaderFlagGenerator:
 
             server_data = {}
 
-            # Generate data for 5 endpoints
+            # DISTINCT KEYS for Solo Mode
+            # Regular: endpoint_1 .. endpoint_5
+            # Solo:    channel_1 .. channel_5
+            key_prefix = "channel" if self.mode == "solo" else "endpoint"
+
             for i, flag in enumerate(all_flags, start=1):
-                endpoint_key = f"endpoint_{i}"
+                endpoint_key = f"{key_prefix}_{i}"
                 data = self.generate_endpoint_data(flag)
                 server_data[endpoint_key] = data
                 
                 if flag == real_flag:
                     print(f"✅ Flag hidden in {endpoint_key}")
 
-            # Obfuscate / Encode data so it's not readable in plain text
             json_str = json.dumps(server_data)
             b64_data = base64.b64encode(json_str.encode("utf-8")).decode("utf-8")
 
-            # Save to hidden file
             target_file = challenge_folder / ".server_data"
             target_file.write_text(b64_data)
-            print(f"💾 Saved web server configuration to {target_file.relative_to(self.project_root)}")
+            
+            # Update hint based on paths
+            url_example = "/covert/channel_X" if self.mode == "solo" else "/mystery/endpoint_X"
 
             self.metadata = {
                 "real_flag": real_flag,
                 "challenge_file": str(target_file.relative_to(self.project_root)),
-                "unlock_method": "Use curl -I to check headers of /mystery/endpoint_X",
+                "unlock_method": f"Use curl -I to check headers of {url_example}",
                 "hint": "Check X-Flag header"
             }
 

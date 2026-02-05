@@ -23,27 +23,8 @@ def check_web_server():
     except Exception:
         pass
 
-def create_intel_file():
-    """Creates a dummy intel file so the user has something to 'discover'."""
-    filename = "active_portals.txt"
-    content = (
-        "--- INTERNAL NETWORK CONFIG ---\n"
-        "Active Portals:\n"
-        "- alpha\n"
-        "- beta\n"
-        "- gamma\n"
-        "- delta\n"
-        "- omega\n"
-    )
-    # Only create if it doesn't exist to avoid overwriting user changes
-    if not os.path.exists(filename):
-        with open(filename, "w") as f:
-            f.write(content)
-
-def cleanup_intel_file():
+def cleanup_artifacts():
     """Removes the intel file on exit to leave no trace."""
-    if os.path.exists("active_portals.txt"):
-        os.remove("active_portals.txt")
     if os.path.exists("flag.txt"):
         os.remove("flag.txt")
 
@@ -53,8 +34,7 @@ def main():
     bot = Coach("Source Code Hunter (curl)")
     
     # Ensure fresh state
-    cleanup_intel_file()
-    create_intel_file()
+    cleanup_artifacts()
     
     bot.start()
 
@@ -71,34 +51,17 @@ def main():
             os.chdir(target_dir)
         # ======================
 
-        # STEP 2: Discovery (Recon)
+        # STEP 2: The Test (Curl one)
         bot.teach_step(
             instruction=(
-                "We need to know what to attack.\n"
-                "List the files. You should see an intel file named `active_portals.txt`."
-            ),
-            command_to_display="ls -l"
-        )
-
-        # STEP 3: Read Intel
-        bot.teach_step(
-            instruction=(
-                "Read `active_portals.txt` to find the names of the internal portals."
-            ),
-            command_to_display="cat active_portals.txt"
-        )
-
-        # STEP 4: The Test (Curl one)
-        bot.teach_step(
-            instruction=(
-                "The file lists 5 portals: `alpha`, `beta`, `gamma`, `delta`, and `omega`.\n"
+                "We have identified 5 portals: `alpha`, `beta`, `gamma`, `delta`, and `omega`.\n"
                 "To view their source code, we use `curl`.\n\n"
                 "Let's manually inspect the first one (`alpha`) to see what we are up against:"
             ),
             command_to_display="curl http://localhost:5000/internal/alpha"
         )
 
-        # STEP 5: Automation (Brace Expansion)
+        # STEP 3: Automation (Brace Expansion)
         bot.teach_step(
             instruction=(
                 "That was a mess of HTML. The flag is hidden in one of those 5 portals.\n"
@@ -109,7 +72,7 @@ def main():
             command_to_display="curl \"http://localhost:5000/internal/{alpha,beta,gamma,delta,omega}\""
         )
 
-        # STEP 6: Filter and Save
+        # STEP 4: Filter and Save
         bot.teach_loop(
             instruction=(
                 "We fetched them all! Now we filter the massive output:\n"
@@ -131,7 +94,7 @@ def main():
             clean_files=["flag.txt"]
         )
 
-        # STEP 7: Verify
+        # STEP 5: Verify
         bot.teach_step(
             instruction=(
                 "Success! You enumerated the targets, scanned them, and captured the flag.\n"
@@ -145,7 +108,7 @@ def main():
     except KeyboardInterrupt:
         bot.finish()
     finally:
-        cleanup_intel_file()
+        cleanup_artifacts()
 
 if __name__ == "__main__":
     main()

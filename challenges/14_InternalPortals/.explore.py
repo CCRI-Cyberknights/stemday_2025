@@ -10,7 +10,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'
 from exploration_core import Colors, header, pause, require_input, print_success, print_error, print_info, resize_terminal, clear_screen, spinner
 
 # === Config ===
-INTEL_FILE = "active_portals.txt"
+# No external file dependencies
 
 def get_path(filename):
     return os.path.join(os.path.dirname(__file__), filename)
@@ -111,12 +111,10 @@ def main():
     # 1. Setup
     resize_terminal(35, 90)
     check_web_server()
-    intel_path = get_path(INTEL_FILE)
 
     # 2. Mission Briefing
     header("🌐 Internal Portal Source Audit")
     
-    print(f"📄 Target List: {Colors.BOLD}{INTEL_FILE}{Colors.END}")
     print(f"🔧 Tool in use: {Colors.BOLD}curl{Colors.END}\n")
     print("🎯 Goal: Retrieve the raw HTML source code to find hidden comments or tags.\n")
     
@@ -130,23 +128,16 @@ def main():
 
     # 3. Recon
     header("🔍 Phase 1: Target Identification")
-    print(f"Reading {INTEL_FILE}...\n")
     
-    portals = []
-    if os.path.exists(intel_path):
-        with open(intel_path, "r") as f:
-            content = f.read()
-            print(f"{Colors.YELLOW}{content.strip()}{Colors.END}")
-            # Extract names (alpha, beta, etc) roughly
-            for line in content.splitlines():
-                if "-" in line:
-                    portals.append(line.split("-")[1].strip())
-    else:
-        # Fallback if file missing
-        print_error(f"{INTEL_FILE} missing. Generating default targets.")
-        portals = ["alpha", "beta", "gamma", "delta", "omega"]
+    # Hardcoded fallback since we removed the file reliance
+    portals = ["alpha", "beta", "gamma", "delta", "omega"]
 
-    print(f"\nWe have identified {len(portals)} targets.\n")
+    print(f"Scanning local configuration...\n")
+    print(f"We have identified {len(portals)} targets:")
+    for p in portals:
+        print(f" - {p}")
+    print("\n")
+    
     require_input("Type 'load' to prepare the curl tool: ", "load")
 
     # 4. Tool Explanation

@@ -23,25 +23,7 @@ def check_web_server():
     except Exception:
         pass
 
-def create_intel_file():
-    """Creates a dummy log file to reveal the endpoints."""
-    filename = "server_logs.txt"
-    content = (
-        "[INFO] Server started on port 5000\n"
-        "[INFO] Deployment successful.\n"
-        "[DEBUG] Active API Routes:\n"
-        " - /mystery/endpoint_1  (Status: Active)\n"
-        " - /mystery/endpoint_2  (Status: Active)\n"
-        " - /mystery/endpoint_3  (Status: Active)\n"
-        " - /mystery/endpoint_4  (Status: Active)\n"
-        " - /mystery/endpoint_5  (Status: Active)\n"
-    )
-    with open(filename, "w") as f:
-        f.write(content)
-
-def cleanup_intel_file():
-    if os.path.exists("server_logs.txt"):
-        os.remove("server_logs.txt")
+def cleanup_artifacts():
     if os.path.exists("flag.txt"):
         os.remove("flag.txt")
 
@@ -51,8 +33,7 @@ def main():
     bot = Coach("HTTP Header Detective (curl)")
     
     # Ensure fresh state
-    cleanup_intel_file()
-    create_intel_file()
+    cleanup_artifacts()
     
     bot.start()
 
@@ -71,34 +52,17 @@ def main():
             os.chdir(target_dir)
         # ======================
 
-        # STEP 2: Discovery (Recon)
+        # STEP 2: The Concept (Manual Test)
         bot.teach_step(
             instruction=(
-                "We need to find the API endpoints.\n"
-                "List the files. You should see `server_logs.txt`."
-            ),
-            command_to_display="ls -l"
-        )
-
-        # STEP 3: Read Logs
-        bot.teach_step(
-            instruction=(
-                "Read the log file to identify our targets."
-            ),
-            command_to_display="cat server_logs.txt"
-        )
-
-        # STEP 4: The Concept (Manual Test)
-        bot.teach_step(
-            instruction=(
-                "The logs show 5 endpoints (`endpoint_1` through `5`).\n"
+                "We have identified 5 endpoints (`endpoint_1` through `5`).\n"
                 "The flag is hidden in a custom **Header**.\n\n"
                 "Use `curl -I` (Fetch Headers Only) to inspect the first endpoint manually:"
             ),
             command_to_display="curl -I http://localhost:5000/mystery/endpoint_1"
         )
 
-        # STEP 5: Automation (Curl Sequencing)
+        # STEP 3: Automation (Curl Sequencing)
         bot.teach_step(
             instruction=(
                 "You checked one, but we need to check **all 5**.\n"
@@ -109,7 +73,7 @@ def main():
             command_to_display="curl -I \"http://localhost:5000/mystery/endpoint_[1-5]\""
         )
 
-        # STEP 6: Filter and Save
+        # STEP 4: Filter and Save
         bot.teach_loop(
             instruction=(
                 "We scanned the list! Now let's filter the noise.\n"
@@ -130,7 +94,7 @@ def main():
             clean_files=["flag.txt"]
         )
 
-        # STEP 7: Verify
+        # STEP 5: Verify
         bot.teach_step(
             instruction=(
                 "Success! You automated the scan and captured the flag.\n"
@@ -144,7 +108,7 @@ def main():
     except KeyboardInterrupt:
         bot.finish()
     finally:
-        cleanup_intel_file()
+        cleanup_artifacts()
 
 if __name__ == "__main__":
     main()

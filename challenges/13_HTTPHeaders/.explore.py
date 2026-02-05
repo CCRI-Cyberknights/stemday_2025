@@ -10,7 +10,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'
 from exploration_core import Colors, header, pause, require_input, print_success, print_error, print_info, resize_terminal, clear_screen, spinner
 
 # === Config ===
-LOG_FILE = "server_logs.txt"
+# No external file dependencies
 
 def get_path(filename):
     return os.path.join(os.path.dirname(__file__), filename)
@@ -96,12 +96,10 @@ def main():
     # 1. Setup
     resize_terminal(35, 90)
     check_web_server()
-    log_path = get_path(LOG_FILE)
 
     # 2. Mission Briefing
     header("📡 HTTP Header Interceptor")
     
-    print(f"📄 Log File: {Colors.BOLD}{LOG_FILE}{Colors.END}")
     print(f"🔧 Tool in use: {Colors.BOLD}curl -I{Colors.END}\n")
     print("🎯 Goal: Interrogate the active endpoints to find the hidden header.\n")
     
@@ -111,22 +109,17 @@ def main():
     print("   ➤ **The Lock:** The flag is hidden in a custom header (e.g., `X-Flag`).")
     print("   ➤ **The Tool:** `curl -I` fetches *only* the headers, skipping the body.\n")
     
-    require_input("Type 'ready' to read the intercepted logs: ", "ready")
+    require_input("Type 'ready' to proceed to reconnaissance: ", "ready")
 
     # 3. Discovery
     header("🔍 Phase 1: Reconnaissance")
-    print(f"Let's see which endpoints are active by reading {LOG_FILE}.\n")
+    print("Intelligence indicates there are 5 active targets on the local network:\n")
     
-    if os.path.exists(log_path):
-        print("-" * 50)
-        with open(log_path, "r") as f:
-            print(f"{Colors.YELLOW}{f.read().strip()}{Colors.END}")
-        print("-" * 50 + "\n")
-    else:
-        print_error(f"{LOG_FILE} missing. (The server might generate it automatically).")
-        print("We will assume endpoints 1 through 5 are active.")
+    targets = ["endpoint_1", "endpoint_2", "endpoint_3", "endpoint_4", "endpoint_5"]
+    for t in targets:
+        print(f"   - /mystery/{t}")
+    print("")
 
-    print("We have identified 5 targets: endpoint_1 through endpoint_5.\n")
     require_input("Type 'load' to power up the curl tool: ", "load")
 
     # 4. Tool Explanation

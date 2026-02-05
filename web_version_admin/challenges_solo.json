@@ -2,91 +2,91 @@
   "01_Stego": {
     "name": "Stego Decode",
     "folder": "01_Stego",
-    "flag": "CCRI-RZWX-7221"
+    "flag": "CCRI-IKRW-3417"
   },
   "02_Base64": {
     "name": "Base64 Decoder",
     "folder": "02_Base64",
-    "flag": "CCRI-XRFI-6455"
+    "flag": "CCRI-LYCI-7458"
   },
   "03_ROT13": {
     "name": "ROT13 Explorer",
     "folder": "03_ROT13",
-    "flag": "CCRI-TYHD-1291"
+    "flag": "CCRI-WFDN-1330"
   },
   "04_Vigenere": {
     "name": "Vigen\u00e8re Cipher",
     "folder": "04_Vigenere",
-    "flag": "CCRI-OVAP-2822"
+    "flag": "CCRI-LNAJ-1872"
   },
   "05_ArchivePassword": {
     "name": "Archive Password Cracker",
     "folder": "05_ArchivePassword",
-    "flag": "CCRI-RYQE-1193"
+    "flag": "CCRI-TPNW-7903"
   },
   "06_Hashcat": {
     "name": "Hashcat Challenge",
     "folder": "06_Hashcat",
-    "flag": "CCRI-PZMT-5997"
+    "flag": "CCRI-CNWQ-6014"
   },
   "07_ExtractBinary": {
     "name": "Extract from Binary",
     "folder": "07_ExtractBinary",
-    "flag": "CCRI-MFLY-1741"
+    "flag": "CCRI-UMSF-7053"
   },
   "08_FakeAuthLog": {
     "name": "Fake Auth Log",
     "folder": "08_FakeAuthLog",
-    "flag": "CCRI-NIEU-5555"
+    "flag": "CCRI-YECT-4119"
   },
   "09_FixScript": {
     "name": "Fix the Script",
     "folder": "09_FixScript",
-    "flag": "CCRI-SCRP-9614"
+    "flag": "CCRI-SCRP-2070"
   },
   "10_Metadata": {
     "name": "Metadata Explorer",
     "folder": "10_Metadata",
-    "flag": "CCRI-FAGS-3265"
+    "flag": "CCRI-KVBV-9374"
   },
   "11_HiddenFlag": {
     "name": "Hidden Flag Hunt",
     "folder": "11_HiddenFlag",
-    "flag": "CCRI-ESCX-6502"
+    "flag": "CCRI-GHZX-2846"
   },
   "12_QRCodes": {
     "name": "QR Codes Puzzle",
     "folder": "12_QRCodes",
-    "flag": "CCRI-UGJY-8045"
+    "flag": "CCRI-SVGB-0145"
   },
   "13_HTTPHeaders": {
     "name": "HTTP Headers Analysis",
     "folder": "13_HTTPHeaders",
-    "flag": "CCRI-RUKY-1328"
+    "flag": "CCRI-GTPM-6446"
   },
   "14_InternalPortals": {
     "name": "Internal Portals",
     "folder": "14_InternalPortals",
-    "flag": "CCRI-TBNO-6485"
+    "flag": "CCRI-OTGJ-5641"
   },
   "15_ProcessInspection": {
     "name": "Process Inspection",
     "folder": "15_ProcessInspection",
-    "flag": "CCRI-NVON-9868"
+    "flag": "CCRI-QUBC-9906"
   },
   "16_HexHunting": {
     "name": "Hex Hunting",
     "folder": "16_HexHunting",
-    "flag": "CCRI-VXZN-0470"
+    "flag": "CCRI-PZLZ-5398"
   },
   "17_NmapScanning": {
     "name": "Nmap Scanning",
     "folder": "17_NmapScanning",
-    "flag": "CCRI-LWUT-6974"
+    "flag": "CCRI-OODF-7185"
   },
   "18_PcapSearch": {
     "name": "Pcap Search",
     "folder": "18_PcapSearch",
-    "flag": "CCRI-HSQZ-8383"
+    "flag": "CCRI-AZVD-8387"
   }
 }

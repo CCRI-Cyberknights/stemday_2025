@@ -16,11 +16,16 @@ from utils import load_challenges
 bp = Blueprint('main', __name__, static_folder=config.static_folder, static_url_path='/static')
 
 # --- Helper to read HIDDEN/OBFUSCATED challenge files ---
-def get_challenge_server_data(challenge_id):
+def get_challenge_server_data(challenge_id, mode_override=None):
     """
     Locates the hidden .server_data file, base64 decodes it, and returns the JSON dict.
+    Allows forcing a specific mode (e.g. for unique Solo routes).
     """
-    mode = session.get("mode", config.DEFAULT_MODE if config.DEFAULT_MODE else "regular")
+    if mode_override:
+        mode = mode_override
+    else:
+        mode = session.get("mode", config.DEFAULT_MODE if config.DEFAULT_MODE else "regular")
+        
     try:
         challenge_list, _ = load_challenges(mode)
         # Ensure we pass the ID as a string exactly as it appears in challenges.json
@@ -33,7 +38,7 @@ def get_challenge_server_data(challenge_id):
                     decoded_json = base64.b64decode(encoded_content).decode('utf-8')
                     return json.loads(decoded_json)
     except Exception as e:
-        print(f"Error reading server data for challenge {challenge_id}: {e}")
+        print(f"Error reading server data for challenge {challenge_id} (Mode: {mode}): {e}")
     return None
 
 @bp.route('/')
@@ -65,14 +70,11 @@ def set_mode(mode):
     if mode not in ["regular", "solo"]:
         return "Invalid mode", 400
     if mode not in config.AVAILABLE_MODES:
-        # Graceful redirect to whatever exists
         if config.DEFAULT_MODE:
-            print(f"⚠️ Requested mode '{mode}' not available. Redirecting to {config.DEFAULT_MODE}.")
             session["mode"] = config.DEFAULT_MODE
             return redirect(url_for('main.index'))
         return "No challenges available in this build.", 404
     session["mode"] = mode
-    print(f"🌐 Mode set to: {mode.upper()}")
     return redirect(url_for('main.index'))
 
 @bp.route('/challenges')
@@ -85,18 +87,13 @@ def index():
     try:
         challenge_list, challenges_folder = load_challenges(mode)
     except Exception as e:
-        print(f"❌ ERROR loading challenges: {e}")
-        return render_template(
-            'error.html',
-            message="No challenges available in this build."
-        ), 404
+        return render_template('error.html', message="No challenges available in this build."), 404
 
     if config.base_mode == "admin":
         list_title = f"Admin {'Exploration' if mode == 'regular' else 'Solo'} Challenge List"
     else:
         list_title = f"Student {'Exploration' if mode == 'regular' else 'Solo'} Challenge List"
 
-    print(f"📄 Opening {list_title}...")
     return render_template('index.html',
                            challenges=challenge_list,
                            base_mode=config.base_mode,
@@ -131,7 +128,7 @@ def challenge_view(challenge_id):
 
     folder = selectedChallenge.getFolder()
     if not os.path.exists(folder):
-        # Try other mode's folder before 404
+         # Try other mode's folder before 404
         other = "solo" if mode == "regular" else "regular"
         if other in config.AVAILABLE_MODES:
             try:
@@ -163,11 +160,10 @@ def challenge_view(challenge_id):
         and f != "README.md"
         and not f.startswith(".")
         and (not f.endswith(".py") or f in visible_scripts)
-        and f != ".server_data" # Hide the secret server data file
+        and f != ".server_data" 
     ]
 
     template = "challenge_solo.html" if mode == "solo" else "challenge.html"
-    print(f"➡️ Opening {selectedChallenge.getName()} in {mode.upper()} mode.")
     return render_template(template,
                            challenge=selectedChallenge,
                            readme=readme_html,
@@ -192,10 +188,8 @@ def submit_flag(challenge_id):
     real_flag = selected_challenge.getFlag().strip()
 
     if submitted_flag == real_flag:
-        print(f"✅ Correct flag submitted for {challenge_id}")
         return jsonify({"status": "correct"})
     else:
-        print(f"❌ Incorrect flag submitted for {challenge_id}")
         return jsonify({"status": "incorrect"})
 
 @bp.route('/open_folder/<challenge_id>', methods=['POST'])
@@ -211,7 +205,6 @@ def open_folder(challenge_id):
         return jsonify({"status": "error", "message": "Challenge not found"}), 404
 
     folder_path = selectedChallenge.getFolder()
-    print(f"📂 Opening folder: {folder_path}")
     try:
         if sys.platform.startswith('linux'):
             subprocess.Popen(['xdg-open', folder_path])
@@ -241,19 +234,15 @@ def run_script(challenge_id):
         return jsonify({"status": "error", "message": "Challenge not found"}), 404
 
     script_path = selectedChallenge.getScript()
-    print(f"🚀 Running helper script: {script_path}")
-
     try:
         subprocess.Popen(['gnome-terminal', '--', 'python3', script_path])
         return jsonify({"status": "success", "message": "Helper script started"})
     except Exception as e:
         return jsonify({"status": "error", "message": f"Failed to run script: {e}"}), 500
 
-# NEW: Coach Mode Route
 @bp.route('/run_coach/<challenge_id>', methods=['POST'])
 def run_coach(challenge_id):
     mode = session.get("mode", config.DEFAULT_MODE if config.DEFAULT_MODE else "regular")
-    
     try:
         challenge_list, _ = load_challenges(mode)
     except Exception:
@@ -263,26 +252,20 @@ def run_coach(challenge_id):
     if selectedChallenge is None:
         return jsonify({"status": "error", "message": "Challenge not found"}), 404
 
-    # ⬇️ CHANGE IS HERE: Look for .coach.py instead of coach.py
     script_path = os.path.join(selectedChallenge.getFolder(), '.coach.py')
-    
     if not os.path.exists(script_path):
         return jsonify({"status": "error", "message": "Coach script not found for this challenge."}), 404
 
-    print(f"🎓 Launching Coach Mode: {script_path}")
-
     try:
-        # Launch mate-terminal (Parrot OS default) with GEOMETRY (Size + Left Position)
         subprocess.Popen([
             "mate-terminal",
-            "--geometry=90x35+50+100",  # <--- WINDOW POSITIONING
+            "--geometry=90x35+50+100",
             "--title=Coach Mode: " + selectedChallenge.getName(),
             "--",
             "python3", script_path
         ])
         return jsonify({"status": "success", "message": "Coach terminal launched"})
     except FileNotFoundError:
-        # Fallback to x-terminal-emulator if mate-terminal is missing
         try:
              subprocess.Popen([
                 "x-terminal-emulator",
@@ -293,7 +276,6 @@ def run_coach(challenge_id):
              return jsonify({"status": "error", "message": f"Terminal not found: {e}"}), 500
     except Exception as e:
         return jsonify({"status": "error", "message": f"Failed to run coach: {e}"}), 500
-
 
 @bp.route('/challenge/<challenge_id>/file/<path:filename>')
 def get_challenge_file(challenge_id, filename):
@@ -311,65 +293,76 @@ def get_challenge_file(challenge_id, filename):
     filepath = os.path.join(folder, filename)
     if not os.path.exists(filepath):
         return "File not found", 404
-
-    print(f"📂 Serving file '{filename}' for challenge {challenge_id}.")
     return send_from_directory(folder, filename)
 
 # ==========================================
 #  CHALLENGE 13: HTTP Headers Mystery
 # ==========================================
-def serve_header_challenge(index):
-    """
-    Reads hidden JSON data from .server_data and constructs the response.
-    """
-    # Use full ID "13_HTTPHeaders" to match challenges.json
-    data_map = get_challenge_server_data("13_HTTPHeaders")
-    endpoint_key = f"endpoint_{index}"
+
+# --- REGULAR MODE (Coach/Explore) ---
+# Uses /mystery/endpoint_X and keys "endpoint_X"
+def serve_header_challenge(index, mode_override=None, key_prefix="endpoint"):
+    data_map = get_challenge_server_data("13_HTTPHeaders", mode_override=mode_override)
+    endpoint_key = f"{key_prefix}_{index}"
 
     if not data_map or endpoint_key not in data_map:
-        return make_response("System Error: Challenge data not generated yet. Run generation script.", 404)
+        return make_response("System Error: Challenge data missing or invalid mode.", 404)
 
     data = data_map[endpoint_key]
-    
     resp = make_response(data.get("body", ""), data.get("status_code", 200))
-    
     for k, v in data.get("headers", {}).items():
         resp.headers[k] = v
-        
     return resp
 
 @bp.route('/mystery/endpoint_1')
-def header_mystery_1(): return serve_header_challenge(1)
-
+def header_mystery_1(): return serve_header_challenge(1, mode_override="regular")
 @bp.route('/mystery/endpoint_2')
-def header_mystery_2(): return serve_header_challenge(2)
-
+def header_mystery_2(): return serve_header_challenge(2, mode_override="regular")
 @bp.route('/mystery/endpoint_3')
-def header_mystery_3(): return serve_header_challenge(3)
-
+def header_mystery_3(): return serve_header_challenge(3, mode_override="regular")
 @bp.route('/mystery/endpoint_4')
-def header_mystery_4(): return serve_header_challenge(4)
-
+def header_mystery_4(): return serve_header_challenge(4, mode_override="regular")
 @bp.route('/mystery/endpoint_5')
-def header_mystery_5(): return serve_header_challenge(5)
+def header_mystery_5(): return serve_header_challenge(5, mode_override="regular")
+
+# --- SOLO MODE ---
+# Uses /covert/channel_X and keys "channel_X"
+@bp.route('/covert/channel_1')
+def solo_header_mystery_1(): return serve_header_challenge(1, mode_override="solo", key_prefix="channel")
+@bp.route('/covert/channel_2')
+def solo_header_mystery_2(): return serve_header_challenge(2, mode_override="solo", key_prefix="channel")
+@bp.route('/covert/channel_3')
+def solo_header_mystery_3(): return serve_header_challenge(3, mode_override="solo", key_prefix="channel")
+@bp.route('/covert/channel_4')
+def solo_header_mystery_4(): return serve_header_challenge(4, mode_override="solo", key_prefix="channel")
+@bp.route('/covert/channel_5')
+def solo_header_mystery_5(): return serve_header_challenge(5, mode_override="solo", key_prefix="channel")
 
 
 # ==========================================
 #  CHALLENGE 14: Internal Portals
 # ==========================================
+
+# --- REGULAR MODE (Coach/Explore) ---
+# Uses /internal/<site_name>
 @bp.route('/internal/<site_name>')
 def internal_sites(site_name):
-    """
-    Reads hidden JSON data and serves the specific HTML string.
-    """
     site_name = site_name.lower()
-    # Use full ID "14_InternalPortals" to match challenges.json
-    data_map = get_challenge_server_data("14_InternalPortals")
-    
+    data_map = get_challenge_server_data("14_InternalPortals", mode_override="regular")
     if data_map and site_name in data_map:
         return data_map[site_name]
-    
     return "404 - Site Not Found", 404
+
+# --- SOLO MODE ---
+# Uses /private/<site_name>
+@bp.route('/private/<site_name>')
+def solo_internal_sites(site_name):
+    site_name = site_name.lower()
+    # Force load from Solo data
+    data_map = get_challenge_server_data("14_InternalPortals", mode_override="solo")
+    if data_map and site_name in data_map:
+        return data_map[site_name]
+    return "404 - Restricted Sector Not Found", 404
 
 @bp.route("/linux-basics")
 def linux_basics():
@@ -377,16 +370,7 @@ def linux_basics():
 
 @bp.route('/healthz')
 def healthz():
-    """
-    Detailed health check for debugging and environment verification.
-    """
     return jsonify({
-        "available_modes": config.AVAILABLE_MODES,
-        "default_mode": config.DEFAULT_MODE,
-        "guided_present": os.path.isdir(config.GUIDED_DIR),
-        "solo_present": os.path.isdir(config.SOLO_DIR),
-        "server_dir": config.server_dir,
-        "base_dir": config.BASE_DIR,
-        "assets_env": os.environ.get("CCRI_ASSETS_DIR"),
-        "argv0": sys.argv[0],
+        "status": "ok",
+        "mode": session.get("mode", "unknown")
     })
