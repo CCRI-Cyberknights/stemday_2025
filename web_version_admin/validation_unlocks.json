@@ -1,63 +1,63 @@
 {
   "01_Stego": {
-    "real_flag": "CCRI-BHQP-4497",
+    "real_flag": "CCRI-HYLC-5874",
     "challenge_file": "challenges/01_Stego/squirrel.jpg",
     "unlock_method": "steghide extract -sf squirrel.jpg -p <password>",
     "hint": "Use: steghide extract -sf squirrel.jpg -p password",
     "last_password": "password",
     "fake_flags": [
-      "GHGP-WDBY-7970",
-      "RUBR-4709-MPYB",
-      "HPVO-7458-WMHV",
-      "MUDM-FKMJ-0674"
+      "IABF-VFGU-2479",
+      "MLWX-OLDC-3735",
+      "NAHL-WUKE-9657",
+      "NFAB-HLXH-3898"
     ]
   },
   "02_Base64": {
-    "real_flag": "CCRI-RRHV-4335",
+    "real_flag": "CCRI-WSNU-8773",
     "challenge_file": "challenges/02_Base64/encoded.txt",
     "unlock_method": "Base64 decode",
     "hint": "Decode encoded.txt using base64 -d or an online tool."
   },
   "03_ROT13": {
-    "real_flag": "CCRI-ZDOE-6620",
+    "real_flag": "CCRI-FJLU-9964",
     "challenge_file": "challenges/03_ROT13/cipher.txt",
     "unlock_method": "ROT13 decode",
     "hint": "Apply ROT13 to cipher.txt to recover plaintext."
   },
   "04_Vigenere": {
-    "real_flag": "CCRI-VUUO-9264",
+    "real_flag": "CCRI-NVCF-0644",
     "vigenere_key": "login",
     "challenge_file": "challenges/04_Vigenere/cipher.txt",
     "unlock_method": "Vigen\u00e8re cipher (key='login')",
     "hint": "Use the Vigen\u00e8re key 'login' to decrypt cipher.txt."
   },
   "05_ArchivePassword": {
-    "real_flag": "CCRI-USXM-8135",
-    "last_zip_password": "abcd123",
+    "real_flag": "CCRI-NHUP-5897",
+    "last_zip_password": "123456",
     "challenge_file": "challenges/05_ArchivePassword/secret.zip",
     "wordlist_file": "challenges/05_ArchivePassword/wordlist.txt",
     "unlock_method": "Brute-force ZIP password using provided wordlist",
     "hint": "Use wordlist.txt with zip2john + hashcat or fcrackzip."
   },
   "06_Hashcat": {
-    "real_flag": "CCRI-XHKR-2602",
-    "reconstructed_flag": "CCRI-XHKR-2602",
+    "real_flag": "CCRI-WHJD-4092",
+    "reconstructed_flag": "CCRI-WHJD-4092",
     "challenge_files": {
       "hashes": "challenges/06_Hashcat/hashes.txt",
       "wordlist": "challenges/06_Hashcat/wordlist.txt",
       "segments_dir": "challenges/06_Hashcat/segments"
     },
     "hash_password_zip_map": {
-      "482652ada89da8459ab6099b40ab3a1d": {
-        "password": "complex2",
+      "133987b0b6ad0c01fc0ccbdae1b95449": {
+        "password": "Welcome123",
         "zip_file": "challenges/06_Hashcat/segments/part1.zip"
       },
-      "93f7e83546b7f0e1bd47219ea653bc61": {
-        "password": "Spring2013",
+      "2205ce927bae9d2694fac345478efb4b": {
+        "password": "sql2010",
         "zip_file": "challenges/06_Hashcat/segments/part2.zip"
       },
-      "8b2fee48cd255fddee9a662b55da4fd4": {
-        "password": "secret12",
+      "e6e66b8981c1030d5650da159e79539a": {
+        "password": "calvin",
         "zip_file": "challenges/06_Hashcat/segments/part3.zip"
       }
     },
@@ -65,76 +65,76 @@
     "hint": "Use hashes.txt + wordlist.txt with Hashcat to crack passwords and extract ZIPs."
   },
   "07_ExtractBinary": {
-    "real_flag": "CCRI-QAHJ-6802",
+    "real_flag": "CCRI-TWDT-9677",
     "challenge_file": "challenges/07_ExtractBinary/hidden_flag",
     "unlock_method": "Analyze binary with strings or disassembler to find flags",
     "hint": "Try using 'strings hidden_flag' or load it in radare2."
   },
   "08_FakeAuthLog": {
-    "real_flag": "CCRI-GZAE-3390",
-    "reconstructed_flag": "CCRI-GZAE-3390",
+    "real_flag": "CCRI-VIRJ-8210",
+    "reconstructed_flag": "CCRI-VIRJ-8210",
     "challenge_file": "challenges/08_FakeAuthLog/auth.log",
     "unlock_method": "Inspect auth.log for embedded flag in sshd PIDs",
     "hint": "Look for unusual process IDs in auth.log to spot the flag."
   },
   "09_FixScript": {
-    "real_flag": "CCRI-SCRP-5759",
-    "correct_operator": "+",
+    "real_flag": "CCRI-SCRP-4410",
+    "correct_operator": "*",
     "challenge_file": "challenges/09_FixScript/broken_flag.py",
     "unlock_method": "Fix the Python script\u2019s math operator to calculate the flag",
-    "hint": "Find the broken operator in broken_flag.py and replace it with '+'."
+    "hint": "Find the broken operator in broken_flag.py and replace it with '*'."
   },
   "10_Metadata": {
-    "real_flag": "CCRI-SGFG-8377",
+    "real_flag": "CCRI-ZPBI-0746",
     "challenge_file": "challenges/10_Metadata/capybara.jpg",
     "unlock_method": "Inspect EXIF metadata of capybara.jpg to find the flag",
     "hint": "Use exiftool or exifread to view metadata tags."
   },
   "11_HiddenFlag": {
-    "real_flag": "CCRI-HLZK-2387",
+    "real_flag": "CCRI-GKKR-4099",
     "challenge_folder": "challenges/11_HiddenFlag/junk",
     "unlock_method": "Search recursively for the flag in hidden files",
     "hint": "Use grep -R or find/strings to locate the flag in junk/"
   },
   "12_QRCodes": {
-    "real_flag": "CCRI-NXCB-6314",
+    "real_flag": "CCRI-UHFE-1172",
     "challenge_folder": "challenges/12_QRCodes",
     "unlock_method": "Scan QR codes to reveal flags and find the real one",
     "hint": "Use a QR scanner app or zbarimg to read qr_*.png"
   },
   "13_HTTPHeaders": {
-    "real_flag": "CCRI-RRYG-2065",
+    "real_flag": "CCRI-OYKA-0217",
     "challenge_file": "challenges/13_HTTPHeaders/.server_data",
     "unlock_method": "Use curl -I to check headers of /mystery/endpoint_X",
     "hint": "Check X-Flag header"
   },
   "14_InternalPortals": {
-    "real_flag": "CCRI-MLAY-2647",
+    "real_flag": "CCRI-RXOA-9491",
     "challenge_folder": "/home/ccri_admin/Desktop/stemday_2025/challenges/14_InternalPortals",
     "unlock_method": "Inspect DOM / View Source",
     "hint": "Check hidden span elements on alpha/beta/..."
   },
   "15_ProcessInspection": {
-    "real_flag": "CCRI-FMII-3572",
+    "real_flag": "CCRI-JAIB-1984",
     "challenge_file": "challenges/15_ProcessInspection/ps_dump.txt",
     "unlock_method": "Inspect ps_dump.txt for flags embedded in process commands",
     "hint": "Use grep to search for flags in ps_dump.txt"
   },
   "16_HexHunting": {
-    "real_flag": "CCRI-XEHJ-0824",
+    "real_flag": "CCRI-IXHY-8814",
     "challenge_file": "challenges/16_HexHunting/hex_flag.bin",
     "unlock_method": "Inspect hex_flag.bin with a hex editor or strings command to locate the flag",
     "hint": "Try running 'strings hex_flag.bin' or open it in a hex editor like bless or GHex."
   },
   "17_NmapScanning": {
-    "real_flag": "CCRI-HPWG-2471",
-    "real_port": 8008,
+    "real_flag": "CCRI-UWKT-1905",
+    "real_port": 8085,
     "server_file": "web_version_admin/fake_services.py",
-    "unlock_method": "Scan ports 8000\u20138099 and query HTTP endpoints to locate the real flag (port 8008)",
+    "unlock_method": "Scan ports 8000\u20138099 and query HTTP endpoints to locate the real flag (port 8085)",
     "hint": "Use nmap -p8000-8099 localhost to discover ports and curl to check flags."
   },
   "18_PcapSearch": {
-    "real_flag": "CCRI-MNET-0432",
+    "real_flag": "CCRI-XYYJ-7162",
     "challenge_file": "challenges/18_PcapSearch/traffic.pcap",
     "unlock_method": "Analyze traffic.pcap for flags in HTTP headers using Wireshark or tshark",
     "hint": "Filter for HTTP headers (e.g., `http.header`) or grep for `X-Flag:`"
