@@ -1,3 +1,5 @@
+Due to the rolling update nature of Parrot OS, since they are on 7.1 as of writing and this is a 6.4 project, downloading proper dependancies is a bit broken, as the newest downloads expect the latest version of things. Therefore I am archiving this as supporting such a version change is out of scope of this project. Feel free to fork and attempt an update process.
+
 # 🌟 `stemday_2025` Project README (Admin-Only)
 
 Welcome to the **CCRI CyberKnights STEM Day VM Project!** 🎉
